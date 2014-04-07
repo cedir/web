@@ -8,6 +8,13 @@
 		</div>
 	    {% endfor %}
     </div>
+    <div class="line medicoLine" style="position:relative;">
+	    {% for disp in disponibilidades %}
+		<div class ="disponibilidad" style="background-color:{{ disp.color }};position:absolute;top:{{ disp.top }}px;height:{{ disp.duracionEnPixeles }}px;" title="Medico: {{ disp.medico }} ">
+			<span class="nombreMedico">{{ disp.sala}}</span>
+		</div>
+	    {% endfor %}
+    </div>
     <div class="line timeLine">
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','07:00');"><strong>07:00-</strong></div>
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','07:15');">07:15-</div>
@@ -62,7 +69,7 @@
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','19:30');">19:30-</div>
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','19:45');">19:45-</div>
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','20:00');"><strong>20:00-</strong></div>
-	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','20:15');">20:15-</div>
+	    <!--<div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','20:15');">20:15-</div>
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','20:30');">20:30-</div>
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','20:45');">20:45-</div>
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','21:00');"><strong>21:00-</strong></div>
@@ -76,7 +83,7 @@
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','23:00');"><strong>23:00-</strong></div>
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','23:15');">23:15-</div>
 	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','23:30');">23:30-</div>
-	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','23:45');">23:45-</div>
+	    <div class="time" onclick="javascript: getConfirmarTurno('{{fechaTurno}}','23:45');">23:45-</div>-->
     </div>
     <div class="line dayLine" style="position:relative;">
 	    {% for turno in turnos %}

@@ -177,7 +177,7 @@ a:hover, a:active {
 }
 /**********************Asignar turno*********************/
 .line{
-    height:1360px;
+    height:1071px;
 }
 .timeLine{
     width:50px;
@@ -185,7 +185,7 @@ a:hover, a:active {
     float:left;
 }
 .dayLine{
-    width:152px;
+    width:138px;
     background-color:#FAF0E6;
     float:left;
 
@@ -202,7 +202,7 @@ a:hover, a:active {
 }
 .turno{
     height:100px;
-    width:145px;
+    width:131px;
     border: #667F66 2px solid;
     font-size:13px;
     padding-top:3px;

@@ -1,61 +1,58 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Cedir - Gestor de turnos</title>
+        <link rel="stylesheet" type="text/css" href="/css/layout.css"/>
+        <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="/js/turno.js"></script>
+    </head>
+    <body>
+        <div id="wrapper">
 
+          <div id="header">
+            <div>
+              <div style="display:block;float:left;cursor:pointer;margin-top:2px;" onclick="location.href='/app/?controlador=Root&accion=getHome'">
+            <img  src="/images/turnos/cedirLogoMinMin.jpg" alt="Logo de Cedir" />
+            <img  src="/images/turnos/cedirNombre_descripcionMed.jpg" alt="Logo de Cedir" style="height:45px;"/>
+              </div>
+              <div id="user-tools">Bienvenido/a,<strong> {{logged_user_name}}</strong>. <a href="#">Cambiar contrase&ntilde;a</a> / <a href="/app/?controlador=Root&accion=logout">Salir</a></div>
+            </div>
+            <ul class="topnav">
+              <li>
+              <a href="#">Pacientes</a>
+              <span></span>
+              <ul class="subnav">
+                  <li><a href="/app/?controlador=Pacientes&accion=getCreate">Nuevo</a></li>
+                  <li><a href="/app/?controlador=Pacientes&accion=getBuscar">Buscar</a></li>
+              </ul>
+              </li>
+              <li>
+              <a href="#">Turnos</a>
+              <span></span>
+              <ul class="subnav">
+                  <li><a href="/app/?controlador=Turnos&accion=getTurnosDisponibles">Nuevo</a></li>
+                  <li><a href="/app/?controlador=Turnos&accion=getBuscarTurnos">Buscar</a></li>
+              </ul>
+              </li>
+              <li>
+              <a href="#">Medicos</a>
+              <span></span>
+              <ul class="subnav">
+                  <li><a href="/app/?controlador=Root&accion=getDisponibilidadMedicos">Horarios de atenci&oacute;n</a></li>
+              </ul>
+              </li>
+            </ul>
+            <div class="clear"></div>
+          </div>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" >
-<head>
-    <title>Cedir - Gestor de turnos</title>
-    <link rel="stylesheet" type="text/css" href="/css/layout.css"/>
-    <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="/js/turno.js"></script>
-</head>
-<body>
-<div id="wrapper">
+          <div id="content">
+            {% block content %}{% endblock %}
+          </div>
 
-  <div id="header">
-    <div>
-      <div style="display:block;float:left;cursor:pointer;margin-top:2px;" onclick="location.href='/app/?controlador=Root&accion=getHome'">
-	<img  src="/images/turnos/cedirLogoMinMin.jpg" alt="Logo de Cedir" />
-	<img  src="/images/turnos/cedirNombre_descripcionMed.jpg" alt="Logo de Cedir" style="height:45px;"/>
-      </div>
-      <div id="user-tools">Bienvenido/a,<strong> {{logged_user_name}}</strong>. <a href="#">Cambiar contrase&ntilde;a</a> / <a href="/app/?controlador=Root&accion=logout">Salir</a></div>
-    </div>
-    <ul class="topnav">  
-      <li>  
-	  <a href="#">Pacientes</a>
-	  <span></span>
-	  <ul class="subnav">  
-	      <li><a href="/app/?controlador=Pacientes&accion=getCreate">Nuevo</a></li>  
-	      <li><a href="/app/?controlador=Pacientes&accion=getBuscar">Buscar</a></li>  
-	  </ul>  
-      </li>
-      <li>  
-	  <a href="#">Turnos</a>
-	  <span></span> 
-	  <ul class="subnav">  
-	      <li><a href="/app/?controlador=Turnos&accion=getTurnosDisponibles">Nuevo</a></li>  
-	      <li><a href="/app/?controlador=Turnos&accion=getBuscarTurnos">Buscar</a></li>  
-	  </ul>  
-      </li>
-      <li>  
-	  <a href="#">Medicos</a>
-	  <span></span> 
-	  <ul class="subnav">  
-	      <li><a href="/app/?controlador=Root&accion=getDisponibilidadMedicos">Horarios de atenci&oacute;n</a></li>   
-	  </ul>  
-      </li>
-    </ul>  
-    <div class="clear"></div>
-  </div>
-
-  <div id="content">
-    {% block content %}{% endblock %}
-  </div>
-
-  <div id="footer">
-    Cedir - Centro de Endoscop&iacute;as Digestivas de Rosario
-  </div>
-
-</div>
-</body>
+          <div id="footer">
+            Cedir - Centro de Endoscop&iacute;as Digestivas de Rosario
+          </div>
+        </div>
+    </body>
 </html>
 

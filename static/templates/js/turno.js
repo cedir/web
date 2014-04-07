@@ -174,18 +174,22 @@ function save() {
 
       },
       error: function(response,err) {
-	  alert("Error en el servidor: " + err);
+	    alert("Error en el servidor: " + err);
       }
     });
 }
 
 function getVerPlanilla(){
-  var idSala = $("#id-sala").val();
-  if(!idSala){
-    alert("Debe seleccionar una sala para poder ver la planilla de turnos");
-    return;
-  }
-  $("#ver-planilla").submit();
+    var idSala = $("#id-sala").val();
+    var idPracticas = $("#id-practicas").val();
+    var idMedico = $("#id-medico").val();
+    if(!idSala){
+        if (!idMedico || !idPracticas){
+            alert("Debe seleccionar una sala, o bien un medico y las practicas para visualizar la planilla.");
+            return;
+        }
+    }
+    $("#ver-planilla").submit();
 }
 
 function getEdit(idTurno){
