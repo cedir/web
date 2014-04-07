@@ -1,0 +1,66 @@
+{% extends "turnos/base.html" %}
+
+{% block content %}
+<link href="/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/jquery-ui-1.8.1.custom.min.js"></script>
+<script type="text/javascript" src="/js/jquery.ui.datepicker-es.js"></script>
+<script>
+$(document).ready(function() {
+
+  var hush = $.datepicker.regional['es'];
+  hush['appendText'] = '(dd/mm/aaaa)';
+  $("#txtFechaNacimiento").datepicker(hush);
+
+});
+</script>
+<div class="module">
+    <h3>Datos Personales</h3>
+    <form id="form1" name="form1" action="/app/"  method="post">
+      <input type="hidden" name="controlador" value="Pacientes" />
+      <input type="hidden" name="accion" value="crear" />
+			<input type="hidden" name="id" id="id" value="{{id}}" />
+
+      <div class="form-row">
+	  <label>Nombre:</label><input type="text" id="txtNombre" name="txtNombre" value="{{nombre}}" />
+      </div>
+      <div class="form-row">
+	  <label>Apellido:</label><input type="text" id="txtApellido" name="txtApellido" value="{{apellido}}"  />
+      </div>
+      <div class="form-row">
+	  <label>Documento:</label><input type="text" id="txtDni" name="txtDni" value="{{dni}}" />    
+      </div>
+      <div class="form-row">
+	  <label>Fecha de Nacimiento:</label><input type="text" name="txtFechaNacimiento" id="txtFechaNacimiento" value="{{fechaNacimiento}}" >    
+      </div>
+      <div class="form-row">
+	  <label>Sexo:</label>
+	  <select name="txtSexo" id="txtSexo">
+	      <option value="">Selecione..</option>
+	      <option value="Femenino">Femenino</option>
+	      <option value="Masculino">Masculino</option>		                  
+          </select>
+      </div>
+      <div class="form-row">
+	  <label>Domicilio:</label><input type="text" name="txtDomicilio" id="txtDomicilio" value="{{domicilio}}"> 
+      </div>
+      <div class="form-row">
+	  <label>Teléfono:</label><input type="text" id="txtTelefono" name="txtTelefono" value="{{telefono}}">    
+      </div>
+
+      {% if isCreate %}
+      <div class="form-row">
+	  <input id="btnAceptar" type="button" value="Guardar" class="botones" onclick="createPaciente(false);" />
+	  <input id="btnGuardarCrear" type="button" value="Guardar y crear turno" class="botones" onclick="createPaciente(true);" />
+      </div>
+      {% else %}
+      <div class="form-row">
+	  <input id="btnAceptar" type="button" value="Guardar" class="botones" onclick="updatePaciente();" />
+      </div>
+      {% endif %}
+</form>
+
+
+  </div>
+{% endblock %}
+     
+  

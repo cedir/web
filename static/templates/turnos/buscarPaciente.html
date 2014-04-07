@@ -1,0 +1,90 @@
+{% extends "turnos/base.html" %}
+
+{% block content %}
+<link href="/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/js/jquery-ui-1.8.1.custom.min.js"></script>
+
+<script type="text/javascript">
+// <!CDATA[
+
+function btbNuevoPaciente_onclick(){
+location.href = "/app/?controlador=Pacientes&accion=getCreate";
+
+}
+
+
+
+		$(function(){
+			$('tbody tr').hover(
+				function(){ $('td', this).addClass('ui-grid-state-hover');},
+				function(){ $('td', this).removeClass('ui-grid-state-hover');}
+			)
+// 			.toggle(
+// 				function(){ $('td', this).addClass('ui-state-highlight');},
+// 				function(){ $('td', this).removeClass('ui-state-highlight');}
+// 			);
+		});
+
+
+
+
+// ]]>
+</script>
+
+
+<div class="module">
+  <h3>Buscar paciente</h3>
+  <form name='frmBuscar' action="/app/"  >
+    <input type="hidden" name="controlador" value="Pacientes" />
+    <input type="hidden" name="accion" value="getBuscar" />
+    <div class="form-row"><label>Apellido:</label><input type="text" name="apellido" value="{{apellido}}"/></div>
+    <div class="form-row"><label>Nombre:</label><input type="text" name="nombre" value="{{nombre}}"/></div>
+    <div class="form-row"><label>Documento:</label><input type="text" name="dni" value="{{dni}}"/><input type= "submit" name="Buscar" value="Buscar" /></div>
+  </form>
+</div>
+
+
+
+<div class="ui-grid ui-widget ui-widget-content ui-corner-all">
+      <!--<div class="ui-grid-header ui-widget-header ui-corner-top">Pacientes encontrados</div> -->
+      <table class="ui-grid-content ui-widget-content">
+	  <thead>
+	      <tr>
+		      <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Dni</a></th>
+		      <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Apellido y Nombre</a></th>
+		      <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Domicilio</a></th>
+		      <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Teléfono</a></th>
+		      <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Acción</a></th>
+	      </tr>
+	  </thead>
+	  <tbody>
+	      {% for hshPaciente in pacientes %}
+	      <tr class="ui-widget-content">
+		  <td>{{ hshPaciente.dni }}</td>
+		  <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshPaciente.id }}">{{ hshPaciente.apellido }}, {{ hshPaciente.nombre }} </a></td>
+		  <td>{{ hshPaciente.domicilio }}</td>
+		  <td>{{ hshPaciente.telefono }}</td>
+		  <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshPaciente.id }}">Modificar</a>&nbsp;|&nbsp;<a href="/app/?controlador=Turnos&accion=getTurnosDisponibles&id-paciente={{ hshPaciente.id }}">Nuevo turno</a></td>
+	      </tr>
+	      {% endfor %}
+	  </tbody>
+      </table>
+      <div class="ui-grid-footer ui-widget-header ui-corner-bottom ui-helper-clearfix">
+	      <div class="ui-grid-paging ui-helper-clearfix">
+		      <a href="?results=1" class="ui-grid-paging-prev ui-state-default ui-corner-left"><span class="ui-icon ui-icon-triangle-1-w" title="previous set of results"></span></a>
+		      <a href="?results=3" class="ui-grid-paging-next ui-state-default ui-corner-right"><span class="ui-icon ui-icon-triangle-1-e" title="next set of results"></span></a>
+
+	      </div>
+	      <div class="ui-grid-results">Mostrando solo los primeros 25 resultados</div>
+      </div>
+      <input id="btbNuevoPaciente" type="button" value="Nuevo Paciente" onclick="return btbNuevoPaciente_onclick()" />
+</div>
+
+
+
+
+
+      
+{% endblock %}
+     
+  

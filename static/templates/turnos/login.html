@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Bienvenidos al sistema de gesti&oacute;n de turnos del Cedir.</title>
+<style>
+  .centerDiv
+ {
+  position: absolute;
+  margin: auto;
+  padding: 12px;
+  top:50%;
+  left:35%;
+ }
+</style>
+<!--<script type="text/javascript" src="..\js\cedir.js"></script> -->
+</head>
+
+<body>
+		
+    <form id="form1" name="form1" runat="server" action="/app/"  method="post" style="position:relative;">
+      <input type="hidden" name="controlador" value="Root">
+      <input type="hidden" name="accion" value="login">
+
+    <div class="centerDiv">
+    <table style="width:100px; height:100px; background-color:ButtonFace;" >       
+	  
+          <tr>
+            <td colspan="2" align="center"> <img src="/images/turnos/logo-loguin.png" alt="logo"  /></td>
+          </tr>
+          
+            <tr>
+                <td align="right" style="width:314px; height: 27px;" >Nombre de Usuario</td>
+                <td align="left" style="width:305px; height: 27px;" ><input type="text" name="txtNomUsuario" id="txtNomUsuario"></input></td>
+            </tr>
+            <tr>
+                <td align="right" style="width: 314px; height: 27px;" >Contraseña: </td>
+                <td align="left" style="width: 305px; height: 27px;" ><input type="password" name="txtPassword" id="txtPassword""></input></td>
+             </tr>
+             <tr>
+
+                <td align="right" style="width: 314px; height: 27px;" ><input type="submit" name="btnAceptar" value="Aceptar"> </td>
+                <td align="left" style="width: 305px; height: 27px;"><span id="error-text" style="font-size: 11px;color: red;{% if error_message %} display:block; {% else %} display:none; {% endif %}">{{error_message}}</span></td>
+             </tr>
+             <!--
+	     <tr>
+                <td colspan="2" align="center" style="height: 27px"><a href="#"> Olvide mi contraseña</a></td>
+             </tr>
+	     -->
+           
+		</table>
+      </div>
+    </form>
+</body>
+</html>

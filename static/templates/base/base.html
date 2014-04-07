@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head profile="http://www.w3.org/2005/10/profile">
+	{% block meta_tags %}
+	  <title>{% if page_title %}{{page_title}} - Cedir {% else %}Cedir - Videoscopia - balon gastrico - endoscopia{% endif %}</title>
+	  <META NAME="Title" CONTENT="Cedir - Videoscopia - balon gastrico - endoscopia" />
+	  <META NAME="Description" CONTENT="Centro especializado en endoscopia digestiva. La mas alta tecnologia y los mejores profesionales en gastroenterologia." />
+	  <META NAME="Keywords" CONTENT="balon gastrico, endoscopia, gastroenterologia, gastroenterologo, videoscopia,ideoendoscopia, endocapsula, colangiografia" />
+	{% endblock %}
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<META NAME="Author" CONTENT="Cedir" />
+	<META NAME="Subject" CONTENT="{% if page_title %}{{page_title}} - Cedir {% else %}Cedir - Videoscopia, balon gastrico y endoscopia{% endif %}" />
+	<META NAME="Generator" CONTENT="Quanta" />
+	<META NAME="Language" CONTENT="Spanish" />
+	<META NAME="Revisit" CONTENT="1 day" />
+	<META NAME="Distribution" CONTENT="Global" />
+	<META NAME="Robots" CONTENT="All" />
+	<link href="/css/enlaces.css" rel="stylesheet" type="text/css" />
+	<link rel="icon" type="image/png" href="/images/favicon.png" />
+	<meta name="verify-v1" content="KhvlXh6lnrR6fxu1gKrXrLNA9vZZVb+r0WLtSXX+95U=" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+	<script type="text/javascript" src="http://www.jquery4u.com/demos/jquery-quick-pagination/js/jquery.quick.pagination.min.js"></script>
+	
+			
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$("ul.pagination").quickPagination({pagerLocation:"both",pageSize:"70"});
+	});
+	</script>
+		
+</head>
+
+<body>
+
+<div class="main dt">
+	<div class="dr">
+		<div class="dc">
+			<div class="dt">
+				<div class="dr">
+				
+				
+				
+					<div class="dc">
+						<div class="flash " >
+							{% include 'includes/encabezado.html' %}
+						</div>
+
+						<!--e-->
+						<div class="dt" style=" height:22px;"><img src="/images/spacer.gif" width="1" height="1" alt=""></div>	
+						<!--/e-->
+						
+						<!--c-->
+						<div class="content_0 dt">
+							{% block content %}
+							 <!--include default content here-->
+							{% endblock %}
+						</div>
+						<!--/c-->
+					
+						<div class="dt" style="height:10px;"><img src="/images/spacer.gif" width="1" height="1" alt=""></div>
+						<div class="dt" style="height:1px; width:100%; background:#E9E9E9"><img src="/images/spacer.gif" width="1" height="1" alt=""></div>
+					
+
+						<div class="dt footer" align="center" style=" height:123px;text-align:center;width:100%;margin-left:0px;margin-top:20px;" >
+							{% include 'includes/pie.html' %}
+						</div>
+
+				
+					</div>
+				
+				
+				
+				
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">_uacct = "UA-3656043-1"; urchinTracker();</script>
+</body>
+</html>

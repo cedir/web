@@ -1,0 +1,315 @@
+/* css Cedir - Centro de Endoscopia digestiva de Rosario */
+
+
+
+/* basic elements */
+html {
+	margin: 0;
+	padding: 0;
+	}
+body { 
+    font-family:normal Arial,Helvetica,sans-serif;
+    font-size:10px;
+    font-size-adjust:none;
+    font-style:normal;
+    font-variant:normal;
+    font-weight:normal;
+    line-height:normal;
+ 
+
+	
+}
+p { 
+	margin-top: 0; 
+	text-align: justify;
+	}
+h3 { 
+	font: italic normal 1.4em georgia, sans-serif;
+	letter-spacing: 1px; 
+	margin-bottom: 0; 
+	color: #7D775C;
+	}
+/*a:link { 
+	font-weight: bold; 
+	text-decoration: none; 
+	color: #5B80B2;
+	}
+a:visited { 
+	text-decoration: none; 
+	color: #5B80B2;
+	}
+a:hover, a:active { 
+	color: #003366;
+	}*/
+
+
+
+#wrapper {
+  border:1px solid #ccc;
+  width:960px;
+  margin:0 auto 0 auto;
+
+}
+#wrapper .clear{
+  clear:both;
+}
+
+/******Header***********/
+#user-tools {
+    font-size: 11px;
+    padding: 1.2em 10px;
+    position: relative;
+    right: 0;
+    text-align: right;
+    top: 0;
+    float:left;
+    width:770px;
+}
+
+
+/******MENU****************/
+#header ul.topnav {
+	list-style: none;
+	padding: 0 20px;
+	margin: 0;
+	float: left;
+	width: 920px;
+	background: #222;
+	font-size: 1.2em;
+	background: url(/images/turnos/topnav_bg.gif) repeat-x;
+}
+#header ul.topnav li {
+	float: left;
+	margin: 0;
+	padding: 0 15px 0 0;
+	position: relative; 
+}
+#header ul.topnav li a{
+	padding: 10px 5px;
+	color: #fff;
+	display: block;
+	text-decoration: none;
+	float: left;
+}
+#header ul.topnav li a:hover{
+	background: url(/images/turnos/topnav_hover.gif) no-repeat center top;
+}
+#header ul.topnav li span { /*--Drop down trigger styles--*/
+	width: 17px;
+	height: 35px;
+	float: left;
+	background: url(/images/turnos/subnav_btn.gif) no-repeat center top;
+}
+#header ul.topnav li span.subhover {background-position: center bottom; cursor: pointer;} /*--Hover effect for trigger--*/
+#header ul.topnav li ul.subnav {
+	list-style: none;
+	position: absolute; /*--Important - Keeps subnav from affecting main navigation flow--*/
+	left: 0; top: 35px;
+	background: #333;
+	margin: 0; padding: 0;
+	display: none;
+	float: left;
+	width: 170px;
+	border: 1px solid #111;
+}
+#header ul.topnav li ul.subnav li{
+	margin: 0; padding: 0;
+	border-top: 1px solid #252525; /*--Create bevel effect--*/
+	border-bottom: 1px solid #444; /*--Create bevel effect--*/
+	clear: both;
+	width: 170px;
+}
+#header ul.topnav li ul.subnav li a {
+	float: left;
+	width: 145px;
+	background: #333 url(/images/turnos/dropdown_linkbg.gif) no-repeat 10px center;
+	padding-left: 20px;
+}
+#header ul.topnav li ul.subnav li a:hover { /*--Hover effect for subnav links--*/
+	background: #222 url(/images/turnos/dropdown_linkbg.gif) no-repeat 10px center;
+}
+
+
+/************CONTENT*******************/
+
+#content .module{
+  border:1px solid #ccc;
+  margin: 5px 5px 5px 5px;
+}
+#content .module .section{
+  float:left;
+  width:50%;
+}
+
+#content .module H3{
+  background-color: #E6E6E6;
+  height:25px;
+  margin:0; 
+  padding:7px 0 0 12px;
+  color:#000;
+  font-weight:bold;
+}
+
+.form-row {
+  border-bottom:1px solid #EEEEEE;
+  font-size:11px;
+  overflow:hidden;
+  padding:8px 12px;
+}
+.form-row LABEL {
+  display:block;
+  width:8em;
+  float:left;
+  font-weight:bold;
+}
+.form-row .form-subrow{
+  float:left;
+  margin-left:10px;
+}
+.form-row .form-subrow_first{
+  margin-left:0px;
+}
+.form-row .form-subrow.form-subrow_first LABEL{
+  width:8em;
+}
+.form-row .form-subrow LABEL{
+  width: 6em;
+}
+/**********************Asignar turno*********************/
+.line{
+    height:1360px;
+}
+.timeLine{
+    width:50px;
+    background-color:#F2F2F2;
+    float:left;
+}
+.dayLine{
+    width:152px;
+    background-color:#FAF0E6;
+    float:left;
+
+}
+.medicoLine{
+    width:16px;
+    background-color:#ccc;
+    float:left;
+}	  
+.time{
+    height:20px;
+    font-size:14px;
+    cursor:pointer;
+}
+.turno{
+    height:100px;
+    width:145px;
+    border: #667F66 2px solid;
+    font-size:13px;
+    padding-top:3px;
+    padding-left:3px;
+    overflow:hidden;
+}
+.medicoLine .disponibilidad{
+  width:16px;
+  overflow:hidden;
+  text-align:center;
+  cursor:pointer;
+}
+
+.medicoLine .disponibilidad .nombreMedico{
+  font-weight:bold;
+  font-size:14px;
+}
+	     
+/**********************************************************/	     
+
+/***************Home**************************/
+.home H2{
+  margin-left:14px;
+  color:#88064C;
+}
+.home-button{
+  background: url(/images/turnos/home-button-green.png) no-repeat;
+  width:100px;
+  height:100px;
+  display:block;
+  color:#fff;
+  font-weight:bold;
+  text-align:center;
+  font-size:14px;
+  cursor:pointer;
+}
+.home-button SPAN{
+  position:relative;
+  top:42px;
+}
+.home-button SPAN.two-lines{
+  position:relative;
+  top:35px;
+}
+.home .short-cut-buttons{
+  overflow:hidden;
+  margin:14px;
+}
+.home .short-cut-buttons .home-button{
+  float:left;
+  margin-right:10px;
+}
+
+
+/************Widgets**************/
+.multiselect {
+    width: 463px;
+    height: 200px;
+}
+.ui-multiselect .remove-all {
+  display:none;
+}
+.ui-multiselect .add-all {
+  display:none;
+}
+
+.dialog{
+  display:none;
+}
+
+/*---------------Grid----------------------------------*/
+.ui-grid {  padding: .4em;  background-image: none; }
+.ui-grid .ui-grid-content { width: 100%; border-collapse: collapse; }
+.ui-grid table tbody td, .ui-grid .ui-grid-header, .ui-grid table thead a { padding: .4em;  }
+.ui-grid table tbody td {  text-align: right; font-weight: normal;  }
+.ui-grid .ui-grid-header, .ui-grid .ui-grid-footer { padding: .8em .4em; text-align: center; }
+.ui-grid .ui-grid-footer { background-image: none; font-weight: normal; text-align: left; }
+.ui-grid table thead a { display: block;  }
+.ui-grid .ui-icon { float: right; }
+.ui-grid .ui-grid-paging { float: right; }
+.ui-grid .ui-grid-paging-prev { float: left; width: 16px; height: 16px; }
+.ui-grid .ui-grid-paging-next { float: right; width: 16px; height: 16px; }
+.ui-grid .ui-grid-results {  }
+.ui-grid .ui-widget-content A{
+  color:#1B7CD2;
+  text-decoration:none;
+}
+.ui-grid .ui-widget-content TD{
+  text-align: left;
+}
+.ui-grid-state-hover {
+  background: #dadada url(widgets/images/ui-bg_glass_75_dadada_1x400.png)  50%  50% repeat-x; 
+  font-weight: normal; 
+  color: #212121; 
+}
+
+
+/*************TABs********************/
+#fragment-1 {
+  padding:2px;
+}
+
+
+/************Footer**************/
+
+#footer{
+  background-color: #cccccc;
+  text-align: center;
+  font-size:11px;
+}
