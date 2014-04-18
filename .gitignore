@@ -1,3 +1,4 @@
 .idea
+logs
 settings.py
 static/media_files
