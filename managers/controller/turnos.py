@@ -93,13 +93,17 @@ class Turnos():
         request = self.request
         fecha = request.GET['fecha']
         idSala = request.GET['id-sala']
-        idMedico = request.GET.get('id-medico') or 0
+        idMedico = request.GET.get('id-medico', 0)
+        idPracticas = []
+        if request.GET.has_key('id-practicas[]') and request.GET['id-practicas[]'] != "":
+            idPracticas = request.GET.getlist('id-practicas[]')
+
         sp = fecha.split('-')
         currentDate = datetime.date(int(sp[0]), int(sp[1]), int(sp[2]))
-        nextDate = self._getNextDate(currentDate, idSala, idMedico)
+        nextDate = self._getNextDate(currentDate, idSala, idMedico, idPracticas)
 
         dayLines = []
-        dayLines.append(self._getDayLine(nextDate, idSala))
+        dayLines.append(self._getDayLine(nextDate, idSala, idMedico, idPracticas))
         viewTurnos = ViewTurnos()
         return viewTurnos.getDayLines(dayLines)
 
@@ -107,13 +111,17 @@ class Turnos():
         request = self.request
         fecha = request.GET['fecha']
         idSala = request.GET['id-sala']
-        idMedico = request.GET.get('id-medico') or 0
+        idMedico = request.GET.get('id-medico', 0)
+        idPracticas = []
+        if request.GET.has_key('id-practicas[]') and request.GET['id-practicas[]'] != "":
+            idPracticas = request.GET.getlist('id-practicas[]')
+
         sp = fecha.split('-')
         currentDate = datetime.date(int(sp[0]), int(sp[1]), int(sp[2]))
-        backDate = self._getPreviousDate(currentDate, idSala, idMedico)
+        backDate = self._getPreviousDate(currentDate, idSala, idMedico, idPracticas)
 
         dayLines = []
-        dayLines.append(self._getDayLine(backDate, idSala))
+        dayLines.append(self._getDayLine(backDate, idSala, idMedico, idPracticas))
         viewTurnos= ViewTurnos()
         return viewTurnos.getDayLines(dayLines)
 
@@ -145,16 +153,31 @@ class Turnos():
     #WALTER: reescribir _getNextDate y _getPreviousDate ya que son casi iguales y para que se adapten a usar _getDisponibilidadForGivenDay
     #WALTER: ver los valores por defecto de los parametros, creo que estan mal en None.
     def _getNextDate(self, date, idSala=None, idMedico=None, idPracticas=None):
-        if idMedico == 0:
-            return date + timedelta(days=1)
+        """
+        Devuelve la siguiente fecha hacia delante que debra luego ser mostrada.
+        Si se esta en modo medico, esta fecha, dependera de la disponibilidad del mismo.
+        Si se esta en modo sala, la fecha sera el siguiente dia que haya atencion (disponibilidad), en dicha sala.
+        """
+        if idMedico == 0:  # si no hay medico, se eligio sala y solo hay que mostrar el siguiente dia.
+            return date + timedelta(days=1)  # TODO: si es domingo sumar un dia mas para saltearlo
 
         t = time.mktime((date.year, date.month, date.day, 0, 0, 0, 0, 0, 0))
         dateDay = unicode(time.strftime("%a", time.gmtime(t)))
 
-        disponibilidades = self._getDisponibilidad(None, idSala, idMedico, idPracticas)
+        # get disponibilidad deberia devolver la disponibilidad para un dia determinado con el fin de
+        # mostrarlo en la barra del costado. Otra cosa es usar la disponibilidad para obtener el siguiente dia
+        # a mostrar.
+        # disponibilidades = self._getDisponibilidad(None, idSala, idMedico, idPracticas)
+
+        disponibilidadConditional = {u'medico__id': idMedico}
+        if idSala:
+            disponibilidadConditional["sala__id"] = idSala
+        else:
+            disponibilidadConditional["sala__id__in"] = self._get_salas_atencion_por_practicas(idPracticas)
+        disponibilidades = Disponibilidad.objects.filter(**disponibilidadConditional).order_by('horaInicio')
 
         if len(disponibilidades) == 0:
-            return date + timedelta(days=1)
+            return date + timedelta(days=1) # TODO: si es domingo sumar un dia mas para saltearlo
 
         hshDisponibilidades = {}
         for disp in disponibilidades:
@@ -172,7 +195,14 @@ class Turnos():
         if idMedico == 0:
             return date - timedelta(days=1)
 
-        disponibilidades = self._getDisponibilidad(None, idSala, idMedico, idPracticas)
+        #disponibilidades = self._getDisponibilidad(None, idSala, idMedico, idPracticas)
+        disponibilidadConditional = {u'medico__id': idMedico}
+        if idSala:
+            disponibilidadConditional["sala__id"] = idSala
+        else:
+            disponibilidadConditional["sala__id__in"] = self._get_salas_atencion_por_practicas(idPracticas)
+        disponibilidades = Disponibilidad.objects.filter(**disponibilidadConditional).order_by('horaInicio')
+
         if len(disponibilidades) == 0:
             return date - timedelta(days=1)
 
@@ -192,31 +222,41 @@ class Turnos():
                 return date - timedelta(days=i + 1)
 
 
-    def _getDisponibilidad(self, dia=None, idSala=None, idMedico=None, idPracticas=None):
+    def _getDisponibilidad(self, dia, idSala=None, idMedico=None, idPracticas=None):
         """
         Devuelve la disponibilidad para un dia determinado (Ej Lunes).
-            - Si se recibe la sala, se devulve la disponibilidad del dia para todos los medicos que atienden ese dia en esa sala.
-            - Si se recibe como paramatro Medico-Practicas, devuelve
-            la disponibilidad del dia solo para el medico elegido y en todas las salas (puede atender en mas de una sala
-            el mismo dia).
+            - Si se recibe la sala, se devulve la disponibilidad del dia para dicha sala. Si hay un medico, solo
+            devolvera la disponibilidad en la sala para el medico elegido.
+            - Si no se recibe sala como paramatro, entonces se recibe Medico-Practicas, y se devuelve la disponibilidad
+            del dia solo para el medico elegido y en todas las salas que se permitan las pracitas seleccionadas.
+
+        Params:
+            - dia: lunes, martes, miercoles, jueves, viernes, sabado, domingo
         """
         #TODO: si se quiere agregar horarios a futuro, va a haber que agregar fecha_hasta para la disponibilidad
 
-        disponibilidadConditional = {}
-
-        if dia:
-            disponibilidadConditional["dia"] = dia
+        disponibilidadConditional = {u'dia': dia}
+        # disponibilidadConditional = {}
+        # if dia:
+        #     disponibilidadConditional["dia"] = dia
 
         if idSala:
             disponibilidadConditional["sala__id"] = idSala
         else:
-            disponibilidadConditional["sala__id__in"] = (3, 4, 5, 6, 7) #solo consultorio
+            disponibilidadConditional["sala__id__in"] = self._get_salas_atencion_por_practicas(idPracticas)
 
         if idMedico:
             disponibilidadConditional[u'medico__id'] = idMedico
 
         disponibilidades = Disponibilidad.objects.filter(**disponibilidadConditional).order_by('horaInicio')
         return disponibilidades
+
+    def _get_salas_atencion_por_practicas(self, practicas):
+        # if practicas in (2,3,4):
+        #     #es consultorio
+        # else:
+        #     # es practica
+        return 3, 4, 5, 6, 7  # solo consultorio
 
     def guardar(self):
         request = self.request
