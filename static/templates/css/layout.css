@@ -76,7 +76,7 @@ a:hover, a:active {
 	width: 920px;
 	background: #222;
 	font-size: 1.2em;
-	background: url(/images/turnos/topnav_bg.gif) repeat-x;
+	background: url(/media/images/turnos/topnav_bg.gif) repeat-x;
 }
 #header ul.topnav li {
 	float: left;
@@ -92,13 +92,13 @@ a:hover, a:active {
 	float: left;
 }
 #header ul.topnav li a:hover{
-	background: url(/images/turnos/topnav_hover.gif) no-repeat center top;
+	background: url(/media/images/turnos/topnav_hover.gif) no-repeat center top;
 }
 #header ul.topnav li span { /*--Drop down trigger styles--*/
 	width: 17px;
 	height: 35px;
 	float: left;
-	background: url(/images/turnos/subnav_btn.gif) no-repeat center top;
+	background: url(/media/images/turnos/subnav_btn.gif) no-repeat center top;
 }
 #header ul.topnav li span.subhover {background-position: center bottom; cursor: pointer;} /*--Hover effect for trigger--*/
 #header ul.topnav li ul.subnav {
@@ -122,11 +122,11 @@ a:hover, a:active {
 #header ul.topnav li ul.subnav li a {
 	float: left;
 	width: 145px;
-	background: #333 url(/images/turnos/dropdown_linkbg.gif) no-repeat 10px center;
+	background: #333 url(/media/images/turnos/dropdown_linkbg.gif) no-repeat 10px center;
 	padding-left: 20px;
 }
 #header ul.topnav li ul.subnav li a:hover { /*--Hover effect for subnav links--*/
-	background: #222 url(/images/turnos/dropdown_linkbg.gif) no-repeat 10px center;
+	background: #222 url(/media/images/turnos/dropdown_linkbg.gif) no-repeat 10px center;
 }
 
 
@@ -229,7 +229,7 @@ a:hover, a:active {
   color:#88064C;
 }
 .home-button{
-  background: url(/images/turnos/home-button-green.png) no-repeat;
+  background: url(/media/images/turnos/home-button-green.png) no-repeat;
   width:100px;
   height:100px;
   display:block;
