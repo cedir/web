@@ -3,4 +3,5 @@ logs
 settings.py
 static/media_files
 *.pyc
+*.svn
 
