@@ -3,9 +3,9 @@
 {% block content %}
 
 <div class="dr">
-<div class="dc" style="width:59px;"><img src="images/spacer.gif" width="1" height="1" alt=""></div>
+<div class="dc" style="width:59px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 <div class="dc" style="width:600;">
-	<div style="font-size:16px;">{% if img1 %}<img src="/media_files/{{img1_med}}" align="left" alt="" style="margin:4px 15px 0px 0px;cursor:pointer;" title="Ampliar" onclick="window.open('/media_files/{{img1}}', null, 'height=400,width=500,status=yes,toolbar=no,menubar=no,location=no')">{% endif %}<b>{{title}}</b></div>
+	<div style="font-size:16px;">{% if img1 %}<img src="/media/media_files/{{img1_med}}" align="left" alt="" style="margin:4px 15px 0px 0px;cursor:pointer;" title="Ampliar" onclick="window.open('/media/media_files/{{img1}}', null, 'height=400,width=500,status=yes,toolbar=no,menubar=no,location=no')">{% endif %}<b>{{title}}</b></div>
 <!-- 	<div style="font-size:14px;">{{description|escape|linebreaks}}</div> -->
 		<br>
 	<div>{{body|escape|linebreaks}}</div>

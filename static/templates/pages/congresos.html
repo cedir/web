@@ -1,11 +1,11 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<script language="JavaScript" src="/js/formFunctions.js"></script>
+<script language="JavaScript" src="/media/js/formFunctions.js"></script>
 
 <div class="dr">
-	<div class="dc" style="width:15px;"><img src="/images/spacer.gif" width="1" height="1" alt=""></div>
-	<div class="dc" style="width:190px;"><img src="/images/title_2_1.gif" alt="" style="margin:3px 0px 17px 0px;"><br>
+	<div class="dc" style="width:15px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
+	<div class="dc" style="width:190px;"><img src="/media/images/title_2_1.gif" alt="" style="margin:3px 0px 17px 0px;"><br>
 <!--		<b>Recuerde!</b> <br>Ud. puede dejarnos <a href="/static/?name=contacto.html&buttonId=5">su pregunta</a>.
 		<div>
 
@@ -13,28 +13,28 @@
 	
 	</div>
 	
-	<div class="dc" style="width:15px;"><img src="images/spacer.gif" width="1" height="1" alt=""></div>
+	<div class="dc" style="width:15px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 	<div class="dc" style="width:475px;">
 		<div  style="font-size:20px;"><span>Programas de reuniones cient&iacute;ficas y congresos</span></div>
 		<br>
 		<div>Informaci&oacute;n sobre reuniones cient&iacute;ficas y congresos. </div>
-		<div class="dt" style=" width:100%; height:1px;background:url(/images/bg_point_x.gif) left bottom repeat-x;margin-top:10px;"><img src="/images/spacer.gif" width="1" height="1" alt=""></div>
+		<div class="dt" style=" width:100%; height:1px;background:url(/media/images/bg_point_x.gif) left bottom repeat-x;margin-top:10px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 		<div class="dt">
 			<div class="dr">
 				<div class="dc">
 					{% for content in contents %}
 						<div style="margin-top:5px;">
 							{% if forloop.first %}
-								<img src="/images/title_2_2.gif" alt="" style="margin:4px 0px 16px 0px;"><br>
+								<img src="/media/images/title_2_2.gif" alt="" style="margin:4px 0px 16px 0px;"><br>
 							{% else %}
 								
 							{% endif %}
 							
-							{% if content.img1_min %}<!--<img src="/media_files/{{content.img1_min}}" align="left" alt="" style="margin:4px 15px 0px 0px;cursor:pointer" title="Ampliar" onclick="window.open('/media_files/{{content.img1}}', null, 'height=400,width=500,status=yes,toolbar=no,menubar=no,location=no')">-->{% endif %}
+							{% if content.img1_min %}<!--<img src="/media/media_files/{{content.img1_min}}" align="left" alt="" style="margin:4px 15px 0px 0px;cursor:pointer" title="Ampliar" onclick="window.open('/media/media_files/{{content.img1}}', null, 'height=400,width=500,status=yes,toolbar=no,menubar=no,location=no')">-->{% endif %}
 							
 							<span><b>{{ content.title }} </b></span><br>
 							{{ content.description }} 
-							<br style="line-height:1px;"><br style="line-height:5px;"><img src="/images/list_0_1.gif" alt="" style="margin:0px 4px 0px 0px;" align="top"><a href="/content/{{ content.id }}/">Ampliar</a>  
+							<br style="line-height:1px;"><br style="line-height:5px;"><img src="/media/images/list_0_1.gif" alt="" style="margin:0px 4px 0px 0px;" align="top"><a href="/content/{{ content.id }}/">Ampliar</a>
 							<br style="line-height:1px;"><br style="line-height:16px;">
 						</div>
 						

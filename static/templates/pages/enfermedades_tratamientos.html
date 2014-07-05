@@ -1,46 +1,46 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<script language="JavaScript" src="/js/formFunctions.js"></script>
+<script language="JavaScript" src="/media/js/formFunctions.js"></script>
 
 <div class="dr">
-	<div class="dc" style="width:20px;"><img src="/images/spacer.gif" width="1" height="1" alt=""></div>
-	<div class="dc" style="width:190px;"><img src="/images/title_2_1.gif" alt="" style="margin:3px 0px 17px 0px;"><br>
+	<div class="dc" style="width:20px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
+	<div class="dc" style="width:190px;"><img src="/media/images/title_2_1.gif" alt="" style="margin:3px 0px 17px 0px;"><br>
 		<b>Buscar:</b> <br>En Enfermedades D&iacute;gestivas.
 		<div>
 			<form id="form" action="/search" name="searchForm" id="searchForm" method="get">
 				<div>
 					<input type="hidden" value="6" name="categoryId">
 					<input style="width:100px;" type="text" value="" name="keyWord" id="keyWord">
-					<img alt="Search" src="/images/icon_searchbox.png" onclick="getSearch();" style="cursor:pointer;"/>
+					<img alt="Search" src="/media/images/icon_searchbox.png" onclick="getSearch();" style="cursor:pointer;"/>
 				</div>
 			</form>
 		</div>	
 	
 	</div>
 	
-	<div class="dc" style="width:15px;"><img src="images/spacer.gif" width="1" height="1" alt=""></div>
+	<div class="dc" style="width:15px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 	<div class="dc" style="width:465px;">
 		<div  style="font-size:20px;"><span>Enfermedades D&iacute;gestivas</span></div>
 		<br>
 		<div>A continuaci&oacute;n se listan las enfermedades gastrointestinales m&aacute;s importantes. Recuerde que puede utilizar el buscador ubucado a la izquierda para localizar enfermedades y tratamientos.</div>
-		<div class="dt" style=" width:100%; height:1px;background:url(/images/bg_point_x.gif) left bottom repeat-x;margin-top:10px;"><img src="/images/spacer.gif" width="1" height="1" alt=""></div>
+		<div class="dt" style=" width:100%; height:1px;background:url(/media/images/bg_point_x.gif) left bottom repeat-x;margin-top:10px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 		<div class="dt">
 			<div class="dr">
 				<div class="dc">
 					{% for content in contents %}
 						<div style="margin-top:5px;">
 							{% if forloop.first %}
-								<img src="/images/title_2_2.gif" alt="" style="margin:4px 0px 16px 0px;"><br>
+								<img src="/media/images/title_2_2.gif" alt="" style="margin:4px 0px 16px 0px;"><br>
 							{% else %}
 								
 							{% endif %}
 							
-							{% if content.img1_min %}<!--<img src="/media_files/{{content.img1_min}}" align="left" alt="" style="margin:4px 15px 0px 0px;cursor:pointer" title="Ampliar" onclick="window.open('/media_files/{{content.img1}}', null, 'height=400,width=500,status=yes,toolbar=no,menubar=no,location=no')">-->{% endif %}
+							{% if content.img1_min %}<!--<img src="/media/media_files/{{content.img1_min}}" align="left" alt="" style="margin:4px 15px 0px 0px;cursor:pointer" title="Ampliar" onclick="window.open('/media/media_files/{{content.img1}}', null, 'height=400,width=500,status=yes,toolbar=no,menubar=no,location=no')">-->{% endif %}
 							
 							<span><b>{{ content.title }} </b></span><br>
 							{{ content.description }} 
-							<br style="line-height:1px;"><br style="line-height:5px;"><img src="/images/list_0_1.gif" alt="" style="margin:0px 4px 0px 0px;" align="top"><a href="{% if content.friendlyURL %}{{ content.friendlyURL }}{% else %}/content/{{ content.id }}/{% endif %}">Ampliar</a>  
+							<br style="line-height:1px;"><br style="line-height:5px;"><img src="/media/images/list_0_1.gif" alt="" style="margin:0px 4px 0px 0px;" align="top"><a href="{% if content.friendlyURL %}{{ content.friendlyURL }}{% else %}/content/{{ content.id }}/{% endif %}">Ampliar</a>
 							<br style="line-height:1px;"><br style="line-height:16px;">
 						</div>
 						

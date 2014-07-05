@@ -1,6 +1,10 @@
-from django.db import models
+
 from PIL import Image
-import glob, os
+import glob
+import os
+from django.db import models
+from django.conf import settings
+
 
 # Create your models here.
 class Categoria(models.Model):
@@ -8,11 +12,12 @@ class Categoria(models.Model):
     description = models.TextField("Descripcion",blank=True)
     
     def __unicode__ (self):
-	return self.name
-	
+        return self.name
+
     class Admin:
-	list_display = ('name', 'description')
-	search_fields = ['name']
+        list_display = ('name', 'description')
+        search_fields = ['name']
+
 
 class Contenido(models.Model):
     title = models.CharField("Titulo", max_length=200,null=False,blank=False )
@@ -31,60 +36,59 @@ class Contenido(models.Model):
     categoria = models.ManyToManyField(Categoria, verbose_name="Categoria")
     
     def save(self):
-	super(Contenido, self).save()
-	
-	minSizes = [147,140]
-	medSizes = [200,200]
-	
-	#f = open('/tmp/w.w','w')
-	#TODO: checkear que no hay otra imagen con el mismo nombre y renomabrar, si es que no lo hace PIL automaticamente
-	
-	if self.img1.name <> '':
-		imgPath = '/var/www/cedir/static/media_files/' + self.img1.name
-		im = Image.open(imgPath)
-		filePathName, ext = os.path.splitext(imgPath)
-		imgSize = im.size
-		
-		#min image
-		if (imgSize[0] > minSizes[0]) or (imgSize[1] > minSizes[1]):
-			#f.write('La que lo pario2: ' + self.img2.name )
-			im.thumbnail(minSizes, Image.ANTIALIAS)
-			im.save(filePathName + '_min' + ext, "JPEG")
-		
-		#med image
-		if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
-			imCopy = Image.open(imgPath)
-			imCopy.thumbnail(medSizes, Image.ANTIALIAS)
-			imCopy.save(filePathName + '_med' + ext, "JPEG")
-			
-	if self.img2.name <> '':
-		imgPath = '/var/www/cedir/static/media_files/' + self.img2.name
-		im = Image.open(imgPath)
-		filePathName, ext = os.path.splitext(imgPath)
-		imgSize = im.size
-			
-		#med image
-		if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
-			im.thumbnail(medSizes, Image.ANTIALIAS)
-			im.save(filePathName + '_med' + ext, "JPEG")
-			
-	if self.img3.name <> '':
-		imgPath = '/var/www/cedir/static/media_files/' + self.img3.name
-		im = Image.open(imgPath)
-		filePathName, ext = os.path.splitext(imgPath)
-		imgSize = im.size
-		
-		#med image
-		if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
-			im.thumbnail(medSizes, Image.ANTIALIAS)
-			im.save(filePathName + '_med' + ext, "JPEG")
-	#f.close()
+        super(Contenido, self).save()
 
+        minSizes = [147,140]
+        medSizes = [200,200]
+
+        #f = open('/tmp/w.w','w')
+        #TODO: checkear que no hay otra imagen con el mismo nombre y renomabrar, si es que no lo hace PIL automaticamente
+
+        if self.img1.name <> '':
+            imgPath = settings.MEDIA_ROOT + self.img1.name
+            im = Image.open(imgPath)
+            filePathName, ext = os.path.splitext(imgPath)
+            imgSize = im.size
+
+            #min image
+            if (imgSize[0] > minSizes[0]) or (imgSize[1] > minSizes[1]):
+                #f.write('La que lo pario2: ' + self.img2.name )
+                im.thumbnail(minSizes, Image.ANTIALIAS)
+                im.save(filePathName + '_min' + ext, "JPEG")
+
+            #med image
+            if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
+                imCopy = Image.open(imgPath)
+                imCopy.thumbnail(medSizes, Image.ANTIALIAS)
+                imCopy.save(filePathName + '_med' + ext, "JPEG")
+
+        if self.img2.name <> '':
+            imgPath = settings.MEDIA_ROOT + self.img2.name
+            im = Image.open(imgPath)
+            filePathName, ext = os.path.splitext(imgPath)
+            imgSize = im.size
+
+            #med image
+            if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
+                im.thumbnail(medSizes, Image.ANTIALIAS)
+                im.save(filePathName + '_med' + ext, "JPEG")
+
+        if self.img3.name <> '':
+            imgPath = settings.MEDIA_ROOT + self.img3.name
+            im = Image.open(imgPath)
+            filePathName, ext = os.path.splitext(imgPath)
+            imgSize = im.size
+
+            #med image
+            if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
+                im.thumbnail(medSizes, Image.ANTIALIAS)
+                im.save(filePathName + '_med' + ext, "JPEG")
+        #f.close()
 
     def __unicode__ (self):
-	return self.title
-	
+        return self.title
+
     class Admin:
-	list_display = ('title', 'description', 'createdDate', 'publishContent' )
-	list_filter = ['publishContent']
-	search_fields = ['title', 'description']
+        list_display = ('title', 'description', 'createdDate', 'publishContent' )
+        list_filter = ['publishContent']
+        search_fields = ['title', 'description']

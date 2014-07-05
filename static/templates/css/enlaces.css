@@ -1,7 +1,7 @@
 body	{
 						margin:0px;
 						padding:0px;
-						background-image: url(/images/bg_body.gif);
+						background-image: url(/media/images/bg_body.gif);
 						background-position: left top;
 						background-repeat: repeat-x;
 						background-color:F7F7F7;
@@ -26,7 +26,7 @@ img {
 						height:100%; 
 						margin:auto; 
 						text-align:left;
-						background:url(/images/bg_top.jpg) left top no-repeat #ffffff;			
+						background:url(/media/images/bg_top.jpg) left top no-repeat #ffffff;
 						
 						}
 .flash	{
@@ -124,7 +124,7 @@ textarea	{
 						}						
 /*-----------------------------------------------------  cl_0 li	 	---------------------*/
 .cl_0 li	{
-						background-image: url(/images/list_0_2.gif);
+						background-image: url(/media/images/list_0_2.gif);
 						background-position: 0px 1px;
 						background-repeat: no-repeat;
 						font-size:12px;
@@ -149,7 +149,7 @@ textarea	{
 						}
 /*-----------------------------------------------------  	 li	 	---------------------*/
 li	{
-						background-image: url(/images/list_0_1.gif);
+						background-image: url(/media/images/list_0_1.gif);
 						background-position: 0px 1px;
 						background-repeat: no-repeat;
 						font-size:11px;

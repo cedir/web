@@ -1,7 +1,7 @@
 .idea
 logs
 settings.py
-static/media_files
+static/templates/media_files
 *.pyc
 *.svn
 

@@ -242,7 +242,7 @@ a:hover, a:active {
 .module blockquote { margin-left:12px; }
 .module ul, .module ol { margin-left:1.5em; }
 .module h3 { margin-top:.6em; }
-.module h2, .module caption, .inline-group h2 { margin:0; padding:2px 5px 3px 5px; font-size:11px; text-align:left; font-weight:bold; background:#99cccc url(/images/admin/default-bg.gif) top left repeat-x; color:white; }
+.module h2, .module caption, .inline-group h2 { margin:0; padding:2px 5px 3px 5px; font-size:11px; text-align:left; font-weight:bold; background:#99cccc url(/media/images/admin/default-bg.gif) top left repeat-x; color:white; }
 .module table { border-collapse: collapse; }
 
 
@@ -259,7 +259,7 @@ a:hover, a:active {
 	
 	}
 
-.menu {width:100%; height:25px; position:relative; font-size:11px; z-index:100; background-repeat : repeat-x; background-image: url('/images/turnos/bg_mainMenu.jpgw');}
+.menu {width:100%; height:25px; position:relative; font-size:11px; z-index:100; background-repeat : repeat-x; background-image: url('/media/images/turnos/bg_mainMenu.jpgw');}
 .menu ul li a, .menu ul li a:visited {list-style-type:none;display:block; text-decoration:none;width:90px; height:25px; text-align:center; color:#333333;line-height:20px; font-size:11px; overflow:hidden;}
 .menu ul {padding:0px; margin:0px; list-style: none;}
 .menu ul li {float:left; position:relative;}
@@ -323,7 +323,7 @@ table { border-collapse:collapse; border-color:#ccc; }
 td, th { font-size:11px; line-height:13px; border-bottom:1px solid #eee; vertical-align:top; padding:5px;  }
 th { text-align:left; font-size:12px; font-weight:bold; }
 thead th, 
-tfoot td { color:#666; padding:2px 5px; font-size:11px; background:#e1e1e1 url(/images/turnos/nav-bg.gif) top left repeat-x; border-left:1px solid #ddd; border-bottom:1px solid #ddd; }
+tfoot td { color:#666; padding:2px 5px; font-size:11px; background:#e1e1e1 url(/media/images/turnos/nav-bg.gif) top left repeat-x; border-left:1px solid #ddd; border-bottom:1px solid #ddd; }
 tfoot td { border-bottom:none; border-top:1px solid #ddd; }
 thead th:first-child, 
 tfoot td:first-child { border-left:none !important; }
@@ -339,7 +339,7 @@ tr.alt { background:#f6f6f6; }
  margin: 10px;width:90px;}
 
 thead th, tfoot td {
-	background:#E1E1E1 url(/images/turnos/nav-bg.gif) repeat-x scroll left top;
+	background:#E1E1E1 url(/media/images/turnos/nav-bg.gif) repeat-x scroll left top;
 	border-bottom:1px solid #DDDDDD;
 	border-left:1px solid #DDDDDD;
 	color:#666666;
@@ -381,7 +381,7 @@ thead th, tfoot td {
 	      padding-bottom:10px;
 	      padding-top:10px;
 	      position:relative;
-	      background:white url(/images/turnos/nav-bg.gif) 0 180%  repeat-x;
+	      background:white url(/media/images/turnos/nav-bg.gif) 0 180%  repeat-x;
 	      border-bottom:1px solid #EEEEEE;
 	      border-top:1px solid #EEEEEE;
 	      color:#666666;
