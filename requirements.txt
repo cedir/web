@@ -1,6 +1,6 @@
 # Requirements - I had to run "sudo apt-get install libpq-dev" before running pip install
+# Also install libjpeg-dev before pillow sudo apt-get install libjpeg-dev
 Django==1.4
-Pillow==1.7.7
+Pillow==2.5.1
 psycopg2==2.4.5
 simplejson==2.3.2
-
