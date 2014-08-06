@@ -28,13 +28,13 @@ urlpatterns = patterns('',
     (r'mapa-web/', 'contenidos.getStatic.getStatic',{'templateName': 'site-map.html'}),
     (r'^conferencias/$', 'contenidos.getContent.getContent',{'idContent': 94}),
     
-    (r'^enlaces/', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces.html'}),
-    (r'enlaces/1/', 'contenidos.getStatic.getStatic',{'templateName': 'enlace1.html'}),
-    (r'enlaces/2/', 'contenidos.getStatic.getStatic',{'templateName': 'enlace2.html'}),
-    (r'enlaces/3/', 'contenidos.getStatic.getStatic',{'templateName': 'enlace3.html'}),
-    (r'enlaces/4/', 'contenidos.getStatic.getStatic',{'templateName': 'enlace4.html'}),
-    (r'enlaces/5/', 'contenidos.getStatic.getStatic',{'templateName': 'enlace5.html'}),
-    (r'enlaces/6/', 'contenidos.getStatic.getStatic',{'templateName': 'enlace6.html'}),
+    (r'^enlaces/$', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces.html'}),
+    (r'enlaces/enlaces1.html/$', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces1.html'}),
+    (r'enlaces/enlaces2.html/$', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces2.html'}),
+    (r'enlaces/enlaces3.html/$', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces3.html'}),
+    (r'enlaces/enlaces4.html/$', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces4.html'}),
+    (r'enlaces/enlaces5.html/$', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces5.html'}),
+    (r'enlaces/enlaces6.html/$', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces6.html'}),
     
     
     # Uncomment this for admin:
