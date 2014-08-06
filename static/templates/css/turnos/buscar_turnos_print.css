@@ -1,0 +1,20 @@
+@media print {
+	/*display observation column on printing*/
+	.observacion_column{
+		display: table-cell !important;
+		visibility: visible;
+	}
+	/*hide actuin column*/
+	.action_column{
+		display: none;
+	}
+	/*hide buscar button*/
+	.form-row input {
+	    display: none;
+	}
+
+	/*hide top menu*/
+	.topnav{
+		display: none;
+	}
+}

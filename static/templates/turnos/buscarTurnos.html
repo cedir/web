@@ -1,6 +1,9 @@
 {% extends "turnos/base.html" %}
 
 {% block content %}
+
+<link rel="stylesheet" href="/media/css/turnos/buscar_turnos.css" media="screen" />
+<link rel="stylesheet" href="/media/css/turnos/buscar_turnos_print.css" media="print" />
 <!--<link type="text/css" href="/css/widgets/ui.multiselect.css" rel="stylesheet" />-->
 <link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="/media/js/jquery-ui-1.8.1.custom.min.js"></script>
@@ -112,27 +115,31 @@ $(document).ready(function() {
       <table class="ui-grid-content ui-widget-content">
 	  <thead>
 	      <tr>
-		  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span></a></th>
-		  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Fecha</a></th>
-		  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Hora</a></th>
-		  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Paciente</a></th>
-		  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Médico</a></th>
-		  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Obra Social</a></th>
-		  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Pr&aacute;cticas</a></th>
-		  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Acción</a></th>
+              <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span></a></th>
+              <th class="ui-state-default"><a href="#">Fecha</a></th>
+              <th class="ui-state-default"><a href="#">Hora</a></th>
+              <th class="ui-state-default"><a href="#">Paciente</a></th>
+              <th class="ui-state-default"><a href="#">Médico</a></th>
+              <th class="ui-state-default"><a href="#">Obra Social</a></th>
+              <th class="ui-state-default"><a href="#">Pr&aacute;cticas</a></th>
+              <th class="ui-state-default observacion_column"><a href="#">Observacion</a></th>
+              <th class="ui-state-default action_column"><a href="#" class="">Acción</a></th>
 	      </tr>
 	  </thead>
 	  <tbody>
 	      {% for hshTurnos in turnos %}
 	      <tr class="ui-widget-content">
-		  <td><img src="/media/images/turnos/{{hshTurnos.img_estado}}" title="estado" alt="estado" /></td>
-		  <td>{{ hshTurnos.fecha }}</td>
-		  <td>{{ hshTurnos.hora_inicio }}</td>
-		  <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshTurnos.id_paciente }}">{{ hshTurnos.apellido }}, {{ hshTurnos.nombre }} </a></td>
-		  <td>{{ hshTurnos.medico }}</td>
-		  <td>{{ hshTurnos.obra_social }}</td>
-		  <td>{{ hshTurnos.practica }}</td>
-		  <td><a href="#" onclick="getEdit({{ hshTurnos.id }});event.preventDefault();">Editar<a></td>
+              <td><img src="/media/images/turnos/{{hshTurnos.img_estado}}" title="estado" alt="estado" /></td>
+              <td>{{ hshTurnos.fecha }}</td>
+              <td>{{ hshTurnos.hora_inicio }}</td>
+              <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshTurnos.id_paciente }}">{{ hshTurnos.apellido }}, {{ hshTurnos.nombre }} </a></td>
+              <td>{{ hshTurnos.medico }}</td>
+              <td>{{ hshTurnos.obra_social }}</td>
+              <td>{{ hshTurnos.practica }}</td>
+              <td class="observacion_column">{{ hshTurnos.observacion }}</td>
+              <td class="action_column" >
+                  <a href="#" onclick="getEdit({{ hshTurnos.id }});event.preventDefault();">Editar</a>
+              </td>
 	      </tr>
 	      {% endfor %}
 	  </tbody>
