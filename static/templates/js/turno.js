@@ -238,6 +238,7 @@ function updateTurno() {
       success: function(data) {
 // 	  if(data.status){
 	    alert(data.message);
+		$("#frmBuscar").submit();
 // 	  }
 
       },

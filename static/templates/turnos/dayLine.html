@@ -80,9 +80,9 @@
     </div>
     <div class="line dayLine" style="position:relative;">
 	    {% for turno in turnos %}
-		<div class="turno" style="cursor:pointer;background-color:#CCFFCC;top:{{ turno.top }}px;position:absolute;opacity: 0.6;height:{{ turno.duracionEnPixeles }}px;" title="Medico: {{ turno.medico }} ">
-			<b>{{ turno.paciente}}</b><br> Dr./a {{ turno.medico}}
-		
+		<div class="turno" style="cursor:pointer;background-color:#CCFFCC;top:{{ turno.top }}px;position:absolute;opacity: 0.6;height:{{ turno.duracionEnPixeles }}px;" title="Medico: {{ turno.medico }} Practicas: {{ turno.practicas}}">
+			<b>{{ turno.paciente}}</b><br> Dr. {{ turno.medico}}
+		    <b>{{ turno.practicas}}</b>
 		</div>
 	    {% endfor %}
     </div>

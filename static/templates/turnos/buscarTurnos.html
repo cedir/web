@@ -72,7 +72,7 @@ $(document).ready(function() {
 	<div style="clear:both;"></div>
       </div>
       <div class="form-row"><label>Creado por:</label> <span id="popup-creado-por"></span> el <span id="popup-fecha-otorgamiento"></span></div>
-      <div class="form-row"><label>Observacion</label><textarea name="popup-observacion_turno" id="popup-observacion_turno" value="" style="width: 379px; height: 68px;" maxlength="150"></textarea></div>
+      <div class="form-row"><label>Observacion</label><textarea name="popup-observacion_turno" id="popup-observacion_turno" value="" style="width: 379px; height: 68px;" maxlength="200"></textarea></div>
       <div class="form-row"><input type="button" name="btnAnunciar" value="Anunciar" onclick="anunciarTurno();"/><input type="button" value="Anular" onclick="anular();"/><input type="button" value="Reprogramar" onclick="reprogramar();"/><input type="button" value="Confirmar" onclick="confirmar();"/><input type="button" name="btnCerrarFinalizar" value="Cerrar" onclick="$('#dialog').dialog('close');" style="float: right;"/><input type="button" name="btnConfirmar" value="Guardar" onclick="updateTurno();" style="float: right;"/></div>
 </div>
 
@@ -136,7 +136,7 @@ $(document).ready(function() {
               <td>{{ hshTurnos.medico }}</td>
               <td>{{ hshTurnos.obra_social }}</td>
               <td>{{ hshTurnos.practica }}</td>
-              <td class="observacion_column">{{ hshTurnos.observacion }}</td>
+              <td class="observacion_column"><div class="observacion_wrapper">{{ hshTurnos.observacion }}</div></td>
               <td class="action_column" >
                   <a href="#" onclick="getEdit({{ hshTurnos.id }});event.preventDefault();">Editar</a>
               </td>

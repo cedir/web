@@ -3,6 +3,11 @@
 	.observacion_column{
 		display: table-cell !important;
 		visibility: visible;
+		word-wrap: break-word;
+	}
+
+	.observacion_wrapper{
+		max-width:250px;
 	}
 	/*hide actuin column*/
 	.action_column{
