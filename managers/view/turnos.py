@@ -112,8 +112,7 @@ class ViewTurnos():
                 hshTurno["duracion"] = turno.getDuracionEnMinutos()
                 hshTurno["duracionEnPixeles"] = turno.getDuracionEnMinutos() * 1.333 - (4 * 1.333)
                 hshTurno["medico"] = turno.medico.nombre + ' ' + turno.medico.apellido
-                hshTurno["practicas"] = u''  # u'-'.join([p.abreviatura for p in turno.practicas.all()])
-                                             # lo saque porque hacia que el request tarde el doble
+                hshTurno["practicas"] = u'-'.join([p.abreviatura for p in turno.practicas.all()])
                 arrHshTurnos.append(hshTurno)
 
             disponibilidades = dayLine["disponibilidad"]
