@@ -2,7 +2,7 @@
 #from django.http import HttpResponse
 from django.template import Template, Context, loader
 from datetime import datetime
-from django.utils import simplejson
+import simplejson
 
 class ViewRoot():
   def __init__(self, request=None):

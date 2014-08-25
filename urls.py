@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+#from django.conf.urls import patterns, url, include
 from django.conf.urls import patterns, include, url
 from index import *
 from sendMail import *

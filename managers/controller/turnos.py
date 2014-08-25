@@ -8,7 +8,7 @@ import time
 import datetime
 from datetime import timedelta
 from django.db.models import Q
-from django.utils import simplejson
+import simplejson
 
 class Turnos():
 

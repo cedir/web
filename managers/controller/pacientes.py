@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from datetime import datetime
 from managers.view.pacientes import *
 from managers.model.personas import *
-from django.utils import simplejson
+import simplejson
 from decimal import *
 
 

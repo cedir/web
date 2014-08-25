@@ -6,7 +6,7 @@ from datetime import datetime
 from managers.view.root import *
 from managers.model.personas import *
 from managers.model.turno import *
-from django.utils import simplejson
+import simplejson
 
 class Root():
 

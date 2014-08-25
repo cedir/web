@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.template import Template, Context, loader
 from datetime import datetime
-from django.utils import simplejson
+import simplejson
 #from django.utils.encoding import smart_str, smart_unicode
 
 class ViewTurnos():
