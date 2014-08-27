@@ -197,6 +197,7 @@ function getEdit(idTurno){
 	data: "controlador=Turnos&accion=getTurno&id=" + idTurno,
 	success: function(data) {
 	  $("#popup-paciente").text(data.paciente);
+	  $("#popup-paciente").attr("href", "/app/?controlador=Pacientes&accion=getUpdate&id=" + data.paciente_id);
 	  $("#popup-paciente-tel").text(data.tel);
 	  $("#popup-paciente-dni").text(data.dni);
 	  $("#popup-fecha").text(data.fecha);
@@ -343,6 +344,8 @@ function createPaciente(createTurno) {
     var fechaNacimiento = $("#txtFechaNacimiento").val();
     var sexo = $("#txtSexo").val();
     var domicilio = $("#txtDomicilio").val();
+	var nroAfiliado = $("#txtNroAfiliado").val();
+	var email = $("#txtEmail").val();
 
     if(!nombre){
       alert("Error, el campo Nombre debe completarse.");
@@ -357,11 +360,18 @@ function createPaciente(createTurno) {
       return false;
     }
 
+	if(!isEmail(email)){
+		alert("Error, email no esta bien formado.");
+		return false;
+	}
+
     $.ajax({
       url: '/app/',
       dataType: 'json',
       type:'POST',
-      data: "controlador=Pacientes&accion=crear&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni + "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio + "&_nocache=" + rand,
+      data: "controlador=Pacientes&accion=crear&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
+		  "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
+		  "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
       success: function(data) {
 	  if(data.status){
 	    alert(data.message);
@@ -373,7 +383,7 @@ function createPaciente(createTurno) {
 	  }
       },
       error: function(XMLHttpRequest, textStatus, errorThrown) {
-	  alert("Error, puede que ya exista un paciente con DNI " + dni + ". Verifique que se trate del mismo paciente y vuelva a intentarlo" );
+		alert("Error, puede que ya exista un paciente con DNI " + dni + ". Verifique que se trate del mismo paciente y vuelva a intentarlo" );
       }
     });
 }
@@ -386,6 +396,8 @@ function createAndAsignPaciente(createTurno) {//TODO: aca llamar a createPacient
     var fechaNacimiento = $("#txtFechaNacimiento").val();
     var sexo = $("#txtSexo").val();
     var domicilio = $("#txtDomicilio").val();
+	var nroAfiliado = $("#txtNroAfiliado").val();
+	var email = $("#txtEmail").val();
 
     if(!nombre){
       alert("Error, el campo Nombre debe completarse.");
@@ -400,11 +412,18 @@ function createAndAsignPaciente(createTurno) {//TODO: aca llamar a createPacient
       return false;
     }
 
+	if(!isEmail(email)){
+		alert("Error, email no esta bien formado.");
+		return false;
+	}
+
     $.ajax({
       url: '/app/',
       dataType: 'json',
       type:'POST',
-      data: "controlador=Pacientes&accion=crear&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni + "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio + "&_nocache=" + rand,
+      data: "controlador=Pacientes&accion=crear&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
+		  "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
+		  "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
       success: function(data) {
 	if(data.status){
 	  setPaciente(data.idPaciente,$("#txtNombre").val(),$("#txtApellido").val());
@@ -429,6 +448,8 @@ function updatePaciente() {//TODO: aca llamar a createPaciente para no repetir c
     var fechaNacimiento = $("#txtFechaNacimiento").val();
     var sexo = $("#txtSexo").val();
     var domicilio = $("#txtDomicilio").val();
+	var nroAfiliado = $("#txtNroAfiliado").val();
+	var email = $("#txtEmail").val();
 
     if(!nombre){
       alert("Error, el campo Nombre debe completarse.");
@@ -443,11 +464,18 @@ function updatePaciente() {//TODO: aca llamar a createPaciente para no repetir c
       return false;
     }
 
+	if(!isEmail(email)){
+		alert("Error, email no esta bien formado.");
+		return false;
+	}
+
     $.ajax({
       url: '/app/',
       dataType: 'json',
       type:'POST',
-      data: "controlador=Pacientes&accion=update&id=" + id + "&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni + "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio + "&_nocache=" + rand,
+      data: "controlador=Pacientes&accion=update&id=" + id + "&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
+		  "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
+		  "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
       success: function(data) {
 	  if(data.status){
 	    alert(data.message);
@@ -632,4 +660,16 @@ function eliminarHorario(){
 	alert("Error en el servidor: " + err);
     }
   });
+}
+
+
+/*------------------Utils-------------------------*/
+
+function isEmail(email) {
+	// allow empty string as valid email
+	if(email){
+		var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+		return regex.test(email);
+	}
+	return true
 }
