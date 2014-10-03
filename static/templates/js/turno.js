@@ -296,7 +296,7 @@ function anunciarTurno(){
     $.ajax({
       url: '/app/',
       dataType: 'json',
-      data: "controlador=Turnos&accion=anunciar&id-turno=" + idTurno + "&_nocache=" + rand,
+      data: "/turnos/anunciar/" + idTurno + "/?_nocache=" + rand,
       success: function(data) {
 	  if (data.status){
 	    alert("El paciente fue anunciado con exitosamente");
