@@ -67,10 +67,10 @@ def anunciar(request, id_turno):
             log.observacion = 'creado desde turnos'
             log.save()
 
-            response_dict['status'] = True
-            response_dict['message'] = "Success"
-            json = simplejson.dumps(response_dict)
-            return HttpResponse(json)
+        response_dict['status'] = True
+        response_dict['message'] = "Success"
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
     except Exception, err:
         response_dict['status'] = False
         response_dict['message'] = str(err)

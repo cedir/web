@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import time
-import datetime
-from datetime import timedelta, date
+from datetime import datetime, timedelta, date
 import simplejson
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
-from turno.models import Turno
+from turno.models import Turno, Estado
 from paciente.models import Paciente
 from medico.models import Medico, Disponibilidad
 from obra_social.models import ObraSocial
 from sala.models import Sala
 from practica.models import Practica
-from managers.models import AuditLog
+from managers.models import AuditLog, Usuario
 from managers.view.turnos import *
 
 
@@ -54,7 +53,7 @@ class Turnos():
       
     selectedDate = date.today()
     if fecha != "":
-      selectedDate = datetime.date(int(fecha.split("/")[2]),int(fecha.split("/")[1]),int(fecha.split("/")[0]))
+      selectedDate = date(int(fecha.split("/")[2]),int(fecha.split("/")[1]),int(fecha.split("/")[0]))
     
     selectedDate = selectedDate - timedelta(days=1)#resto uno ya que nextDay le va a sumar uno luego
 
@@ -96,7 +95,7 @@ class Turnos():
     idSala = request.GET['id-sala']
     idMedico = request.GET.get('id-medico') or 0
     sp = fecha.split('-')
-    c = datetime.date(int(sp[0]),int(sp[1]),int(sp[2]))
+    c = date(int(sp[0]),int(sp[1]),int(sp[2]))
     #nextDate = c + timedelta(days=1)
     nextDate = self._getNextDay(c,idSala,idMedico)
     #return self._getDayLines(nextDate,idSala)
@@ -112,7 +111,7 @@ class Turnos():
     idSala = request.GET['id-sala']
     idMedico = request.GET.get('id-medico') or 0
     sp = fecha.split('-')
-    c = datetime.date(int(sp[0]),int(sp[1]),int(sp[2]))
+    c = date(int(sp[0]),int(sp[1]),int(sp[2]))
     #backDate = c - timedelta(days=1)
     backDate = self._getPreviousDay(c,idSala,idMedico)
     #return self._getDayLines(backDate,idSala)
@@ -139,15 +138,6 @@ class Turnos():
     #dayLines.append(line)
     #return dayLines
     return line
-    
-  def test(self):
-    request = self.request
-    fecha = request.GET['fecha']
-    idSala = request.GET['id-sala']
-    idMedico = request.GET.get('id-medico') or 0
-    sp = fecha.split('-')
-    c = datetime.date(int(sp[0]),int(sp[1]),int(sp[2]))
-    return self._getNextDay(c,idSala,idMedico)
     
   def _getNextDay(self,date,idSala,idMedico=None):
     spanishDays = {'Sun':'domingo','Sat':'sabado','Mon':'lunes','Tue':'martes','Wed':'miercoles','Thu':'jueves','Fri':'viernes' }
@@ -258,7 +248,7 @@ class Turnos():
       turno.horaInicio = hora_inicio
       turno.horaFinEstimada = hora_fin_estimada
       turno.horaFinReal = hora_fin_estimada
-      turno.fecha_otorgamiento = datetime.datetime.now()
+      turno.fecha_otorgamiento = datetime.now()
       turno.fechaTurno = fecha_turno
       turno.observacion = observacion_turno
       turno.paciente = paciente
@@ -278,7 +268,7 @@ class Turnos():
       log.userActionId = 1
       log.objectTypeId = 3
       log.objectId = turno.id
-      log.dateTime = datetime.datetime.now()
+      log.dateTime = datetime.now()
       log.observacion = ''
       log.save()
 

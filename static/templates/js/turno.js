@@ -294,9 +294,9 @@ function anunciarTurno(){
     var idTurno = $("#current-turno-id").val();
     if(!confirm('¿Seguro desea anunciar el paciente?')){return;}
     $.ajax({
-      url: '/app/',
+      url: '/turnos/anunciar/' + idTurno,
       dataType: 'json',
-      data: "/turnos/anunciar/" + idTurno + "/?_nocache=" + rand,
+      data: "_nocache=" + rand,
       success: function(data) {
 	  if (data.status){
 	    alert("El paciente fue anunciado con exitosamente");
