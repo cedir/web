@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from managers.model.turno import *
-from managers.model.personas import *
-from managers.view.turnos import *
 import time
-import datetime
-from datetime import timedelta
-from django.db.models import Q
+from datetime import datetime, timedelta, date
 import simplejson
+from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Q
+from turno.models import Turno, Estado
+from paciente.models import Paciente
+from medico.models import Medico, Disponibilidad
+from obra_social.models import ObraSocial
+from sala.models import Sala
+from practica.models import Practica
+from managers.models import AuditLog, Usuario
+from managers.view.turnos import *
+
 
 class Turnos():
 
@@ -49,7 +53,7 @@ class Turnos():
       
     selectedDate = date.today()
     if fecha != "":
-      selectedDate = datetime.date(int(fecha.split("/")[2]),int(fecha.split("/")[1]),int(fecha.split("/")[0]))
+      selectedDate = date(int(fecha.split("/")[2]),int(fecha.split("/")[1]),int(fecha.split("/")[0]))
     
     selectedDate = selectedDate - timedelta(days=1)#resto uno ya que nextDay le va a sumar uno luego
 
@@ -91,7 +95,7 @@ class Turnos():
     idSala = request.GET['id-sala']
     idMedico = request.GET.get('id-medico') or 0
     sp = fecha.split('-')
-    c = datetime.date(int(sp[0]),int(sp[1]),int(sp[2]))
+    c = date(int(sp[0]),int(sp[1]),int(sp[2]))
     #nextDate = c + timedelta(days=1)
     nextDate = self._getNextDay(c,idSala,idMedico)
     #return self._getDayLines(nextDate,idSala)
@@ -107,7 +111,7 @@ class Turnos():
     idSala = request.GET['id-sala']
     idMedico = request.GET.get('id-medico') or 0
     sp = fecha.split('-')
-    c = datetime.date(int(sp[0]),int(sp[1]),int(sp[2]))
+    c = date(int(sp[0]),int(sp[1]),int(sp[2]))
     #backDate = c - timedelta(days=1)
     backDate = self._getPreviousDay(c,idSala,idMedico)
     #return self._getDayLines(backDate,idSala)
@@ -134,15 +138,6 @@ class Turnos():
     #dayLines.append(line)
     #return dayLines
     return line
-    
-  def test(self):
-    request = self.request
-    fecha = request.GET['fecha']
-    idSala = request.GET['id-sala']
-    idMedico = request.GET.get('id-medico') or 0
-    sp = fecha.split('-')
-    c = datetime.date(int(sp[0]),int(sp[1]),int(sp[2]))
-    return self._getNextDay(c,idSala,idMedico)
     
   def _getNextDay(self,date,idSala,idMedico=None):
     spanishDays = {'Sun':'domingo','Sat':'sabado','Mon':'lunes','Tue':'martes','Wed':'miercoles','Thu':'jueves','Fri':'viernes' }
@@ -253,7 +248,7 @@ class Turnos():
       turno.horaInicio = hora_inicio
       turno.horaFinEstimada = hora_fin_estimada
       turno.horaFinReal = hora_fin_estimada
-      turno.fecha_otorgamiento = datetime.datetime.now()
+      turno.fecha_otorgamiento = datetime.now()
       turno.fechaTurno = fecha_turno
       turno.observacion = observacion_turno
       turno.paciente = paciente
@@ -273,7 +268,7 @@ class Turnos():
       log.userActionId = 1
       log.objectTypeId = 3
       log.objectId = turno.id
-      log.dateTime = datetime.datetime.now()
+      log.dateTime = datetime.now()
       log.observacion = ''
       log.save()
 
@@ -454,94 +449,94 @@ class Turnos():
     except Exception, err:
       return str(err)
   
-  def anunciar(self):
-    request = self.request
-    idTurno = request.GET['id-turno']
-    response_dict = {}
-
-    turno = Turno.objects.get(id=idTurno)
-    if (turno is None):
-      	response_dict['status'] = False
-	response_dict['message'] = "Error, no existe turno"
-	json = simplejson.dumps(response_dict)
-	return json
-    
-    try:
-#      pacientes = []
-#      paciente = PacienteEstudio()
-#      
-#      if (turno.paciente.dni != ""):
-#	pacientes = GetPacienteEstudio.objects.filter(dni=turno.paciente.dni)
-      
-#      if (len(pacientes) == 0):
-#	paciente.dni = turno.paciente.dni
-#	paciente.nombre = turno.paciente.nombre #TODO: escape acentos y enies
-#	paciente.apellido = turno.paciente.apellido
-#	paciente.edad = int(turno.paciente.edad)
-#	paciente.domicilio = turno.paciente.domicilio
-#	paciente.telefono = turno.paciente.telefono
-#	paciente.sexo = turno.paciente.sexo
-#	paciente.nroAfiliado = ""
-#	paciente.save()
-#      else:
-#	paciente.id = pacientes[0].id
-	
-      practicas = turno.practicas.all()
-      for practica in practicas:
-	estudio = Estudio()
-	estudio.paciente_id = turno.paciente.id
-	estudio.practica_id = practica.id
-	estudio.fechaEstudio = turno.fechaTurno
-	estudio.motivoEstudio = ""
-	estudio.informe = ""
-	estudio.save()#TODO: gestionar error: si falla en algun save, ver si se puede hacer rollback, sino informar del error grave! porque se desconfiguran los id de estudio
-	
-	detalleEstudio = DetalleEstudio()
-	detalleEstudio.medico_id = turno.medico.id
-	detalleEstudio.obraSocial_id = turno.obraSocial.id
-	detalleEstudio.medicoSolicitante_id = turno.medico.id
-	detalleEstudio.idFacturacion = 0
-	detalleEstudio.nroDeOrden = ""
-	detalleEstudio.idAnestesista = 1
-	detalleEstudio.esPagoContraFactura = 0
-	detalleEstudio.save()
-	
-	estudioPagoCobro = PagoCobroEstudio()
-	estudioPagoCobro.fechaCobro = None
-	estudioPagoCobro.importeEstudio = 0
-	estudioPagoCobro.importeMedicacion = 0
-	estudioPagoCobro.pagoContraFactura = 0
-	estudioPagoCobro.diferenciaPaciente = 0
-	estudioPagoCobro.pension = 0
-	estudioPagoCobro.importePagoMedico = 0
-	estudioPagoCobro.importePagoMedicoSol = 0
-	estudioPagoCobro.diferenciaPacienteMedicacion = None
-	estudioPagoCobro.nroPagoMedicoAct = None
-	estudioPagoCobro.nroPagoMedicoSol = None
-	estudioPagoCobro.importeCobradoPension = 0
-	estudioPagoCobro.importeCobradoArancelAnestesia = 0
-	estudioPagoCobro.importeEstudioCobrado = 0
-	estudioPagoCobro.importeMedicacionCobrado = 0
-	estudioPagoCobro.arancelAnestesia = 0
-	estudioPagoCobro.save()
-	
-	#log estudio
-	log = AuditLog()
-	log.user = Usuario.objects.get(id=int(request.session.get('cedir_user_id')))
-	log.userActionId = 1
-	log.objectTypeId = 1
-	log.objectId = estudio.id
-	log.dateTime = datetime.datetime.now()
-	log.observacion = 'creado desde turnos'
-	log.save()
-      
-      response_dict['status'] = True
-      response_dict['message'] = "Success"
-      json = simplejson.dumps(response_dict)
-      return json
-      
-    except Exception, err:
-      response_dict['status'] = False
-      response_dict['message'] = str(err)
-      json = simplejson.dumps(response_dict)
-      return json
+#   def anunciar(self):
+#     request = self.request
+#     idTurno = request.GET['id-turno']
+#     response_dict = {}
+#
+#     turno = Turno.objects.get(id=idTurno)
+#     if (turno is None):
+#       	response_dict['status'] = False
+# 	response_dict['message'] = "Error, no existe turno"
+# 	json = simplejson.dumps(response_dict)
+# 	return json
+#
+#     try:
+# #      pacientes = []
+# #      paciente = PacienteEstudio()
+# #
+# #      if (turno.paciente.dni != ""):
+# #	pacientes = GetPacienteEstudio.objects.filter(dni=turno.paciente.dni)
+#
+# #      if (len(pacientes) == 0):
+# #	paciente.dni = turno.paciente.dni
+# #	paciente.nombre = turno.paciente.nombre #TODO: escape acentos y enies
+# #	paciente.apellido = turno.paciente.apellido
+# #	paciente.edad = int(turno.paciente.edad)
+# #	paciente.domicilio = turno.paciente.domicilio
+# #	paciente.telefono = turno.paciente.telefono
+# #	paciente.sexo = turno.paciente.sexo
+# #	paciente.nroAfiliado = ""
+# #	paciente.save()
+# #      else:
+# #	paciente.id = pacientes[0].id
+#
+#       practicas = turno.practicas.all()
+#       for practica in practicas:
+# 	estudio = Estudio()
+# 	estudio.paciente_id = turno.paciente.id
+# 	estudio.practica_id = practica.id
+# 	estudio.fechaEstudio = turno.fechaTurno
+# 	estudio.motivoEstudio = ""
+# 	estudio.informe = ""
+# 	estudio.save()#TODO: gestionar error: si falla en algun save, ver si se puede hacer rollback, sino informar del error grave! porque se desconfiguran los id de estudio
+#
+# 	detalleEstudio = DetalleEstudio()
+# 	detalleEstudio.medico_id = turno.medico.id
+# 	detalleEstudio.obraSocial_id = turno.obraSocial.id
+# 	detalleEstudio.medicoSolicitante_id = turno.medico.id
+# 	detalleEstudio.idFacturacion = 0
+# 	detalleEstudio.nroDeOrden = ""
+# 	detalleEstudio.idAnestesista = 1
+# 	detalleEstudio.esPagoContraFactura = 0
+# 	detalleEstudio.save()
+#
+# 	estudioPagoCobro = PagoCobroEstudio()
+# 	estudioPagoCobro.fechaCobro = None
+# 	estudioPagoCobro.importeEstudio = 0
+# 	estudioPagoCobro.importeMedicacion = 0
+# 	estudioPagoCobro.pagoContraFactura = 0
+# 	estudioPagoCobro.diferenciaPaciente = 0
+# 	estudioPagoCobro.pension = 0
+# 	estudioPagoCobro.importePagoMedico = 0
+# 	estudioPagoCobro.importePagoMedicoSol = 0
+# 	estudioPagoCobro.diferenciaPacienteMedicacion = None
+# 	estudioPagoCobro.nroPagoMedicoAct = None
+# 	estudioPagoCobro.nroPagoMedicoSol = None
+# 	estudioPagoCobro.importeCobradoPension = 0
+# 	estudioPagoCobro.importeCobradoArancelAnestesia = 0
+# 	estudioPagoCobro.importeEstudioCobrado = 0
+# 	estudioPagoCobro.importeMedicacionCobrado = 0
+# 	estudioPagoCobro.arancelAnestesia = 0
+# 	estudioPagoCobro.save()
+#
+# 	#log estudio
+# 	log = AuditLog()
+# 	log.user = Usuario.objects.get(id=int(request.session.get('cedir_user_id')))
+# 	log.userActionId = 1
+# 	log.objectTypeId = 1
+# 	log.objectId = estudio.id
+# 	log.dateTime = datetime.datetime.now()
+# 	log.observacion = 'creado desde turnos'
+# 	log.save()
+#
+#       response_dict['status'] = True
+#       response_dict['message'] = "Success"
+#       json = simplejson.dumps(response_dict)
+#       return json
+#
+#     except Exception, err:
+#       response_dict['status'] = False
+#       response_dict['message'] = str(err)
+#       json = simplejson.dumps(response_dict)
+#       return json

@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
+import simplejson
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.template import Template, Context, loader
 from datetime import datetime
 from managers.view.root import *
-from managers.model.personas import *
-from managers.model.turno import *
-import simplejson
+from managers.models import Usuario
+from medico.models import Medico, Disponibilidad
+from sala.models import Sala
+
 
 class Root():
 
@@ -18,21 +20,21 @@ class Root():
     return viewRoot.getLogin()
 
   def login(self):
-    request = self.request
-    usuario = request.POST['txtNomUsuario']
-    password = request.POST['txtPassword']
+        request = self.request
+        usuario = request.POST['txtNomUsuario']
+        password = request.POST['txtPassword']
 
-    try:
-      obj_user = Usuario.objects.get(nombreUsuario=usuario)
-      if obj_user.password == password:
-	request.session['cedir_user_id'] = obj_user.id
-	request.session['cedir_user_name'] = obj_user.nombreUsuario
-	request.session.set_expiry(0)
-	return self.getHome()
-      else:
-	return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=1&next=%s' % request.path)
-    except:
-      return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=1&next=%s' % request.path)
+        try:
+            obj_user = Usuario.objects.get(nombreUsuario=usuario)
+            if obj_user.password == password:
+                request.session['cedir_user_id'] = obj_user.id
+                request.session['cedir_user_name'] = obj_user.nombreUsuario
+                request.session.set_expiry(0)
+                return self.getHome()
+            else:
+                return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=1&next=%s' % request.path)
+        except Usuario.DoesNotExist:
+            return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=1&next=%s' % request.path)
 
   def logout(self):
     request = self.request
@@ -89,7 +91,7 @@ class Root():
       idMedico = request.GET['id-medico']
       cond["medico__id"] = idMedico
 
-    disponibilidades = Disponibilidad.objects.filter(**cond)    
+    disponibilidades = Disponibilidad.objects.filter(**cond)
 
     viewRoot = ViewRoot(self.request)
     kwargs = {'idMedico':idMedico,'disponibilidades':disponibilidades}
@@ -159,7 +161,7 @@ class Root():
     response_dict['message'] = "El horario se ha actualizado correctamente."
     json = simplejson.dumps(response_dict)
     return json
-    
+
   def deleteDisponibilidad(self):
     request = self.request
     response_dict = {}

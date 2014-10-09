@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.template import Template, Context, loader
 from datetime import datetime
 from managers.view.pacientes import *
-from managers.model.personas import *
+from paciente.models import Paciente
 import simplejson
 from decimal import *
 

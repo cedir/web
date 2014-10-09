@@ -1,4 +1,3 @@
-#from django.conf.urls import patterns, url, include
 from django.conf.urls import patterns, include, url
 from index import *
 from sendMail import *
@@ -21,12 +20,16 @@ urlpatterns = patterns('',
     (r'^search/', 'contenidos.getSearchContents.getResults'),
     (r'^sendMail/', sendMail),
     (r'^app/', dispatch),
-    (r'^turnos/', getLogin),
+    (r'^turnos/$', getLogin),
     (r'balongastrico/', 'contenidos.getContent.getContent',{'idContent': 90, 'templateName': 'balon.html'}),
     (r'^endocapsula/$', 'contenidos.getContent.getContent',{'idContent': 2, 'templateName': 'endocapsula.html'}),
     (r'^videoendoscopia/$', 'contenidos.getContent.getContent',{'idContent': 65, 'templateName': 'videoendoscopia.html'}),
     (r'mapa-web/', 'contenidos.getStatic.getStatic',{'templateName': 'site-map.html'}),
     (r'^conferencias/$', 'contenidos.getContent.getContent',{'idContent': 94}),
+
+
+    (r'', include('turno.urls')),
+
     
     (r'^enlaces/$', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces.html'}),
     (r'enlaces/enlaces1.html/$', 'contenidos.getStatic.getStatic',{'templateName': 'enlaces1.html'}),

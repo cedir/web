@@ -67,7 +67,7 @@ function isValidTime(timeStr) {
 function getNext() {
     var rand = Math.round(100*Math.random());
     var main = document.getElementById('lineasSector');
-    var lastchild = main.lastChild;
+    var lastchild = main.lastElementChild;
     var inputObjs = lastchild.getElementsByTagName('input');
     var fecha = inputObjs[0].value;
     var sala = $("#id-sala").val();
@@ -79,7 +79,7 @@ function getNext() {
       success: function(data) {
 // 	$('#lineasSector').html(data);
 	var main = document.getElementById('lineasSector');
-	var child = main.firstChild;
+	var child = main.firstElementChild;
 	main.removeChild(child);
 
 	var el = document.createElement('div');
@@ -93,7 +93,7 @@ function getNext() {
 function getBack() {
      var rand = Math.round(100*Math.random());
     var main = document.getElementById('lineasSector');
-    var firstchild = main.firstChild;
+    var firstchild = main.firstElementChild;
     var inputObjs = firstchild.getElementsByTagName('input');
     var fecha = inputObjs[0].value;
     var sala = $("#id-sala").val();
@@ -104,7 +104,7 @@ function getBack() {
       data: "controlador=Turnos&accion=getBackDayLine&fecha=" + fecha + "&id-sala=" + sala + "&id-medico=" + medico + "&_nocache=" + rand ,
       success: function(data) {
  	      var main = document.getElementById('lineasSector');
-	      var child = main.lastChild;
+	      var child = main.lastElementChild;
 	      main.removeChild(child);
 
 	      var el = document.createElement('div');
@@ -294,9 +294,9 @@ function anunciarTurno(){
     var idTurno = $("#current-turno-id").val();
     if(!confirm('¿Seguro desea anunciar el paciente?')){return;}
     $.ajax({
-      url: '/app/',
+      url: '/turnos/anunciar/' + idTurno,
       dataType: 'json',
-      data: "controlador=Turnos&accion=anunciar&id-turno=" + idTurno + "&_nocache=" + rand,
+      data: "_nocache=" + rand,
       success: function(data) {
 	  if (data.status){
 	    alert("El paciente fue anunciado con exitosamente");
