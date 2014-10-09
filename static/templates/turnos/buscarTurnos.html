@@ -48,7 +48,7 @@ $(document).ready(function() {
 <div id="dialog" title="Datos del turno" class="dialog">
       <input type="hidden" name="current-turno-id" id="current-turno-id" value="" />
       <div class="form-row">
-	<div class="form-subrow form-subrow_first"><label>Paciente:</label><span id="popup-paciente"></span> (DNI: <span id="popup-paciente-dni"></span>)</div>
+	<div class="form-subrow form-subrow_first"><label>Paciente:</label><a href="/app/?controlador=Pacientes&accion=getUpdate&id=" id="popup-paciente" target="_blank"></a> (DNI: <span id="popup-paciente-dni"></span>)</div>
 	<div class="form-subrow"><label>Telefono:</label><span id="popup-paciente-tel"></span></div>
 	<div style="clear:both;"></div>
       </div>

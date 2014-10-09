@@ -2,7 +2,7 @@
 from django.template import Template, Context, loader
 from datetime import datetime
 import simplejson
-#from django.utils.encoding import smart_str, smart_unicode
+
 
 class ViewTurnos():
     def __init__(self, request=None):
@@ -92,7 +92,6 @@ class ViewTurnos():
         t = loader.get_template('turnos/buscarTurnosDisponibles.html')
 
         return t.render(c)
-
 
     def getDayLines(self, dayLines):
         strLines = None
@@ -239,6 +238,7 @@ class ViewTurnos():
         response_dict["paciente"] = turno.paciente.apellido + ", " + turno.paciente.nombre
         response_dict["tel"] = turno.paciente.telefono
         response_dict["dni"] = turno.paciente.dni
+        response_dict["paciente_id"] = turno.paciente.id
         response_dict["hora_inicio"] = str(turno.horaInicio)
         response_dict["hora_fin_real"] = str(turno.horaFinReal)
         response_dict["hora_fin"] = str(turno.horaFinEstimada)

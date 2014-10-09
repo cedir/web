@@ -21,40 +21,45 @@ $(document).ready(function() {
 			<input type="hidden" name="id" id="id" value="{{id}}" />
 
       <div class="form-row">
-	  <label>Nombre:</label><input type="text" id="txtNombre" name="txtNombre" value="{{nombre}}" />
+	    <label>Nombre:</label><input type="text" id="txtNombre" name="txtNombre" value="{{nombre}}" />
       </div>
       <div class="form-row">
-	  <label>Apellido:</label><input type="text" id="txtApellido" name="txtApellido" value="{{apellido}}"  />
+	    <label>Apellido:</label><input type="text" id="txtApellido" name="txtApellido" value="{{apellido}}"  />
       </div>
       <div class="form-row">
-	  <label>Documento:</label><input type="text" id="txtDni" name="txtDni" value="{{dni}}" />    
+	    <label>Documento:</label><input type="text" id="txtDni" name="txtDni" value="{{dni}}" />
       </div>
       <div class="form-row">
-	  <label>Fecha de Nacimiento:</label><input type="text" name="txtFechaNacimiento" id="txtFechaNacimiento" value="{{fechaNacimiento}}" >    
+	    <label>Fecha de Nacimiento:</label><input type="text" name="txtFechaNacimiento" id="txtFechaNacimiento" value="{{fechaNacimiento}}" >
       </div>
       <div class="form-row">
 	  <label>Sexo:</label>
-	  <select name="txtSexo" id="txtSexo">
-	      <option value="">Selecione..</option>
-	      <option value="Femenino">Femenino</option>
-	      <option value="Masculino">Masculino</option>		                  
-          </select>
+        <select name="txtSexo" id="txtSexo">
+            <option value="">Selecione..</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Masculino">Masculino</option>
+        </select>
       </div>
       <div class="form-row">
-	  <label>Domicilio:</label><input type="text" name="txtDomicilio" id="txtDomicilio" value="{{domicilio}}"> 
+	    <label>Domicilio:</label><input type="text" name="txtDomicilio" id="txtDomicilio" value="{{domicilio}}">
       </div>
       <div class="form-row">
-	  <label>Teléfono:</label><input type="text" id="txtTelefono" name="txtTelefono" value="{{telefono}}">    
+	    <label>Teléfono:</label><input type="text" id="txtTelefono" name="txtTelefono" value="{{telefono}}">
       </div>
-
+      <div class="form-row">
+	    <label>Nro de afiliado:</label><input type="text" id="txtNroAfiliado" name="txtNroAfiliado" value="{{nro_afiliado}}">
+      </div>
+      <div class="form-row">
+	    <label>Email:</label><input type="text" id="txtEmail" name="txtEmail" value="{{email}}">
+      </div>
       {% if isCreate %}
       <div class="form-row">
-	  <input id="btnAceptar" type="button" value="Guardar" class="botones" onclick="createPaciente(false);" />
-	  <input id="btnGuardarCrear" type="button" value="Guardar y crear turno" class="botones" onclick="createPaciente(true);" />
+          <input id="btnAceptar" type="button" value="Guardar" class="botones" onclick="createPaciente(false);" />
+          <input id="btnGuardarCrear" type="button" value="Guardar y crear turno" class="botones" onclick="createPaciente(true);" />
       </div>
       {% else %}
       <div class="form-row">
-	  <input id="btnAceptar" type="button" value="Guardar" class="botones" onclick="updatePaciente();" />
+	    <input id="btnAceptar" type="button" value="Guardar" class="botones" onclick="updatePaciente();" />
       </div>
       {% endif %}
 </form>
