@@ -11,3 +11,7 @@ class Practica(models.Model):
 
     class Meta:
         db_table = u'cedirData\".\"AlmacenEstudios'
+        ordering = ['descripcion']
+
+    def __unicode__(self):
+        return u'%s' % self.descripcion

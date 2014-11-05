@@ -4,7 +4,6 @@ from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
 
-
 class Estudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
@@ -16,6 +15,10 @@ class Estudio(models.Model):
     class Meta:
         db_table = 'cedirData\".\"tblEstudios'
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            return False
+
 
 class DetalleEstudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
@@ -26,6 +29,7 @@ class DetalleEstudio(models.Model):
     nroDeOrden = models.CharField(max_length=200)
     idAnestesista = models.IntegerField()
     esPagoContraFactura = models.IntegerField()
+    #estudio = models.ForeignKey(Estudio, db_column="nro")
 
     class Meta:
         db_table = 'cedirData\".\"tblDetalleEstudio'
@@ -52,3 +56,5 @@ class PagoCobroEstudio(models.Model):
 
     class Meta:
         db_table = 'cedirData\".\"tblPagoCobroEstudio'
+
+
