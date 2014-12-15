@@ -1,24 +1,23 @@
-# Create your views here.
-
-
 from django.http import HttpResponse
-from django.template import Template, Context, loader
-
+from django.template import Template, Context, RequestContext
+from django.template.loader import select_template
+from django.shortcuts import render
 from contenidos.models import *
+from estudio.models import Estudio
 
-def getContent(request, idContent):
-    
-    templateName = 'getContent.html'
-    if (request.GET.has_key('template') and request.GET['template'] != ''):
-    	templateName = request.GET['template']
-    
-    cContent = Contenido.objects.get(pk=1)
-    
-    
-    c = Context({
-	'content': cContent,
-    })
-    
-    
-    t = loader.get_template('pages/' + templateName)
-    return HttpResponse(t.render(c))
+def get_video(request, public_id):
+
+        video_url = None
+
+        try:
+            estudio = Estudio.object.get(public_id=public_id)
+            video_url = estudio.video
+        except Estudio.DoesNotExist:
+            pass
+
+        context = {
+            'video_url' : video_url
+        }
+        t = select_template(['pages/video_details.html'])
+        return HttpResponse(t.render(RequestContext(request, context)))
+
