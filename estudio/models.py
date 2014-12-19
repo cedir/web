@@ -12,6 +12,8 @@ class Estudio(models.Model):
     practica = models.ForeignKey(Practica, db_column="idEstudio")  # TODO: esto estaba asociado a Estado en vez de practica. Por que??? ver si no estaba rompiendo
     motivoEstudio = models.CharField(max_length=300)
     informe = models.TextField()
+    enlace_video = models.CharField(max_length=256, db_column="enlaceVideo")
+    public_id = models.CharField(max_length=100, db_column="publicID")
 
     class Meta:
         db_table = 'cedirData\".\"tblEstudios'
