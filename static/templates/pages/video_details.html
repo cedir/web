@@ -5,22 +5,25 @@
 	<div class="dc" style="width:35px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 	<div class="dc" style="width:650;">
 		<div style="font-size:18px;margin-bottom:12px;">
-
-            {{IF 
-
-			<span>Gracias {{name}} por atenderse con nosotros.</span>
-            <span>Si ud. no es {{name}} por favor reportelo inmediatamente al teléfonos 449-9536 o por mail cedirsalud@gmail.com.</span>
-            
-            <span>Instrucciones para descargar y reproducir el video</span>
-            <ul>
-                <li>Haga click en el siguiente link: <a href="{{video_url}}" target="_blank"></a></li>
+            {% if link_vencido %}
+                <p>Gracias {{name}} por atenderse con nosotros.</p>
+                <p>Le informamos que el link a expirado. Si a&uacute;n desea realizar la descarga  por favor env&iacute;enos un mail a cedirsalud@gmail.com</p>
+            {% else %}
+			    <span>Gracias {{name}} por atenderse con nosotros.</span>
+                <span>Si ud. no es {{name}} por favor reportelo inmediatamente al tel&eacute;fono 449-9536 o por mail cedirsalud@gmail.com</span>
                 
-            <ul>            
-            
-            <p>
-                Nota: el link estar&aacute; disponible hasta el {{fecha_vencimiento}}. Si el video no esta disponible o tiene problemas
-                para realizar la descarga por favor comuniquese con nosostros.
-            </p>
+                <span>Instrucciones para descargar y reproducir el video</span>
+                <ul>
+                    <li>Haga click en el siguiente link: <a href="{{video_url}}" target="_blank">{{video_url}}</a></li>
+                    <li>Vas a hacer re</li>
+                    
+                <ul>            
+                
+                <p>
+                    Nota: el link estar&aacute; disponible para descarga hasta el {{fecha_vencimiento}}. Si el video no esta disponible o tiene problemas
+                    para realizar la descarga por favor comuniquese con nosostros al tel&eacute;fono 449-9536 o por mail cedirsalud@gmail.com.
+                </p>
+			{% endif %}
 		</div>
 	</div>
 </div>

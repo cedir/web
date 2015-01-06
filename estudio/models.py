@@ -1,22 +1,32 @@
+import datetime
 from django.db import models
 from medico.models import Medico
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
 
+MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
+
 
 class Estudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
-    fechaEstudio = models.CharField(max_length=100)  # TODO:Esto deberia ser DATE
+    fechaEstudio = models.DateTimeField()
     practica = models.ForeignKey(Practica, db_column="idEstudio")  # TODO: esto estaba asociado a Estado en vez de practica. Por que??? ver si no estaba rompiendo
     motivoEstudio = models.CharField(max_length=300)
     informe = models.TextField()
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo")
-    public_id = models.CharField(max_length=100, db_column="publicID")
+    #public_id = models.CharField(max_length=100, db_column="publicID")
 
     class Meta:
         db_table = 'cedirData\".\"tblEstudios'
+
+    @property
+    def fecha_vencimiento_link_video(self):
+        return self.fechaEstudio + datetime.timedelta(days=MAX_DAYS_VIDEO_LINK_AVAILABLE)
+
+    def is_link_vencido(self):
+        return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
 
 
 class DetalleEstudio(models.Model):
