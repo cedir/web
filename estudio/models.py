@@ -5,6 +5,7 @@ from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
 
+
 MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
 
 
@@ -28,6 +29,10 @@ class Estudio(models.Model):
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            return False
+
 
 class DetalleEstudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
@@ -38,6 +43,7 @@ class DetalleEstudio(models.Model):
     nroDeOrden = models.CharField(max_length=200)
     idAnestesista = models.IntegerField()
     esPagoContraFactura = models.IntegerField()
+    #estudio = models.ForeignKey(Estudio, db_column="nro")
 
     class Meta:
         db_table = 'cedirData\".\"tblDetalleEstudio'
@@ -64,3 +70,5 @@ class PagoCobroEstudio(models.Model):
 
     class Meta:
         db_table = 'cedirData\".\"tblPagoCobroEstudio'
+
+

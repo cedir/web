@@ -1,9 +1,13 @@
+import logging
 from django.http import HttpResponse
 from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
 from django.shortcuts import render
 from contenidos.models import *
 from estudio.models import Estudio
+
+
+logger = logging.getLogger(u'videos')
 
 def get_video(request, public_id):
     """
@@ -23,7 +27,10 @@ def get_video(request, public_id):
         paciente = str(estudio.paciente)
         fecha_vencimiento = estudio.fecha_vencimiento_link_video
         link_vencido = estudio.is_link_vencido()
+
+        logger.info('Acceso correcto con public_id: %s' % public_id)
     except Estudio.DoesNotExist:
+        logger.error('Intento con public_id erroneo: %s' % public_id)
         pass
 
     context = {
