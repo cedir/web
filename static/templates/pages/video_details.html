@@ -1,27 +1,37 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<div class="dr">
+<style>
+    #video_download .dc p, #video_download li{
+        color: #6f6f6f;
+        font-size: 12px;
+    }
+</style>
+
+
+<div class="dr" id="video_download">
 	<div class="dc" style="width:35px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 	<div class="dc" style="width:650;">
 		<div style="font-size:18px;margin-bottom:12px;">
             {% if link_vencido %}
-                <p>Gracias {{name}} por atenderse con nosotros.</p>
+                <p>Gracias {{paciente}} por atenderse con nosotros.</p>
                 <p>Le informamos que el link a expirado. Si a&uacute;n desea realizar la descarga  por favor env&iacute;enos un mail a cedirsalud@gmail.com</p>
             {% else %}
-			    <span>Gracias {{name}} por atenderse con nosotros.</span>
-                <span>Si ud. no es {{name}} por favor reportelo inmediatamente al tel&eacute;fono 449-9536 o por mail cedirsalud@gmail.com</span>
+			    <p>Gracias {{paciente}} por atenderse con nosotros.</p>
+                <p>Si ud. no es {{paciente}} por favor reportelo inmediatamente al tel&eacute;fono 449-9536 o por mail a cedirsalud@gmail.com</p>
                 
-                <span>Instrucciones para descargar y reproducir el video</span>
+                <h4>Instrucciones para descargar y reproducir el video</h4>
                 <ul>
                     <li>Haga click en el siguiente link: <a href="{{video_url}}" target="_blank">{{video_url}}</a></li>
-                    <li>Vas a hacer re</li>
-                    
-                <ul>            
+                    <li>Ser&aacute;s redirigido al sitio Mega, donde ver&aacute;s un archivo con tu nombre y extensi&oacute;n "mpg".</li>
+                    <li>Haga doble click sobre este archivo para iniciar la descarga.</li>
+                    <li>Por &uacute;ltimo b&uacute;sque y reprodusca el video en su computadora (suele descargarse dentro de la carpeta "Descargas")</li>
+                <ul>
                 
+                <p>Nota: es recomandable usar <a href="https://www.google.es/chrome/browser/desktop/index.html" target="_blank">Chrome</a> como navegador.</p>
                 <p>
-                    Nota: el link estar&aacute; disponible para descarga hasta el {{fecha_vencimiento}}. Si el video no esta disponible o tiene problemas
-                    para realizar la descarga por favor comuniquese con nosostros al tel&eacute;fono 449-9536 o por mail cedirsalud@gmail.com.
+                    Nota 2: el link estar&aacute; disponible para descarga hasta el {{fecha_vencimiento}}. Si el video no esta disponible o tiene problemas
+                    para realizar la descarga por favor comuniquese con nosostros al tel&eacute;fono 449-9536 o por mail a cedirsalud@gmail.com.
                 </p>
 			{% endif %}
 		</div>

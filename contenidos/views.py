@@ -19,11 +19,8 @@ def get_video(request, public_id):
     link_vencido = True
 
     try:
-        #estudio = Estudio.object.get(public_id=public_id)
-        #video_url = estudio.enlace_video
-        estudio = Estudio.objects.get(pk=public_id)
+        estudio = Estudio.object.get(public_id=public_id)
         video_url = estudio.enlace_video
-
         paciente = str(estudio.paciente)
         fecha_vencimiento = estudio.fecha_vencimiento_link_video
         link_vencido = estudio.is_link_vencido()
