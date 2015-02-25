@@ -4,6 +4,7 @@ from medico.models import Medico
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
+from utils.security import encode
 
 
 MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
@@ -32,6 +33,9 @@ class Estudio(models.Model):
     def save(self, *args, **kwargs):
         if self.pk:
             return False
+
+    def set_public_id(self):
+        self.public_id = encode(self.pk)
 
 
 class DetalleEstudio(models.Model):

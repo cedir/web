@@ -5,7 +5,7 @@ from contenidos.views import get_video
 urlpatterns = patterns('',
     (r'^$', render_home),
     (r'^content/(\d+)/$', 'contenidos.getContent.getContent'),
-    (r'^video/(?P<public_id>\w+)/$', get_video),
+    (r'^video/(?P<public_id>\w+={0,2})/$', get_video),
     (r'^static/', 'contenidos.getStatic.getStatic'),
     (r'^listContents/', 'contenidos.getContentsList.getList'),
     (r'^search/', 'contenidos.getSearchContents.getResults'),
