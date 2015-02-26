@@ -13,7 +13,7 @@ MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
 class Estudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
-    fechaEstudio = models.DateTimeField()
+    fechaEstudio = models.DateField()
     practica = models.ForeignKey(Practica, db_column="idEstudio")  # TODO: esto estaba asociado a Estado en vez de practica. Por que??? ver si no estaba rompiendo
     motivoEstudio = models.CharField(max_length=300)
     informe = models.TextField()
@@ -31,8 +31,8 @@ class Estudio(models.Model):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
 
     def save(self, *args, **kwargs):
-        if self.pk:
-            return False
+        if self.pk is None:
+            super(Estudio, self).save(*args, **kwargs)
 
     def set_public_id(self):
         self.public_id = encode(self.pk)
