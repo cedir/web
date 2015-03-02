@@ -4,7 +4,6 @@ from medico.models import Medico
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
-from utils.security import encode
 
 
 MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
@@ -31,11 +30,11 @@ class Estudio(models.Model):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
 
     def save(self, *args, **kwargs):
-        if self.pk is None:
+        """
+        Disable save from admin. Passing param 'force' to allow saving from code.
+        """
+        if self.pk is None or kwargs.pop(u'force', None):
             super(Estudio, self).save(*args, **kwargs)
-
-    def set_public_id(self):
-        self.public_id = encode(self.pk)
 
 
 class DetalleEstudio(models.Model):

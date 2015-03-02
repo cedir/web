@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from turno.models import Turno
 from estudio.models import Estudio, DetalleEstudio, PagoCobroEstudio
 from managers.models import AuditLog, Usuario
+from utils.security import encode
 
 
 def anunciar(request, id_turno):
@@ -26,8 +27,9 @@ def anunciar(request, id_turno):
             estudio.fechaEstudio = turno.fechaTurno
             estudio.motivoEstudio = ""
             estudio.informe = ""
-            estudio.set_public_id()
             estudio.save()  # TODO: gestionar error: si falla en algun save, ver si se puede hacer rollback, sino informar del error grave! porque se desconfiguran los id de estudio
+            estudio.public_id = encode(estudio.id)
+            estudio.save(force=True)
 
             detalleEstudio = DetalleEstudio()
             detalleEstudio.medico_id = turno.medico.id
