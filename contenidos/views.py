@@ -1,24 +1,43 @@
-# Create your views here.
-
-
+import logging
 from django.http import HttpResponse
-from django.template import Template, Context, loader
-
+from django.template import Template, Context, RequestContext
+from django.template.loader import select_template
+from django.shortcuts import render
 from contenidos.models import *
+from estudio.models import Estudio
 
-def getContent(request, idContent):
-    
-    templateName = 'getContent.html'
-    if (request.GET.has_key('template') and request.GET['template'] != ''):
-    	templateName = request.GET['template']
-    
-    cContent = Contenido.objects.get(pk=1)
-    
-    
-    c = Context({
-	'content': cContent,
-    })
-    
-    
-    t = loader.get_template('pages/' + templateName)
-    return HttpResponse(t.render(c))
+
+logger = logging.getLogger(u'videos')
+
+def get_video(request, public_id):
+    """
+    Get the estudio for the given public_id, and displays the video link that redirects to the video download page.
+    """    
+    video_url = None
+    paciente = None
+    fecha_vencimiento = None
+    link_vencido = True
+    estudio_does_not_exist = False
+
+    try:
+        estudio = Estudio.objects.get(public_id=public_id)
+        video_url = estudio.enlace_video
+        paciente = str(estudio.paciente)
+        fecha_vencimiento = estudio.fecha_vencimiento_link_video
+        link_vencido = estudio.is_link_vencido()
+
+        logger.info('Acceso correcto con public_id: %s' % public_id)
+    except Estudio.DoesNotExist:
+        estudio_does_not_exist = True
+        logger.error('Intento con public_id erroneo: %s' % public_id)
+
+    context = {
+        u'video_url': video_url,
+        u'paciente': paciente,
+        u'fecha_vencimiento': fecha_vencimiento,
+        u'link_vencido': link_vencido,
+        u'estudio_does_not_exist': estudio_does_not_exist,
+    }
+    t = select_template(['pages/video_details.html'])
+    return HttpResponse(t.render(RequestContext(request, context)))
+
