@@ -17,6 +17,7 @@ def get_video(request, public_id):
     paciente = None
     fecha_vencimiento = None
     link_vencido = True
+    estudio_does_not_exist = False
 
     try:
         estudio = Estudio.objects.get(public_id=public_id)
@@ -27,14 +28,15 @@ def get_video(request, public_id):
 
         logger.info('Acceso correcto con public_id: %s' % public_id)
     except Estudio.DoesNotExist:
+        estudio_does_not_exist = True
         logger.error('Intento con public_id erroneo: %s' % public_id)
-        pass
 
     context = {
         u'video_url': video_url,
         u'paciente': paciente,
         u'fecha_vencimiento': fecha_vencimiento,
         u'link_vencido': link_vencido,
+        u'estudio_does_not_exist': estudio_does_not_exist,
     }
     t = select_template(['pages/video_details.html'])
     return HttpResponse(t.render(RequestContext(request, context)))

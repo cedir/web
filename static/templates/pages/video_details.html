@@ -13,10 +13,13 @@
 	<div class="dc" style="width:35px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 	<div class="dc" style="width:650;">
 		<div style="font-size:18px;margin-bottom:12px;">
-            <p>Gracias {{paciente}} por atenderse con nosotros.</p>
-            {% if link_vencido %}
-                <p>Le informamos que el link a expirado. Si a&uacute;n desea realizar la descarga  por favor env&iacute;enos un mail a cedirsalud@gmail.com</p>
+            {% if estudio_does_not_exist %}
+                <p>El link ingresado es incorrecto. Por favor verifiquelo nuevamente recordando respetar mayusculas y minusculas. Si a&uacute;n persiste con el problema, env&iacute;enos un mail a cedirsalud@gmail.com</p>
+            {% elif link_vencido %}
+                <p>Gracias {{paciente}} por atenderse con nosotros.</p>
+                <p>Le informamos que el link ha expirado. Si a&uacute;n desea realizar la descarga  por favor env&iacute;enos un mail a cedirsalud@gmail.com</p>
             {% else %}
+                <p>Gracias {{paciente}} por atenderse con nosotros.</p>
                 <p>Si ud. no es {{paciente}} por favor reportelo inmediatamente al tel&eacute;fono 449-9536 o por mail a cedirsalud@gmail.com</p>
                 
                 <h4>Instrucciones para descargar y reproducir el video</h4>
@@ -24,7 +27,7 @@
                     <li>Haga click en el siguiente link: <a href="{{video_url}}" target="_blank">{{video_url}}</a></li>
                     <li>Ser&aacute;s redirigido al sitio Mega, donde ver&aacute;s un archivo con tu nombre y extensi&oacute;n "mpg".</li>
                     <li>Haga doble click sobre este archivo para iniciar la descarga.</li>
-                    <li>Por &uacute;ltimo b&uacute;sque y reprodusca el video en su computadora (suele descargarse dentro de la carpeta "Descargas")</li>
+                    <li>Por &uacute;ltimo b&uacute;sque y reproduzca el video en su computadora (suele descargarse dentro de la carpeta "Descargas")</li>
                 <ul>
                 
                 <p>Nota: es recomandable usar <a href="https://www.google.es/chrome/browser/desktop/index.html" target="_blank">Chrome</a> como navegador.</p>
@@ -34,9 +37,11 @@
                 </p>
 			{% endif %}
                 <p>
-                IMPORTANTE: El estudio endoscopico realizado debe ir acompañado por el informe escrito y firmado por el medico tratante como &uacute;nico comprobante exigible. </br>
-                Todo otro tipo de material, ya sean im&aacute;genes fotogr&aacute;ficas impresas o grabadas en tiempo real y archivadas en formato de DVD o nube inform&aacute;tica, 
-                ser&aacute;n consideras como im&aacute;genes complementarias opcionales, sujeto a disponibilidad t&eacute;cnica y sin obligaci&oacute;n por parte de la instituci&oacute;n a la entrega de este material complenetario.
+                    <i>
+                        IMPORTANTE: El estudio endoscopico realizado debe ir acompañado por el informe escrito y firmado por el medico tratante como &uacute;nico comprobante exigible. </br>
+                        Todo otro tipo de material, ya sean im&aacute;genes fotogr&aacute;ficas impresas o grabadas en tiempo real y archivadas en formato de DVD o nube inform&aacute;tica, 
+                        ser&aacute;n consideras como im&aacute;genes complementarias opcionales, sujeto a disponibilidad t&eacute;cnica y sin obligaci&oacute;n por parte de la instituci&oacute;n a la entrega de este material complenetario.
+                    </i>
                 </p>
                 <p><img src="/media/images/icon-ingecol_01.png" alt="Medio Ambiente Icono" style="width:50px; height:50px; vertical-align: middle;"/>Al utilizar el link de descarga en vez de un DVD estas contribuyendo al cuidado del medio ambiente.</p>
 		</div>
