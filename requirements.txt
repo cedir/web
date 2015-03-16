@@ -4,7 +4,7 @@ Django==1.7
 Pillow==2.5.1
 psycopg2==2.6.1
 simplejson==2.3.2
-#bootstrap-admin  # https://github.com/douglasmiranda/django-admin-bootstrap
+bootstrap-admin  # https://github.com/douglasmiranda/django-admin-bootstrap
 ConcurrentLogHandler==0.9.1
 reportlab==3.3.0
 django-filter==0.11.0
