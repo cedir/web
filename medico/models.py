@@ -1,5 +1,6 @@
 from django.db import models
 from sala.models import Sala
+from obra_social.models import ObraSocial
 
 
 class Medico(models.Model):
@@ -13,10 +14,11 @@ class Medico(models.Model):
     #mail = models.CharField("Mail",max_length=200, db_column="mail")
 
     def __unicode__ (self):
-        return self.apellido
+        return u'%s, %s' % (self.apellido, self.nombre, )
 
     class Meta:
         db_table = 'cedirData\".\"tblMedicosAct'
+        ordering = [u'apellido']
 
 
 class Disponibilidad(models.Model):
@@ -32,3 +34,10 @@ class Disponibilidad(models.Model):
 
     class Meta:
         db_table = 'cedirData\".\"turnos_disponibilidad_medicos'
+
+
+class InfoMedico(models.Model):
+    medico = models.ForeignKey(Medico)
+    obra_social = models.ForeignKey(ObraSocial)
+    texto = models.TextField()
+
