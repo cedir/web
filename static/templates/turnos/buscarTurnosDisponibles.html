@@ -1,9 +1,10 @@
 {% extends "turnos/base.html" %}
 
 {% block content %}
-
+<link href="/media/css/turnos/nuevo_turno.css" rel="stylesheet" type="text/css"/>
 <link type="text/css" href="/media/css/widgets/ui.multiselect.css" rel="stylesheet" />
 <link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<link href="/media/css/widgets/ui.multiselect.overide.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="/media/js/jquery-ui-1.8.1.custom.min.js"></script>
 <script type="text/javascript" src="/media/js/ui.multiselect.js"></script>
 <script type="text/javascript" src="/media/js/jquery.ui.datepicker-es.js"></script>
@@ -38,21 +39,17 @@ $(function(){
     $("#tab-paciente").tabs();
 
     $('#tabs').bind('tabsselect', function(event, ui) {
-      if (ui.panel.id == "fragment-2") {
-	//alert("cool");
-	var idPracticas = $("#id-practicas").val();
+        if (ui.panel.id == "fragment-2") {
+            var idPracticas = $("#id-practicas").val();
 
-	var arr = String(idPracticas).split(",");
-	for(var i = 0;i< arr.length; i++){
-	  if(arr[i] != 'null'){
-	    
-	    //alert($("#id-practicas option[value='" + arr[i] + "']").text());
-	    var newRow = "<tr><td>Orden de " + $("#id-practicas option[value='" + arr[i] + "']").text() + "</td><td>%100</td></tr>";
-	    $('#table-ordenes').append(newRow);
-	  }
-	}
-
-      }
+            var arr = String(idPracticas).split(",");
+            for(var i = 0;i< arr.length; i++){
+              if(arr[i] != 'null'){
+                var newRow = "<tr><td>Orden de " + $("#id-practicas option[value='" + arr[i] + "']").text() + "</td><td>%100</td></tr>";
+                $('#table-ordenes').append(newRow);
+              }
+            }
+        }
     });
 
 
@@ -75,7 +72,13 @@ $(function(){
     getHorarioAtencionMedico();
     //subscribe event medico select
     $('#id-medico').change(function() {
-      getHorarioAtencionMedico();
+        getHorarioAtencionMedico();
+        getInfoMedico();
+    });
+
+    getInfoMedico();
+    $('#id-obra-social').change(function() {
+        getInfoMedico();
     });
 
     //agregar los : a la hora de fin de turno
@@ -208,47 +211,52 @@ $(function(){
     <input type="hidden" name="id-paciente" id="id-paciente" value="{{idPaciente}}" >
 
     <div class="section">
-	<div class="form-row">
-	    <label>Médico:</label>
-	    <select id="id-medico" name="id-medico" >
-		  <option value="">Seleccione..</option>
-		  {% for medico in medicos %}
-		      <option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %} >{{ medico.apellido }}, {{ medico.nombre }}</option>
-		  {% endfor %}
-	    </select>
-	</div>
-	<div class="form-row">
-	    <label>Obra Social</label>
-	    <select id="id-obra-social" name="id-obra-social" style="width:350px;">
-		  <option value="">Seleccione..</option>
-		  {% for obrasSocial in obrasSociales %}
-		      <option value="{{ obrasSocial.id }}" {% if obrasSocial.selected %} selected="selected" {% endif %} >{{ obrasSocial.nombre }}</option>
-		  {% endfor %}
-	    </select>
-	</div>
-	<div class="form-row">
-	    <label>Fecha:</label><input type="textbox" id="fecha" name="fecha" value="{{ fecha }}" size="10"/>
-	</div>
-	<div class="form-row">
-	    <label>Sala:</label>
-	    <select id="id-sala" name="id-sala" >
-		  <option value="">Seleccione..</option>
-		  {% for sala in salas %}
-		      <option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %} >{{ sala.nombre }}</option>
-		  {% endfor %}
-	    </select>
-	    <input name="ver" type="button" value="Ver planilla" text="Ver planilla" onclick="getVerPlanilla();" />
-	</div>
-	<div class="form-row" style="display:none;" id="med-info">
-	    Horario de atencion de <span id="med-horario"></span>
-	</div>
+	    <div class="form-row">
+	        <label>Médico:</label>
+	        <select id="id-medico" name="id-medico" >
+		      <option value="">Seleccione..</option>
+		      {% for medico in medicos %}
+		          <option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %} >{{ medico.apellido }}, {{ medico.nombre }}</option>
+		      {% endfor %}
+	        </select>
+	    </div>
+	    <div class="form-row">
+	        <label>Obra Social</label>
+	        <select id="id-obra-social" name="id-obra-social" style="width:350px;">
+		      <option value="">Seleccione..</option>
+		      {% for obrasSocial in obrasSociales %}
+		          <option value="{{ obrasSocial.id }}" {% if obrasSocial.selected %} selected="selected" {% endif %} >{{ obrasSocial.nombre }}</option>
+		      {% endfor %}
+	        </select>
+	    </div>
+	    <div class="form-row">
+	        <label>Fecha:</label><input type="textbox" id="fecha" name="fecha" value="{{ fecha }}" size="10"/>
+	    </div>
+	    <div class="form-row">
+	        <label>Sala:</label>
+	        <select id="id-sala" name="id-sala" >
+		      <option value="">Seleccione..</option>
+		      {% for sala in salas %}
+		          <option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %} >{{ sala.nombre }}</option>
+		      {% endfor %}
+	        </select>
+	        <input name="ver" type="button" value="Ver planilla" text="Ver planilla" onclick="getVerPlanilla();" />
+	    </div>
+	    <div class="form-row" style="display:none;" id="med-info">
+	        Horario de atencion de <span id="med-horario"></span>
+	    </div>
     </div>
     <div class="section">
-      <select id="id-practicas" class="multiselect" multiple="multiple" name="id-practicas[]">
-	{% for practica in practicas %}
-	    <option value="{{ practica.id }}" {% if practica.selected %} selected="selected" {% endif %} >{{ practica.nombre }}</option>
-	{% endfor %}
-      </select>
+        <select id="id-practicas" class="multiselect" multiple="multiple" name="id-practicas[]">
+            {% for practica in practicas %}
+                <option value="{{ practica.id }}" {% if practica.selected %} selected="selected" {% endif %} >{{ practica.nombre }}</option>
+            {% endfor %}
+        </select>
+        <div id="med-os-info">
+            Datos del m&eacute;dico para <b><span id="infomed-obrasocial"></b></span>
+	        <ul>
+            </ul>
+	    </div>
     </div>
     <div class="clear"></div>
 

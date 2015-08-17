@@ -156,6 +156,10 @@ a:hover, a:active {
   overflow:hidden;
   padding:8px 12px;
 }
+.form-row SELECT {
+    line-height: 26px;
+    height: 26px;
+}
 .form-row LABEL {
   display:block;
   width:8em;

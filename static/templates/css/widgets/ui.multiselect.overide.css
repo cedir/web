@@ -1,0 +1,8 @@
+
+.ui-multiselect.ui-helper-clearfix.ui-widget{
+    height: 165px;
+}
+
+.ui-multiselect ul.available, .ui-multiselect ul.selected {
+    height: 137px !important;
+}

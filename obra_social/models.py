@@ -11,3 +11,7 @@ class ObraSocial(models.Model):
 
     class Meta:
         db_table = 'cedirData\".\"AlmacenObraSocial'
+        ordering = ['nombre']
+
+    def __unicode__(self):
+        return u'%s' % self.nombre

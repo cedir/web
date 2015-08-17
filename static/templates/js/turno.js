@@ -2,6 +2,9 @@
   Turnos
 
 */
+
+//(function($) {
+
 $(document).ready(function(){
 	$("ul.topnav li a").hover(function() { //When trigger is clicked...
 		$(this).parent().find("ul.subnav").slideDown('fast').show(); //Drop down the subnav on click
@@ -330,6 +333,31 @@ function getHorarioAtencionMedico() {
 	      var medico = $("#id-medico option:selected").text();
 	      $('#med-horario').html("<b>" + medico + "</b>" + data.horario);
 	      $('#med-info').show();
+      }
+    });
+}
+
+function getInfoMedico() {
+    var medicoId = $("#id-medico").val();
+    var obraSocialId = $("#id-obra-social").val();
+
+    if (!medicoId || !obraSocialId){
+      $('#med-os-info').hide();
+      return;
+    }
+    
+    $.ajax({
+      url: '/api/medico/infomedicos/',
+      dataType: 'json',
+      data: 'medico=' + medicoId + '&obra_social=' + obraSocialId,
+      success: function(data) {
+            $('#med-os-info ul').empty();
+            for (var i = 0; i < data.length; i++) {
+                $('#med-os-info ul').append("<li>" + data[i].texto + "</li>");
+            };
+            var nombreObraSocial = $("#id-obra-social option:selected").text();
+            $('#infomed-obrasocial').html(nombreObraSocial);
+            $('#med-os-info').show();
       }
     });
 }
@@ -673,3 +701,6 @@ function isEmail(email) {
 	}
 	return true
 }
+
+//})(jQuery);
+
