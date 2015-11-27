@@ -1,10 +1,15 @@
 import simplejson
 from datetime import datetime
 from django.http import HttpResponse
-from turno.models import Turno
+from django.shortcuts import render
+from django.db.models import Q
+import django_filters
+from rest_framework import viewsets
+from turno.models import Turno, InfoTurno
 from estudio.models import Estudio, DetalleEstudio, PagoCobroEstudio
 from managers.models import AuditLog, Usuario
 from utils.security import encode
+from turno.serializers import InfoTurnoSerializer
 
 
 def anunciar(request, id_turno):
@@ -79,3 +84,30 @@ def anunciar(request, id_turno):
         response_dict['message'] = str(err)
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
+
+
+class InfoTurnoViewSet(viewsets.ModelViewSet):
+    model = InfoTurno
+    queryset = InfoTurno.objects.all()
+    serializer_class = InfoTurnoSerializer
+
+    def get_queryset(self):
+        queryset = InfoTurno.objects.all()
+        medico_id = self.request.query_params.get(u'medico')
+        practica_ids = self.request.query_params.get(u'practicas')
+        obra_social_id = self.request.query_params.get(u'obrasocial')
+
+        if medico_id:
+            queryset = queryset.filter(Q(medico=medico_id) | Q(medico__isnull=True))
+
+        if obra_social_id:
+            queryset = queryset.filter(Q(obra_social=obra_social_id) | Q(obra_social__isnull=True))
+
+        if practica_ids:
+            queryset = queryset.filter(Q(practicas__id__in=practica_ids.split(u',')) | Q(practicas__isnull=True))
+
+        return queryset
+
+
+
+

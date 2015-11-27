@@ -1,6 +1,5 @@
 from django.db import models
 from sala.models import Sala
-from obra_social.models import ObraSocial
 
 
 class Medico(models.Model):
@@ -34,10 +33,4 @@ class Disponibilidad(models.Model):
 
     class Meta:
         db_table = 'cedirData\".\"turnos_disponibilidad_medicos'
-
-
-class InfoMedico(models.Model):
-    medico = models.ForeignKey(Medico)
-    obra_social = models.ForeignKey(ObraSocial)
-    texto = models.TextField()
 

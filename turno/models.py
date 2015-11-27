@@ -4,6 +4,7 @@ from paciente.models import Paciente
 from obra_social.models import ObraSocial
 from practica.models import Practica
 from sala.models import Sala
+from obra_social.models import ObraSocial
 
 
 class Estado(models.Model):
@@ -36,3 +37,11 @@ class Turno(models.Model):
 
     def __unicode__(self):
         return str(self.id)
+
+
+class InfoTurno(models.Model):
+    medico = models.ForeignKey(Medico, null=True, blank=True)
+    obra_social = models.ForeignKey(ObraSocial, null=True, blank=True)
+    practicas = models.ManyToManyField(Practica, null=True, blank=True)
+    texto = models.TextField()
+

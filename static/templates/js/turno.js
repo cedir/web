@@ -340,11 +340,16 @@ function getHorarioAtencionMedico() {
 function getInfoMedico() {
     var medicoId = $("#id-medico").val();
     var obraSocialId = $("#id-obra-social").val();
+    var idPracticas = $("#id-practicas").val();
+
+    alert("Med: " + medicoId + " OS: " + obraSocialId + " Prac" + idPracticas);
 
     if (!medicoId || !obraSocialId){
       $('#med-os-info').hide();
       return;
     }
+
+    return;
     
     $.ajax({
       url: '/api/medico/infomedicos/',

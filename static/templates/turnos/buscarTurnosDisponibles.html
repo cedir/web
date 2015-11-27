@@ -19,6 +19,7 @@
 
 <script type="text/javascript">
 $(function(){
+
   $(".multiselect").multiselect();
 //   $(".selected").css("width","200px");
 //   $(".available").css("width","257px");
@@ -76,10 +77,18 @@ $(function(){
         getInfoMedico();
     });
 
+    $('#id-practicas').change(function() {
+        alert("changed");
+        getInfoMedico();
+    });
+
+
     getInfoMedico();
     $('#id-obra-social').change(function() {
         getInfoMedico();
     });
+
+
 
     //agregar los : a la hora de fin de turno
     $('#hora_fin_estimada').keyup(function(e) {
