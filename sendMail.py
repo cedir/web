@@ -5,7 +5,6 @@ from django.template import Template, Context, loader
 
 
 def sendMail(request):
-    import pdb; pdb.set_trace()
     toaddrs = settings.EMAIL_NOTIFICATION_ACCOUNTS
     subject = "Subject: Nuevo mensaje registrado desde cedirsalud.com.ar\n\n"
     request.content_type = "text/html"
