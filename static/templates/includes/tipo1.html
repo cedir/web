@@ -86,7 +86,7 @@
 		<div class="dt" style=" height:213px;">
 			<div class="dr">
 				<!--items-->
-				<div class="dc" style="width:300px;"><img src="/media/images/title_0_3.gif" alt="" style="margin:17px 0px 19px 0px;">
+				<div class="dc"><img src="/media/images/title_0_3.gif" alt="" style="margin:17px 0px 19px 0px;">
 					{% for home_content in home_contents %}
 						 {% if forloop.first %}<ul class="cl_0">{% else %}<ul class="cl_0"  style="padding:18px 0px 0px 0px;">{% endif %}
 							<li><span style="FONT-WEIGHT: bold;">{{ home_content.title }}</span> <br> {{home_content.description}} <a href="{% if home_content.friendlyURL %}{{ home_content.friendlyURL }}{% else %}/content/{{ home_content.id }}/{% endif %}">Ampliar</a></li>
