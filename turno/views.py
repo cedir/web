@@ -108,6 +108,3 @@ class InfoTurnoViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-
-
-

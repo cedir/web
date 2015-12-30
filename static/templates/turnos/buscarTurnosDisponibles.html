@@ -74,18 +74,17 @@ $(function(){
     //subscribe event medico select
     $('#id-medico').change(function() {
         getHorarioAtencionMedico();
-        getInfoMedico();
+        getInfoTurno();
     });
 
-    $('#id-practicas').change(function() {
-        alert("changed");
-        getInfoMedico();
+    $('#btnRefrescar').click(function() {
+        getInfoTurno();
     });
 
 
     getInfoMedico();
     $('#id-obra-social').change(function() {
-        getInfoMedico();
+        getInfoTurno();
     });
 
 
@@ -261,8 +260,9 @@ $(function(){
                 <option value="{{ practica.id }}" {% if practica.selected %} selected="selected" {% endif %} >{{ practica.nombre }}</option>
             {% endfor %}
         </select>
-        <div id="med-os-info">
-            Datos del m&eacute;dico para <b><span id="infomed-obrasocial"></b></span>
+        <input id="btnRefrescar" type="button" value="Refrescar" class="botones" /> 
+        <div id="info-turno">
+            <span>Info Turno</span>
 	        <ul>
             </ul>
 	    </div>
