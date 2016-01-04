@@ -337,27 +337,33 @@ function getHorarioAtencionMedico() {
     });
 }
 
-function getInfoMedico() {
+function getInfoTurno() {
     var medicoId = $("#id-medico").val();
     var obraSocialId = $("#id-obra-social").val();
+    var idPracticas = $("#id-practicas").val();
 
-    if (!medicoId || !obraSocialId){
-      $('#med-os-info').hide();
+    if (!medicoId && !obraSocialId && !idPracticas){
+        $('#info-turno').hide();
+        $('#btnRefrescar').hide();
       return;
+    }
+
+    if (idPracticas === null){
+        idPracticas = "";
     }
     
     $.ajax({
-      url: '/api/medico/infomedicos/',
+      url: '/api/turno/infoturno/',
       dataType: 'json',
-      data: 'medico=' + medicoId + '&obra_social=' + obraSocialId,
+      data: 'medico=' + medicoId + '&obrasocial=' + obraSocialId + "&practicas=" + idPracticas,
       success: function(data) {
-            $('#med-os-info ul').empty();
+            $('#info-turno ul').empty();
             for (var i = 0; i < data.length; i++) {
-                $('#med-os-info ul').append("<li>" + data[i].texto + "</li>");
+                $('#info-turno ul').append("<li>" + data[i].texto + "</li>");
             };
             var nombreObraSocial = $("#id-obra-social option:selected").text();
-            $('#infomed-obrasocial').html(nombreObraSocial);
-            $('#med-os-info').show();
+            $('#info-turno').show();
+            $('#btnRefrescar').show();
       }
     });
 }

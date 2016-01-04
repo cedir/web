@@ -19,6 +19,7 @@
 
 <script type="text/javascript">
 $(function(){
+
   $(".multiselect").multiselect();
 //   $(".selected").css("width","200px");
 //   $(".available").css("width","257px");
@@ -73,13 +74,20 @@ $(function(){
     //subscribe event medico select
     $('#id-medico').change(function() {
         getHorarioAtencionMedico();
-        getInfoMedico();
+        getInfoTurno();
     });
+
+    $('#btnRefrescar').click(function() {
+        getInfoTurno();
+    });
+
 
     getInfoMedico();
     $('#id-obra-social').change(function() {
-        getInfoMedico();
+        getInfoTurno();
     });
+
+
 
     //agregar los : a la hora de fin de turno
     $('#hora_fin_estimada').keyup(function(e) {
@@ -252,8 +260,9 @@ $(function(){
                 <option value="{{ practica.id }}" {% if practica.selected %} selected="selected" {% endif %} >{{ practica.nombre }}</option>
             {% endfor %}
         </select>
-        <div id="med-os-info">
-            Datos del m&eacute;dico para <b><span id="infomed-obrasocial"></b></span>
+        <input id="btnRefrescar" type="button" value="Refrescar" class="botones" /> 
+        <div id="info-turno">
+            <span>Info Turno</span>
 	        <ul>
             </ul>
 	    </div>
