@@ -71,6 +71,7 @@ $(function(){
 
 
     getHorarioAtencionMedico();
+    getInfoTurno();
     //subscribe event medico select
     $('#id-medico').change(function() {
         getHorarioAtencionMedico();
@@ -81,12 +82,9 @@ $(function(){
         getInfoTurno();
     });
 
-
-    getInfoMedico();
     $('#id-obra-social').change(function() {
         getInfoTurno();
     });
-
 
 
     //agregar los : a la hora de fin de turno
