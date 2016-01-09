@@ -357,10 +357,18 @@ function getInfoTurno() {
       dataType: 'json',
       data: 'medico=' + medicoId + '&obrasocial=' + obraSocialId + "&practicas=" + idPracticas,
       success: function(data) {
-            $('#info-turno ul').empty();
-            for (var i = 0; i < data.length; i++) {
-                $('#info-turno ul').append("<li>" + data[i].texto + "</li>");
-            };
+            $('#info-turno tbody tr').remove();
+            $.each(data, function(index, infoTurno) {
+                var info_turno_practicas = '';
+                $.each(infoTurno.practicas, function(index, practica) {
+                    info_turno_practicas += ' -' + (practica.abreviatura? practica.abreviatura : practica.descripcion);
+                });
+                if (!info_turno_practicas){
+                    info_turno_practicas = 'Todas';
+                }
+
+                $('#info-turno table tbody').append("<tr><td>" + infoTurno.texto + '</td><td>' + info_turno_practicas + "</td></tr>");
+            });
             var nombreObraSocial = $("#id-obra-social option:selected").text();
             $('#info-turno').show();
             $('#btnRefrescar').show();

@@ -39,21 +39,6 @@ $(function(){
 
     $("#tab-paciente").tabs();
 
-    $('#tabs').bind('tabsselect', function(event, ui) {
-        if (ui.panel.id == "fragment-2") {
-            var idPracticas = $("#id-practicas").val();
-
-            var arr = String(idPracticas).split(",");
-            for(var i = 0;i< arr.length; i++){
-              if(arr[i] != 'null'){
-                var newRow = "<tr><td>Orden de " + $("#id-practicas option[value='" + arr[i] + "']").text() + "</td><td>%100</td></tr>";
-                $('#table-ordenes').append(newRow);
-              }
-            }
-        }
-    });
-
-
     //plugin form clean a form
     $.fn.clearForm = function() {
       return this.each(function() {
@@ -260,9 +245,10 @@ $(function(){
         </select>
         <input id="btnRefrescar" type="button" value="Refrescar" class="botones" /> 
         <div id="info-turno">
-            <span>Info Turno</span>
-	        <ul>
-            </ul>
+            <table>
+                <thead><tr><th>Info Turnos</th><th>Practicas</th></tr></thead>
+                <tbody></tbody>
+            </table>
 	    </div>
     </div>
     <div class="clear"></div>

@@ -1,8 +1,13 @@
-#med-os-info {
+#info-turno {
     margin-top: 11px;
 }
 
-#med-os-info UL{
+#info-turno table{
     padding-left: 15px;
     font-size: 11px;
+    border-collapse: collapse;
+}
+
+#info-turno table, th, td {
+    border: 1px solid black;
 }
