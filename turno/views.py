@@ -106,5 +106,5 @@ class InfoTurnoViewSet(viewsets.ModelViewSet):
         if practica_ids:
             queryset = queryset.filter(Q(practicas__id__in=practica_ids.split(u',')) | Q(practicas__isnull=True))
 
-        return queryset
+        return queryset.distinct()
 
