@@ -26,7 +26,7 @@ class Comprobante(models.Model):
     sub_tipo = models.CharField(max_length=50, db_column=u'subTipo')
     estado = models.CharField(max_length=50, )
     numero = models.IntegerField(db_column=u'nroComprobante', )
-    nroTerminal = models.SmallIntegerField(db_column=u'fechaRecepcion', default=1)
+    nroTerminal = models.SmallIntegerField(db_column=u'nroTerminal', default=1)
     cae = models.CharField(max_length=128, db_column=u'CAE')
     total_facturado = models.FloatField(db_column=u'totalFacturado', default=0)
     total_cobrado = models.FloatField(db_column=u'totalCobrado')
@@ -37,9 +37,9 @@ class Comprobante(models.Model):
     factura = models.ForeignKey(u'comprobante.Comprobante', db_column=u'idFactura', null=True, blank=True)
     gravado = models.ForeignKey(Gravado, db_column=u'gravado', null=True, blank=True)
 
-
     class Meta:
         db_table = 'cedirData\".\"tblComprobantes'
+
 
 class LineaDeComprobante(models.Model):
     comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'lineas')

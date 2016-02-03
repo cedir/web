@@ -17,24 +17,27 @@ def migrate_comprobantes(apply_changes=False):
     if not apply_changes:
         print u'Los cambios no se guardaran'
 
-    comprobantes = Comprobante.objects.all()
+    comprobantes = Comprobante.objects.filter(estado__contains=u'NO COBRADO').exclude(gravado=1)
 
     for comprobante in comprobantes:
-
         lineas = comprobante.lineas.all()
 
         if len(lineas) > 2 or len(lineas) == 0:
             print u'[WARN] Comprobante #{} tiene mas de 2 lineas o ninguna: {} lineas'.format(comprobante.id, len(lineas))
             continue
+
         try:
             linea_iva, linea_descripcion = get_lineas_iva_descripcion(lineas)
         except AssertionError as e:
             print u'[ERR] {}'.format(e)
 
-        linea_descripcion.importe_neto = linea_descripcion.sub_total
         if linea_iva:
+            linea_descripcion.importe_neto = linea_descripcion.sub_total
             linea_descripcion.iva = linea_iva.sub_total
             linea_descripcion.sub_total = linea_descripcion.importe_neto + linea_descripcion.iva
+        else:
+            linea_descripcion.importe_neto = linea_descripcion.sub_total / (1 + (linea_descripcion.gravado.porcentaje / 100))
+            linea_descripcion.iva = linea_descripcion.importe_neto * linea_descripcion.gravado.porcentaje / 100
 
         if apply_changes:
             linea_descripcion.save()
@@ -53,10 +56,10 @@ def get_lineas_iva_descripcion(lineas):
         assert bool([iva for iva in ivas if iva in lineas[1].concepto]), u'IVA no esta en el concepto: {}'.format(lineas[1].comprobante.id)
         return lineas[1], lineas[0]
 
-    assert bool([iva for iva in ivas if iva in lineas[0].concepto]), u'IVA no esta en el concepto: {}'.format(lineas[0].id)
+    assert bool([iva for iva in ivas if iva in lineas[0].concepto]), u'IVA no esta en el concepto: {}'.format(lineas[0].comprobante.id)
     assert lineas[1].sub_total > lineas[0].sub_total, u'Ambas lineas son iguales: {}'.format(lineas[0].comprobante.id)
 
-    return lineas[1], lineas[0]
+    return lineas[0], lineas[1]
 
 
 
