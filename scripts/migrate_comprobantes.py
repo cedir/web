@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 import datetime
-sys.path.append('/home/wbrunetti/Documents/cedir')
+sys.path.append('/home/devel/Documents/source/web')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 from comprobante.models import Comprobante, LineaDeComprobante, Gravado
@@ -17,49 +17,31 @@ def migrate_comprobantes(apply_changes=False):
     if not apply_changes:
         print u'Los cambios no se guardaran'
 
-    comprobantes = Comprobante.objects.filter(estado__contains=u'NO COBRADO').exclude(gravado=1)
+    comprobantes = Comprobante.objects.all()
 
     for comprobante in comprobantes:
+        gravado = comprobante.gravado.porcentaje if comprobante.gravado else 0
         lineas = comprobante.lineas.all()
+        ivaTotal = 0
 
-        if len(lineas) > 2 or len(lineas) == 0:
-            print u'[WARN] Comprobante #{} tiene mas de 2 lineas o ninguna: {} lineas'.format(comprobante.id, len(lineas))
-            continue
+        for linea in lineas:
+            if gravado:
+                # gravado no es cero
+                linea.importe_neto = round((linea.sub_total * 100) / (100 + gravado), 2) #calculo el importe neto, dado el subtotal y el gravado
+                linea.iva = linea.sub_total - linea.importe_neto
+            else:
+                #gravado es cero
+                linea.importe_neto = linea.sub_total
+                linea.iva = 0
+            ivaTotal += linea.iva
+            if apply_changes:
+                linea.save()
 
-        try:
-            linea_iva, linea_descripcion = get_lineas_iva_descripcion(lineas)
-        except AssertionError as e:
-            print u'[ERR] {}'.format(e)
-
-        if linea_iva:
-            linea_descripcion.importe_neto = linea_descripcion.sub_total
-            linea_descripcion.iva = linea_iva.sub_total
-            linea_descripcion.sub_total = linea_descripcion.importe_neto + linea_descripcion.iva
-        else:
-            linea_descripcion.importe_neto = linea_descripcion.sub_total / (1 + (linea_descripcion.gravado.porcentaje / 100))
-            linea_descripcion.iva = linea_descripcion.importe_neto * linea_descripcion.gravado.porcentaje / 100
-
-        if apply_changes:
-            linea_descripcion.save()
-            if linea_iva:
-                linea_iva.delete()
+        ivaTotalCalculado = (comprobante.total_facturado * gravado) / (100 + gravado)
+        if abs(ivaTotalCalculado - ivaTotal) > 0.1:
+            print("En {0} IVA {1}% difiere. {2} {3}".format(comprobante.id, gravado, comprobante.total_facturado, [(l.sub_total, l.iva, l.concepto) for l in lineas ]))
 
     print u'Done'
-
-
-def get_lineas_iva_descripcion(lineas):
-    if len(lineas) == 1:
-        return None, lineas[0]
-
-    ivas = (u'IVA', u'iva', u'Iva')
-    if lineas[0].sub_total > lineas[1].sub_total:
-        assert bool([iva for iva in ivas if iva in lineas[1].concepto]), u'IVA no esta en el concepto: {}'.format(lineas[1].comprobante.id)
-        return lineas[1], lineas[0]
-
-    assert bool([iva for iva in ivas if iva in lineas[0].concepto]), u'IVA no esta en el concepto: {}'.format(lineas[0].comprobante.id)
-    assert lineas[1].sub_total > lineas[0].sub_total, u'Ambas lineas son iguales: {}'.format(lineas[0].comprobante.id)
-
-    return lineas[0], lineas[1]
 
 
 
