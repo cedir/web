@@ -1,16 +1,17 @@
 {% extends "turnos/base.html" %}
 
+{% load staticfiles %}
 {% block content %}
-<link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="/media/js/jquery-ui-1.8.1.custom.min.js"></script>
-<script type="text/javascript" src="/media/js/jquery.ui.datepicker-es.js"></script>
+<link href="{% static 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css' %}" rel="stylesheet" type="text/css"/>
+<link href="{% static 'chosen/chosen.min.css' %}" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js' %}"></script>
+
 <script>
 $(document).ready(function() {
-
-  var hush = $.datepicker.regional['es'];
-  hush['appendText'] = '(dd/mm/aaaa)';
-  $("#txtFechaNacimiento").datepicker(hush);
-
+  $("#txtFechaNacimiento").datepicker({language:"es"});
+  $("#txtSexo").chosen({width: "138px"});
 });
 </script>
 <div class="module">
@@ -67,5 +68,3 @@ $(document).ready(function() {
 
   </div>
 {% endblock %}
-     
-  

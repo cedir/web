@@ -1,10 +1,11 @@
 {% extends "turnos/base.html" %}
+{% load staticfiles %}
 
 {% block content %}
-<link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css"/>
+
+<link href="{% static 'chosen/chosen.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="/media/js/jquery-ui-1.8.1.custom.min.js"></script>
-<script type="text/javascript" src="/media/js/jquery.ui.datepicker-es.js"></script>
-<script type="text/javascript" src="/media/js/jquery.ui.datepicker-es.js"></script>
 <script type="text/javascript" src="/media/js/ui/jquery.ui.core.js"></script>
 <script type="text/javascript" src="/media/js/ui/jquery.ui.widget.js"></script>
 <script type="text/javascript" src="/media/js/ui/jquery.ui.mouse.js"></script>
@@ -12,103 +13,124 @@
 <script type="text/javascript" src="/media/js/ui/jquery.ui.position.js"></script>
 <script type="text/javascript" src="/media/js/ui/jquery.ui.resizable.js"></script>
 <script type="text/javascript" src="/media/js/ui/jquery.ui.dialog.js"></script>
+<script type="text/javascript" src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
 
 <script type="text/javascript">
-// <!CDATA[
-    $(function(){
-	    $('tbody tr').hover(
-		    function(){ $('td', this).addClass('ui-grid-state-hover');},
-		    function(){ $('td', this).removeClass('ui-grid-state-hover');}
-	    )
-    });
-// ]]>
+  // <!CDATA[
+  $(function() {
+    $("#id-medico-horario").chosen({width:"40%"});
+    $("#id-medico").chosen({width:"60%"});
+    $("#id-sala").chosen({width:"60%"});
+    $("#id-dia").chosen({width:"60%"});
+
+    $('tbody tr').hover(
+      function() {
+        $('td', this).addClass('ui-grid-state-hover');
+      },
+      function() {
+        $('td', this).removeClass('ui-grid-state-hover');
+      }
+    )
+  });
+  // ]]>
 </script>
 <div id="dialog" title="Crear/Modificar horario" class="dialog">
-      <input type="hidden" name="current-disponibilidad-id" id="current-disponibilidad-id" value="" />
-      <div class="form-row">
-	<label>M&eacute;dico:</label>
-	<select id="id-medico-horario" name="id-medico-horario" >
-	      <option value="">Seleccione..</option>
-	      {% for medico in medicos %}
-		  <option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %} >{{ medico.apellido }}, {{ medico.nombre }}</option>
-	      {% endfor %}
-	</select>
-      </div>
-      <div class="form-row">
-	  <label>Sala:</label>
-	  <select id="id-sala" name="id-sala" >
-		<option value="">Seleccione..</option>
-		{% for sala in salas %}
-		    <option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %} >{{ sala.nombre }}</option>
-		{% endfor %}
-	  </select>
-      </div>
-      <div class="form-row">
-	  <label>Dia:</label>
-	  <select id="id-dia" name="id-dia" >
-		<option value="">Seleccione..</option>
-		{% for dia in dias %}
-		    <option value="{{ dia.id }}" {% if dia.selected %} selected="selected" {% endif %} >{{ dia.nombre }}</option>
-		{% endfor %}
-	  </select>
-      </div>
-      <div class="form-row">
-	<div class="form-subrow form-subrow_first"><label>Desde:</label><input type="text" name="hora_desde" id="hora_desde" value="" size="10"/></div>
-	<div class="form-subrow"><label>hasta:</label><input type="text" name="hora_hasta" id="hora_hasta" value="" size="10"/></div>
-	<div style="clear:both;"></div>
-      </div>
-      <div class="form-row"><input type="button" name="btnGuardar" id="btnGuardar" value="Guardar" onclick="updateHorario();"/><input type="button" name="btnCrear" id="btnCrear" value="Guardar" onclick="createHorario();"/><input type="button" name="btnEliminar" id="btnEliminar"  value="Eliminar" onclick="eliminarHorario();"/><input type="button" name="btnCerrarFinalizar" value="Cerrar" onclick="$('#dialog').dialog('close');"/></div>
+  <input type="hidden" name="current-disponibilidad-id" id="current-disponibilidad-id" value="" />
+  <div class="form-row">
+    <label>M&eacute;dico:</label>
+    <select id="id-medico-horario" name="id-medico-horario">
+      <option value="">Seleccione..</option>
+      {% for medico in medicos %}
+      <option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %}>{{ medico.apellido }}, {{ medico.nombre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-row">
+    <label>Sala:</label>
+    <select id="id-sala" name="id-sala">
+      <option value="">Seleccione..</option>
+      {% for sala in salas %}
+      <option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %}>{{ sala.nombre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-row">
+    <label>Dia:</label>
+    <select id="id-dia" name="id-dia">
+      <option value="">Seleccione..</option>
+      {% for dia in dias %}
+      <option value="{{ dia.id }}" {% if dia.selected %} selected="selected" {% endif %}>{{ dia.nombre }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-row">
+    <div class="form-subrow form-subrow_first">
+      <label>Desde:</label>
+      <input type="text" name="hora_desde" id="hora_desde" value="" size="10" />
+    </div>
+    <div class="form-subrow">
+      <label>hasta:</label>
+      <input type="text" name="hora_hasta" id="hora_hasta" value="" size="10" />
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+  <div class="form-row">
+    <input type="button" name="btnGuardar" id="btnGuardar" value="Guardar" onclick="updateHorario();" />
+    <input type="button" name="btnCrear" id="btnCrear" value="Guardar" onclick="createHorario();" />
+    <input type="button" name="btnEliminar" id="btnEliminar" value="Eliminar" onclick="eliminarHorario();" />
+    <input type="button" name="btnCerrarFinalizar" value="Cerrar" onclick="$('#dialog').dialog('close');" />
+  </div>
 </div>
 <div class="module">
   <h3>Buscar Horario</h3>
-  <form name='frmBuscar' id='frmBuscar' action="/app/"  >
+  <form name='frmBuscar' id='frmBuscar' action="/app/">
     <input type="hidden" name="controlador" value="Root" />
     <input type="hidden" name="accion" value="getDisponibilidadMedicos" />
     <div class="form-row">
       <label>M&eacute;dico:</label>
-      <select id="id-medico" name="id-medico" >
-	    <option value="">Seleccione..</option>
-	    {% for medico in medicos %}
-		<option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %} >{{ medico.apellido }}, {{ medico.nombre }}</option>
-	    {% endfor %}
+      <select id="id-medico" name="id-medico">
+        <option value="">Seleccione..</option>
+        {% for medico in medicos %}
+        <option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %}>{{ medico.apellido }}, {{ medico.nombre }}</option>
+        {% endfor %}
       </select>
-      <input type= "submit" name="Buscar" value="Buscar" />
+      <input type="submit" name="Buscar" value="Buscar" />
     </div>
   </form>
 </div>
 
 
 <div class="ui-grid ui-widget ui-widget-content ui-corner-all">
-      <!--<div class="ui-grid-header ui-widget-header ui-corner-top">Pacientes encontrados</div> -->
-      <table class="ui-grid-content ui-widget-content">
-	  <thead>
-	      <tr>
-		      <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Medico</a></th>
-		      <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Sala</a></th>
-		      <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Dia</a></th>
-		      <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Horario</a></th>
-	      </tr>
-	  </thead>
-	  <tbody>
-	      {% for hshDisp in disponibilidades %}
-	      <tr class="ui-widget-content">
-		  <td><a href="#" onclick="getUpdateHorario({{hshDisp.id}});">{{hshDisp.medico}}</a></td>
-		  <td>{{hshDisp.sala}}</td>
-		  <td>{{hshDisp.dia}}</td>
-		  <td>{{hshDisp.horaInicio}} a {{hshDisp.horaFin}}</td>
-	      </tr>
-	      {% endfor %}
-	  </tbody>
-      </table>
-      <div class="ui-grid-footer ui-widget-header ui-corner-bottom ui-helper-clearfix">
-	      <div class="ui-grid-paging ui-helper-clearfix">
-		      <a href="?results=1" class="ui-grid-paging-prev ui-state-default ui-corner-left"><span class="ui-icon ui-icon-triangle-1-w" title="previous set of results"></span></a>
-		      <a href="?results=3" class="ui-grid-paging-next ui-state-default ui-corner-right"><span class="ui-icon ui-icon-triangle-1-e" title="next set of results"></span></a>
+  <!--<div class="ui-grid-header ui-widget-header ui-corner-top">Pacientes encontrados</div> -->
+  <table class="ui-grid-content ui-widget-content">
+    <thead>
+      <tr>
+        <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Medico</a></th>
+        <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Sala</a></th>
+        <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Dia</a></th>
+        <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span> Horario</a></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for hshDisp in disponibilidades %}
+      <tr class="ui-widget-content">
+        <td><a href="#" onclick="getUpdateHorario({{hshDisp.id}});">{{hshDisp.medico}}</a></td>
+        <td>{{hshDisp.sala}}</td>
+        <td>{{hshDisp.dia}}</td>
+        <td>{{hshDisp.horaInicio}} a {{hshDisp.horaFin}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="ui-grid-footer ui-widget-header ui-corner-bottom ui-helper-clearfix">
+    <div class="ui-grid-paging ui-helper-clearfix">
+      <a href="?results=1" class="ui-grid-paging-prev ui-state-default ui-corner-left"><span class="ui-icon ui-icon-triangle-1-w" title="previous set of results"></span></a>
+      <a href="?results=3" class="ui-grid-paging-next ui-state-default ui-corner-right"><span class="ui-icon ui-icon-triangle-1-e" title="next set of results"></span></a>
 
-	      </div>
-	      <div class="ui-grid-results"></div>
-      </div>
-      <input id="btbNuevoPaciente" type="button" value="Nuevo Horario" onclick="getCreateHorario();" />
+    </div>
+    <div class="ui-grid-results"></div>
+  </div>
+  <input id="btbNuevoPaciente" type="button" value="Nuevo Horario" onclick="getCreateHorario();" />
 </div>
 
 

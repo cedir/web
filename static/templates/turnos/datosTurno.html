@@ -1,128 +1,126 @@
 {% extends "turnos/base.html" %}
-
 {% block content %}
 
+<div class="change-listwww">
 
+  <table style="border-left:1px solid #ccc;border-right:1px solid #ccc;border-bottom:1px solid #ccc; width:100%;">
+    <thead style="height:35px;">
+      <tr>
+        <th align="Center" colspan="2" style="background:#E1E1E1 url(/images/turnos/nav-bg.gif) repeat-x scroll left top;border-top:1px solid #ccc; vertical-align:middle; font-size:larger;">
+          Datos Turno
+        </th>
+      </tr>
+    </thead>
+    <tbody style="border-bottom:1px solid #ccc;">
+      <tr>
+        <td align="right" style="width:56%;">
+          <b>Paciente:</b>
+        </td>
+        <td align="left">
+          Perez, Juan
+        </td>
+        <td>
+        </td>
 
-    <div class="change-listwww" >
+      </tr>
+      <tr>
+        <td align="right" style="width:56%;">
+          <b>Fecha:</b>
+        </td>
+        <td align="left">
+          05/05/2009
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td align="right" style="width:56%;">
+          <b>Hora Inicio:</b>
+        </td>
+        <td align="left">
+          13:00 hs.
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td align="right" style="width:56%;">
+          <b>Hora Fin:</b>
+        </td>
+        <td align="left">
+          13:00 hs
+        </td>
+        <td>
+        </td>
+      </tr>
 
+      <tr>
+        <td align="right" style="width:56%;">
+          <b>Médico:</b>
+        </td>
+        <td align="left">
+          Galli, Cristian
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td align="right" style="width:56%;">
+          <b>Obra Social:</b>
+        </td>
+        <td align="left">
+          <select id="Select2">
+            <option selected="selected">IAPOS</option>
+            <option selected="selected">OSDE</option>
+            <option selected="selected">AMR</option>
+          </select>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td align="right" style="width:56%;">
+          <b>Estado del turno:</b>
+        </td>
+        <td align="left">
+          Pendiente
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td align="right" style="width:56%;">
+          <b>Depósito:</b>
+        </td>
+        <td align="left">
+          <input id="Text1" type="text" />
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <th align="center" colspan="2">Ordenes Requeridas Presentadas</th>
+        <th align="center">Práctica a realizar</th>
+      </tr>
+      <tr>
+        <td colspan="2" style="height: 54px; width:56%;">
+          <table style="border:1px solid #ccc;">
+            <thead>
+              <tr>
+                <th align="Center">Presentó</th>
+                <th align="Center">Orden</th>
+                <th align="Center">Cobertura</th>
+              </tr>
+            </thead>
 
-    <table style="border-left:1px solid #ccc;border-right:1px solid #ccc;border-bottom:1px solid #ccc; width:100%;">
-         <thead style="height:35px;">  
-            <tr>
-            <th align="Center" colspan="2" style="background:#E1E1E1 url(/images/turnos/nav-bg.gif) repeat-x scroll left top;border-top:1px solid #ccc; vertical-align:middle; font-size:larger;">
-                  Datos Turno
-           </th>
-           </tr>                 
-        </thead>
-      <tbody style="border-bottom:1px solid #ccc;">
-            <tr>
-                <td align="right" style="width:56%;">
-                    <b>Paciente:</b>
+            <tbody>
+              {% for hshPaciente in pacientes %}
+              <tr class="{% cycle 'row1' 'row2' %}">
+                <td>
+                  <input id="Checkbox1" type="checkbox" />
                 </td>
-                <td align="left">
-                    Perez, Juan
-                </td>
-                <td >                   
-                </td>
-
-            </tr>
-            <tr>
-                 <td align="right" style="width:56%;">
-                    <b>Fecha:</b>
-                </td>
-                <td align="left">
-                    05/05/2009
-                </td>
-                 <td >                   
-                </td>
-            </tr>
-	    <tr>
-                <td align="right" style="width:56%;">
-                    <b>Hora Inicio:</b>
-                </td>
-                <td align="left">
-                    13:00 hs.
-                </td>
-                 <td >                   
-                </td>
-            </tr>
-	    <tr>
-                 <td align="right" style="width:56%;">
-                    <b>Hora Fin:</b>
-                </td>
-                <td align="left">
-                    13:00 hs
-                </td>
-                 <td >                   
-                </td>
-            </tr>
-           
-            <tr>
-                 <td align="right" style="width:56%;">
-                    <b>Médico:</b>
-                </td>
-                <td align="left">
-                    Galli, Cristian
-                </td>
-                 <td >                   
-                </td>
-            </tr>
-            <tr>
-                 <td align="right" style="width:56%;">
-                    <b>Obra Social:</b>
-                </td>
-                <td align="left">
-                   <select id="Select2">
-                       <option selected="selected">IAPOS</option>
-                       <option selected="selected">OSDE</option>
-                       <option selected="selected">AMR</option>
-                   </select>
-                </td>
-                 <td >                   
-                </td>
-            </tr>
-	    <tr>
-                 <td align="right" style="width:56%;">
-                    <b>Estado del turno:</b>
-                </td>
-                <td align="left">
-		      Pendiente  
-                </td>
-                 <td >                   
-                </td>
-            </tr>
-            <tr>
-                 <td align="right" style="width:56%;">
-                    <b>Depósito:</b>
-                </td>
-                <td align="left">
-                    <input id="Text1" type="text" />
-                </td>
-                 <td >                   
-                </td>
-            </tr>
-            <tr>
-                 <th  align="center" colspan="2">Ordenes Requeridas Presentadas</th>  
-                 <th  align="center">Práctica a realizar</th> 
-            </tr>
-            <tr>
-                <td colspan="2" style="height: 54px; width:56%;">		 
-		    <table style="border:1px solid #ccc;">
-			<thead>
-			<tr>
-                                <th align="Center">Presentó</th>
-                                <th align="Center">Orden</th>
-                                <th align="Center">Cobertura</th>
-			</tr>
-			</thead>
-
-			<tbody>
-			{% for hshPaciente in pacientes %}
-			<tr class="{% cycle 'row1' 'row2' %}">
-			    <td><input id="Checkbox1" type="checkbox" /></td>
-			    <td>{{ hshPaciente.observacion }}</td>
-			    <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshPaciente.id }}">Modificar<a>&nbsp;|&nbsp;<a href="/app/?controlador=Turnos&accion=getTurnosDisponibles&idPaciente={{ hshPaciente.id }}">Nuevo turno<a></td>
+                <td>{{ hshPaciente.observacion }}</td>
+                <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshPaciente.id }}">Modificar<a>&nbsp;|&nbsp;<a href="/app/?controlador=Turnos&accion=getTurnosDisponibles&idPaciente={{ hshPaciente.id }}">Nuevo turno<a></td>
 			</tr>
 			{% endfor %}
 			</tbody>
@@ -130,7 +128,7 @@
                </td>
 		    <td colspan="2">
 			<table style="border:1px solid #ccc;">
-			    <thead>  
+			    <thead>
 				<tr>
 				    <th align="Center">Práctica</th>
 				  </tr>
@@ -151,21 +149,18 @@
 		    </td>
             </tr>
             <tr>
-               
+
             </tr>
             <tr>
                 <td  colspan="2" align="left" style="margin: 0px; border-bottom-color:#ccc; border-bottom-width: 1px;">
                     <input id="btbAnunciar" type="button" value="Anunciar" />
-              
+
                     <input id="btbCancelar" type="button" value="Cancelar" onclick="return btbCancelar_onclick()" />
                </td>
             </tr>
         </tbody>
   </table>
-  
+
  </div>
 
-      
 {% endblock %}
-     
-  

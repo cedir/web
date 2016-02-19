@@ -7,7 +7,7 @@ html {
 	margin: 0;
 	padding: 0;
 	}
-body { 
+body {
     font-family:normal Arial,Helvetica,sans-serif;
     font-size:10px;
     font-size-adjust:none;
@@ -15,30 +15,30 @@ body {
     font-variant:normal;
     font-weight:normal;
     line-height:normal;
- 
 
-	
+
+
 }
-p { 
-	margin-top: 0; 
+p {
+	margin-top: 0;
 	text-align: justify;
 	}
-h3 { 
+h3 {
 	font: italic normal 1.4em georgia, sans-serif;
-	letter-spacing: 1px; 
-	margin-bottom: 0; 
+	letter-spacing: 1px;
+	margin-bottom: 0;
 	color: #7D775C;
 	}
-/*a:link { 
-	font-weight: bold; 
-	text-decoration: none; 
+/*a:link {
+	font-weight: bold;
+	text-decoration: none;
 	color: #5B80B2;
 	}
-a:visited { 
-	text-decoration: none; 
+a:visited {
+	text-decoration: none;
 	color: #5B80B2;
 	}
-a:hover, a:active { 
+a:hover, a:active {
 	color: #003366;
 	}*/
 
@@ -82,7 +82,7 @@ a:hover, a:active {
 	float: left;
 	margin: 0;
 	padding: 0 15px 0 0;
-	position: relative; 
+	position: relative;
 }
 #header ul.topnav li a{
 	padding: 10px 5px;
@@ -111,6 +111,7 @@ a:hover, a:active {
 	float: left;
 	width: 170px;
 	border: 1px solid #111;
+	z-index: 500;
 }
 #header ul.topnav li ul.subnav li{
 	margin: 0; padding: 0;
@@ -144,7 +145,7 @@ a:hover, a:active {
 #content .module H3{
   background-color: #E6E6E6;
   height:25px;
-  margin:0; 
+  margin:0;
   padding:7px 0 0 12px;
   color:#000;
   font-weight:bold;
@@ -153,7 +154,6 @@ a:hover, a:active {
 .form-row {
   border-bottom:1px solid #EEEEEE;
   font-size:11px;
-  overflow:hidden;
   padding:8px 12px;
 }
 .form-row LABEL {
@@ -194,7 +194,7 @@ a:hover, a:active {
     width:16px;
     background-color:#ccc;
     float:left;
-}	  
+}
 .time{
     height:20px;
     font-size:14px;
@@ -220,8 +220,8 @@ a:hover, a:active {
   font-weight:bold;
   font-size:14px;
 }
-	     
-/**********************************************************/	     
+
+/**********************************************************/
 
 /***************Home**************************/
 .home H2{
@@ -258,15 +258,14 @@ a:hover, a:active {
 
 
 /************Widgets**************/
-.multiselect {
-    width: 463px;
-    height: 200px;
+.multiselect ul.chosen-choices {
+	  overflow-y: scroll;
+		min-height: 150px;
+    max-height: 150px;
 }
-.ui-multiselect .remove-all {
-  display:none;
-}
-.ui-multiselect .add-all {
-  display:none;
+
+.multiselect li.search-choice {
+	  width: 100%;
 }
 
 .dialog{
@@ -294,9 +293,9 @@ a:hover, a:active {
   text-align: left;
 }
 .ui-grid-state-hover {
-  background: #dadada url(widgets/images/ui-bg_glass_75_dadada_1x400.png)  50%  50% repeat-x; 
-  font-weight: normal; 
-  color: #212121; 
+  background: #dadada url(widgets/images/ui-bg_glass_75_dadada_1x400.png)  50%  50% repeat-x;
+  font-weight: normal;
+  color: #212121;
 }
 
 
