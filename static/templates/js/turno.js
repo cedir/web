@@ -192,39 +192,67 @@ function getVerPlanilla() {
   $("#ver-planilla").submit();
 }
 
-function getEdit(idTurno) {
-  $("#dialog").dialog({
-    width: 550
-  });
+function getConfirmarTurno(event) {
+  var button = $(event.relatedTarget);
+  var fecha = button.data('fecha');
+  var horaInicio = button.data('hora');
+
+  var modal = $(this)
+
+  modal.find("#selected-medico").text($("#id-medico option:selected").text());
+  modal.find("#selected-obrasocial").text($("#id-obra-social option:selected").text());
+  modal.find("#selected-practicas").text($("#id-practicas option:selected").text());
+  modal.find("#selected-fecha").text(fecha);
+  modal.find("#selected-fecha-value").val(fecha);
+  modal.find("#hora_inicio").val(horaInicio);
+  modal.find("#selected-sala").text($("#id-sala option:selected").text());
+
+}
+
+
+function setPaciente(id, nombre, apellido) {
+  $('#selectedPaciente').html(apellido + ", " + nombre);
+  $("#id-paciente").val(id);
+  $("#dialogPaciente").modal("hide");
+}
+
+
+function getEdit(event) {
+  var button = $(event.relatedTarget);
+  var idTurno = button.data('turno-id');
+  var modal = $(this)
 
   $.ajax({
     url: '/app/',
     dataType: 'json',
     data: "controlador=Turnos&accion=getTurno&id=" + idTurno,
     success: function(data) {
-      $("#popup-paciente").text(data.paciente);
-      $("#popup-paciente").attr("href", "/app/?controlador=Pacientes&accion=getUpdate&id=" + data.paciente_id);
-      $("#popup-paciente-tel").text(data.tel);
-      $("#popup-paciente-dni").text(data.dni);
-      $("#popup-fecha").text(data.fecha);
-      $("#popup-medico").text(data.medico);
-      $("#popup-practicas").text(data.practicas);
-      $("#popup-sala").text(data.sala);
-      $("#popup-estado").text(data.estado);
-      $("#popup-hora-inicio").text(data.hora_inicio);
-      $("#popup-hora-fin").text(data.hora_fin);
-      $("#popup-fecha-otorgamiento").text(data.fecha_otorgamiento);
-      $("#popup-observacion_turno").text(data.observacion);
-      $("#popup-observacion_turno").val(data.observacion);
-      $("#current-turno-id").val(data.id);
-      $("#id-obra-social option[value='" + data.obra_social + "']").attr('selected', 'selected');
-      $("#id-obra-social").trigger("chosen:updated");
-      $("#popup-creado-por").text(data.creado_por);
+      modal.find("#popup-paciente")
+           .text(data.paciente)
+           .attr("href", "/app/?controlador=Pacientes&accion=getUpdate&id=" + data.paciente_id);
+
+      modal.find("#popup-paciente-tel").text(data.tel);
+      modal.find("#popup-paciente-dni").text(data.dni);
+      modal.find("#popup-fecha").text(data.fecha);
+      modal.find("#popup-medico").text(data.medico);
+      modal.find("#popup-practicas").text(data.practicas);
+      modal.find("#popup-sala").text(data.sala);
+      modal.find("#popup-estado").text(data.estado);
+      modal.find("#popup-hora-inicio").text(data.hora_inicio);
+      modal.find("#popup-hora-fin").text(data.hora_fin);
+      modal.find("#popup-fecha-otorgamiento").text(data.fecha_otorgamiento);
+      modal.find("#popup-observacion_turno")
+           .text(data.observacion)
+           .val(data.observacion);
+
+      modal.find("#current-turno-id").val(data.id);
+      modal.find("#id-obra-social option[value='" + data.obra_social + "']").attr('selected', 'selected');
+      modal.find("#id-obra-social").trigger("chosen:updated");
+      modal.find("#popup-creado-por").text(data.creado_por);
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
     }
-
   });
 }
 
@@ -520,23 +548,6 @@ function buscarPacientes() {
 }
 
 
-/****************Horarios medicos***************/
-function getCreateHorario() {
-  $("#dialog").dialog({
-    width: 550
-  });
-  $("#btnEliminar").hide();
-  $("#btnGuardar").hide();
-  $("#btnCrear").show();
-  //set all to default
-  $("#hora_desde").val('');
-  $("#hora_hasta").val('');
-  $("#current-disponibilidad-id").val('');
-  $("#id-medico-horario option[value='']").attr('selected', 'selected');
-  $("#id-sala option[value='']").attr('selected', 'selected');
-  $("#id-dia option[value='']").attr('selected', 'selected');
-}
-
 function createHorario() {
   var rand = Math.round(100 * Math.random());
   var hora_desde = $("#hora_desde").val();
@@ -585,10 +596,34 @@ function createHorario() {
 
 }
 
-function getUpdateHorario(id) {
-  $("#dialog").dialog({
-    width: 550
-  });
+/****************Horarios medicos***************/
+function getCreateHorario(event) {
+  var button = $(event.relatedTarget);
+  var modal = $(this)
+
+  $("#btnEliminar").hide();
+  $("#btnGuardar").hide();
+  $("#btnCrear").show();
+  //set all to default
+  modal.find("#hora_desde").val('');
+  modal.find("#hora_hasta").val('');
+  modal.find("#current-disponibilidad-id").val('');
+
+  modal.find("#id-medico-horario option[value='']").attr('selected', 'selected');
+  modal.find("#id-sala option[value='']").attr('selected', 'selected');
+  modal.find("#id-dia option[value='']").attr('selected', 'selected');
+
+  modal.find("#id-medico-horario").trigger("chosen:updated");
+  modal.find("#id-sala").trigger("chosen:updated");
+  modal.find("#id-dia").trigger("chosen:updated");
+}
+
+function getUpdateHorario(event) {
+  var button = $(event.relatedTarget);
+  var id = button.data('horario');
+
+  var modal = $(this)
+
   $("#btnCrear").hide();
   $("#btnEliminar").show();
   $("#btnGuardar").show();
@@ -598,16 +633,17 @@ function getUpdateHorario(id) {
     dataType: 'json',
     data: "controlador=Root&accion=getDisponibilidad&id=" + id,
     success: function(data) {
-      $("#hora_desde").val(data.hora_inicio);
-      $("#hora_hasta").val(data.hora_fin);
-      $("#current-disponibilidad-id").val(data.id);
-      $("#id-medico-horario option[value='" + data.medico + "']").attr('selected', 'selected');
-      $("#id-sala option[value='" + data.sala + "']").attr('selected', 'selected');
-      $("#id-dia option[value='" + data.dia + "']").attr('selected', 'selected');
+      modal.find("#hora_desde").val(data.hora_inicio);
+      modal.find("#hora_hasta").val(data.hora_fin);
+      modal.find("#current-disponibilidad-id").val(data.id);
+      modal.find("#id-medico-horario option[value='" + data.medico + "']").attr('selected', 'selected');
+      modal.find("#id-sala option[value='" + data.sala + "']").attr('selected', 'selected');
+      modal.find("#id-dia option[value='" + data.dia + "']").attr('selected', 'selected');
 
-      $("#id-medico-horario").trigger("chosen:updated");
-      $("#id-sala").trigger("chosen:updated");
-      $("#id-dia").trigger("chosen:updated");
+      modal.find("#id-medico-horario").trigger("chosen:updated");
+      modal.find("#id-sala").trigger("chosen:updated");
+      modal.find("#id-dia").trigger("chosen:updated");
+
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);

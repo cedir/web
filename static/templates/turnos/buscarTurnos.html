@@ -1,96 +1,89 @@
-{% extends "turnos/base.html" %}
-{% load staticfiles %}
-
-{% block content %}
-
-<link href="{% static 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css' %}" rel="stylesheet" type="text/css"/>
-<link href="{% static 'chosen/chosen.min.css' %}" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" href="/media/css/turnos/buscar_turnos.css" media="screen" />
-<link rel="stylesheet" href="/media/css/turnos/buscar_turnos_print.css" media="print" />
-<link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="/media/js/jquery-ui-1.8.1.custom.min.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.core.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.widget.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.mouse.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.draggable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.position.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.resizable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.dialog.js"></script>
-<script type="text/javascript" src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js' %}"></script>
+{% extends "turnos/base.html" %} {% load staticfiles %} {% block content %}
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('tbody tr').hover(
-			function() {
-				$('td', this).addClass('ui-grid-state-hover');
-			},
-			function() {
-				$('td', this).removeClass('ui-grid-state-hover');
-			}
-		);
 
-		$("#fecha").datepicker({language:"es"});
+		$("#dialog").on('show.bs.modal', getEdit);
 
-		$("#id-obra-social").chosen({width:"60%"});
+		$("#fecha").datepicker({
+			language: "es"
+		});
+
+		$("#id-obra-social").chosen({
+			width: "60%"
+		});
+
 		$("#id-medico").chosen();
 		$("#id-sala").chosen();
 
 	});
 </script>
 
-<div id="dialog" title="Datos del turno" class="dialog">
-	<input type="hidden" name="current-turno-id" id="current-turno-id" value="" />
-	<div class="form-row">
-		<div class="form-subrow form-subrow_first">
-			<label>Paciente:</label>
-			<a href="/app/?controlador=Pacientes&accion=getUpdate&id=" id="popup-paciente" target="_blank"></a> (DNI: <span id="popup-paciente-dni"></span>)</div>
-		<div class="form-subrow">
-			<label>Telefono:</label><span id="popup-paciente-tel"></span></div>
-		<div style="clear:both;"></div>
+
+<div id="dialog" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Datos del turno</h4>
+			</div>
+			<div class="modal-body">
+				<input type="hidden" name="current-turno-id" id="current-turno-id" value="" />
+				<div class="form-row">
+					<div class="form-subrow form-subrow_first">
+						<label>Paciente:</label>
+						<a href="/app/?controlador=Pacientes&accion=getUpdate&id=" id="popup-paciente" target="_blank"></a> (DNI: <span id="popup-paciente-dni"></span>)</div>
+					<div class="form-subrow">
+						<label>Telefono:</label><span id="popup-paciente-tel"></span></div>
+					<div style="clear:both;"></div>
+				</div>
+				<div class="form-row">
+					<label>Fecha:</label><span id="popup-fecha"></span></div>
+				<div class="form-row">
+					<label>Obra Social:</label>
+					<select id="id-obra-social" name="id-obra-social" style="width:350px;">
+						<option value="0">Seleccione..</option>
+						{% for obrasSocial in obrasSociales %}
+						<option value="{{ obrasSocial.id }}" {% if obrasSocial.selected %} selected="selected" {% endif %}>{{ obrasSocial.nombre }}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="form-row">
+					<label>Medico:</label><span id="popup-medico"></span></div>
+				<div class="form-row">
+					<label>Pr&aacute;ticas:</label><span id="popup-practicas"></span></div>
+				<div class="form-row">
+					<label>Sala:</label><span id="popup-sala"></span></div>
+				<div class="form-row">
+					<label>Estado:</label><span id="popup-estado"></span></div>
+				<div class="form-row">
+					<div class="form-subrow form-subrow_first">
+						<label>Hora de inicio:</label><span id="popup-hora-inicio"></span></div>
+					<div class="form-subrow">
+						<label>Hora de fin:</label><span id="popup-hora-fin"></span></div>
+					<div style="clear:both;"></div>
+				</div>
+				<div class="form-row">
+					<label>Creado por:</label> <span id="popup-creado-por"></span> el <span id="popup-fecha-otorgamiento"></span></div>
+				<div class="form-row">
+					<label>Observacion</label>
+					<textarea name="popup-observacion_turno" id="popup-observacion_turno" value="" style="width: 379px; height: 68px;" maxlength="200"></textarea>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<input type="button" class="btn btn-primary" name="btnAnunciar" value="Anunciar" onclick="anunciarTurno();" />
+				<input type="button" class="btn btn-primary" value="Anular" onclick="anular();" />
+				<input type="button" class="btn btn-primary" value="Reprogramar" onclick="reprogramar();" />
+				<input type="button" class="btn btn-primary" value="Confirmar" onclick="confirmar();" />
+				<input type="button" class="btn btn-default" name="btnCerrarFinalizar" value="Cerrar" data-dismiss="modal" style="float: right;" />
+				<input type="button" class="btn btn-primary" name="btnConfirmar" value="Guardar" onclick="updateTurno();" style="float: right;" />
+			</div>
+		</div>
+		<!-- /.modal-content -->
 	</div>
-	<div class="form-row">
-		<label>Fecha:</label><span id="popup-fecha"></span></div>
-	<div class="form-row">
-		<label>Obra Social:</label>
-		<select id="id-obra-social" name="id-obra-social" style="width:350px;">
-			<option value="0">Seleccione..</option>
-			{% for obrasSocial in obrasSociales %}
-			<option value="{{ obrasSocial.id }}" {% if obrasSocial.selected %} selected="selected" {% endif %}>{{ obrasSocial.nombre }}</option>
-			{% endfor %}
-		</select>
-	</div>
-	<div class="form-row">
-		<label>Medico:</label><span id="popup-medico"></span></div>
-	<div class="form-row">
-		<label>Pr&aacute;ticas:</label><span id="popup-practicas"></span></div>
-	<div class="form-row">
-		<label>Sala:</label><span id="popup-sala"></span></div>
-	<div class="form-row">
-		<label>Estado:</label><span id="popup-estado"></span></div>
-	<div class="form-row">
-		<div class="form-subrow form-subrow_first">
-			<label>Hora de inicio:</label><span id="popup-hora-inicio"></span></div>
-		<div class="form-subrow">
-			<label>Hora de fin:</label><span id="popup-hora-fin"></span></div>
-		<div style="clear:both;"></div>
-	</div>
-	<div class="form-row">
-		<label>Creado por:</label> <span id="popup-creado-por"></span> el <span id="popup-fecha-otorgamiento"></span></div>
-	<div class="form-row">
-		<label>Observacion</label>
-		<textarea name="popup-observacion_turno" id="popup-observacion_turno" value="" style="width: 379px; height: 68px;" maxlength="200"></textarea>
-	</div>
-	<div class="form-row">
-		<input type="button" name="btnAnunciar" value="Anunciar" onclick="anunciarTurno();" />
-		<input type="button" value="Anular" onclick="anular();" />
-		<input type="button" value="Reprogramar" onclick="reprogramar();" />
-		<input type="button" value="Confirmar" onclick="confirmar();" />
-		<input type="button" name="btnCerrarFinalizar" value="Cerrar" onclick="$('#dialog').dialog('close');" style="float: right;" />
-		<input type="button" name="btnConfirmar" value="Guardar" onclick="updateTurno();" style="float: right;" />
-	</div>
+	<!-- /.modal-dialog -->
 </div>
+<!-- /.modal -->
 
 <div class="module">
 	<h3>Turnos</h3>
@@ -162,7 +155,7 @@
 					<div class="observacion_wrapper">{{ hshTurnos.observacion }}</div>
 				</td>
 				<td class="action_column">
-					<a href="#" onclick="getEdit({{ hshTurnos.id }});event.preventDefault();">Editar</a>
+					<a href="#" data-toggle="modal" data-target="#dialog" data-turno-id="{{ hshTurnos.id }}">Editar</a>
 				</td>
 			</tr>
 			{% endfor %}

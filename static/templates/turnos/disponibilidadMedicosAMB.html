@@ -3,18 +3,6 @@
 
 {% block content %}
 
-<link href="{% static 'chosen/chosen.min.css' %}" rel="stylesheet" type="text/css" />
-<link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="/media/js/jquery-ui-1.8.1.custom.min.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.core.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.widget.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.mouse.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.draggable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.position.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.resizable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.dialog.js"></script>
-<script type="text/javascript" src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
-
 <script type="text/javascript">
   // <!CDATA[
   $(function() {
@@ -23,64 +11,76 @@
     $("#id-sala").chosen({width:"60%"});
     $("#id-dia").chosen({width:"60%"});
 
-    $('tbody tr').hover(
-      function() {
-        $('td', this).addClass('ui-grid-state-hover');
-      },
-      function() {
-        $('td', this).removeClass('ui-grid-state-hover');
-      }
-    )
+    $("#dialog").on('show.bs.modal', function(event){
+      var button = $(event.relatedTarget);
+      var mode = button.data('mode');
+      mode == "create" && getCreateHorario.apply(this, [event]);
+      mode == "update" && getUpdateHorario.apply(this, [event]);
+    });
+
+
   });
   // ]]>
 </script>
-<div id="dialog" title="Crear/Modificar horario" class="dialog">
-  <input type="hidden" name="current-disponibilidad-id" id="current-disponibilidad-id" value="" />
-  <div class="form-row">
-    <label>M&eacute;dico:</label>
-    <select id="id-medico-horario" name="id-medico-horario">
-      <option value="">Seleccione..</option>
-      {% for medico in medicos %}
-      <option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %}>{{ medico.apellido }}, {{ medico.nombre }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="form-row">
-    <label>Sala:</label>
-    <select id="id-sala" name="id-sala">
-      <option value="">Seleccione..</option>
-      {% for sala in salas %}
-      <option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %}>{{ sala.nombre }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="form-row">
-    <label>Dia:</label>
-    <select id="id-dia" name="id-dia">
-      <option value="">Seleccione..</option>
-      {% for dia in dias %}
-      <option value="{{ dia.id }}" {% if dia.selected %} selected="selected" {% endif %}>{{ dia.nombre }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="form-row">
-    <div class="form-subrow form-subrow_first">
-      <label>Desde:</label>
-      <input type="text" name="hora_desde" id="hora_desde" value="" size="10" />
-    </div>
-    <div class="form-subrow">
-      <label>hasta:</label>
-      <input type="text" name="hora_hasta" id="hora_hasta" value="" size="10" />
-    </div>
-    <div style="clear:both;"></div>
-  </div>
-  <div class="form-row">
-    <input type="button" name="btnGuardar" id="btnGuardar" value="Guardar" onclick="updateHorario();" />
-    <input type="button" name="btnCrear" id="btnCrear" value="Guardar" onclick="createHorario();" />
-    <input type="button" name="btnEliminar" id="btnEliminar" value="Eliminar" onclick="eliminarHorario();" />
-    <input type="button" name="btnCerrarFinalizar" value="Cerrar" onclick="$('#dialog').dialog('close');" />
-  </div>
-</div>
+
+<div id="dialog" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Crear/Modificar horario</h4>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="current-disponibilidad-id" id="current-disponibilidad-id" value="" />
+        <div class="form-row">
+          <label>M&eacute;dico:</label>
+          <select id="id-medico-horario" name="id-medico-horario">
+            <option value="">Seleccione..</option>
+            {% for medico in medicos %}
+            <option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %}>{{ medico.apellido }}, {{ medico.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Sala:</label>
+          <select id="id-sala" name="id-sala">
+            <option value="">Seleccione..</option>
+            {% for sala in salas %}
+            <option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %}>{{ sala.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Dia:</label>
+          <select id="id-dia" name="id-dia">
+            <option value="">Seleccione..</option>
+            {% for dia in dias %}
+            <option value="{{ dia.id }}" {% if dia.selected %} selected="selected" {% endif %}>{{ dia.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-subrow form-subrow_first">
+            <label>Desde:</label>
+            <input type="text" name="hora_desde" id="hora_desde" value="" size="10" />
+          </div>
+          <div class="form-subrow">
+            <label>hasta:</label>
+            <input type="text" name="hora_hasta" id="hora_hasta" value="" size="10" />
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn btn-primary" name="btnGuardar" id="btnGuardar" value="Guardar" onclick="updateHorario();" />
+        <input type="button" class="btn btn-primary" name="btnCrear" id="btnCrear" value="Guardar" onclick="createHorario();" />
+        <input type="button" class="btn btn-primary" name="btnEliminar" id="btnEliminar" value="Eliminar" onclick="eliminarHorario();" />
+        <input type="button" class="btn btn-default" name="btnCerrarFinalizar" value="Cerrar" data-dismiss="modal"/>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <div class="module">
   <h3>Buscar Horario</h3>
   <form name='frmBuscar' id='frmBuscar' action="/app/">
@@ -114,7 +114,7 @@
     <tbody>
       {% for hshDisp in disponibilidades %}
       <tr class="ui-widget-content">
-        <td><a href="#" onclick="getUpdateHorario({{hshDisp.id}});">{{hshDisp.medico}}</a></td>
+        <td><a href="#" data-toggle="modal" data-target="#dialog" data-mode="update" data-horario="{{hshDisp.id}}">{{hshDisp.medico}}</a></td>
         <td>{{hshDisp.sala}}</td>
         <td>{{hshDisp.dia}}</td>
         <td>{{hshDisp.horaInicio}} a {{hshDisp.horaFin}}</td>
@@ -130,7 +130,7 @@
     </div>
     <div class="ui-grid-results"></div>
   </div>
-  <input id="btbNuevoPaciente" type="button" value="Nuevo Horario" onclick="getCreateHorario();" />
+  <input id="btbNuevoPaciente" type="button" data-toggle="modal" data-target="#dialog" data-mode="create" value="Nuevo Horario"/>
 </div>
 
 

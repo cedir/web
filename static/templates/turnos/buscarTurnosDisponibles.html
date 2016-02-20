@@ -3,24 +3,10 @@
 
 {% block content %}
 
-<link href="{% static 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css' %}" rel="stylesheet" type="text/css"/>
-<link href="{% static 'chosen/chosen.min.css' %}" rel="stylesheet" type="text/css" />
-<link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="/media/js/jquery-ui-1.8.1.custom.min.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.core.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.widget.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.mouse.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.draggable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.position.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.resizable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.dialog.js"></script>
-<script type="text/javascript" src="/media/js/formFunctions.js"></script>
-<script type="text/javascript" src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js' %}"></script>
-
 <script type="text/javascript">
   $(document).ready(function() {
+
+    $("#dialog").on('show.bs.modal', getConfirmarTurno);
 
     $(".multiselect").chosen({
         search_contains : true,
@@ -34,29 +20,10 @@
 		$("#id-medico").chosen();
 		$("#id-sala").chosen();
 
-    $(".count").css("padding-bottom", "5px");
-
     $("#fecha").datepicker({language:"es"});
 
-    $("#tab-paciente").tabs();
 
-    $('#tabs').bind('tabsselect', function(event, ui) {
-      if (ui.panel.id == "fragment-2") {
-        //alert("cool");
-        var idPracticas = $("#id-practicas").val();
-
-        var arr = String(idPracticas).split(",");
-        for (var i = 0; i < arr.length; i++) {
-          if (arr[i] != 'null') {
-
-            //alert($("#id-practicas option[value='" + arr[i] + "']").text());
-            var newRow = "<tr><td>Orden de " + $("#id-practicas option[value='" + arr[i] + "']").text() + "</td><td>%100</td></tr>";
-            $('#table-ordenes').append(newRow);
-          }
-        }
-
-      }
-    });
+    $(".count").css("padding-bottom", "5px");
 
 
     //plugin form clean a form
@@ -78,9 +45,7 @@
 
     getHorarioAtencionMedico();
     //subscribe event medico select
-    $('#id-medico').change(function() {
-      getHorarioAtencionMedico();
-    });
+    $('#id-medico').change(getHorarioAtencionMedico);
 
     //agregar los : a la hora de fin de turno
     $('#hora_fin_estimada').keyup(function(e) {
@@ -92,152 +57,145 @@
   });
 </script>
 
-<script>
-  function getConfirmarTurno(fecha, horaInicio) {
-
-    $("#dialog").dialog({
-      width: 550
-    });
-
-    $("#selected-medico").text($("#id-medico option:selected").text());
-    $("#selected-obrasocial").text($("#id-obra-social option:selected").text());
-    $("#selected-practicas").text($("#id-practicas option:selected").text());
-    $("#selected-fecha").text(CDate.convertToRegular(fecha));
-    $("#selected-fecha-value").val(fecha);
-    $("#hora_inicio").val(horaInicio);
-    $("#selected-sala").text($("#id-sala option:selected").text());
-
-
-  }
-
-  function getPaciente() {
-    $("#dialogPaciente").dialog({
-      width: 500
-    });
-  }
-
-  function setPaciente(id, nombre, apellido) {
-    $('#selectedPaciente').html(apellido + ", " + nombre);
-    $("#id-paciente").val(id);
-    $("#dialogPaciente").dialog("close");
-
-  }
-</script>
-
-
-<div id="dialog" title="Resúmen del turno" class="dialog">
-  <div class="form-row">
-    <label>M&eacute;dico: </label><span id="selected-medico"></span></div>
-  <div class="form-row">
-    <label>Obra Social: </label><span id="selected-obrasocial"></span></div>
-  <div class="form-row">
-    <label>Fecha: </label><span id="selected-fecha"></span>
-    <input type="hidden" name="selected-fecha-value" id="selected-fecha-value" />
-  </div>
-  <div class="form-row">
-    <label>Sala: </label><span id="selected-sala"></span></div>
-  <div class="form-row">
-    <label>Hora inicio: </label>
-    <input type="text" name="hora_inicio" id="hora_inicio" value="" size="10" />
-  </div>
-  <div class="form-row">
-    <label>Hora de fin estimada</label>
-    <input type="text" name="hora_fin_estimada" id="hora_fin_estimada" value="" size="10" />
-  </div>
-  <div class="form-row">
-    <label>Practicas: </label><span id="selected-practicas"></span></div>
-  <div class="form-row">
-    <label>Observaci&oacute;n: </label>
-    <textarea id="observacion" style="width: 379px; height: 68px;" maxlength="150"></textarea>
-  </div>
-  <div class="form-row">
-    <input type="button" name="btnConfirmar" value="Confirmar" onclick="save();" />
-    <input type="button" name="btnCerrar" value="Cerrar" onclick="$('#dialog').dialog('close');" />
-  </div>
-</div>
-
-<div id="dialogPaciente" title="Seleccionar paciente" class="dialog">
-  <div id="tab-paciente">
-    <ul>
-      <li><a href="#buscar-paciente-tab"><span>Buscar</span></a></li>
-      <li><a href="#crear-paciente-tab"><span>Crear</span></a></li>
-    </ul>
-    <div id="buscar-paciente-tab">
-      <div class="form-row">
-        Apellido:
-        <input type="text" name="apellidoPacienteBuscar" id="apellidoPacienteBuscar" style="width:90px;" /> Nombre:
-        <input type="text" name="nombrePacienteBuscar" id="nombrePacienteBuscar" style="width:80px;" /> DNI:
-        <input type="text" name="dniPacienteBuscar" id="dniPacienteBuscar" style="width:50px;" />
-        <input type="button" name="Buscar" value="Buscar" onclick="buscarPacientes();" />
+<div id="dialog" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Resúmen del turno</h4>
       </div>
-      <div class="ui-grid ui-widget ui-widget-content ui-corner-all">
-        <table class="ui-grid-content ui-widget-content">
-          <thead>
-            <tr>
-              <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Dni</a></th>
-              <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Apellido y Nombre</a></th>
-              <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Domicilio</a></th>
-              <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Acci&oacute;n</a></th>
-            </tr>
-          </thead>
-          <tbody class="result">
-          </tbody>
-        </table>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>M&eacute;dico: </label><span id="selected-medico"></span></div>
+        <div class="form-row">
+          <label>Obra Social: </label><span id="selected-obrasocial"></span></div>
+        <div class="form-row">
+          <label>Fecha: </label><span id="selected-fecha"></span>
+          <input type="hidden" name="selected-fecha-value" id="selected-fecha-value" />
+        </div>
+        <div class="form-row">
+          <label>Sala: </label><span id="selected-sala"></span></div>
+        <div class="form-row">
+          <label>Hora inicio: </label>
+          <input type="text" name="hora_inicio" id="hora_inicio" value="" size="10" />
+        </div>
+        <div class="form-row">
+          <label>Hora de fin estimada</label>
+          <input type="text" name="hora_fin_estimada" id="hora_fin_estimada" value="" size="10" />
+        </div>
+        <div class="form-row">
+          <label>Practicas: </label><span id="selected-practicas"></span></div>
+        <div class="form-row">
+          <label>Observaci&oacute;n: </label>
+          <textarea id="observacion" style="width: 379px; height: 68px;" maxlength="150"></textarea>
+        </div>
       </div>
-    </div>
-    <div id="crear-paciente-tab">
-      <form id="formCrearPaciente" name="formCrearPaciente" action="/app/" method="post">
-        <div class="form-row">
-          <label>Nombre:</label>
-          <input type="text" id="txtNombre" name="txtNombre" value="{{nombre}}" />
-        </div>
-        <div class="form-row">
-          <label>Apellido:</label>
-          <input type="text" id="txtApellido" name="txtApellido" value="{{apellido}}" />
-        </div>
-        <div class="form-row">
-          <label>Documento:</label>
-          <input type="text" id="txtDni" name="txtDni" value="{{id}}" />
-        </div>
-        <div class="form-row">
-          <label>Fecha de Nacimiento:</label>
-          <input type="text" name="txtFechaNacimiento" id="txtFechaNacimiento" value="{{fechaNacimiento}}">
-        </div>
-        <div class="form-row">
-          <label>Sexo:</label>
-          <select name="txtSexo" id="txtSexo">
-            <option value="">Selecione..</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Masculino">Masculino</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label>Domicilio:</label>
-          <input type="text" name="txtDomicilio" id="txtDomicilio" value="{{domicilio}}">
-        </div>
-        <div class="form-row">
-          <label>Teléfono:</label>
-          <input type="text" id="txtTelefono" name="txtTelefono" value="{{telefono}}">
-        </div>
-        <div class="form-row">
-          <label>Nro de afiliado:</label>
-          <input type="text" id="txtNroAfiliado" name="txtNroAfiliado" value="{{nro_afiliado}}">
-        </div>
-        <div class="form-row">
-          <label>Email:</label>
-          <input type="text" id="txtEmail" name="txtEmail" value="{{email}}">
-        </div>
-        <div class="form-row">
-          <input id="btnAceptar" type="button" value="Guardar y seleccionar" class="botones" onclick="createAndAsignPaciente();" />
-        </div>
-      </form>
-    </div>
+      <div class="modal-footer">
+        <input type="button" class="btn btn-primary" name="btnConfirmar" onclick="save();" />
+        <input type="button" class="btn btn-default" name="btnCerrar" data-dismiss="modal" />
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
-  </div>
-</div>
+
+<div id="dialogPaciente" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Seleccionar paciente</h4>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a href="#buscar-paciente-tab" role="tab" data-toggle="tab"><span>Buscar</span></a></li>
+          <li role="presentation"><a href="#crear-paciente-tab" role="tab" data-toggle="tab"><span>Crear</span></a></li>
+        </ul>
+        <div id="tab-paciente" class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="buscar-paciente-tab">
+            <div class="form-row">
+              Apellido:
+              <input type="text" name="apellidoPacienteBuscar" id="apellidoPacienteBuscar" style="width:90px;" /> Nombre:
+              <input type="text" name="nombrePacienteBuscar" id="nombrePacienteBuscar" style="width:80px;" /> DNI:
+              <input type="text" name="dniPacienteBuscar" id="dniPacienteBuscar" style="width:50px;" />
+              <input type="button" name="Buscar" value="Buscar" onclick="buscarPacientes();" />
+            </div>
+            <div class="ui-grid ui-widget ui-widget-content ui-corner-all">
+              <table class="ui-grid-content ui-widget-content">
+                <thead>
+                  <tr>
+                    <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Dni</a></th>
+                    <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Apellido y Nombre</a></th>
+                    <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Domicilio</a></th>
+                    <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Acci&oacute;n</a></th>
+                  </tr>
+                </thead>
+                <tbody class="result">
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="crear-paciente-tab">
+            <form id="formCrearPaciente" name="formCrearPaciente" action="/app/" method="post">
+              <div class="form-row">
+                <label>Nombre:</label>
+                <input type="text" id="txtNombre" name="txtNombre" value="{{nombre}}" />
+              </div>
+              <div class="form-row">
+                <label>Apellido:</label>
+                <input type="text" id="txtApellido" name="txtApellido" value="{{apellido}}" />
+              </div>
+              <div class="form-row">
+                <label>Documento:</label>
+                <input type="text" id="txtDni" name="txtDni" value="{{id}}" />
+              </div>
+              <div class="form-row">
+                <label>Fecha de Nacimiento:</label>
+                <input type="text" name="txtFechaNacimiento" id="txtFechaNacimiento" value="{{fechaNacimiento}}">
+              </div>
+              <div class="form-row">
+                <label>Sexo:</label>
+                <select name="txtSexo" id="txtSexo">
+                  <option value="">Selecione..</option>
+                  <option value="Femenino">Femenino</option>
+                  <option value="Masculino">Masculino</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label>Domicilio:</label>
+                <input type="text" name="txtDomicilio" id="txtDomicilio" value="{{domicilio}}">
+              </div>
+              <div class="form-row">
+                <label>Teléfono:</label>
+                <input type="text" id="txtTelefono" name="txtTelefono" value="{{telefono}}">
+              </div>
+              <div class="form-row">
+                <label>Nro de afiliado:</label>
+                <input type="text" id="txtNroAfiliado" name="txtNroAfiliado" value="{{nro_afiliado}}">
+              </div>
+              <div class="form-row">
+                <label>Email:</label>
+                <input type="text" id="txtEmail" name="txtEmail" value="{{email}}">
+              </div>
+              <div class="form-row">
+                <input id="btnAceptar" type="button" value="Guardar y seleccionar" class="botones" onclick="createAndAsignPaciente();" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
 
 <div class="module">
-  <h3>Asignar turno al paciente: <span id="selectedPaciente" style="font-style:italic;">{{ apellidoPaciente}} {{ nombrePaciente}}</span><a href="javascript: getPaciente();" style="font-size:10px">[Elegir]</a></h3>
+  <h3>Asignar turno al paciente: <span id="selectedPaciente" style="font-style:italic;">{{ apellidoPaciente}} {{ nombrePaciente}}</span><a data-toggle="modal" data-target="#dialogPaciente" style="font-size:10px">[Elegir]</a></h3>
 
   <form name="ver-planilla" id="ver-planilla" action="/app/">
     <input type="hidden" name="controlador" value="Turnos" />

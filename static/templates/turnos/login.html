@@ -1,42 +1,42 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> {% load staticfiles %}
+<html xmlns="http://www.w3.org/1999/xhtml">
 
-{% load staticfiles %}
-<html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
   <title>Bienvenidos al sistema de gesti&oacute;n de turnos del Cedir.</title>
   <link rel="stylesheet" media="screen" href="{% static 'bootstrap/dist/css/bootstrap.css' %}" type="text/css">
 </head>
+
 <body>
   <div class="container-fluid">
     <div class="row">
-    <div class="col-md-4 col-md-offset-4 col-sm-5 col-sm-offset-3">
-      <form id="form1" name="form1" runat="server" action="/app/"  method="post" style="position:relative;">
-        <input type="hidden" name="controlador" value="Root">
-        <input type="hidden" name="accion" value="login">
+      <div class="col-md-4 col-md-offset-4 col-sm-5 col-sm-offset-3">
+        <form id="form1" name="form1" runat="server" action="/app/" method="post" style="position:relative;">
+          <input type="hidden" name="controlador" value="Root">
+          <input type="hidden" name="accion" value="login">
 
-        <div class="row">
-          <div class="col-md-12 col-sm-12">
-              <img src="/media/images/turnos/logo-loguin.png" class="img-responsive center-block" alt="logo"/>
+          <div class="row">
+            <div class="col-md-12 col-sm-12">
+              <img src="/media/images/turnos/logo-loguin.png" class="img-responsive center-block" alt="logo" />
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label for="txtNomUsuario">Nombre de Usuario</label>
-          <input type="text" class="form-control" name="txtNomUsuario" id="txtNomUsuario" placeholder="Email">
-        </div>
-        <div class="form-group">
-          <label for="txtNomUsuario">Contraseña</label>
-          <input type="password" class="form-control" name="txtPassword" id="txtPassword" placeholder="Contraseña">
-        </div>
-        <div class="form-group has-error">
-          {% if error_message %}
-          <label class="control-label" id="error-text">{{error_message}}</label>
-          {% endif %}
-        </div>
-        <button type="submit" class="btn btn-default" name="btnAceptar">Aceptar</button>
+          <div class="form-group">
+            <label for="txtNomUsuario">Nombre de Usuario</label>
+            <input type="text" class="form-control" name="txtNomUsuario" id="txtNomUsuario" placeholder="Email">
+          </div>
+          <div class="form-group">
+            <label for="txtNomUsuario">Contraseña</label>
+            <input type="password" class="form-control" name="txtPassword" id="txtPassword" placeholder="Contraseña">
+          </div>
+          <div class="form-group has-error">
+            {% if error_message %}
+            <label class="control-label" id="error-text">{{error_message}}</label>
+            {% endif %}
+          </div>
+          <button type="submit" class="btn btn-default" name="btnAceptar">Aceptar</button>
+      </div>
+      </form>
     </div>
-  </form>
-</div>
-</div>
-</div>
+  </div>
 </body>
+
 </html>
