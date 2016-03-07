@@ -1,0 +1,25 @@
+{
+  "name": "web",
+  "homepage": "https://github.com/cedir/web",
+  "authors": [
+    "José Ignacio Aguilera <jiaguilera@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "jquery": "~1.12.1",
+    "bootstrap": "~3.3.6",
+    "chosen": "~1.4.2",
+    "bootstrap-datepicker": "~1.6.0"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

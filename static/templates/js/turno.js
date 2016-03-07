@@ -4,11 +4,10 @@
 */
 $(document).ready(function() {
   $("ul.topnav li a").hover(function() { //When trigger is clicked...
-    $(this).parent().find("ul.subnav").slideDown('fast').show(); //Drop down the subnav on click
-
-    $(this).parent().hover(function() {}, function() {
-      $(this).parent().find("ul.subnav").slideUp('slow'); //When the mouse hovers out of the subnav, move it back up
-    });
+      $(this).parent().find("ul.subnav").slideDown('fast').show(); //Drop down the subnav on click
+      $(this).parent().hover(function() {}, function() {
+        $(this).parent().find("ul.subnav").slideUp('slow'); //When the mouse hovers out of the subnav, move it back up
+      });
   }).hover(function() {
     $(this).addClass("subhover"); //On hover over, add class "subhover"
   }, function() { //On Hover Out
@@ -343,7 +342,7 @@ function anunciarTurno() {
     data: "_nocache=" + rand,
     success: function(data) {
       if (data.status) {
-        alert("El paciente fue anunciado con exitosamente");
+        alert("El paciente fue anunciado exitosamente");
       } else {
         alert("Se ha producido un error al crear el paciente y los estudios. Por favor revise en el sistema que esten los datos ingresados y vuelva a intentarlo. \n\n Error: " + data.message);
       }

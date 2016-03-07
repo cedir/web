@@ -1,7 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
+{% load staticfiles %}
 <head profile="http://www.w3.org/2005/10/profile">
-	<title>{%block pagetitle %}Cedir - Centro de endoscopía digestiva de Rosario{% endblock %}</title>
+	<title>{%block pagetitle %}Cedir - Centro de endoscopï¿½a digestiva de Rosario{% endblock %}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	{% block meta_tags %}
 	  <META NAME="Title" CONTENT="{% block metatitle %}Cedir - Videoscopia, balon gastrico y endoscopia{% endblock %}" />
@@ -18,16 +19,8 @@
 	<link href="/media/css/enlaces.css" rel="stylesheet" type="text/css" />
 	<link rel="icon" type="image/png" href="/media/images/favicon.png">
 	<meta name="verify-v1" content="KhvlXh6lnrR6fxu1gKrXrLNA9vZZVb+r0WLtSXX+95U=" />
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-	<script type="text/javascript" src="http://www.jquery4u.com/demos/jquery-quick-pagination/js/jquery.quick.pagination.min.js"></script>
-	
-			
-	<script type="text/javascript">
-	$(document).ready(function() {
-		$("ul.pagination").quickPagination({pagerLocation:"both",pageSize:"70"});
-	});
-	</script>
-		
+	<script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+
 </head>
 
 <body>
@@ -37,9 +30,9 @@
 		<div class="dc">
 			<div class="dt">
 				<div class="dr">
-				
-				
-				
+
+
+
 					<div class="dc">
 						<div class="flash " >
 							{% include 'includes/encabezado.html' %}
@@ -48,7 +41,7 @@
 						<!--e-->
 						<div class="dt" style=" height:22px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 						<!--/e-->
-						
+
 						<!--c-->
 						<div class="content_0 dt">
 							{% block content %}
@@ -56,21 +49,21 @@
 							{% endblock %}
 						</div>
 						<!--/c-->
-					
+
 						<div class="dt" style="height:10px;"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
 						<div class="dt" style="height:1px; width:100%; background:#E9E9E9"><img src="/media/images/spacer.gif" width="1" height="1" alt=""></div>
-					
+
 
 						<div class="dt footer" align="center" style=" height:123px;text-align:center;width:100%;margin-left:0px;margin-top:20px;" >
 							{% include 'includes/pie.html' %}
 						</div>
 
-				
+
 					</div>
-				
-				
-				
-				
+
+
+
+
 				</div>
 			</div>
 		</div>
