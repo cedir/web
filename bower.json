@@ -1,9 +1,7 @@
 {
   "name": "web",
   "homepage": "https://github.com/cedir/web",
-  "authors": [
-    "José Ignacio Aguilera <jiaguilera@gmail.com>"
-  ],
+  "authors": [],
   "description": "",
   "main": "",
   "moduleType": [],

@@ -6,4 +6,3 @@ psycopg2==2.4.5
 simplejson==2.3.2
 #bootstrap-admin  # https://github.com/douglasmiranda/django-admin-bootstrap
 ConcurrentLogHandler==0.9.1
-django-bower==5.1.0
