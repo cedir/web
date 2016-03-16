@@ -95,13 +95,13 @@ class InfoTurnoViewSet(viewsets.ModelViewSet):
         queryset = InfoTurno.objects.all()
         medico_id = self.request.query_params.get(u'medico')
         practica_ids = self.request.query_params.get(u'practicas')
-        obra_social_id = self.request.query_params.get(u'obrasocial')
+        obra_social_ids = self.request.query_params.get(u'obrasocial')
 
         if medico_id:
             queryset = queryset.filter(Q(medico=medico_id) | Q(medico__isnull=True))
 
-        if obra_social_id:
-            queryset = queryset.filter(Q(obra_social=obra_social_id) | Q(obra_social__isnull=True))
+        if obra_social_ids:
+            queryset = queryset.filter(Q(obra_sociales__id__in=obra_social_ids.split(u',')) | Q(obra_sociales__isnull=True))
 
         if practica_ids:
             queryset = queryset.filter(Q(practicas__id__in=practica_ids.split(u',')) | Q(practicas__isnull=True))
