@@ -13,9 +13,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
 	'ENGINE':'django.db.backends.postgresql_psycopg2',           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-	'NAME':'',             # Or path to database file if using sqlite3.
-	'USER':'',             # Not used with sqlite3.
-	'PASSWORD':'',         # Not used with sqlite3.
+	'NAME':'PruebasCedirFE',             # Or path to database file if using sqlite3.
+	'USER':'postgres',             # Not used with sqlite3.
+	'PASSWORD':'Devel$1234',         # Not used with sqlite3.
 	'HOST':'localhost',             # Set to empty string for localhost. Not used with sqlite3.
 	'PORT':'5432',             # Set to empty string for default. Not used with sqlite3.
     }
@@ -45,9 +45,11 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 #USE_TZ = True
 
+SITE_BASE = u'/home/ignacio/Documents/sources/cedir/web'
+
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/wbrunetti/Documents/cedir/static/templates/media_files/'
+MEDIA_ROOT = SITE_BASE + u'/static/templates/media_files/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -74,10 +76,11 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    u'/home/wbrunetti/Documents/cedir/static/templates',
+    SITE_BASE + u'/static/bower_components',
+    SITE_BASE + u'/static/templates',
     u'/usr/local/lib/python2.7/dist-packages/django/contrib/admin/static',
     #Alias /css /var/www/cedir/static/templates/css
-    u'/home/wbrunetti/Documents/cedir/static', # media_files
+    SITE_BASE + u'/static', # media_files
     #Alias /images /var/www/cedir/static/templates/images
     #Alias /js /var/www/cedir/static/templates/js
     #Alias /flash /var/www/cedir/static/templates/flash
@@ -122,7 +125,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-     "/home/wbrunetti/Documents/cedir/static/templates",
+     SITE_BASE + u"/static/templates",
      #"/var/www/django_projects/cedir/admin/templates",
 )
 
@@ -143,6 +146,7 @@ INSTALLED_APPS = (
     'medico',
     'turno',
     'estudio',
+    "comprobante",
 )
 
 
@@ -201,4 +205,3 @@ LOGGING = {
         }
     }
 }
-

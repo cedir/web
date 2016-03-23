@@ -12,5 +12,6 @@ urlpatterns = patterns('',
     (r'^app/', dispatch),
     (r'^turnos/$', getLogin),
     (r'', include('turno.urls')),
+    (r'', include('comprobante.urls')),
     (r'^admin/', include(admin.site.urls)),
 )
