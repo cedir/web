@@ -355,7 +355,7 @@ function getInfoTurno() {
     $.ajax({
       url: '/api/turno/infoturno/',
       dataType: 'json',
-      data: 'medico=' + medicoId + '&obrasocial=' + obraSocialId + "&practicas=" + idPracticas,
+      data: 'medico=' + medicoId + '&obras_sociales=' + obraSocialId + "&practicas=" + idPracticas,
       success: function(data) {
             $('#info-turno tbody tr').remove();
             $.each(data, function(index, infoTurno) {

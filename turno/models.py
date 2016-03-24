@@ -44,4 +44,3 @@ class InfoTurno(models.Model):
     obra_sociales = models.ManyToManyField(ObraSocial, null=True, blank=True)
     practicas = models.ManyToManyField(Practica, null=True, blank=True)
     texto = models.TextField()
-

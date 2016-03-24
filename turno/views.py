@@ -1,9 +1,7 @@
 import simplejson
 from datetime import datetime
 from django.http import HttpResponse
-from django.shortcuts import render
 from django.db.models import Q
-import django_filters
 from rest_framework import viewsets
 from turno.models import Turno, InfoTurno
 from estudio.models import Estudio, DetalleEstudio, PagoCobroEstudio
@@ -95,7 +93,7 @@ class InfoTurnoViewSet(viewsets.ModelViewSet):
         queryset = InfoTurno.objects.all()
         medico_id = self.request.query_params.get(u'medico')
         practica_ids = self.request.query_params.get(u'practicas')
-        obra_social_ids = self.request.query_params.get(u'obrasocial')
+        obra_social_ids = self.request.query_params.get(u'obras_sociales')
 
         if medico_id:
             queryset = queryset.filter(Q(medico=medico_id) | Q(medico__isnull=True))
