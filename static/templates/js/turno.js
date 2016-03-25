@@ -2,6 +2,8 @@
   Turnos
 
 */
+
+//(function($) {
 $(document).ready(function() {
   $("ul.topnav li a").hover(function() { //When trigger is clicked...
       $(this).parent().find("ul.subnav").slideDown('fast').show(); //Drop down the subnav on click
@@ -376,6 +378,46 @@ function getHorarioAtencionMedico() {
   });
 }
 
+function getInfoTurno() {
+    var medicoId = $("#id-medico").val();
+    var obraSocialId = $("#id-obra-social").val();
+    var idPracticas = $("#id-practicas").val();
+
+    if (!medicoId && !obraSocialId && !idPracticas){
+        $('#info-turno').hide();
+        return;
+    }
+
+    if (idPracticas === null){
+        idPracticas = "";
+    }
+    
+    $.ajax({
+      url: '/api/turno/infoturno/',
+      dataType: 'json',
+      data: 'medico=' + medicoId + '&obras_sociales=' + obraSocialId + "&practicas=" + idPracticas,
+      success: function(data) {
+            $('#info-turno tbody tr').remove();
+            $.each(data, function(index, infoTurno) {
+                var info_turno_practicas = '';
+                $.each(infoTurno.practicas, function(index, practica) {
+                    info_turno_practicas += ' -' + (practica.abreviatura? practica.abreviatura : practica.descripcion);
+                });
+                if (!info_turno_practicas){
+                    info_turno_practicas = 'Todas';
+                }
+
+                $('#info-turno table tbody').append("<tr><td>" + infoTurno.texto + '</td><td>' + info_turno_practicas + "</td></tr>");
+            });
+            if (data.length) {
+              $('#info-turno').show();
+            }else{
+              $('#info-turno').hide();
+            }
+      }
+    });
+}
+
 /********** PACIENTES **********/
 function createPaciente(createTurno) {
   var rand = Math.round(100 * Math.random());
@@ -736,3 +778,6 @@ function isEmail(email) {
   }
   return true
 }
+
+//})(jQuery);
+

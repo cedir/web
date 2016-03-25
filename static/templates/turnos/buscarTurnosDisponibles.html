@@ -3,7 +3,10 @@
 
 {% block content %}
 
+<link href="/media/css/turnos/nuevo_turno.css" rel="stylesheet" type="text/css"/>
+
 <script type="text/javascript">
+
   $(document).ready(function() {
 
     $("#dialog").on('show.bs.modal', getConfirmarTurno);
@@ -14,11 +17,11 @@
         width: "400px",
         no_results_text : "No hay estudios que contengan",
         placeholder_text_multiple : "Seleccione uno o más estudios"
-    });
+    }).change(function() { getInfoTurno(); });
 
-    $("#id-obra-social").chosen();
-		$("#id-medico").chosen();
-		$("#id-sala").chosen();
+    $("#id-obra-social").chosen().change(function() { getInfoTurno(); });
+    $("#id-medico").chosen().change(function() { getHorarioAtencionMedico(); getInfoTurno(); });
+    $("#id-sala").chosen();
 
     $("#fecha").datepicker({language:"es"});
 
@@ -41,11 +44,6 @@
           this.selectedIndex = 0;
       });
     };
-
-
-    getHorarioAtencionMedico();
-    //subscribe event medico select
-    $('#id-medico').change(getHorarioAtencionMedico);
 
     //agregar los : a la hora de fin de turno
     $('#hora_fin_estimada').keyup(function(e) {
@@ -245,6 +243,12 @@
         <option value="{{ practica.id }}" {% if practica.selected %} selected="selected" {% endif %}>{{ practica.nombre }}</option>
         {% endfor %}
       </select>
+      <div id="info-turno">
+            <table>
+                <thead><tr><th>Info Turnos</th><th>Practicas</th></tr></thead>
+                <tbody></tbody>
+            </table>
+      </div>
     </div>
     <div class="clear"></div>
 
