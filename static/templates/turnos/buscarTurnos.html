@@ -16,6 +16,15 @@
 		$("#id-medico").chosen();
 		$("#id-sala").chosen();
 
+
+        // Grilla. Hace que se ponga gris la linea al pasar el mouse por arriba.
+        $(function(){
+            $('tbody tr').hover(
+                function(){ $('td', this).addClass('ui-grid-state-hover');},
+                function(){ $('td', this).removeClass('ui-grid-state-hover');}
+            )
+        });
+
 	});
 </script>
 

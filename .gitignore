@@ -1,6 +1,12 @@
-.idea
-logs
-static/templates/media_files
+
+settings.py
 *.pyc
 *.svn
 *~
+
+# folders
+logs
+node_modules/
+static/templates/media_files
+static/bower_components/
+.idea
