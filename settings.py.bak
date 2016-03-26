@@ -76,7 +76,6 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    PROJECT_ROOT + u'/static/bower_components',
     PROJECT_ROOT + u'/static/templates',
     u'/usr/local/lib/python2.7/dist-packages/django/contrib/admin/static',
     #Alias /css /var/www/cedir/static/templates/css

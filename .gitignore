@@ -8,5 +8,5 @@ settings.py
 logs
 node_modules/
 static/templates/media_files
-static/bower_components/
+static/templates/bower_components/
 .idea
