@@ -7,8 +7,8 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('medico', '0002_auto_20151019_1902'),
         ('obra_social', '0002_auto_20151019_1902'),
+        ('medico', '0002_auto_20151019_1902'),
         ('practica', '0002_auto_20150806_1845'),
         ('turno', '0001_initial'),
     ]
@@ -19,9 +19,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('texto', models.TextField()),
-                ('medico', models.ForeignKey(to='medico.Medico', null=True)),
-                ('obra_social', models.ForeignKey(to='obra_social.ObraSocial', null=True)),
-                ('practicas', models.ManyToManyField(to='practica.Practica', null=True)),
+                ('medico', models.ForeignKey(blank=True, to='medico.Medico', null=True)),
+                ('obra_sociales', models.ManyToManyField(to='obra_social.ObraSocial', null=True, blank=True)),
+                ('practicas', models.ManyToManyField(to='practica.Practica', null=True, blank=True)),
             ],
             options={
             },

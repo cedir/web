@@ -41,7 +41,6 @@ class Turno(models.Model):
 
 class InfoTurno(models.Model):
     medico = models.ForeignKey(Medico, null=True, blank=True)
-    obra_social = models.ForeignKey(ObraSocial, null=True, blank=True)
+    obra_sociales = models.ManyToManyField(ObraSocial, null=True, blank=True)
     practicas = models.ManyToManyField(Practica, null=True, blank=True)
     texto = models.TextField()
-

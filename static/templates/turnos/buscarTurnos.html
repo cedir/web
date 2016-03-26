@@ -1,156 +1,182 @@
-{% extends "turnos/base.html" %}
-
-{% block content %}
-
-<link rel="stylesheet" href="/media/css/turnos/buscar_turnos.css" media="screen" />
-<link rel="stylesheet" href="/media/css/turnos/buscar_turnos_print.css" media="print" />
-<!--<link type="text/css" href="/css/widgets/ui.multiselect.css" rel="stylesheet" />-->
-<link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="/media/js/jquery-ui-1.8.1.custom.min.js"></script>
-<!--<script type="text/javascript" src="/media/js/ui.multiselect.js"></script>-->
-<script type="text/javascript" src="/media/js/jquery.ui.datepicker-es.js"></script>
-<!--<script type="text/javascript" src="/media/js/jquery.ui.datepicker-es.js"></script>-->
-<script type="text/javascript" src="/media/js/ui/jquery.ui.core.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.widget.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.mouse.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.draggable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.position.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.resizable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.dialog.js"></script>
+{% extends "turnos/base.html" %} {% load staticfiles %} {% block content %}
 
 <script type="text/javascript">
-// <!CDATA[
-		$(function(){
-			$('tbody tr').hover(
-				function(){ $('td', this).addClass('ui-grid-state-hover');},
-				function(){ $('td', this).removeClass('ui-grid-state-hover');}
-			)
-// 			.toggle(
-// 				function(){ $('td', this).addClass('ui-state-highlight');},
-// 				function(){ $('td', this).removeClass('ui-state-highlight');}
-// 			);
+	$(document).ready(function() {
+
+		$("#dialog").on('show.bs.modal', getEdit);
+
+		$("#fecha").datepicker({
+			language: "es"
 		});
-// ]]>
+
+		$("#id-obra-social").chosen({
+			width: "60%"
+		});
+
+		$("#id-medico").chosen();
+		$("#id-sala").chosen();
+
+
+        // Grilla. Hace que se ponga gris la linea al pasar el mouse por arriba.
+        $(function(){
+            $('tbody tr').hover(
+                function(){ $('td', this).addClass('ui-grid-state-hover');},
+                function(){ $('td', this).removeClass('ui-grid-state-hover');}
+            )
+        });
+
+	});
 </script>
-<script>
-$(document).ready(function() {
-
-  var hush = $.datepicker.regional['es'];
-  hush['appendText'] = '(dd/mm/aaaa)';
-  $("#fecha").datepicker(hush);
 
 
-
-});
-</script>
-
-
-<div id="dialog" title="Datos del turno" class="dialog">
-      <input type="hidden" name="current-turno-id" id="current-turno-id" value="" />
-      <div class="form-row">
-	<div class="form-subrow form-subrow_first"><label>Paciente:</label><a href="/app/?controlador=Pacientes&accion=getUpdate&id=" id="popup-paciente" target="_blank"></a> (DNI: <span id="popup-paciente-dni"></span>)</div>
-	<div class="form-subrow"><label>Telefono:</label><span id="popup-paciente-tel"></span></div>
-	<div style="clear:both;"></div>
-      </div>
-      <div class="form-row"><label>Fecha:</label><span id="popup-fecha"></span></div>
-      <div class="form-row">
-	  <label>Obra Social:</label>
-	  <select id="id-obra-social" name="id-obra-social" style="width:350px;">
-	    <option value="0">Seleccione..</option>
-	    {% for obrasSocial in obrasSociales %}
-		<option value="{{ obrasSocial.id }}" {% if obrasSocial.selected %} selected="selected" {% endif %} >{{ obrasSocial.nombre }}</option>
-	    {% endfor %}
-	  </select>
-      </div>
-      <div class="form-row"><label>Medico:</label><span id="popup-medico"></span></div>
-      <div class="form-row"><label>Pr&aacute;ticas:</label><span id="popup-practicas"></span></div>
-      <div class="form-row"><label>Sala:</label><span id="popup-sala"></span></div>
-      <div class="form-row"><label>Estado:</label><span id="popup-estado"></span></div>
-      <div class="form-row">
-	<div class="form-subrow form-subrow_first"><label>Hora de inicio:</label><span id="popup-hora-inicio"></span></div>
-	<div class="form-subrow"><label>Hora de fin:</label><span id="popup-hora-fin"></span></div>
-	<div style="clear:both;"></div>
-      </div>
-      <div class="form-row"><label>Creado por:</label> <span id="popup-creado-por"></span> el <span id="popup-fecha-otorgamiento"></span></div>
-      <div class="form-row"><label>Observacion</label><textarea name="popup-observacion_turno" id="popup-observacion_turno" value="" style="width: 379px; height: 68px;" maxlength="200"></textarea></div>
-      <div class="form-row"><input type="button" name="btnAnunciar" value="Anunciar" onclick="anunciarTurno();"/><input type="button" value="Anular" onclick="anular();"/><input type="button" value="Reprogramar" onclick="reprogramar();"/><input type="button" value="Confirmar" onclick="confirmar();"/><input type="button" name="btnCerrarFinalizar" value="Cerrar" onclick="$('#dialog').dialog('close');" style="float: right;"/><input type="button" name="btnConfirmar" value="Guardar" onclick="updateTurno();" style="float: right;"/></div>
+<div id="dialog" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Datos del turno</h4>
+			</div>
+			<div class="modal-body">
+				<input type="hidden" name="current-turno-id" id="current-turno-id" value="" />
+				<div class="form-row">
+					<div class="form-subrow form-subrow_first">
+						<label>Paciente:</label>
+						<a href="/app/?controlador=Pacientes&accion=getUpdate&id=" id="popup-paciente" target="_blank"></a> (DNI: <span id="popup-paciente-dni"></span>)</div>
+					<div class="form-subrow">
+						<label>Telefono:</label><span id="popup-paciente-tel"></span></div>
+					<div style="clear:both;"></div>
+				</div>
+				<div class="form-row">
+					<label>Fecha:</label><span id="popup-fecha"></span></div>
+				<div class="form-row">
+					<label>Obra Social:</label>
+					<select id="id-obra-social" name="id-obra-social" style="width:350px;">
+						<option value="0">Seleccione..</option>
+						{% for obrasSocial in obrasSociales %}
+						<option value="{{ obrasSocial.id }}" {% if obrasSocial.selected %} selected="selected" {% endif %}>{{ obrasSocial.nombre }}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="form-row">
+					<label>Medico:</label><span id="popup-medico"></span></div>
+				<div class="form-row">
+					<label>Pr&aacute;ticas:</label><span id="popup-practicas"></span></div>
+				<div class="form-row">
+					<label>Sala:</label><span id="popup-sala"></span></div>
+				<div class="form-row">
+					<label>Estado:</label><span id="popup-estado"></span></div>
+				<div class="form-row">
+					<div class="form-subrow form-subrow_first">
+						<label>Hora de inicio:</label><span id="popup-hora-inicio"></span></div>
+					<div class="form-subrow">
+						<label>Hora de fin:</label><span id="popup-hora-fin"></span></div>
+					<div style="clear:both;"></div>
+				</div>
+				<div class="form-row">
+					<label>Creado por:</label> <span id="popup-creado-por"></span> el <span id="popup-fecha-otorgamiento"></span></div>
+				<div class="form-row">
+					<label>Observacion</label>
+					<textarea name="popup-observacion_turno" id="popup-observacion_turno" value="" style="width: 379px; height: 68px;" maxlength="200"></textarea>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<input type="button" class="btn btn-primary" value="Anunciar"    onclick="anunciarTurno();" name="btnAnunciar" />
+				<input type="button" class="btn btn-primary" value="Anular"      onclick="anular();" />
+				<input type="button" class="btn btn-primary" value="Reprogramar" onclick="reprogramar();" />
+				<input type="button" class="btn btn-primary" value="Confirmar"   onclick="confirmar();" />
+				<input type="button" class="btn btn-primary" value="Guardar"     onclick="updateTurno();" style="float: right;" name="btnConfirmar" />
+				<input type="button" class="btn btn-default" value="Cerrar" data-dismiss="modal" style="float: right;" name="btnCerrarFinalizar" />
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
 </div>
+<!-- /.modal -->
 
 <div class="module">
-  <h3>Turnos</h3>
+	<h3>Turnos</h3>
 
-  <form name='frmBuscar' id='frmBuscar' action="/app/"  >
-    <input type="hidden" name="controlador" value="Turnos" />
-    <input type="hidden" name="accion" value="getBuscarTurnos" />
+	<form name='frmBuscar' id='frmBuscar' action="/app/">
+		<input type="hidden" name="controlador" value="Turnos" />
+		<input type="hidden" name="accion" value="getBuscarTurnos" />
 
-    <div class="form-row"><label>Paciente:</label><input type = "text" name="paciente" value="{{paciente}}" /></div>
-    <div class="form-row"><label>Fecha:</label><input type = "text" id="fecha" name="fecha" value="{{fecha}}" /></div>
-    <div class="form-row">
-      <label>M&eacute;dico:</label>
-      <select id="id-medico" name="id-medico" >
-	    <option value="">Seleccione..</option>
-	    {% for medico in medicos %}
-		<option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %} >{{ medico.apellido }}, {{ medico.nombre }}</option>
-	    {% endfor %}
-      </select>
-      <input type="checkbox" name="ocultar-turnos-anulados" value="true" {{ ocultarAnuladosState }} />Ocultar turnos anulados
-    </div>
-    <div class="form-row">
-      <label>Salas:</label>
-      <select id="id-sala" name="id-sala" >
-	    <option value="">Seleccione..</option>
-	    {% for sala in salas %}
-		<option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %} >{{ sala.nombre }}</option>
-	    {% endfor %}
-      </select>
-      <input type= "submit" name="Buscar" value="Buscar" />
-    </div>
+		<div class="form-row">
+			<label>Paciente:</label>
+			<input type="text" name="paciente" value="{{paciente}}" />
+		</div>
+		<div class="form-row">
+			<label>Fecha:</label>
+			<input type="text" id="fecha" name="fecha" value="{{fecha}}" />
+		</div>
+		<div class="form-row">
+			<label>M&eacute;dico:</label>
+			<select id="id-medico" name="id-medico">
+				<option value="">Seleccione..</option>
+				{% for medico in medicos %}
+				<option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %}>{{ medico.apellido }}, {{ medico.nombre }}</option>
+				{% endfor %}
+			</select>
+			<input type="checkbox" name="ocultar-turnos-anulados" value="true" {{ ocultarAnuladosState }} />Ocultar turnos anulados
+		</div>
+		<div class="form-row">
+			<label>Salas:</label>
+			<select id="id-sala" name="id-sala">
+				<option value="">Seleccione..</option>
+				{% for sala in salas %}
+				<option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %}>{{ sala.nombre }}</option>
+				{% endfor %}
+			</select>
+			<input type="submit" name="Buscar" value="Buscar" />
+		</div>
 
-  </form>
+	</form>
 </div>
 
 
 <div class="ui-grid ui-widget ui-widget-content ui-corner-all">
-      <!--<div class="ui-grid-header ui-widget-header ui-corner-top">Turnos</div> -->
-      <table class="ui-grid-content ui-widget-content">
-	  <thead>
-	      <tr>
-              <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span></a></th>
-              <th class="ui-state-default"><a href="#">Fecha</a></th>
-              <th class="ui-state-default"><a href="#">Hora</a></th>
-              <th class="ui-state-default"><a href="#">Paciente</a></th>
-              <th class="ui-state-default"><a href="#">Médico</a></th>
-              <th class="ui-state-default"><a href="#">Obra Social</a></th>
-              <th class="ui-state-default"><a href="#">Pr&aacute;cticas</a></th>
-              <th class="ui-state-default observacion_column"><a href="#">Observacion</a></th>
-              <th class="ui-state-default action_column"><a href="#" class="">Acción</a></th>
-	      </tr>
-	  </thead>
-	  <tbody>
-	      {% for hshTurnos in turnos %}
-	      <tr class="ui-widget-content">
-              <td><img src="/media/images/turnos/{{hshTurnos.img_estado}}" title="estado" alt="estado" /></td>
-              <td>{{ hshTurnos.fecha }}</td>
-              <td>{{ hshTurnos.hora_inicio }}</td>
-              <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshTurnos.id_paciente }}">{{ hshTurnos.apellido }}, {{ hshTurnos.nombre }} </a></td>
-              <td>{{ hshTurnos.medico }}</td>
-              <td>{{ hshTurnos.obra_social }}</td>
-              <td>{{ hshTurnos.practica }}</td>
-              <td class="observacion_column"><div class="observacion_wrapper">{{ hshTurnos.observacion }}</div></td>
-              <td class="action_column" >
-                  <a href="#" onclick="getEdit({{ hshTurnos.id }});event.preventDefault();">Editar</a>
-              </td>
-	      </tr>
-	      {% endfor %}
-	  </tbody>
-      </table>
-      <div class="ui-grid-footer ui-widget-header ui-corner-bottom ui-helper-clearfix">
-<!--	      <div class="ui-grid-paging ui-helper-clearfix">
+	<!--<div class="ui-grid-header ui-widget-header ui-corner-top">Turnos</div> -->
+	<table class="ui-grid-content ui-widget-content">
+		<thead>
+			<tr>
+				<th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span></a></th>
+				<th class="ui-state-default"><a href="#">Fecha</a></th>
+				<th class="ui-state-default"><a href="#">Hora</a></th>
+				<th class="ui-state-default"><a href="#">Paciente</a></th>
+				<th class="ui-state-default"><a href="#">Médico</a></th>
+				<th class="ui-state-default"><a href="#">Obra Social</a></th>
+				<th class="ui-state-default"><a href="#">Pr&aacute;cticas</a></th>
+				<th class="ui-state-default observacion_column"><a href="#">Observacion</a></th>
+				<th class="ui-state-default action_column"><a href="#" class="">Acción</a></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for hshTurnos in turnos %}
+			<tr class="ui-widget-content">
+				<td><img src="/media/images/turnos/{{hshTurnos.img_estado}}" title="estado" alt="estado" /></td>
+				<td>{{ hshTurnos.fecha }}</td>
+				<td>{{ hshTurnos.hora_inicio }}</td>
+				<td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshTurnos.id_paciente }}">{{ hshTurnos.apellido }}, {{ hshTurnos.nombre }} </a></td>
+				<td>{{ hshTurnos.medico }}</td>
+				<td>{{ hshTurnos.obra_social }}</td>
+				<td>{{ hshTurnos.practica }}</td>
+				<td class="observacion_column">
+					<div class="observacion_wrapper">{{ hshTurnos.observacion }}</div>
+				</td>
+				<td class="action_column">
+					<a href="#" data-toggle="modal" data-target="#dialog" data-turno-id="{{ hshTurnos.id }}">Editar</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<div class="ui-grid-footer ui-widget-header ui-corner-bottom ui-helper-clearfix">
+		<!--	      <div class="ui-grid-paging ui-helper-clearfix">
 		      <a href="?results=1" class="ui-grid-paging-prev ui-state-default ui-corner-left"><span class="ui-icon ui-icon-triangle-1-w" title="previous set of results"></span></a>
 		      <a href="?results=3" class="ui-grid-paging-next ui-state-default ui-corner-right"><span class="ui-icon ui-icon-triangle-1-e" title="next set of results"></span></a>
 	      </div>-->
-<!-- 	      <div class="ui-grid-results">Showing results 10-20</div> -->
-      </div>
+		<!-- 	      <div class="ui-grid-results">Showing results 10-20</div> -->
+	</div>
 </div>
 
 {% endblock %}

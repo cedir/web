@@ -1,5 +1,6 @@
 #info-turno {
     margin-top: 11px;
+    display: none;
 }
 
 #info-turno table{
@@ -9,5 +10,5 @@
 }
 
 #info-turno table, th, td {
-    border: 1px solid black;
+    border: 1px solid #a9a9a9;
 }

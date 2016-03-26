@@ -17,10 +17,10 @@ class TurnoSerializer(serializers.HyperlinkedModelSerializer):
 class InfoTurnoSerializer(serializers.HyperlinkedModelSerializer):
 
     medico = MedicoSerializer()
-    obra_social = ObraSocialSerializer()
+    obra_sociales = ObraSocialSerializer(many=True)
     practicas = PracticaSerializer(many=True)
 
     class Meta:
         model = InfoTurno
-        fields = (u'medico', u'obra_social', u'practicas', u'texto', )
+        fields = (u'medico', u'obra_sociales', u'practicas', u'texto', )
 

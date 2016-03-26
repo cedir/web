@@ -1,255 +1,254 @@
 {% extends "turnos/base.html" %}
+{% load staticfiles %}
 
 {% block content %}
+
 <link href="/media/css/turnos/nuevo_turno.css" rel="stylesheet" type="text/css"/>
-<link type="text/css" href="/media/css/widgets/ui.multiselect.css" rel="stylesheet" />
-<link href="/media/css/widgets/jquery-ui.css" rel="stylesheet" type="text/css"/>
-<link href="/media/css/widgets/ui.multiselect.overide.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="/media/js/jquery-ui-1.8.1.custom.min.js"></script>
-<script type="text/javascript" src="/media/js/ui.multiselect.js"></script>
-<script type="text/javascript" src="/media/js/jquery.ui.datepicker-es.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.core.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.widget.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.mouse.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.draggable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.position.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.resizable.js"></script>
-<script type="text/javascript" src="/media/js/ui/jquery.ui.dialog.js"></script>
-<script type="text/javascript" src="/media/js/formFunctions.js"></script>
 
 <script type="text/javascript">
-$(function(){
 
-  $(".multiselect").multiselect();
-//   $(".selected").css("width","200px");
-//   $(".available").css("width","257px");
-  $(".count").css("padding-bottom","5px");
-
-});
-
-
-
-</script>
-  <script>
   $(document).ready(function() {
 
-    var hush = $.datepicker.regional['es'];
-    hush['appendText'] = '(dd/mm/yyyy)';
-    $("#fecha").datepicker(hush);
+    $("#dialog").on('show.bs.modal', getConfirmarTurno);
 
-    $("#tab-paciente").tabs();
+    $(".multiselect").chosen({
+        search_contains : true,
+        inherit_select_classes: true,
+        width: "400px",
+        no_results_text : "No hay estudios que contengan",
+        placeholder_text_multiple : "Seleccione uno o más estudios"
+    }).change(function() { getInfoTurno(); });
+
+    $("#id-obra-social").chosen().change(function() { getInfoTurno(); });
+    $("#id-medico").chosen().change(function() { getHorarioAtencionMedico(); getInfoTurno(); });
+    $("#id-sala").chosen();
+
+    $("#fecha").datepicker({language:"es"});
+
+
+    $(".count").css("padding-bottom", "5px");
+
 
     //plugin form clean a form
     $.fn.clearForm = function() {
       return this.each(function() {
-	var type = this.type, tag = this.tagName.toLowerCase();
-	if (tag == 'form')
-	  return $(':input',this).clearForm();
-	if (type == 'text' || type == 'password' || tag == 'textarea')
-	  this.value = '';
-	else if (type == 'checkbox' || type == 'radio')
-	  this.checked = false;
-	else if (tag == 'select')
-	  this.selectedIndex = 0;
+        var type = this.type,
+          tag = this.tagName.toLowerCase();
+        if (tag == 'form')
+          return $(':input', this).clearForm();
+        if (type == 'text' || type == 'password' || tag == 'textarea')
+          this.value = '';
+        else if (type == 'checkbox' || type == 'radio')
+          this.checked = false;
+        else if (tag == 'select')
+          this.selectedIndex = 0;
       });
     };
 
-
-    getHorarioAtencionMedico();
-    getInfoTurno();
-    //subscribe event medico select
-    $('#id-medico').change(function() {
-        getHorarioAtencionMedico();
-        getInfoTurno();
-    });
-
-    $('#btnRefrescar').click(function() {
-        getInfoTurno();
-    });
-
-    $('#id-obra-social').change(function() {
-        getInfoTurno();
-    });
-
-
     //agregar los : a la hora de fin de turno
     $('#hora_fin_estimada').keyup(function(e) {
-      if (this.value.length == 2 && e.keyCode != 8){
-	  this.value = this.value + ":";
+      if (this.value.length == 2 && e.keyCode != 8) {
+        this.value = this.value + ":";
       }
     });
 
   });
-  </script>
-
-<script>
-
-  function getConfirmarTurno(fecha,horaInicio){
-      
-      $("#dialog").dialog({ width: 550 });
-      
-      $("#selected-medico").text($("#id-medico option:selected").text());
-      $("#selected-obrasocial").text($("#id-obra-social option:selected").text());
-      $("#selected-practicas").text($("#id-practicas option:selected").text());
-      $("#selected-fecha").text(CDate.convertToRegular(fecha));
-      $("#selected-fecha-value").val(fecha);
-      $("#hora_inicio").val(horaInicio);
-      $("#selected-sala").text($("#id-sala option:selected").text());
-
-      
-  }
-  function getPaciente(){
-    $("#dialogPaciente").dialog({width:500});
-  }
-  function setPaciente(id, nombre, apellido){
-      $('#selectedPaciente').html(apellido + ", " + nombre);
-      $("#id-paciente").val(id);
-      $("#dialogPaciente").dialog("close");
-
-  }
 </script>
 
+<div id="dialog" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Resúmen del turno</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label>M&eacute;dico: </label><span id="selected-medico"></span></div>
+        <div class="form-row">
+          <label>Obra Social: </label><span id="selected-obrasocial"></span></div>
+        <div class="form-row">
+          <label>Fecha: </label><span id="selected-fecha"></span>
+          <input type="hidden" name="selected-fecha-value" id="selected-fecha-value" />
+        </div>
+        <div class="form-row">
+          <label>Sala: </label><span id="selected-sala"></span></div>
+        <div class="form-row">
+          <label>Hora inicio: </label>
+          <input type="text" name="hora_inicio" id="hora_inicio" value="" size="10" />
+        </div>
+        <div class="form-row">
+          <label>Hora de fin estimada</label>
+          <input type="text" name="hora_fin_estimada" id="hora_fin_estimada" value="" size="10" />
+        </div>
+        <div class="form-row">
+          <label>Practicas: </label><span id="selected-practicas"></span></div>
+        <div class="form-row">
+          <label>Observaci&oacute;n: </label>
+          <textarea id="observacion" style="width: 379px; height: 68px;" maxlength="150"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn btn-primary" value="Guardar" name="btnConfirmar" onclick="save();" />
+        <input type="button" class="btn btn-default" value="Cerrar" name="btnCerrar" data-dismiss="modal" />
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
-<div id="dialog" title="Resúmen del turno" class="dialog">
-    <div class="form-row"><label>M&eacute;dico: </label><span id="selected-medico"></span></div>
-    <div class="form-row"><label>Obra Social: </label><span id="selected-obrasocial"></span></div>
-    <div class="form-row"><label>Fecha: </label><span id="selected-fecha"></span><input type="hidden" name="selected-fecha-value" id="selected-fecha-value"/></div>
-    <div class="form-row"><label>Sala: </label><span id="selected-sala"></span></div> 
-    <div class="form-row"><label>Hora inicio: </label><input type="text" name="hora_inicio" id="hora_inicio" value="" size="10"/></div>
-    <div class="form-row"><label>Hora de fin estimada</label><input type="text" name="hora_fin_estimada" id="hora_fin_estimada" value="" size="10"/></div>
-    <div class="form-row"><label>Practicas: </label><span id="selected-practicas"></span></div>
-    <div class="form-row"><label>Observaci&oacute;n: </label><textarea id="observacion" style="width: 379px; height: 68px;" maxlength="150"></textarea></div>
-    <div class="form-row"><input type="button" name="btnConfirmar" value="Confirmar" onclick="save();"/><input type="button" name="btnCerrar" value="Cerrar" onclick="$('#dialog').dialog('close');"/></div>
-</div>
 
-<div id="dialogPaciente" title="Seleccionar paciente" class="dialog">
-    <div id="tab-paciente">
-	  <ul>
-	      <li><a href="#buscar-paciente-tab"><span>Buscar</span></a></li>
-	      <li><a href="#crear-paciente-tab"><span>Crear</span></a></li>
-	  </ul>
-	 <div id="buscar-paciente-tab">
-		<div class="form-row">
-		  Apellido:<input type="text" name="apellidoPacienteBuscar" id="apellidoPacienteBuscar" style="width:90px;"/>
-		  Nombre:<input type="text" name="nombrePacienteBuscar" id="nombrePacienteBuscar" style="width:80px;"/>
-		  DNI:<input type="text" name="dniPacienteBuscar" id="dniPacienteBuscar" style="width:50px;"/>
-		  <input type= "button" name="Buscar" value="Buscar" onclick="buscarPacientes();"/>
-		</div>
-		<div class="ui-grid ui-widget ui-widget-content ui-corner-all">
-		  <table class="ui-grid-content ui-widget-content">
-		      <thead>
-			  <tr>
-				  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Dni</a></th>
-				  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Apellido y Nombre</a></th>
-				  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Domicilio</a></th>
-				  <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Acci&oacute;n</a></th>
-			  </tr>
-		      </thead>
-		      <tbody class="result">
-		      </tbody>
-		  </table>
-	      </div>
-	</div>
-	<div id="crear-paciente-tab">
-		<form id="formCrearPaciente" name="formCrearPaciente" action="/app/"  method="post">
-		  <div class="form-row">
-		      <label>Nombre:</label><input type="text" id="txtNombre" name="txtNombre" value="{{nombre}}" />
-		  </div>
-		  <div class="form-row">
-		      <label>Apellido:</label><input type="text" id="txtApellido" name="txtApellido" value="{{apellido}}"  />
-		  </div>
-		  <div class="form-row">
-		      <label>Documento:</label><input type="text" id="txtDni" name="txtDni" value="{{id}}"  />    
-		  </div>
-		  <div class="form-row">
-		      <label>Fecha de Nacimiento:</label><input type="text" name="txtFechaNacimiento" id="txtFechaNacimiento" value="{{fechaNacimiento}}" >    
-		  </div>
-		  <div class="form-row">
-		      <label>Sexo:</label>
-		      <select name="txtSexo" id="txtSexo">
-			  <option value="">Selecione..</option>
-			  <option value="Femenino">Femenino</option>
-			  <option value="Masculino">Masculino</option>		                  
-		      </select>
-		  </div>
-		  <div class="form-row">
-		      <label>Domicilio:</label><input type="text" name="txtDomicilio" id="txtDomicilio" value="{{domicilio}}"> 
-		  </div>
-		  <div class="form-row">
-		      <label>Teléfono:</label><input type="text" id="txtTelefono" name="txtTelefono" value="{{telefono}}">    
-		  </div>
-          <div class="form-row">
-            <label>Nro de afiliado:</label><input type="text" id="txtNroAfiliado" name="txtNroAfiliado" value="{{nro_afiliado}}">
+<div id="dialogPaciente" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Seleccionar paciente</h4>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a href="#buscar-paciente-tab" role="tab" data-toggle="tab"><span>Buscar</span></a></li>
+          <li role="presentation"><a href="#crear-paciente-tab" role="tab" data-toggle="tab"><span>Crear</span></a></li>
+        </ul>
+        <div id="tab-paciente" class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="buscar-paciente-tab">
+            <div class="form-row">
+              Apellido:
+              <input type="text" name="apellidoPacienteBuscar" id="apellidoPacienteBuscar" style="width:90px;" /> Nombre:
+              <input type="text" name="nombrePacienteBuscar" id="nombrePacienteBuscar" style="width:80px;" /> DNI:
+              <input type="text" name="dniPacienteBuscar" id="dniPacienteBuscar" style="width:50px;" />
+              <input type="button" name="Buscar" value="Buscar" onclick="buscarPacientes();" />
+            </div>
+            <div class="ui-grid ui-widget ui-widget-content ui-corner-all">
+              <table class="ui-grid-content ui-widget-content">
+                <thead>
+                  <tr>
+                    <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Dni</a></th>
+                    <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Apellido y Nombre</a></th>
+                    <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Domicilio</a></th>
+                    <th class="ui-state-default"><a href="#"><span class="ui-icon ui-icon-triangle-1-s" title="sort ascending"></span>Acci&oacute;n</a></th>
+                  </tr>
+                </thead>
+                <tbody class="result">
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div class="form-row">
-            <label>Email:</label><input type="text" id="txtEmail" name="txtEmail" value="{{email}}">
+          <div role="tabpanel" class="tab-pane" id="crear-paciente-tab">
+            <form id="formCrearPaciente" name="formCrearPaciente" action="/app/" method="post">
+              <div class="form-row">
+                <label>Nombre:</label>
+                <input type="text" id="txtNombre" name="txtNombre" value="{{nombre}}" />
+              </div>
+              <div class="form-row">
+                <label>Apellido:</label>
+                <input type="text" id="txtApellido" name="txtApellido" value="{{apellido}}" />
+              </div>
+              <div class="form-row">
+                <label>Documento:</label>
+                <input type="text" id="txtDni" name="txtDni" value="{{id}}" />
+              </div>
+              <div class="form-row">
+                <label>Fecha de Nacimiento:</label>
+                <input type="text" name="txtFechaNacimiento" id="txtFechaNacimiento" value="{{fechaNacimiento}}">
+              </div>
+              <div class="form-row">
+                <label>Sexo:</label>
+                <select name="txtSexo" id="txtSexo">
+                  <option value="">Selecione..</option>
+                  <option value="Femenino">Femenino</option>
+                  <option value="Masculino">Masculino</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label>Domicilio:</label>
+                <input type="text" name="txtDomicilio" id="txtDomicilio" value="{{domicilio}}">
+              </div>
+              <div class="form-row">
+                <label>Teléfono:</label>
+                <input type="text" id="txtTelefono" name="txtTelefono" value="{{telefono}}">
+              </div>
+              <div class="form-row">
+                <label>Nro de afiliado:</label>
+                <input type="text" id="txtNroAfiliado" name="txtNroAfiliado" value="{{nro_afiliado}}">
+              </div>
+              <div class="form-row">
+                <label>Email:</label>
+                <input type="text" id="txtEmail" name="txtEmail" value="{{email}}">
+              </div>
+              <div class="form-row">
+                <input id="btnAceptar" type="button" value="Guardar y seleccionar" class="botones" onclick="createAndAsignPaciente();" />
+              </div>
+            </form>
           </div>
-		  <div class="form-row">
- 		      <input id="btnAceptar" type="button" value="Guardar y seleccionar" class="botones" onclick="createAndAsignPaciente();" /> 
-		  </div>
-	    </form>
-	</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
-    </div>
-</div>
+
+
 
 <div class="module">
-  <h3>Asignar turno al paciente: <span id="selectedPaciente" style="font-style:italic;">{{ apellidoPaciente}} {{ nombrePaciente}}</span><a href="javascript: getPaciente();" style="font-size:10px">[Elegir]</a></h3>
+  <h3>Asignar turno al paciente: <span id="selectedPaciente" style="font-style:italic;">{{ apellidoPaciente}} {{ nombrePaciente}}</span><a data-toggle="modal" data-target="#dialogPaciente" style="font-size:10px">[Elegir]</a></h3>
 
-  <form name="ver-planilla" id="ver-planilla" action="/app/" >
+  <form name="ver-planilla" id="ver-planilla" action="/app/">
     <input type="hidden" name="controlador" value="Turnos" />
     <input type="hidden" name="accion" value="getTurnosDisponibles" />
-    <input type="hidden" name="id-paciente" id="id-paciente" value="{{idPaciente}}" >
+    <input type="hidden" name="id-paciente" id="id-paciente" value="{{idPaciente}}">
 
     <div class="section">
-	    <div class="form-row">
-	        <label>Médico:</label>
-	        <select id="id-medico" name="id-medico" >
-		      <option value="">Seleccione..</option>
-		      {% for medico in medicos %}
-		          <option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %} >{{ medico.apellido }}, {{ medico.nombre }}</option>
-		      {% endfor %}
-	        </select>
-	    </div>
-	    <div class="form-row">
-	        <label>Obra Social</label>
-	        <select id="id-obra-social" name="id-obra-social" style="width:350px;">
-		      <option value="">Seleccione..</option>
-		      {% for obrasSocial in obrasSociales %}
-		          <option value="{{ obrasSocial.id }}" {% if obrasSocial.selected %} selected="selected" {% endif %} >{{ obrasSocial.nombre }}</option>
-		      {% endfor %}
-	        </select>
-	    </div>
-	    <div class="form-row">
-	        <label>Fecha:</label><input type="textbox" id="fecha" name="fecha" value="{{ fecha }}" size="10"/>
-	    </div>
-	    <div class="form-row">
-	        <label>Sala:</label>
-	        <select id="id-sala" name="id-sala" >
-		      <option value="">Seleccione..</option>
-		      {% for sala in salas %}
-		          <option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %} >{{ sala.nombre }}</option>
-		      {% endfor %}
-	        </select>
-	        <input name="ver" type="button" value="Ver planilla" text="Ver planilla" onclick="getVerPlanilla();" />
-	    </div>
-	    <div class="form-row" style="display:none;" id="med-info">
-	        Horario de atencion de <span id="med-horario"></span>
-	    </div>
+      <div class="form-row">
+        <label>Médico:</label>
+        <select id="id-medico" name="id-medico">
+          <option value="">Seleccione..</option>
+          {% for medico in medicos %}
+          <option value="{{ medico.id }}" {% if medico.selected %} selected="selected" {% endif %}>{{ medico.apellido }}, {{ medico.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Obra Social</label>
+        <select id="id-obra-social" name="id-obra-social" style="width:350px;">
+          <option value="">Seleccione..</option>
+          {% for obrasSocial in obrasSociales %}
+          <option value="{{ obrasSocial.id }}" {% if obrasSocial.selected %} selected="selected" {% endif %}>{{ obrasSocial.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Fecha:</label>
+        <input type="textbox" id="fecha" name="fecha" value="{{ fecha }}" size="10" />
+      </div>
+      <div class="form-row">
+        <label>Sala:</label>
+        <select id="id-sala" name="id-sala">
+          <option value="">Seleccione..</option>
+          {% for sala in salas %}
+          <option value="{{ sala.id }}" {% if sala.selected %} selected="selected" {% endif %}>{{ sala.nombre }}</option>
+          {% endfor %}
+        </select>
+        <input name="ver" type="button" value="Ver planilla" text="Ver planilla" onclick="getVerPlanilla();" />
+      </div>
+      <div class="form-row" style="display:none;" id="med-info">
+        Horario de atencion de <span id="med-horario"></span>
+      </div>
     </div>
     <div class="section">
-        <select id="id-practicas" class="multiselect" multiple="multiple" name="id-practicas[]">
-            {% for practica in practicas %}
-                <option value="{{ practica.id }}" {% if practica.selected %} selected="selected" {% endif %} >{{ practica.nombre }}</option>
-            {% endfor %}
-        </select>
-        <input id="btnRefrescar" type="button" value="Refrescar" class="botones" /> 
-        <div id="info-turno">
+      <select id="id-practicas" class="multiselect" multiple="multiple" name="id-practicas[]">
+        {% for practica in practicas %}
+        <option value="{{ practica.id }}" {% if practica.selected %} selected="selected" {% endif %}>{{ practica.nombre }}</option>
+        {% endfor %}
+      </select>
+      <div id="info-turno">
             <table>
                 <thead><tr><th>Info Turnos</th><th>Practicas</th></tr></thead>
                 <tbody></tbody>
             </table>
-	    </div>
+      </div>
     </div>
     <div class="clear"></div>
 
@@ -260,14 +259,14 @@ $(function(){
 
   <div style="{% if showLines %} display:block; {% else %} display:none; {% endif %}">
     <div style="margin-left:390px;">
-      <a href='javascript:getBack();' ><img src="/media/images/turnos/back_button_64.png" title="back" alt="back" border=0  ></a>
-      <a href="javascript:getNext();" ><img src="/media/images/turnos/next_button_64.png" title="next" alt="next" border=0  ></a>
+      <a href='javascript:getBack();'><img src="/media/images/turnos/back_button_64.png" title="back" alt="back" border=0></a>
+      <a href="javascript:getNext();"><img src="/media/images/turnos/next_button_64.png" title="next" alt="next" border=0></a>
     </div>
     <div id="lineasSector">{{dayLines}}</div>
   </div>
 
 
-  
+
   <div class="clear"></div>
 </div>
 

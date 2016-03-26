@@ -1,17 +1,26 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
-
+{% load staticfiles %}
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" >
 <head>
     <title>Cedir - Gestor de turnos</title>
-    <link rel="stylesheet" type="text/css" href="/media/css/turnos/layout.css"/>
-    <link rel="stylesheet" type="text/css" href="/media/css/turnos/layout_print.css" media="print"/>
-    <script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="/media/js/turno.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'chosen/chosen.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/dist/css/bootstrap.css' %}" media="screen">
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css' %}"/>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/turnos/layout.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/turnos/layout_print.css' %}" media="print"/>
+
+    <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap-datepicker/dist/locales/bootstrap-datepicker.es.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/turno.js' %}"></script>
 </head>
 <body>
 <div id="wrapper">
-
   <div id="header">
     <div>
         <div style="display:block;float:left;cursor:pointer;margin-top:2px;" onclick="location.href='/app/?controlador=Root&accion=getHome'">
@@ -20,31 +29,31 @@
       </div>
       <div id="user-tools">Bienvenido/a,<strong> {{logged_user_name}}</strong>. <a href="#">Cambiar contrase&ntilde;a</a> / <a href="/app/?controlador=Root&accion=logout">Salir</a></div>
     </div>
-    <ul class="topnav">  
-      <li>  
+    <ul class="topnav">
+      <li>
 	  <a href="#">Pacientes</a>
 	  <span></span>
-	  <ul class="subnav">  
-	      <li><a href="/app/?controlador=Pacientes&accion=getCreate">Nuevo</a></li>  
-	      <li><a href="/app/?controlador=Pacientes&accion=getBuscar">Buscar</a></li>  
-	  </ul>  
+	  <ul class="subnav">
+	      <li><a href="/app/?controlador=Pacientes&accion=getCreate">Nuevo</a></li>
+	      <li><a href="/app/?controlador=Pacientes&accion=getBuscar">Buscar</a></li>
+	  </ul>
       </li>
-      <li>  
+      <li>
 	  <a href="#">Turnos</a>
-	  <span></span> 
-	  <ul class="subnav">  
-	      <li><a href="/app/?controlador=Turnos&accion=getTurnosDisponibles">Nuevo</a></li>  
-	      <li><a href="/app/?controlador=Turnos&accion=getBuscarTurnos">Buscar</a></li>  
-	  </ul>  
+	  <span></span>
+	  <ul class="subnav">
+	      <li><a href="/app/?controlador=Turnos&accion=getTurnosDisponibles">Nuevo</a></li>
+	      <li><a href="/app/?controlador=Turnos&accion=getBuscarTurnos">Buscar</a></li>
+	  </ul>
       </li>
-      <li>  
+      <li>
 	  <a href="#">Medicos</a>
-	  <span></span> 
-	  <ul class="subnav">  
-	      <li><a href="/app/?controlador=Root&accion=getDisponibilidadMedicos">Horarios de atenci&oacute;n</a></li>   
-	  </ul>  
+	  <span></span>
+	  <ul class="subnav">
+	      <li><a href="/app/?controlador=Root&accion=getDisponibilidadMedicos">Horarios de atenci&oacute;n</a></li>
+	  </ul>
       </li>
-    </ul>  
+    </ul>
     <div class="clear"></div>
   </div>
 
@@ -59,4 +68,3 @@
 </div>
 </body>
 </html>
-
