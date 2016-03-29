@@ -33,6 +33,7 @@ class Comprobante(models.Model):
     gravadopaciente = models.TextField(db_column='gravadoPaciente', blank=True)  # Field name made lowercase.
     nroterminal = models.IntegerField(db_column='nroTerminal', blank=True, null=True)  # Field name made lowercase.
     cae = models.TextField(db_column='CAE', blank=True)  # Field name made lowercase.
+    vencimientoCAE = models.DateField(db_column='vencimientoCAE', blank=True, null=True)
 
     class Meta:
         managed = False
