@@ -8,7 +8,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm, mm
 from reportlab.lib.colors import black,white, Color
 from reportlab.graphics.barcode.common import I2of5
-from reportlab.platypus import Table
+from reportlab.platypus import Table, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 
 from textwrap import wrap
 
@@ -305,7 +306,7 @@ def datos_cliente(p, cliente):
 
 def detalle_lineas(p, header, sizes, lineas):
     tw = width - 2*margin
-    table = Table(header + lineas, [size * tw for size in sizes])
+    table = Table(header + lineas, colWidths=[size * tw for size in sizes])
     table.setStyle([
 	    ('FONT', (0, 0), (-1, -1), font_std),
 	    ('FONT', (0, 0), (-1, 0), font_bld),
@@ -417,10 +418,11 @@ def obtener_iva_comprobante(c, iva):
 
 
 def obtener_lineas_comprobante(c):
+    styles = styles=getSampleStyleSheet()
     if c.subtipo.upper() == 'A':
-        return [[l.concepto, u'{0:.2f}'.format(l.importeneto), format_gravado_linea(c.gravado), u'{0:.2f}'.format(l.subtotal)] for l in c.lineas.all()]
+        return [[Paragraph(l.concepto.replace(u'\r',u'').replace(u'\n',u'<br/>'), styles["Normal"]), u'{0:.2f}'.format(l.importeneto), format_gravado_linea(c.gravado), u'{0:.2f}'.format(l.subtotal)] for l in c.lineas.all()]
     else:
-        return [[l.concepto, u'{0:.2f}'.format(l.subtotal)] for l in c.lineas.all()]
+        return [[Paragraph(l.concepto.replace(u'\r',u'').replace(u'\n',u'<br/>'), styles["Normal"]), u'{0:.2f}'.format(l.subtotal)] for l in c.lineas.all()]
 
 
 def obtener_headers_lineas(c):
