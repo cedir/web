@@ -418,9 +418,9 @@ def obtener_iva_comprobante(c, iva):
 
 def obtener_lineas_comprobante(c):
     if c.subtipo.upper() == 'A':
-        return [[l.concepto, l.importeneto, format_gravado_linea(c.gravado), l.subtotal] for l in c.lineas.all()]
+        return [[l.concepto, u'{0:.2f}'.format(l.importeneto), format_gravado_linea(c.gravado), u'{0:.2f}'.format(l.subtotal)] for l in c.lineas.all()]
     else:
-        return [[l.concepto, l.subtotal] for l in c.lineas.all()]
+        return [[l.concepto, u'{0:.2f}'.format(l.subtotal)] for l in c.lineas.all()]
 
 
 def obtener_headers_lineas(c):
@@ -464,8 +464,8 @@ def obtener_detalle_iva(c):
     return result
 
 
-def obtener_comprobante(id):
-    c = Comprobante.objects.get(id=id)
+def obtener_comprobante(cae):
+    c = Comprobante.objects.get(cae=cae)
 
     return {
         'cabecera': {
@@ -514,12 +514,11 @@ def obtener_response(responsable, encabezado):
     return response
 
 
-def imprimir(request, id_comprobante):
+def imprimir(request, cae):
     # Adquiere datos
-    comp = obtener_comprobante(id_comprobante)
+    comp = obtener_comprobante(cae)
 
     # Create the HttpResponse object with the appropriate PDF headers.
     response = obtener_response(comp['responsable'], comp['cabecera'])
 
     return generar_factura(response, comp)
-
