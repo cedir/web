@@ -283,7 +283,7 @@ def datos_cliente(p, cliente):
 
     # CUIT
     t.setFont(font_bld, th)
-    t.textOut(u'CUIT: ')
+    t.textOut(u'CUIT: ' if len(cliente['CUIT']) > 10 else u'DNI: ')
     t.setFont(font_std, th)
     t.textLine(cliente['CUIT'])
 
@@ -500,7 +500,7 @@ def obtener_comprobante(cae):
 
 
 def obtener_filename(responsable, encabezado):
-    return u'{0}_{1}_{2:04d}_{3:08d}.pdf'.format(
+    return u'{0}_{1}_{2:04d}_{3:08d}'.format(
         responsable['CUIT'],
         encabezado['codigo'],
         encabezado['punto_venta'],
