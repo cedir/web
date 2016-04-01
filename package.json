@@ -1,0 +1,14 @@
+{
+  "name": "cedir",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Cedir web app",
+  "repository": "https://github.com/cedir/web/",
+  "license": "MIT",
+  "devDependencies": {
+    "bower": "^1.7.7"
+  },
+  "scripts": {
+    "postinstall": "bower install"
+  }
+}

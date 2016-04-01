@@ -7,11 +7,11 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('medico', '0001_initial'),
         ('paciente', '0001_initial'),
-        ('obra_social', '0001_initial'),
-        ('practica', '0001_initial'),
+        ('obra_social', '0002_auto_20151019_1902'),
+        ('medico', '0002_auto_20151019_1902'),
         ('sala', '0001_initial'),
+        ('practica', '0002_auto_20150806_1845'),
     ]
 
     operations = [
