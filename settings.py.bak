@@ -143,6 +143,7 @@ INSTALLED_APPS = (
     'medico',
     'turno',
     'estudio',
+    "comprobante",
 )
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
