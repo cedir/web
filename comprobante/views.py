@@ -510,7 +510,7 @@ def obtener_filename(responsable, encabezado):
 
 def obtener_response(responsable, encabezado):
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = u'attachment; filename="{0}.pdf"'.format(
+    response['Content-Disposition'] = u'filename="{0}.pdf"'.format(
         obtener_filename(responsable, encabezado)
         )
     return response
