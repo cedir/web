@@ -14,12 +14,17 @@
 		display: none;
 	}
 	/*hide buscar button*/
-	.form-row input {
+	.form-row input[type=submit] {
 	    display: none;
 	}
 
 	/*hide top menu*/
 	.topnav{
+		display: none;
+	}
+
+	/*hide pop-up*/
+	#dialog{
 		display: none;
 	}
 }

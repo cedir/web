@@ -13,10 +13,11 @@ class Medico(models.Model):
     #mail = models.CharField("Mail",max_length=200, db_column="mail")
 
     def __unicode__ (self):
-        return self.apellido
+        return u'%s, %s' % (self.apellido, self.nombre, )
 
     class Meta:
         db_table = 'cedirData\".\"tblMedicosAct'
+        ordering = [u'apellido']
 
 
 class Disponibilidad(models.Model):
@@ -32,3 +33,4 @@ class Disponibilidad(models.Model):
 
     class Meta:
         db_table = 'cedirData\".\"turnos_disponibilidad_medicos'
+

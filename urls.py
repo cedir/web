@@ -13,5 +13,6 @@ urlpatterns = patterns('',
     (r'^turnos/$', getLogin),
     (r'', include('turno.urls')),
     (r'', include('comprobante.urls')),
+    (r'', include('medico.urls')),
     (r'^admin/', include(admin.site.urls)),
 )

@@ -2,7 +2,7 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-#DEFAULT_CHARSET = 'ascii'
+DEFAULT_CHARSET = 'utf8'
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -15,8 +15,8 @@ DATABASES = {
 	'ENGINE':'django.db.backends.postgresql_psycopg2',           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 	'NAME':'PruebasCedirFE',             # Or path to database file if using sqlite3.
 	'USER':'postgres',             # Not used with sqlite3.
-	'PASSWORD':'Devel$1234',         # Not used with sqlite3.
-	'HOST':'localhost',             # Set to empty string for localhost. Not used with sqlite3.
+	'PASSWORD':'******',         # Not used with sqlite3.
+	'HOST':'localhost',           # Set to empty string for localhost. Not used with sqlite3.
 	'PORT':'5432',             # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -45,11 +45,11 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 #USE_TZ = True
 
-SITE_BASE = u'/home/ignacio/documents/software/cedir/web'
+PROJECT_ROOT = u'/home/wbrunetti/Documents/cedir'
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = SITE_BASE + u'/static/templates/media_files/'
+MEDIA_ROOT = PROJECT_ROOT + u'/static/templates/media_files/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -76,11 +76,11 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    SITE_BASE + u'/static/bower_components',
-    SITE_BASE + u'/static/templates',
+    PROJECT_ROOT + u'/static/bower_components',
+    PROJECT_ROOT + u'/static/templates',
     u'/usr/local/lib/python2.7/dist-packages/django/contrib/admin/static',
     #Alias /css /var/www/cedir/static/templates/css
-    SITE_BASE + u'/static', # media_files
+    PROJECT_ROOT + u'/static', # media_files
     #Alias /images /var/www/cedir/static/templates/images
     #Alias /js /var/www/cedir/static/templates/js
     #Alias /flash /var/www/cedir/static/templates/flash
@@ -110,10 +110,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
-
     #'django.middleware.csrf.CsrfViewMiddleware', por def esta esta descomentada
     'django.contrib.messages.middleware.MessageMiddleware',
-
 )
 
 ROOT_URLCONF = 'urls'
@@ -125,8 +123,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-     SITE_BASE + u"/static/templates",
-     #"/var/www/django_projects/cedir/admin/templates",
+    PROJECT_ROOT + u'/static/templates',
+    #"/var/www/django_projects/cedir/admin/templates",
 )
 
 INSTALLED_APPS = (
@@ -148,7 +146,6 @@ INSTALLED_APPS = (
     'estudio',
     "comprobante",
 )
-
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
