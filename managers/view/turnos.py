@@ -4,6 +4,9 @@ from datetime import datetime
 import simplejson
 
 
+PIXELS_PER_MINUTE = 1.333
+
+
 class ViewTurnos():
     def __init__(self, request=None):
         self.request = request
@@ -105,11 +108,11 @@ class ViewTurnos():
                 hshTurno = {}
                 hshTurno["id"] = turno.id
                 hshTurno["paciente"] = turno.paciente.nombre + ' ' + turno.paciente.apellido
-                hshTurno["top"] = (((turno.horaInicio.hour - 7) * 60) + turno.horaInicio.minute ) * 1.333 + 10
+                hshTurno["top"] = (((turno.horaInicio.hour - 7) * 60) + turno.horaInicio.minute) * PIXELS_PER_MINUTE + 11
                 hshTurno["fecha"] = turno.fechaTurno
                 hshTurno["hora"] = turno.horaInicio
                 hshTurno["duracion"] = turno.getDuracionEnMinutos()
-                hshTurno["duracionEnPixeles"] = turno.getDuracionEnMinutos() * 1.333 - (4 * 1.333)
+                hshTurno["duracionEnPixeles"] = turno.getDuracionEnMinutos() * PIXELS_PER_MINUTE - (1 * PIXELS_PER_MINUTE)
                 hshTurno["medico"] = turno.medico.nombre + ' ' + turno.medico.apellido
                 hshTurno["obra_social"] = turno.obraSocial.nombre
                 hshTurno["practicas"] = u'-'.join([p.abreviatura for p in turno.practicas.all()])
