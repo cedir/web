@@ -207,9 +207,9 @@ a:hover, a:active {
 .turno{
     height:100px;
     width:145px;
-    border: #667F66 2px solid;
+    outline: #667F66 2px solid;
     font-size:13px;
-    padding-top:3px;
+    /*padding-top:3px;*/
     padding-left:3px;
     overflow:hidden;
 }
@@ -297,7 +297,7 @@ a:hover, a:active {
   text-align: left;
 }
 .ui-grid-state-hover {
-  background: #dadada url(widgets/images/ui-bg_glass_75_dadada_1x400.png)  50%  50% repeat-x;
+  background: #dadada;
   font-weight: normal;
   color: #212121;
 }
