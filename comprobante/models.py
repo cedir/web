@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import timedelta
 
 class ComprobanteLinea(models.Model):
     id = models.BigIntegerField(primary_key=True)
@@ -34,6 +35,38 @@ class Comprobante(models.Model):
     nroterminal = models.IntegerField(db_column='nroTerminal', blank=True, null=True)  # Field name made lowercase.
     cae = models.TextField(db_column='CAE', blank=True)  # Field name made lowercase.
     vencimientoCAE = models.DateField(db_column='vencimientoCAE', blank=True, null=True)
+
+    @property
+    def codigo_afip(self):
+        conversion = {
+            'A': {1: 1, 3: 2, 4: 3},
+            'B': {1: 6, 3: 7, 4: 6}
+        }
+        return conversion[self.subtipo][self.idtipocomprobante.id]
+
+    @property
+    def tipo_id_afip(self):
+        return 80 if len(self.nrocuit.replace(u'-', u'')) > 10 else 96
+
+    @property
+    def nro_id_afip(self):
+        return self.nrocuit.replace(u'-', u'')
+
+    @property
+    def importe_afip(self):
+        return int(self.totalfacturado * 100)
+
+    @property
+    def importe_excento_afip(self):
+        return 0 if self.gravado and self.gravado.porcentajegravado else int(self.totalfacturado * 100)
+
+    @property
+    def codigo_operacion_afip(self):
+        return '0' if self.gravado and self.gravado.porcentajegravado else 'E'
+
+    @property
+    def fecha_vencimiento(self):
+        return self.fechaemision + timedelta(days=30)
 
     class Meta:
         managed = False
