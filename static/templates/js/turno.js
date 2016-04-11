@@ -245,9 +245,8 @@ function getEdit(event) {
       modal.find("#popup-observacion_turno")
            .text(data.observacion)
            .val(data.observacion);
-
       modal.find("#current-turno-id").val(data.id);
-      modal.find("#id-obra-social option[value='" + data.obra_social + "']").attr('selected', 'selected');
+      modal.find("#id-obra-social").val(data.obra_social);
       modal.find("#id-obra-social").trigger("chosen:updated");
       modal.find("#popup-creado-por").text(data.creado_por);
     },
