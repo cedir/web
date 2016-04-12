@@ -45,7 +45,7 @@ responsables = {
 # TODO recuperar de base de datos
 codigos = {
     'A': {1: 1, 3: 2, 4: 3},
-    'B': {1: 6, 3: 7, 4: 6}
+    'B': {1: 6, 3: 7, 4: 8}
 }
 
 def digito_verificador_modulo10(numero):

@@ -40,17 +40,17 @@ class Comprobante(models.Model):
     def codigo_afip(self):
         conversion = {
             'A': {1: 1, 3: 2, 4: 3},
-            'B': {1: 6, 3: 7, 4: 6}
+            'B': {1: 6, 3: 7, 4: 8}
         }
         return conversion[self.subtipo][self.idtipocomprobante.id]
 
     @property
     def tipo_id_afip(self):
-        return 80 if len(self.nrocuit.replace(u'-', u'')) > 10 else 96
+        return 80 if len(self.nrocuit.replace('-', '')) > 10 else 96
 
     @property
     def nro_id_afip(self):
-        return self.nrocuit.replace(u'-', u'')
+        return self.nrocuit.replace('-', '')
 
     @property
     def importe_afip(self):
@@ -61,8 +61,20 @@ class Comprobante(models.Model):
         return 0 if self.gravado and self.gravado.porcentajegravado else int(self.totalfacturado * 100)
 
     @property
+    def importe_gravado_afip(self):
+        return int((self.totalfacturado * 10000) / (100 + self.gravado.porcentajegravado)) if self.gravado and self.gravado.porcentajegravado else 0
+
+    @property
+    def importe_alicuota_afip(self):
+        return int((self.totalfacturado * 100 * self.gravado.porcentajegravado) / (100 + self.gravado.porcentajegravado)) if self.gravado and self.gravado.porcentajegravado else 0
+
+    @property
     def codigo_operacion_afip(self):
         return '0' if self.gravado and self.gravado.porcentajegravado else 'E'
+
+    @property
+    def codigo_alicuota_afip(self):
+        return (2 + self.gravado.id) if self.gravado else 3
 
     @property
     def fecha_vencimiento(self):

@@ -9,8 +9,6 @@ def imprimir(request, cae):
 
     # Create the HttpResponse object with the appropriate PDF headers.
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = u'filename="{0}.pdf"'.format(
-        obtener_filename(comp['responsable'], comp['cabecera'])
-        )
+    response['Content-Disposition'] = u'filename="{0}.pdf"'.format(obtener_filename(comp['responsable'], comp['cabecera']))
 
     return generar_factura(response, comp)
