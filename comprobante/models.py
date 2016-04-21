@@ -82,6 +82,9 @@ class Comprobante(models.Model):
 
     class Meta:
         managed = False
+        permissions = (
+            ("informe_ventas", u"Permite generar el informe de ventas."),
+        )
         db_table = 'cedirData\".\"tblComprobantes'
 
 class LineaDeComprobante(models.Model):

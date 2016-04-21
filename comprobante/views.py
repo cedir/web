@@ -1,11 +1,14 @@
 # -*- coding: utf-8
 from django.http import HttpResponse
+from django.conf import settings
+from django.shortcuts import redirect
 
 import zipfile
 import StringIO
 
 from imprimir import generar_factura, obtener_comprobante, obtener_filename
 from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
+
 
 def imprimir(request, cae):
     # Adquiere datos
@@ -20,6 +23,9 @@ def imprimir(request, cae):
 
 # Create your views here.
 def ventas(request, responsable, anio, mes):
+    if not request.user.is_authenticated() or not request.user.has_perm('comprobante.informe_ventas'):
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
     # Adquiere datos
     comprobantes = obtener_comprobantes_ventas(responsable, anio, mes)
 
