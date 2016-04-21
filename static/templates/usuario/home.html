@@ -5,18 +5,6 @@
   <title>Bienvenidos al sistema de gesti&oacute;n de turnos del Cedir.</title>
   <script type="text/javascript" src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
   <link rel="stylesheet" media="screen" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.css' %}" type="text/css">
-  <script>
-    $(function(){
-      $('button[name=btnAceptar]').click(function(event){
-        event.preventDefault();
-        var action = "/comprobante/informe/ventas/XX/9999/00/";
-        action = action.replace('XX', $('#responsable option:selected').val())
-          .replace('00', $('#mes option:selected').val())
-          .replace('9999', $('#anio option:selected').val());
-        $('#informe_ventas').attr('action', action).submit();
-      });
-    });
-  </script>
 </head>
 
 <body>
@@ -85,6 +73,18 @@
         </form>
         </div>
       </div>
+      <script>
+        $(function(){
+          $('button[name=btnAceptar]').click(function(event){
+            event.preventDefault();
+            var action = "/comprobante/informe/ventas/XX/9999/00/";
+            action = action.replace('XX', $('#responsable option:selected').val())
+              .replace('00', $('#mes option:selected').val())
+              .replace('9999', $('#anio option:selected').val());
+            $('#informe_ventas').attr('action', action).submit();
+          });
+        });
+      </script>
       {% endif %}
     {% endif %}
   </div>
