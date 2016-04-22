@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> {% load staticfiles %}
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <title>Bienvenidos al sistema de gesti&oacute;n de turnos del Cedir.</title>
+  <link rel="stylesheet" media="screen" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.css' %}" type="text/css">
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-4 col-md-offset-4 col-sm-5 col-sm-offset-3">
+        <form id="form1" name="form1" runat="server" method="post" style="position:relative;">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col-md-12 col-sm-12">
+              <img src="/media/images/turnos/logo-loguin.png" class="img-responsive center-block" alt="logo" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="username">Nombre de Usuario</label>
+            <input type="text" class="form-control" name="username" id="username" placeholder="Usuario">
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" class="form-control" name="password" id="password" placeholder="Contraseña">
+          </div>
+          {% if error_message %}
+          <div class="form-group has-error">
+            <label class="control-label" id="error-text">{{error_message}}</label>
+          </div>
+          {% endif %}
+
+          {% if not user.is_anonymous %}
+          <div class="form-group">
+            <label class="control-label" id="success-text">Autenticado como: {{user}}</label>
+            <a href="{% url 'salir' %}">Salir</a>
+          </div>
+          {% endif %}
+
+          <button type="submit" class="btn btn-default" name="btnAceptar">Aceptar</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

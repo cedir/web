@@ -1,59 +1,98 @@
 from django.db import models
+from datetime import timedelta
 
-class ComprobanteLinea(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    concepto = models.TextField(blank=True)
-    subtotal = models.FloatField(blank=True, null=True)
-    idcomprobante = models.ForeignKey('Comprobante', db_column='idComprobante', related_name='lineas', blank=True, null=True)  # Field name made lowercase.
-    importeiva = models.DecimalField(db_column='importeIVA', max_digits=10, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
-    importeneto = models.DecimalField(db_column='importeNeto', max_digits=10, decimal_places=2, blank=True, null=True)  # Field name made lowercase.
+class TipoComprobante(models.Model):
+    nombre = models.CharField(max_length=128, db_column=u'tipoComprobante')
 
     class Meta:
-        managed = False
-        db_table = 'cedirData\".\"tblComprobanteLineas'
-
-
-class Comprobante(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    nombrecliente = models.TextField(db_column='nombreCliente', blank=True)  # Field name made lowercase.
-    domiciliocliente = models.TextField(db_column='domicilioCliente', blank=True)  # Field name made lowercase.
-    nrocuit = models.TextField(db_column='nroCuit', blank=True)  # Field name made lowercase.
-    condicionfiscal = models.TextField(db_column='condicionFiscal', blank=True)  # Field name made lowercase.
-    responsable = models.TextField(blank=True)
-    idtipocomprobante = models.ForeignKey('ComprobanteTipo', db_column='idTipoComprobante', blank=True, null=True)  # Field name made lowercase.
-    fechaemision = models.DateField(db_column='fechaEmision', blank=True, null=True)  # Field name made lowercase.
-    fecharecepcion = models.DateField(db_column='fechaRecepcion', blank=True, null=True)  # Field name made lowercase.
-    estado = models.TextField(max_length=-1, blank=True)
-    subtipo = models.TextField(db_column='subTipo', blank=True)  # Field name made lowercase.
-    idfactura = models.BigIntegerField(db_column='idFactura', blank=True, null=True)  # Field name made lowercase.
-    totalfacturado = models.FloatField(db_column='totalFacturado', blank=True, null=True)  # Field name made lowercase.
-    totalcobrado = models.FloatField(db_column='totalCobrado', blank=True, null=True)  # Field name made lowercase.
-    gravado = models.ForeignKey('Gravado', db_column='gravado', blank=True, null=True)
-    nrocomprobante = models.IntegerField(db_column='nroComprobante')  # Field name made lowercase.
-    gravadopaciente = models.TextField(db_column='gravadoPaciente', blank=True)  # Field name made lowercase.
-    nroterminal = models.IntegerField(db_column='nroTerminal', blank=True, null=True)  # Field name made lowercase.
-    cae = models.TextField(db_column='CAE', blank=True)  # Field name made lowercase.
-    vencimientoCAE = models.DateField(db_column='vencimientoCAE', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'cedirData\".\"tblComprobantes'
-
-
-class ComprobanteTipo(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    tipocomprobante = models.TextField(db_column='tipoComprobante')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
         db_table = 'cedirData\".\"tblComprobantesTipo'
 
 
 class Gravado(models.Model):
-    id = models.IntegerField(primary_key=True)  # AutoField?
-    descripciongravado = models.TextField(db_column='descripcionGravado', blank=True)  # Field name made lowercase.
-    porcentajegravado = models.FloatField(db_column='porcentajeGravado', blank=True, null=True)  # Field name made lowercase.
+    descripcion = models.CharField(max_length=128, db_column=u'descripcionGravado')
+    porcentaje = models.FloatField(db_column=u'porcentajeGravado')
+
+    class Meta:
+        db_table = 'cedirData\".\"tblGravado'
+
+
+class Comprobante(models.Model):
+    nombre_cliente = models.CharField(max_length=128, db_column=u'nombreCliente')
+    domicilio_cliente = models.CharField(max_length=128, db_column=u'domicilioCliente')
+    nro_cuit = models.CharField(max_length=128, db_column=u'nroCuit')
+    gravado_paciente = models.CharField(max_length=128, db_column=u'gravadoPaciente')
+    condicion_fiscal = models.CharField(max_length=128, db_column=u'condicionFiscal')
+    responsable = models.CharField(max_length=128, )
+    sub_tipo = models.CharField(max_length=50, db_column=u'subTipo')
+    estado = models.CharField(max_length=50, )
+    numero = models.IntegerField(db_column=u'nroComprobante', )
+    nro_terminal = models.SmallIntegerField(db_column=u'nroTerminal', default=1)
+    cae = models.CharField(max_length=128, db_column=u'CAE')
+    total_facturado = models.FloatField(db_column=u'totalFacturado', default=0)
+    total_cobrado = models.FloatField(db_column=u'totalCobrado')
+    fecha_emision = models.DateField(db_column=u'fechaEmision')
+    fecha_recepcion = models.DateField(db_column=u'fechaRecepcion')
+
+    tipo_comprobante = models.ForeignKey(TipoComprobante, db_column=u'idTipoComprobante')
+    factura = models.ForeignKey(u'comprobante.Comprobante', db_column=u'idFactura', null=True, blank=True)
+    gravado = models.ForeignKey(Gravado, db_column=u'gravado', null=True, blank=True)
+
+    cae = models.TextField(db_column='CAE', blank=True)
+    vencimiento_cae = models.DateField(db_column='vencimientoCAE', blank=True, null=True)
+
+    @property
+    def codigo_afip(self):
+        conversion = {
+            'A': {1: 1, 3: 2, 4: 3},
+            'B': {1: 6, 3: 7, 4: 8}
+        }
+        return conversion[self.sub_tipo][self.tipo_comprobante.id]
+
+    @property
+    def tipo_id_afip(self):
+        return 80 if len(self.nro_cuit.replace('-', '')) > 10 else 96
+
+    @property
+    def nro_id_afip(self):
+        return self.nro_cuit.replace('-', '')
+
+    @property
+    def importe_excento_afip(self):
+        return 0 if self.gravado and self.gravado.porcentaje else self.total_facturado
+
+    @property
+    def importe_gravado_afip(self):
+        return (self.total_facturado * 100) / (100 + self.gravado.porcentaje) if self.gravado and self.gravado.porcentaje else 0
+
+    @property
+    def importe_alicuota_afip(self):
+        return (self.total_facturado * self.gravado.porcentaje) / (100 + self.gravado.porcentaje) if self.gravado and self.gravado.porcentaje else 0
+
+    @property
+    def codigo_operacion_afip(self):
+        return '0' if self.gravado and self.gravado.porcentaje else 'E'
+
+    @property
+    def codigo_alicuota_afip(self):
+        return (2 + self.gravado.id) if self.gravado else 3
+
+    @property
+    def fecha_vencimiento(self):
+        return self.fecha_emision + timedelta(days=30)
 
     class Meta:
         managed = False
-        db_table = 'cedirData\".\"tblGravado'
+        permissions = (
+            ("informe_ventas", u"Permite generar el informe de ventas."),
+        )
+        db_table = 'cedirData\".\"tblComprobantes'
+
+class LineaDeComprobante(models.Model):
+    comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'lineas')
+    concepto = models.CharField(max_length=128, )
+    sub_total = models.FloatField(db_column=u'subtotal', )
+    iva = models.FloatField(db_column=u'importeIVA', )
+    importe_neto = models.FloatField(db_column=u'importeNeto', )
+
+    class Meta:
+        db_table = 'cedirData\".\"tblComprobanteLineas'

@@ -5,7 +5,7 @@ import datetime
 sys.path.append('C:/Users/jiaguilera/Documents/source/web')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
-from comprobante.models import Comprobante, ComprobanteLinea, Gravado
+from comprobante.models import Comprobante, LineaDeComprobante, Gravado
 
 import django
 django.setup()
@@ -20,26 +20,26 @@ def migrate_comprobantes(apply_changes=False):
     comprobantes = Comprobante.objects.all()
 
     for comprobante in comprobantes:
-        gravado = comprobante.gravado.porcentajegravado if comprobante.gravado else 0
+        gravado = comprobante.gravado.porcentaje if comprobante.gravado else 0
         lineas = comprobante.lineas.all()
         ivaTotal = 0
 
         for linea in lineas:
             if gravado:
                 # gravado no es cero
-                linea.importeneto = round((linea.subtotal * 100) / (100 + gravado), 2) #calculo el importe neto, dado el subtotal y el gravado
-                linea.importeiva = linea.subtotal - linea.importeneto
+                linea.importe_neto = round((linea.sub_total * 100) / (100 + gravado), 2) #calculo el importe neto, dado el subtotal y el gravado
+                linea.importe_iva = linea.sub_total - linea.importe_neto
             else:
                 #gravado es cero
-                linea.importeneto = linea.subtotal
-                linea.importeiva = 0
-            ivaTotal += linea.importeiva
+                linea.importe_neto = linea.sub_total
+                linea.importe_iva = 0
+            ivaTotal += linea.importe_iva
             if apply_changes:
                 linea.save()
 
-        ivaTotalCalculado = (comprobante.totalfacturado * gravado) / (100 + gravado)
+        ivaTotalCalculado = (comprobante.total_facturado * gravado) / (100 + gravado)
         if abs(ivaTotalCalculado - ivaTotal) > 0.1:
-            print("En {0} IVA {1}% difiere. {2} {3}".format(comprobante.id, gravado, comprobante.totalfacturado, [(l.subtotal, l.importeiva, l.concepto) for l in lineas ]))
+            print("En {0} IVA {1}% difiere. {2} {3}".format(comprobante.id, gravado, comprobante.total_facturado, [(l.sub_total, l.importe_iva, l.concepto) for l in lineas ]))
 
     print u'Done'
 
