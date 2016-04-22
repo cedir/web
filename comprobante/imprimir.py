@@ -42,11 +42,6 @@ responsables = {
     }
 }
 
-# TODO recuperar de base de datos
-codigos = {
-    'A': {1: 1, 3: 2, 4: 3},
-    'B': {1: 6, 3: 7, 4: 6}
-}
 
 def digito_verificador_modulo10(numero):
     "Rutina para el cálculo del dígito verificador 'módulo 10'"
@@ -389,50 +384,47 @@ def obtener_codigo_barras(c):
     r = responsables[c.responsable.lower()]
     x = u'{0}{1:02d}{2:04d}{3}{4}'.format(
         r['CUIT'].replace('-', ''),
-        codigos[c.subtipo][c.idtipocomprobante.id],
-        c.nroterminal,
+        c.codigo_afip,
+        c.nro_terminal,
         c.cae,
-        c.vencimientoCAE.strftime('%Y%m%d')
+        c.vencimiento_cae.strftime('%Y%m%d')
         )
     return int(x)
 
 
 def format_gravado_linea(grav):
-    return u'{0}%'.format(grav.porcentajegravado) if grav.porcentajegravado else grav.descripciongravado
+    return u'{0}%'.format(grav.porcentaje) if grav.porcentaje else grav.descripcion
 
 
 def format_gravado_detalle(grav):
-    return u'Importe Neto Gravado: $' if grav.porcentajegravado else u'Importe Excento: $'
+    return u'Importe Neto Gravado: $' if grav.porcentaje else u'Importe Excento: $'
 
 
 def obtener_subtotal_comprobante(c):
-    return u'{0:.2f}'.format(100 * c.totalfacturado / (100 + c.gravado.porcentajegravado))
+    return u'{0:.2f}'.format(c.importe_gravado_afip)
 
 
 def obtener_iva_comprobante(c, iva):
-    return \
-        ((c.totalfacturado * c.gravado.porcentajegravado) / (100 + c.gravado.porcentajegravado)) \
-        if c.gravado.porcentajegravado == iva \
-        else 0.0
+    return c.importe_alicuota_afip if c.gravado.porcentaje == iva else 0.0
 
 
 def obtener_lineas_comprobante(c):
     styles = styles=getSampleStyleSheet()
-    if c.subtipo.upper() == 'A':
-        return [[Paragraph(l.concepto.replace(u'\r',u'').replace(u'\n',u'<br/>'), styles["Normal"]), u'{0:.2f}'.format(l.importeneto), format_gravado_linea(c.gravado), u'{0:.2f}'.format(l.subtotal)] for l in c.lineas.all()]
+    if c.sub_tipo.upper() == 'A':
+        return [[Paragraph(l.concepto.replace(u'\r',u'').replace(u'\n',u'<br/>'), styles["Normal"]), u'{0:.2f}'.format(l.importe_neto), format_gravado_linea(c.gravado), u'{0:.2f}'.format(l.sub_total)] for l in c.lineas.all()]
     else:
-        return [[Paragraph(l.concepto.replace(u'\r',u'').replace(u'\n',u'<br/>'), styles["Normal"]), u'{0:.2f}'.format(l.subtotal)] for l in c.lineas.all()]
+        return [[Paragraph(l.concepto.replace(u'\r',u'').replace(u'\n',u'<br/>'), styles["Normal"]), u'{0:.2f}'.format(l.sub_total)] for l in c.lineas.all()]
 
 
 def obtener_headers_lineas(c):
-    if c.subtipo.upper() == 'A':
+    if c.sub_tipo.upper() == 'A':
         return [[u'Producto / Servicio', u'Subtotal', u'Alícuota IVA', u'Subtotal c/IVA']]
     else:
         return [[u'Producto / Servicio', u'Subtotal']]
 
 
 def obtener_headers_sizes(c):
-    if c.subtipo.upper() == 'A':
+    if c.sub_tipo.upper() == 'A':
         return [0.6, 0.14, 0.12, 0.14]
     else:
         return [0.86, 0.14]
@@ -440,7 +432,7 @@ def obtener_headers_sizes(c):
 
 def obtener_detalle_iva(c):
     ivas = [27, 21, 10.5, 5, 2.5, 0]
-    if c.subtipo.upper() == 'A':
+    if c.sub_tipo.upper() == 'A':
         result = [
             [format_gravado_detalle(c.gravado), obtener_subtotal_comprobante(c)],
             [u'', u'']
@@ -452,7 +444,7 @@ def obtener_detalle_iva(c):
             ]
     else:
         result = [
-            [u'Subtotal: $', u'{0:.2f}'.format(c.totalfacturado)],
+            [u'Subtotal: $', u'{0:.2f}'.format(c.total_facturado)],
             [u'', u'']
         ]
 
@@ -460,7 +452,7 @@ def obtener_detalle_iva(c):
 
     result += [
         [u'Importe Otros Tributos: $', u'0.00'],
-        [u'Importe Total: $', u'{0:.2f}'.format(c.totalfacturado)],
+        [u'Importe Total: $', u'{0:.2f}'.format(c.total_facturado)],
     ]
     return result
 
@@ -470,25 +462,25 @@ def obtener_comprobante(cae):
 
     return {
         'cabecera': {
-            'codigo': u'{0:02d}'.format(codigos[c.subtipo][c.idtipocomprobante.id]),
-            'tipo': c.idtipocomprobante.tipocomprobante,
-            'letra': c.subtipo,
-            'punto_venta': c.nroterminal,
-            'numero': c.nrocomprobante,
-            'fecha': c.fechaemision.strftime('%d/%m/%Y'),
+            'codigo': u'{0:02d}'.format(c.codigo_afip),
+            'tipo': c.tipo_comprobante.nombre,
+            'letra': c.sub_tipo,
+            'punto_venta': c.nro_terminal,
+            'numero': c.numero,
+            'fecha': c.fecha_emision.strftime('%d/%m/%Y'),
             'desde': u'  /  /    ',
             'hasta': u'  /  /    ',
-            'vencimiento': (c.fechaemision + timedelta(days=30)).strftime('%d/%m/%Y'),
+            'vencimiento': (c.fecha_emision + timedelta(days=30)).strftime('%d/%m/%Y'),
             'CAE': c.cae,
-            'CAE_vencimiento': c.vencimientoCAE.strftime('%d/%m/%Y'),
+            'CAE_vencimiento': c.vencimiento_cae.strftime('%d/%m/%Y'),
             'codigo_barras': obtener_codigo_barras(c),
         },
         'cliente': {
-            'CUIT': c.nrocuit,
-            'nombre': c.nombrecliente,
-            'condicion_iva': c.condicionfiscal,
+            'CUIT': c.nro_cuit,
+            'nombre': c.nombre_cliente,
+            'condicion_iva': c.condicion_fiscal,
             'condicion_venta': u'Otra',
-            'direccion': c.domiciliocliente,
+            'direccion': c.domicilio_cliente,
         },
         'responsable': responsables[c.responsable.lower()],
         'headers': obtener_headers_lineas(c),

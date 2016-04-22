@@ -14,5 +14,6 @@ urlpatterns = patterns('',
     (r'', include('turno.urls')),
     (r'', include('comprobante.urls')),
     (r'', include('medico.urls')),
+    (r'', include('usuario.urls')),
     (r'^admin/', include(admin.site.urls)),
 )
