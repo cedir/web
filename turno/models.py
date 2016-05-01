@@ -12,7 +12,7 @@ class Estado(models.Model):
     img = models.CharField(max_length=200)
 
     class Meta:
-        db_table = 'cedirData\".\"turnos_estados'
+        db_table = 'turnos_estados'
 
 
 class Turno(models.Model):
@@ -30,7 +30,7 @@ class Turno(models.Model):
     estado = models.ForeignKey(Estado, db_column="estado_id")
 
     class Meta:
-        db_table = 'cedirData\".\"turnos_turnos'
+        db_table = 'turnos_turnos'
 
     def getDuracionEnMinutos(self):
         return (self.horaFinEstimada.hour * 60 + self.horaFinEstimada.minute) - (self.horaInicio.hour * 60 + self.horaInicio.minute)

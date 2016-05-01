@@ -16,7 +16,7 @@ class Medico(models.Model):
         return u'%s, %s' % (self.apellido, self.nombre, )
 
     class Meta:
-        db_table = 'cedirData\".\"tblMedicosAct'
+        db_table = 'tblMedicosAct'
         ordering = [u'apellido']
 
 
@@ -32,5 +32,5 @@ class Disponibilidad(models.Model):
         return (self.horaFin.hour * 60 + self.horaFin.minute) - (self.horaInicio.hour * 60 + self.horaInicio.minute)
 
     class Meta:
-        db_table = 'cedirData\".\"turnos_disponibilidad_medicos'
+        db_table = 'turnos_disponibilidad_medicos'
 

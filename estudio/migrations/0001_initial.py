@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('obraSocial', models.ForeignKey(to='obra_social.ObraSocial', db_column=b'idObraSocial')),
             ],
             options={
-                'db_table': 'cedirData"."tblDetalleEstudio',
+                'db_table': 'tblDetalleEstudio',
             },
             bases=(models.Model,),
         ),
@@ -40,9 +40,12 @@ class Migration(migrations.Migration):
                 ('informe', models.TextField()),
                 ('paciente', models.ForeignKey(to='paciente.Paciente', db_column=b'idPaciente')),
                 ('practica', models.ForeignKey(to='practica.Practica', db_column=b'idEstudio')),
+                ('enlace_video', models.CharField(max_length=256, null=True, db_column=b'enlaceVideo')),
+                ('public_id', models.CharField(max_length=100, null=True, db_column=b'publicID')),
+                ('fechaEstudio', models.DateField()),
             ],
             options={
-                'db_table': 'cedirData"."tblEstudios',
+                'db_table': 'tblEstudios',
             },
             bases=(models.Model,),
         ),
@@ -65,7 +68,7 @@ class Migration(migrations.Migration):
                 ('arancelAnestesia', models.FloatField()),
             ],
             options={
-                'db_table': 'cedirData"."tblPagoCobroEstudio',
+                'db_table': 'tblPagoCobroEstudio',
             },
             bases=(models.Model,),
         ),

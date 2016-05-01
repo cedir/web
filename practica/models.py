@@ -10,7 +10,7 @@ class Practica(models.Model):
     #duracion = models.CharField("Duracion",max_length=200, null=False,blank=False)
 
     class Meta:
-        db_table = u'cedirData\".\"AlmacenEstudios'
+        db_table = u'AlmacenEstudios'
         ordering = ['descripcion']
 
     def __unicode__(self):
