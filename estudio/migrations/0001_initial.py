@@ -15,23 +15,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='DetalleEstudio',
-            fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, db_column=b'nroEstudio')),
-                ('idFacturacion', models.IntegerField()),
-                ('nroDeOrden', models.CharField(max_length=200)),
-                ('idAnestesista', models.IntegerField()),
-                ('esPagoContraFactura', models.IntegerField()),
-                ('medico', models.ForeignKey(related_name='medico_actuante', db_column=b'idMedicoActuante', to='medico.Medico')),
-                ('medicoSolicitante', models.ForeignKey(related_name='medico_solicitante', db_column=b'idMedicoSolicitante', to='medico.Medico')),
-                ('obraSocial', models.ForeignKey(to='obra_social.ObraSocial', db_column=b'idObraSocial')),
-            ],
-            options={
-                'db_table': 'tblDetalleEstudio',
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
             name='Estudio',
             fields=[
                 ('id', models.AutoField(serialize=False, primary_key=True, db_column=b'nroEstudio')),
@@ -43,16 +26,13 @@ class Migration(migrations.Migration):
                 ('enlace_video', models.CharField(max_length=256, null=True, db_column=b'enlaceVideo')),
                 ('public_id', models.CharField(max_length=100, null=True, db_column=b'publicID')),
                 ('fechaEstudio', models.DateField()),
-            ],
-            options={
-                'db_table': 'tblEstudios',
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='PagoCobroEstudio',
-            fields=[
-                ('id', models.AutoField(serialize=False, primary_key=True, db_column=b'nroEstudio')),
+                ('idFacturacion', models.IntegerField()),
+                ('nroDeOrden', models.CharField(max_length=200)),
+                ('idAnestesista', models.IntegerField()),
+                ('esPagoContraFactura', models.IntegerField()),
+                ('medico', models.ForeignKey(related_name='medico_actuante', db_column=b'idMedicoActuante', to='medico.Medico')),
+                ('medicoSolicitante', models.ForeignKey(related_name='medico_solicitante', db_column=b'idMedicoSolicitante', to='medico.Medico')),
+                ('obraSocial', models.ForeignKey(to='obra_social.ObraSocial', db_column=b'idObraSocial')),
                 ('fechaCobro', models.CharField(max_length=100, null=True)),
                 ('importeEstudio', models.FloatField()),
                 ('importeMedicacion', models.FloatField()),
@@ -68,7 +48,7 @@ class Migration(migrations.Migration):
                 ('arancelAnestesia', models.FloatField()),
             ],
             options={
-                'db_table': 'tblPagoCobroEstudio',
+                'db_table': 'tblEstudios',
             },
             bases=(models.Model,),
         ),
