@@ -16,5 +16,4 @@ static/templates/bower_components/
 /obj/*
 /ptvs_virtualenv_proxy.py
 /web.pyproj
-/web.sln
 *.user
