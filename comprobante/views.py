@@ -11,6 +11,9 @@ from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
 
 
 def imprimir(request, cae):
+    # Imprime leyenda?
+    leyenda = request.method == 'GET' and 'leyenda' in request.GET
+
     # Adquiere datos
     comp = obtener_comprobante(cae)
 
@@ -18,7 +21,7 @@ def imprimir(request, cae):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = u'filename="{0}.pdf"'.format(obtener_filename(comp['responsable'], comp['cabecera']))
 
-    return generar_factura(response, comp)
+    return generar_factura(response, comp, leyenda)
 
 
 # Create your views here.
