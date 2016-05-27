@@ -31,7 +31,7 @@ class GrupoUsuarios(models.Model):
 #         return self.descripcion
 #
 #     class Meta:
-#         db_table = 'cedirData\".\"tblCajaMovimientos'
+#         db_table = 'tblCajaMovimientos'
 
 
 class AuditLog(models.Model):
@@ -43,4 +43,4 @@ class AuditLog(models.Model):
     user = models.ForeignKey(Usuario, db_column="userId")
 
     class Meta:
-        db_table = u'cedirData\".\"AuditUserActionsLog'
+        db_table = u'AuditUserActionsLog'

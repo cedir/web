@@ -5,7 +5,7 @@ class TipoComprobante(models.Model):
     nombre = models.CharField(max_length=128, db_column=u'tipoComprobante')
 
     class Meta:
-        db_table = 'cedirData\".\"tblComprobantesTipo'
+        db_table = 'tblComprobantesTipo'
 
 
 class Gravado(models.Model):
@@ -13,7 +13,7 @@ class Gravado(models.Model):
     porcentaje = models.FloatField(db_column=u'porcentajeGravado')
 
     class Meta:
-        db_table = 'cedirData\".\"tblGravado'
+        db_table = 'tblGravado'
 
 
 class Comprobante(models.Model):
@@ -81,11 +81,10 @@ class Comprobante(models.Model):
         return self.fecha_emision + timedelta(days=30)
 
     class Meta:
-        managed = False
         permissions = (
             ("informe_ventas", u"Permite generar el informe de ventas."),
         )
-        db_table = 'cedirData\".\"tblComprobantes'
+        db_table = 'tblComprobantes'
 
 class LineaDeComprobante(models.Model):
     comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'lineas')
@@ -95,4 +94,4 @@ class LineaDeComprobante(models.Model):
     importe_neto = models.FloatField(db_column=u'importeNeto', )
 
     class Meta:
-        db_table = 'cedirData\".\"tblComprobanteLineas'
+        db_table = 'tblComprobanteLineas'

@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('observaciones', models.CharField(max_length=200)),
             ],
             options={
-                'db_table': 'cedirData"."turnos_salas',
+                'db_table': 'turnos_salas',
             },
             bases=(models.Model,),
         ),

@@ -2,7 +2,7 @@
 # Also install libjpeg-dev before pillow sudo apt-get install libjpeg-dev
 Django==1.7
 Pillow==2.5.1
-psycopg2==2.4.5
+psycopg2==2.6.1
 simplejson==2.3.2
 bootstrap-admin  # https://github.com/douglasmiranda/django-admin-bootstrap
 ConcurrentLogHandler==0.9.1

@@ -18,7 +18,7 @@ class Paciente(models.Model):
         return self.id
 
     class Meta:
-        db_table = u'cedirData\".\"tblPacientes'
+        db_table = u'tblPacientes'
 
     def __unicode__(self):
         return u'%s, %s' % (self.nombre, self.apellido)

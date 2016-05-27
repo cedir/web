@@ -7,4 +7,4 @@ class Sala(models.Model):
     observaciones = models.CharField(max_length=200)
 
     class Meta:
-        db_table = u'cedirData\".\"turnos_salas'
+        db_table = u'turnos_salas'

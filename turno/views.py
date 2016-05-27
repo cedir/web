@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.db.models import Q
 from rest_framework import viewsets
 from turno.models import Turno, InfoTurno
-from estudio.models import Estudio, DetalleEstudio, PagoCobroEstudio
+from estudio.models import Estudio
 from managers.models import AuditLog, Usuario
 from utils.security import encode
 from turno.serializers import InfoTurnoSerializer
@@ -30,38 +30,31 @@ def anunciar(request, id_turno):
             estudio.fechaEstudio = turno.fechaTurno
             estudio.motivoEstudio = ""
             estudio.informe = ""
-            estudio.save()  # TODO: gestionar error: si falla en algun save, ver si se puede hacer rollback, sino informar del error grave! porque se desconfiguran los id de estudio
             estudio.public_id = encode(estudio.id)
+            estudio.medico_id = turno.medico.id
+            estudio.obraSocial_id = turno.obraSocial.id
+            estudio.medicoSolicitante_id = turno.medico.id
+            estudio.idFacturacion = 0
+            estudio.nroDeOrden = ""
+            estudio.idAnestesista = 1
+            estudio.esPagoContraFactura = 0
+            estudio.fechaCobro = None
+            estudio.importeEstudio = 0
+            estudio.importeMedicacion = 0
+            estudio.pagoContraFactura = 0
+            estudio.diferenciaPaciente = 0
+            estudio.pension = 0
+            estudio.importePagoMedico = 0
+            estudio.importePagoMedicoSol = 0
+            estudio.diferenciaPacienteMedicacion = None
+            estudio.nroPagoMedicoAct = None
+            estudio.nroPagoMedicoSol = None
+            estudio.importeCobradoPension = 0
+            estudio.importeCobradoArancelAnestesia = 0
+            estudio.importeEstudioCobrado = 0
+            estudio.importeMedicacionCobrado = 0
+            estudio.arancelAnestesia = 0
             estudio.save(force=True)
-
-            detalleEstudio = DetalleEstudio()
-            detalleEstudio.medico_id = turno.medico.id
-            detalleEstudio.obraSocial_id = turno.obraSocial.id
-            detalleEstudio.medicoSolicitante_id = turno.medico.id
-            detalleEstudio.idFacturacion = 0
-            detalleEstudio.nroDeOrden = ""
-            detalleEstudio.idAnestesista = 1
-            detalleEstudio.esPagoContraFactura = 0
-            detalleEstudio.save()
-
-            estudioPagoCobro = PagoCobroEstudio()
-            estudioPagoCobro.fechaCobro = None
-            estudioPagoCobro.importeEstudio = 0
-            estudioPagoCobro.importeMedicacion = 0
-            estudioPagoCobro.pagoContraFactura = 0
-            estudioPagoCobro.diferenciaPaciente = 0
-            estudioPagoCobro.pension = 0
-            estudioPagoCobro.importePagoMedico = 0
-            estudioPagoCobro.importePagoMedicoSol = 0
-            estudioPagoCobro.diferenciaPacienteMedicacion = None
-            estudioPagoCobro.nroPagoMedicoAct = None
-            estudioPagoCobro.nroPagoMedicoSol = None
-            estudioPagoCobro.importeCobradoPension = 0
-            estudioPagoCobro.importeCobradoArancelAnestesia = 0
-            estudioPagoCobro.importeEstudioCobrado = 0
-            estudioPagoCobro.importeMedicacionCobrado = 0
-            estudioPagoCobro.arancelAnestesia = 0
-            estudioPagoCobro.save()
 
             #log estudio
             log = AuditLog()

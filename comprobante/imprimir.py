@@ -28,7 +28,7 @@ responsables = {
         'condicion_iva': u'IVA Responsable Inscripto',
         'condicion_ib': '021-335420-4',
         'inicio_actividades': '30/06/2005',
-        'mensaje': u'',
+        'mensaje': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
     },
     'brunetti': {
         'CUIT': '20118070659',
@@ -41,7 +41,6 @@ responsables = {
         'mensaje': u'"MÉDICO GASTROENTERÓLOGO Mat. Nro. 9314"',
     }
 }
-
 
 def digito_verificador_modulo10(numero):
     "Rutina para el cálculo del dígito verificador 'módulo 10'"
@@ -328,18 +327,20 @@ def detalle_iva(p, detalle):
     table.drawOn(p, width - margin - 8*cm, 55*mm)
 
 
-def pie_de_pagina(p, responsable):
+def pie_de_pagina(p, responsable, leyenda):
+    mensaje = responsable['mensaje'] if leyenda else u''
     top = 250*mm
     ew = width - 2*margin
-    eh = 7*mm
+    eh = 7*mm if mensaje else 0
+
     p.saveState()
     p.rect((width - ew)/2, height - top - eh - 3 , ew, eh, stroke=1, fill=0)
     p.setFont(font_std, 12)
-    p.drawCentredString(width/2, height - top - eh/2 - 6, responsable['mensaje'])
+    p.drawCentredString(width/2, height - top - eh/2 - 6, mensaje)
     p.restoreState()
 
 
-def generar_factura(response, comp):
+def generar_factura(response, comp, leyenda):
     # Create the PDF object, using the response object as its "file."
     p = canvas.Canvas(response, pagesize=A4)
     p.setTitle(obtener_filename(comp['responsable'], comp['cabecera']))
@@ -365,7 +366,7 @@ def generar_factura(response, comp):
 
         detalle_iva(p, comp['detalle'])
 
-        pie_de_pagina(p, comp['responsable'])
+        pie_de_pagina(p, comp['responsable'], leyenda)
 
         # Escribe código de barras
         codigo_barra_i25(p, comp['cabecera'])

@@ -19,26 +19,6 @@ class Estudio(models.Model):
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo")
     public_id = models.CharField(max_length=100, db_column="publicID")
 
-    class Meta:
-        db_table = 'cedirData\".\"tblEstudios'
-
-    @property
-    def fecha_vencimiento_link_video(self):
-        return self.fechaEstudio + datetime.timedelta(days=MAX_DAYS_VIDEO_LINK_AVAILABLE)
-
-    def is_link_vencido(self):
-        return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
-
-    def save(self, *args, **kwargs):
-        """
-        Disable save from admin. Passing param 'force' to allow saving from code.
-        """
-        if self.pk is None or kwargs.pop(u'force', None):
-            super(Estudio, self).save(*args, **kwargs)
-
-
-class DetalleEstudio(models.Model):
-    id = models.AutoField(primary_key=True, db_column="nroEstudio")
     medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name=u'medico_actuante')
     obraSocial = models.ForeignKey(ObraSocial, db_column="idObraSocial")
     medicoSolicitante = models.ForeignKey(Medico, db_column="idMedicoSolicitante", related_name=u'medico_solicitante')
@@ -48,12 +28,6 @@ class DetalleEstudio(models.Model):
     esPagoContraFactura = models.IntegerField()
     #estudio = models.ForeignKey(Estudio, db_column="nro")
 
-    class Meta:
-        db_table = 'cedirData\".\"tblDetalleEstudio'
-
-
-class PagoCobroEstudio(models.Model):
-    id = models.AutoField(primary_key=True, db_column="nroEstudio")
     fechaCobro = models.CharField(null=True, max_length=100)
     importeEstudio = models.FloatField()
     importeMedicacion = models.FloatField()
@@ -72,6 +46,21 @@ class PagoCobroEstudio(models.Model):
     arancelAnestesia = models.FloatField()
 
     class Meta:
-        db_table = 'cedirData\".\"tblPagoCobroEstudio'
+        db_table = 'tblEstudios'
+
+    @property
+    def fecha_vencimiento_link_video(self):
+        return self.fechaEstudio + datetime.timedelta(days=MAX_DAYS_VIDEO_LINK_AVAILABLE)
+
+    def is_link_vencido(self):
+        return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
+
+    def save(self, *args, **kwargs):
+        """
+        Disable save from admin. Passing param 'force' to allow saving from code.
+        """
+        if self.pk is None or kwargs.pop(u'force', None):
+            super(Estudio, self).save(*args, **kwargs)
+
 
 
