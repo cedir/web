@@ -30,7 +30,6 @@ def anunciar(request, id_turno):
             estudio.fechaEstudio = turno.fechaTurno
             estudio.motivoEstudio = ""
             estudio.informe = ""
-            estudio.public_id = encode(estudio.id)
             estudio.medico_id = turno.medico.id
             estudio.obraSocial_id = turno.obraSocial.id
             estudio.medicoSolicitante_id = turno.medico.id
@@ -54,6 +53,8 @@ def anunciar(request, id_turno):
             estudio.importeEstudioCobrado = 0
             estudio.importeMedicacionCobrado = 0
             estudio.arancelAnestesia = 0
+            estudio.save()
+            estudio.public_id = encode(estudio.id)
             estudio.save(force=True)
 
             #log estudio
