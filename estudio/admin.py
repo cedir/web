@@ -14,4 +14,8 @@ class EstudioAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    class Media:
+        js = ('js/admin/estudio.js',)
+
 admin.site.register(Estudio, EstudioAdmin)
+
