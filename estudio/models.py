@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from medico.models import Medico
+from medico.models import Medico, Anestesista
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
@@ -12,7 +12,7 @@ MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
 class Estudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
-    fechaEstudio = models.DateField()
+    fechaEstudio = models.DateField("Fecha")
     practica = models.ForeignKey(Practica, db_column="idEstudio")  # TODO: esto estaba asociado a Estado en vez de practica. Por que??? ver si no estaba rompiendo
     motivoEstudio = models.CharField(max_length=300)
     informe = models.TextField()
@@ -24,7 +24,7 @@ class Estudio(models.Model):
     medicoSolicitante = models.ForeignKey(Medico, db_column="idMedicoSolicitante", related_name=u'medico_solicitante')
     idFacturacion = models.IntegerField()
     nroDeOrden = models.CharField(max_length=200)
-    idAnestesista = models.IntegerField()
+    anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
     esPagoContraFactura = models.IntegerField()
     #estudio = models.ForeignKey(Estudio, db_column="nro")
 

@@ -35,7 +35,7 @@ def anunciar(request, id_turno):
             estudio.medicoSolicitante_id = turno.medico.id
             estudio.idFacturacion = 0
             estudio.nroDeOrden = ""
-            estudio.idAnestesista = 1
+            estudio.anestesista_id = 1
             estudio.esPagoContraFactura = 0
             estudio.fechaCobro = None
             estudio.importeEstudio = 0
