@@ -55,7 +55,7 @@ def anunciar(request, id_turno):
             estudio.arancelAnestesia = 0
             estudio.save()
             estudio.public_id = encode(estudio.id)
-            estudio.save(force=True)
+            estudio.save()
 
             #log estudio
             log = AuditLog()

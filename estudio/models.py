@@ -48,19 +48,13 @@ class Estudio(models.Model):
     class Meta:
         db_table = 'tblEstudios'
 
+    def __unicode__(self):
+        return u'%s %s' % (self.fechaEstudio, self.paciente)
+
     @property
     def fecha_vencimiento_link_video(self):
         return self.fechaEstudio + datetime.timedelta(days=MAX_DAYS_VIDEO_LINK_AVAILABLE)
 
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
-
-    def save(self, *args, **kwargs):
-        """
-        Disable save from admin. Passing param 'force' to allow saving from code.
-        """
-        if self.pk is None or kwargs.pop(u'force', None):
-            super(Estudio, self).save(*args, **kwargs)
-
-
 
