@@ -17,7 +17,7 @@ $(document).ready(function() {
         $("#print_estudio").click(function() {
             currentUrl = window.location.href;
             estudioId = currentUrl.split("/")[6];
-            printUrl = "/estudio/imprimir/" + estudioId;
+            printUrl = "/estudio/" + estudioId + "/imprimir/";
             var win = window.open(printUrl, '_blank');
             if (win) {
                 win.focus();
@@ -49,7 +49,7 @@ $(document).ready(function() {
 
 
 
-    var ALTA_NORMAL = "ESOFAGO. Normal, cardias a 37 cm de la arcada dentaria superior, No se evidencia reflujo gastro esofágico, hernia hiatal, ni esofagitis por reflujo. \n\n" +
+    var ALTA_NORMAL = "ESOFAGO. Normal, cardias a 37 cm de la arcada dentaria superior. No se evidencia reflujo gastro esofágico, hernia hiatal, ni esofagitis por reflujo. \n\n" +
         "ESTOMAGO: Mucosa de características normales. Por retroflexión se observa el techo gástrico con un buen cierre cardial. \n\n" +
         "PILORO: Permeable \n\n" +
         "BULBO DUODENAL Y SEGUNDA PORCION DUODENAL. Normales. \n\n" +
@@ -64,7 +64,7 @@ $(document).ready(function() {
     var COLONO_NORMAL = "Ampolla rectal sin lesión mucosa. \n\n" +
         "Se franquea el ángulo recto sigmoides observando el colon sigmoides de características normales. \n\n"
         "Se progresa por el colon descendente hasta franquear el ángulo esplénico observando el colon transverso, ángulo hepático y colon ascendente sin evidenciar lesión mucosa.\n\n" +
-        "CONCLUSION DIAGNOSTICA: AMPOLLA RECTAL Y MARCO COLONICO VISUALIZADO HASTA CIEGO  DE CARACTERISTICAS NORMALES. \n\n" +
+        "CONCLUSION DIAGNOSTICA: AMPOLLA RECTAL Y MARCO COLONICO VISUALIZADO HASTA CIEGO  DE CARACTERISTICAS NORMALES. \n\n";
 
     var COLANGIO_NORMAL = "En segunda porción duodenal , se visualiza la Ampolla de Vater de características normales.\n\n" +
         "Se canula sin dificultad observando la vía bilair intra hepática de calibre normal.\n\n" +
