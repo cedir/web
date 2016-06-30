@@ -51,7 +51,7 @@ $(document).ready(function() {
 
     var ALTA_NORMAL = "ESOFAGO. Normal, cardias a 37 cm de la arcada dentaria superior. No se evidencia reflujo gastro esofágico, hernia hiatal, ni esofagitis por reflujo. \n\n" +
         "ESTOMAGO: Mucosa de características normales. Por retroflexión se observa el techo gástrico con un buen cierre cardial. \n\n" +
-        "PILORO: Permeable \n\n" +
+        "PILORO: Permeable. \n\n" +
         "BULBO DUODENAL Y SEGUNDA PORCION DUODENAL. Normales. \n\n" +
         "CONCLUSION DIAGNOSTICA: ESOFAGO GASTRO DUODENO DE CARACTERISTICAS NORMALES. \n\n";
 

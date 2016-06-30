@@ -14,7 +14,7 @@ from textwrap import wrap
 from datetime import timedelta
 
 width, height = A4
-margin_left = 6*mm
+margin_left = 13*mm
 font_std = 'Helvetica'
 font_bld = 'Helvetica-Bold'
 
@@ -29,7 +29,8 @@ def generar_informe(response, estudio):
 
     _informe(p, estudio)
 
-    _pie(p, estudio)
+    if estudio.enlace_video:
+        _pie(p, estudio)
 
     # Close the PDF object cleanly, and we're done.
     p.showPage()
@@ -38,58 +39,58 @@ def generar_informe(response, estudio):
     return response
 
 def _datos_estudio(p, estudio):
-    top = margin_left + 40*mm
+    top = margin_left + 50*mm
     ew = (width - 2*margin_left) / 2
     eh = 45*mm
     th = 9
-    ld = 20
+    ld = 12
 
     p.saveState()
-
-    t = p.beginText(1.5*margin_left, height - top - 40)
 
     # Practica (titulo)
     p.setFont(font_bld, 10)
     p.drawCentredString(width/2, height - top, estudio.practica.descripcion)
 
+    t = p.beginText(1.5*margin_left, height - top - 25)
+
     # Fecha del estudio
     t.setFont(font_bld, th)
-    t.textOut(u'Fecha del estudio: ')
+    t.textOut(u'Fecha del estudio.....: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
     t.textLine(str(estudio.fechaEstudio))
 
     # Paciente
     t.setFont(font_bld, th)
-    t.textOut(u'Paciente: ')
+    t.textOut(u'Paciente ....................: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
     t.textLine(str(estudio.paciente))
 
     # Obra Social
     t.setFont(font_bld, th)
-    t.textOut(u'Obra Social: ')
+    t.textOut(u'Obra Social ...............: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
     t.textLine(str(estudio.obraSocial))
 
     # Nro de afiliado
     t.setFont(font_bld, th)
-    t.textOut(u'Nro de afiliado: ')
+    t.textOut(u'Nro de afiliado ..........: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
     t.textLine(str(estudio.paciente.nroAfiliado))
 
     # Medico Solicitante
     t.setFont(font_bld, th)
-    t.textOut(u'Medico Solicitante: ')
+    t.textOut(u'Medico Solicitante ...: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
     t.textLine(str(estudio.medicoSolicitante))
 
     # Motivo del estudio
     t.setFont(font_bld, th)
-    t.textOut(u'Motivo del estudio: ')
+    t.textOut(u'Motivo del estudio ...: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
     t.textLine(str(estudio.motivoEstudio))
@@ -99,24 +100,22 @@ def _datos_estudio(p, estudio):
     p.restoreState()
 
 def _informe(p, estudio):
-    top = margin_left + 120*mm
+    top = margin_left + 88*mm
     ew = 16*mm
     eh = 13*mm
-    th = 9
-    ld = 25
+    #th = 9
+    #ld = 25
+
     p.saveState()
+    p.line(1.5*margin_left, height - top, 520 + margin_left, height - top)
 
-    p.line(margin_left, height - top, 550 + margin_left, height - top)
-
-    #p.setFillColor(white)
-    #p.rect((width - ew)/2, height - top - eh , ew, eh, stroke=1, fill=1)
     p.setFillColor(black)
     p.setFont(font_bld, 10)
-    p.drawCentredString(width/2, height - top - eh + 7, "INFORME")
+    p.drawCentredString(width/2, height - top - eh + 10, "INFORME")
 
-    t = p.beginText(1.5*margin_left, height - top - 40)
-    t.setFont(font_std, th)
-    t.setLeading(ld)
+    #t = p.beginText(1.5*margin_left, height - top - 40)
+    #t.setFont(font_std, th)
+    #t.setLeading(ld)
     #t.textLine(smart_unicode(estudio.informe.replace('\n','<br />')))
     
     styles=getSampleStyleSheet()
@@ -124,18 +123,18 @@ def _informe(p, estudio):
     #tw = width - 2*margin_left
     table = Table([[paragraph, ]], colWidths=[500, ])
     table.setStyle([
-	    ('FONT', (0, 0), (-1, -1), font_std),
+	    #('FONT', (0, 0), (-1, -1), font_std),
 	    ('FONT', (0, 0), (-1, 0), font_bld),
-        ('LEADING', (0, 1), (-1, -1), 5),
+        #('LEADING', (0, 1), (-1, -1), 5),
         #('GRID', (0, 0), (-1, 0), 0.5, black),
         #('BACKGROUND', (0, 0), (-1, 0), Color(0.8,0.8,0.8)),
-        ('ALIGN', (1, 0), (-1, -1), 'CENTRE'),
-        ('ALIGN', (1, 1), (-3, -1), 'RIGHT'),
-        ('ALIGN', (3, 1), (-1, -1), 'RIGHT'),
+        #('ALIGN', (1, 0), (-1, -1), 'CENTRE'),
+        #('ALIGN', (1, 1), (-3, -1), 'RIGHT'),
+        #('ALIGN', (3, 1), (-1, -1), 'RIGHT'),
         ('FONTSIZE',(0,0),(-1,-1),9),
         ])
-    table.wrapOn(p, width, height)
-    table.drawOn(p, margin_left, height - 550)
+    table.wrapOn(p, 1, 1)
+    table.drawOn(p, 1.5*margin_left, height - 480)
 
     #p.drawText(t)
     p.restoreState()
@@ -145,10 +144,32 @@ def _pie(p, estudio):
     top = margin_left + 200*mm
     ew = width - 2*margin_left
     eh = 7*mm
+    th = 9
+    ld = 25
 
     p.saveState()
-    p.line(margin_left, height - 700, 550 + margin_left, height - 700)
-    p.setFont(font_std, 12)
-    p.drawCentredString(width/2, height - top - eh/2 - 6, str(estudio.enlace_video))
+    p.line(1.5*margin_left, height - 660, 520 + margin_left, height - 660)
+    p.setFont(font_std, 8)
+
+    t = p.beginText(1.5*margin_left, height - 680)
+
+    t.setFont(font_bld, th)
+    #t.setLeading(ld)
+    t.textLine(u'- El siguiente enlace web permitirá descargar el video del estudio a partir de las próximas 48hs de realizado.')
+    p.drawText(t)
+
+    t.setFont(font_bld, th)
+    #t.setLeading(ld)
+    t.textLine(u'- Recordar que sólo estará disponible para descarga durante los próximos 30 días de realizado el mismo.')
+    p.drawText(t)
+
+    t.setFont(font_bld, th)
+    #t.setLeading(ld)
+    t.textLine(u'- Coloque el siguiente enlace en la barra de direcciones de su explorador web, para proceder con la descarga del video.')
+    p.drawText(t)
+
+    p.setFont(font_std, 11)
+    p.drawCentredString(width/2, height - 800, str(estudio.enlace_video))
+
     p.restoreState()
 
