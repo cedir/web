@@ -149,6 +149,14 @@ def _pie(p, estudio):
 
     p.saveState()
     p.line(1.5*margin_left, height - 660, 520 + margin_left, height - 660)
+
+    filename = './icon-ingecol_01.png'
+    import os.path
+    fn = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon-ingecol_01.png')
+
+    #p.drawImage(fn, 1.5*margin_left, height - 660)
+
+
     p.setFont(font_std, 8)
 
     t = p.beginText(1.5*margin_left, height - 680)
