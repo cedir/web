@@ -38,6 +38,7 @@ def generar_informe(response, estudio):
     p.save()
     return response
 
+
 def _datos_estudio(p, estudio):
     top = margin_left + 50*mm
     ew = (width - 2*margin_left) / 2
@@ -99,6 +100,7 @@ def _datos_estudio(p, estudio):
     p.drawText(t)
     p.restoreState()
 
+
 def _informe(p, estudio):
     top = margin_left + 88*mm
     ew = 16*mm
@@ -118,23 +120,25 @@ def _informe(p, estudio):
     #t.setLeading(ld)
     #t.textLine(smart_unicode(estudio.informe.replace('\n','<br />')))
     
-    styles=getSampleStyleSheet()
-    paragraph = Paragraph(estudio.informe.replace(u'\r',u'').replace(u'\n',u'<br/>'), styles["Normal"])
+    styles = getSampleStyleSheet()
+    paragraph = Paragraph(estudio.informe.replace(u'\r', u'').replace(u'\n', u'<br/>'), styles["Normal"])
     #tw = width - 2*margin_left
-    table = Table([[paragraph, ]], colWidths=[500, ])
-    table.setStyle([
-	    #('FONT', (0, 0), (-1, -1), font_std),
-	    ('FONT', (0, 0), (-1, 0), font_bld),
-        #('LEADING', (0, 1), (-1, -1), 5),
-        #('GRID', (0, 0), (-1, 0), 0.5, black),
-        #('BACKGROUND', (0, 0), (-1, 0), Color(0.8,0.8,0.8)),
-        #('ALIGN', (1, 0), (-1, -1), 'CENTRE'),
-        #('ALIGN', (1, 1), (-3, -1), 'RIGHT'),
-        #('ALIGN', (3, 1), (-1, -1), 'RIGHT'),
-        ('FONTSIZE',(0,0),(-1,-1),9),
-        ])
-    table.wrapOn(p, 1, 1)
-    table.drawOn(p, 1.5*margin_left, height - 480)
+    # table = Table([[paragraph, ]], colWidths=[500, ])
+    # table.setStyle([
+	 #    #('FONT', (0, 0), (-1, -1), font_std),
+	 #    ('FONT', (0, 0), (-1, 0), font_bld),
+    #     #('LEADING', (0, 1), (-1, -1), 5),
+    #     #('GRID', (0, 0), (-1, 0), 0.5, black),
+    #     ('BACKGROUND', (0, 0), (-1, 0), Color(0.8,0.8,0.8)),
+    #     ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    #     #('ALIGN', (1, 1), (-3, -1), 'RIGHT'),
+    #     #('ALIGN', (3, 1), (-1, -1), 'RIGHT'),
+    #     ('FONTSIZE',(0,0),(-1,-1),9),
+    #     ])
+    # table.wrapOn(p, 1, 1)
+    # table.drawOn(p, 1.5*margin_left, height - 480)
+    paragraph.wrapOn(p, 180*mm, 100*mm)
+    paragraph.drawOn(p, 1.5*margin_left, height - 200*mm)
 
     #p.drawText(t)
     p.restoreState()
@@ -180,4 +184,3 @@ def _pie(p, estudio):
     p.drawCentredString(width/2, height - 800, str(estudio.enlace_video))
 
     p.restoreState()
-
