@@ -66,7 +66,7 @@ def _datos_estudio(p, estudio):
     t.textOut(u'Paciente ....................: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
-    t.textLine(str(estudio.paciente))
+    t.textLine(u'{} ({})'.format(str(estudio.paciente), str(estudio.paciente.get_edad())))
 
     # Obra Social
     t.setFont(font_bld, th)
