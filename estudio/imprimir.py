@@ -1,5 +1,6 @@
 
 # -*- coding: utf-8
+import os.path
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm, mm
@@ -115,33 +116,32 @@ def _informe(p, estudio):
     p.setFont(font_bld, 10)
     p.drawCentredString(width/2, height - top - eh + 10, "INFORME")
 
-    #t = p.beginText(1.5*margin_left, height - top - 40)
-    #t.setFont(font_std, th)
-    #t.setLeading(ld)
-    #t.textLine(smart_unicode(estudio.informe.replace('\n','<br />')))
-    
     styles = getSampleStyleSheet()
     paragraph = Paragraph(estudio.informe.replace(u'\r', u'').replace(u'\n', u'<br/>'), styles["Normal"])
-    #tw = width - 2*margin_left
-    # table = Table([[paragraph, ]], colWidths=[500, ])
-    # table.setStyle([
-	 #    #('FONT', (0, 0), (-1, -1), font_std),
-	 #    ('FONT', (0, 0), (-1, 0), font_bld),
-    #     #('LEADING', (0, 1), (-1, -1), 5),
-    #     #('GRID', (0, 0), (-1, 0), 0.5, black),
-    #     ('BACKGROUND', (0, 0), (-1, 0), Color(0.8,0.8,0.8)),
-    #     ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-    #     #('ALIGN', (1, 1), (-3, -1), 'RIGHT'),
-    #     #('ALIGN', (3, 1), (-1, -1), 'RIGHT'),
-    #     ('FONTSIZE',(0,0),(-1,-1),9),
-    #     ])
-    # table.wrapOn(p, 1, 1)
-    # table.drawOn(p, 1.5*margin_left, height - 480)
-    paragraph.wrapOn(p, 180*mm, 100*mm)
-    paragraph.drawOn(p, 1.5*margin_left, height - 200*mm)
+
+    #paragraph.wrapOn(p, 180*mm, 100*mm)
+    #paragraph.drawOn(p, 1.5*margin_left, height - 200*mm)
+
+    #paragraph.wrapOn(p, 100*mm, 100*mm)
+    #paragraph.drawOn(p, *coord(20, 48, mm))
+
+    from reportlab.platypus.flowables import KeepInFrame   # ejemplo en http://two.pairlist.net/pipermail/reportlab-users/2009-April/008180.html
+
+    f = KeepInFrame(180*mm, 100*mm,[paragraph],mode='shrink')
+    w,h=f.wrapOn(p,100*mm,100*mm)
+    f.drawOn(p,1.5*margin_left, height - 200*mm)
 
     #p.drawText(t)
-    p.restoreState()
+    #p.restoreState()
+
+
+#def coord(x, y, unit=1):
+#        """
+#        # http://stackoverflow.com/questions/4726011/wrap-text-in-a-table-reportlab
+#        Helper class to help position flowables in Canvas objects
+#        """
+#        x, y = x * unit, height -  y * unit
+#        return x, y  
 
 
 def _pie(p, estudio):
@@ -154,11 +154,9 @@ def _pie(p, estudio):
     p.saveState()
     p.line(1.5*margin_left, height - 660, 520 + margin_left, height - 660)
 
-    filename = './icon-ingecol_01.png'
-    import os.path
-    fn = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon-ingecol_01.png')
-
-    #p.drawImage(fn, 1.5*margin_left, height - 660)
+    filename = './savetheearth.jpg'
+    fn = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'savetheearth.jpg')
+    p.drawImage(fn, 1.5*margin_left, height - 660)
 
 
     p.setFont(font_std, 8)
