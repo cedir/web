@@ -4,15 +4,9 @@ import os.path
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm, mm
-from reportlab.lib.colors import black,white, Color
-from reportlab.graphics.barcode.common import I2of5
-from reportlab.platypus import Table, Paragraph
+from reportlab.lib.colors import black
+from reportlab.platypus import Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
-from django.utils.encoding import smart_str, smart_unicode
-
-from textwrap import wrap
-
-from datetime import timedelta
 
 width, height = A4
 margin_left = 13*mm
@@ -42,8 +36,6 @@ def generar_informe(response, estudio):
 
 def _datos_estudio(p, estudio):
     top = margin_left + 50*mm
-    ew = (width - 2*margin_left) / 2
-    eh = 45*mm
     th = 9
     ld = 12
 
@@ -104,10 +96,7 @@ def _datos_estudio(p, estudio):
 
 def _informe(p, estudio):
     top = margin_left + 88*mm
-    ew = 16*mm
     eh = 13*mm
-    #th = 9
-    #ld = 25
 
     p.saveState()
     p.line(1.5*margin_left, height - top, 520 + margin_left, height - top)
@@ -119,29 +108,10 @@ def _informe(p, estudio):
     styles = getSampleStyleSheet()
     paragraph = Paragraph(estudio.informe.replace(u'\r', u'').replace(u'\n', u'<br/>'), styles["Normal"])
 
-    #paragraph.wrapOn(p, 180*mm, 100*mm)
-    #paragraph.drawOn(p, 1.5*margin_left, height - 200*mm)
+    w, h = paragraph.wrapOn(p, 170*mm, 150*mm)
+    paragraph.drawOn(p, 1.5*margin_left, height - 265*mm + (150*mm - h))
 
-    #paragraph.wrapOn(p, 100*mm, 100*mm)
-    #paragraph.drawOn(p, *coord(20, 48, mm))
-
-    from reportlab.platypus.flowables import KeepInFrame   # ejemplo en http://two.pairlist.net/pipermail/reportlab-users/2009-April/008180.html
-
-    f = KeepInFrame(180*mm, 100*mm,[paragraph],mode='shrink')
-    w,h=f.wrapOn(p,100*mm,100*mm)
-    f.drawOn(p,1.5*margin_left, height - 200*mm)
-
-    #p.drawText(t)
-    #p.restoreState()
-
-
-#def coord(x, y, unit=1):
-#        """
-#        # http://stackoverflow.com/questions/4726011/wrap-text-in-a-table-reportlab
-#        Helper class to help position flowables in Canvas objects
-#        """
-#        x, y = x * unit, height -  y * unit
-#        return x, y  
+    p.restoreState()
 
 
 def _pie(p, estudio):
@@ -152,30 +122,33 @@ def _pie(p, estudio):
     ld = 25
 
     p.saveState()
-    p.line(1.5*margin_left, height - 660, 520 + margin_left, height - 660)
+    p.line(1.5*margin_left, height - 700, 520 + margin_left, height - 700)
 
     filename = './savetheearth.jpg'
-    fn = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'savetheearth.jpg')
-    p.drawImage(fn, 1.5*margin_left, height - 660)
+    fn = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+    p.drawImage(fn, 1.5*margin_left, height - 790, width=30*mm, height=30*mm)
 
 
     p.setFont(font_std, 8)
 
-    t = p.beginText(1.5*margin_left, height - 680)
+    t = p.beginText(3.5*margin_left, height - 720)
 
     t.setFont(font_bld, th)
     #t.setLeading(ld)
-    t.textLine(u'- El siguiente enlace web permitirá descargar el video del estudio a partir de las próximas 48hs de realizado.')
+    t.textLine(u'- El siguiente enlace web permitirá descargar el video del estudio a partir de las')
+    t.textLine(u'  próximas 48hs de realizado.')
     p.drawText(t)
 
     t.setFont(font_bld, th)
     #t.setLeading(ld)
-    t.textLine(u'- Recordar que sólo estará disponible para descarga durante los próximos 30 días de realizado el mismo.')
+    t.textLine(u'- Recordar que sólo estará disponible para descarga durante los próximos 30 días')
+    t.textLine(u'  de realizado el mismo.')
     p.drawText(t)
 
     t.setFont(font_bld, th)
     #t.setLeading(ld)
-    t.textLine(u'- Coloque el siguiente enlace en la barra de direcciones de su explorador web, para proceder con la descarga del video.')
+    t.textLine(u'- Coloque el siguiente enlace en la barra de direcciones de su explorador web,')
+    t.textLine(u'  para proceder con la descarga del video.')
     p.drawText(t)
 
     p.setFont(font_std, 11)
