@@ -13,8 +13,8 @@ $(document).ready(function() {
         practicaChangeHandler();
 
         /* values have changed events*/
-        $("#id_informe").on('input', function() { estudioFueModificado = true;});
-        $("#id_motivoEstudio").on('input', function() { estudioFueModificado = true;});
+        $("#id_informe").on('change', function() { estudioFueModificado = true;});
+        $("#id_motivoEstudio").on('change', function() { estudioFueModificado = true;});
     }
 
     function cargarVistaChangeEstudio(){
@@ -41,7 +41,8 @@ $(document).ready(function() {
         $("#colangioConCalculoButton").click(function() {load_informe(COLANGIO_CON_CALCULO);});
 
         function load_informe(text){
-            $("#id_informe").text(text);
+            $("#id_informe").val(text);
+            $( "#id_informe" ).change();  //trigger change event
         }
 
 
@@ -75,22 +76,22 @@ $(document).ready(function() {
         ESTUDIOS_BAJOS = [2, 19, 23];
         ESTUDIOS_COLANGIOS = [13, 34];
 
-        var ALTA_NORMAL = "ESOFAGO. Normal, cardias a 37 cm de la arcada dentaria superior. No se evidencia reflujo gastro esofágico, hernia hiatal, ni esofagitis por reflujo. \n\n" +
-            "ESTOMAGO: Mucosa de características normales. Por retroflexión se observa el techo gástrico con un buen cierre cardial. \n\n" +
-            "PILORO: Permeable. \n\n" +
-            "BULBO DUODENAL Y SEGUNDA PORCION DUODENAL. Normales. \n\n" +
-            "CONCLUSION DIAGNOSTICA: ESOFAGO GASTRO DUODENO DE CARACTERISTICAS NORMALES. \n";
+        var ALTA_NORMAL = "<b>Esófago.</b> Normal, cardias a 37 cm de la arcada dentaria superior. No se evidencia reflujo gastro esofágico, hernia hiatal, ni esofagitis por reflujo. \n\n" +
+            "<b>Estómago:</b> Mucosa de características normales. Por retroflexión se observa el techo gástrico con un buen cierre cardial. \n\n" +
+            "<b>Píloro:</b> Permeable. \n\n" +
+            "<b>Bulbo duodenal y segunda porción duodenal.</b> Normales. \n\n" +
+            "<b>Conclusión diagnóstica: esófago gastro duodeno de características normales.</b> \n";
 
-        var GASTRITIS = "ESOFAGO. Normal, cardias a 37 cm de la arcada dentaria superior. \n\n" +
-            "ESTOMAGO: Mucosa antral difusamente congestiva eritematosa a predominio pre pilórico.\n\n" +
-            "PILORO: Permeable.\n\n" +
-            "BULBO DUODENAL Y SEGUNDA PORCION DUODENAL. Normales. \n\n" +
-            "CONCLUSION DIAGNOSTICA: GASTRITIS SUPERFICIAL NO EROSIVA DE ANTRO GASTRICO. \n";
+        var GASTRITIS = "<b>Esófago.</b> Normal, cardias a 37 cm de la arcada dentaria superior. \n\n" +
+            "<b>Estómago:</b> Mucosa antral difusamente congestiva eritematosa a predominio pre pilórico.\n\n" +
+            "<b>Píloro:</b> Permeable.\n\n" +
+            "<b>Bulbo duodenal y segunda porción duodenal.</b> Normales. \n\n" +
+            "<b>Conclusión diagnóstica: gastritis superficial no erosiva de antro gástrico.</b> \n";
 
         var COLONO_NORMAL = "Ampolla rectal sin lesión mucosa. \n\n" +
             "Se franquea el ángulo recto sigmoides observando el colon sigmoides de características normales. \n\n" +
             "Se progresa por el colon descendente hasta franquear el ángulo esplénico observando el colon transverso, ángulo hepático y colon ascendente sin evidenciar lesión mucosa.\n\n" +
-            "CONCLUSION DIAGNOSTICA: AMPOLLA RECTAL Y MARCO COLONICO VISUALIZADO HASTA CIEGO  DE CARACTERISTICAS NORMALES. \n";
+            "<b>Conclusión diagnóstica: ampolla rectal y marco colónico visualizado hasta ciego de características normales.</b> \n";
 
         var COLANGIO_NORMAL = "En segunda porción duodenal , se visualiza la Ampolla de Vater de características normales.\n\n" +
             "Se canula sin dificultad observando la vía bilair intra hepática de calibre normal.\n\n" +
