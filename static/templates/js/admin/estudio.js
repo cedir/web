@@ -94,14 +94,14 @@ $(document).ready(function() {
             "<b>Conclusión diagnóstica: ampolla rectal y marco colónico visualizado hasta ciego de características normales.</b> \n";
 
         var COLANGIO_NORMAL = "En segunda porción duodenal , se visualiza la Ampolla de Vater de características normales.\n\n" +
-            "Se canula sin dificultad observando la vía bilair intra hepática de calibre normal.\n\n" +
+            "Se canula sin dificultad observando la vía biliar intra hepática de calibre normal.\n\n" +
             "La vía biliar extra hepática presenta tanto el conducto hepático como el colédoco de aspecto y calibre normal.\n\n" +
             "No se observan imágenes radiolucidas en su interior y el drenaje de la sustancia de contraste se realiza en tiempo aceptable. \n\n" +
             "Buena tolerancia al procedimiento.\n\n" +
             "Las imágenes radioscópicas son digitalizadas e impresas en papel , acompañando el presente informe.\n";
 
         var COLANGIO_CON_CALCULO = "En segunda porción duodenal se visualiza la Ampolla de Vater de características normales. \n\n" +
-            "Se canula sin dificultad observando la vía bilar intra hepática de calibre conservado. \n\n" +
+            "Se canula sin dificultad observando la vía biliar intra hepática de calibre conservado. \n\n" +
             "La vía biiliar extra hepática se observa dilatada de aproximadamente 20 mm en promedio con una imagen radiolúcida en su interior con limites netos que podría corresponder a un lito coledociano.\n\n" +
             "Se realiza papilotomía ámplia y con canastilla de dormia se extrae un lito con las características descriptas en al imagen radiológica. \n\n" +
             "Buena tolerancia al procedimiento. \n\n" +
