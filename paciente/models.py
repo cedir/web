@@ -16,6 +16,9 @@ class Paciente(models.Model):
     email = models.CharField(u'Email', max_length=200, db_column=u"e_mail")
 
     def get_edad(self):
+        if not self.fechaNacimiento:
+            return None
+
         today = date.today()
         return today.year - self.fechaNacimiento.year - ((today.month, today.day) < (self.fechaNacimiento.month, self.fechaNacimiento.day))
 

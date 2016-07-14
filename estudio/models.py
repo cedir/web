@@ -12,9 +12,9 @@ MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
 class Estudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
-    fechaEstudio = models.DateField("Fecha")
-    practica = models.ForeignKey(Practica, db_column="idEstudio")  # TODO: esto estaba asociado a Estado en vez de practica. Por que??? ver si no estaba rompiendo
-    motivoEstudio = models.CharField(max_length=300)
+    fechaEstudio = models.DateField(u'Fecha')
+    practica = models.ForeignKey(Practica, db_column="idEstudio")
+    motivoEstudio = models.CharField(u'Motivo', max_length=300)
     informe = models.TextField()
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo", blank=True)
     public_id = models.CharField(max_length=100, db_column="publicID")
@@ -26,7 +26,6 @@ class Estudio(models.Model):
     nroDeOrden = models.CharField(max_length=200)
     anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
     esPagoContraFactura = models.IntegerField()
-    #estudio = models.ForeignKey(Estudio, db_column="nro")
 
     fechaCobro = models.CharField(null=True, max_length=100)
     importeEstudio = models.FloatField()

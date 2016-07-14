@@ -9,7 +9,8 @@ class EstudioAdmin(admin.ModelAdmin):
     list_display = (u'fechaEstudio', u'paciente', u'practica', u'medico', u'obraSocial')
     raw_id_fields = (u'paciente', )
     ordering = (u'-fechaEstudio',)
-    list_filter = ('fechaEstudio',)
+    list_filter = (u'fechaEstudio',)
+    readonly_fields = (u'public_id', )
 
     def has_add_permission(self, request):
         return False
@@ -18,7 +19,8 @@ class EstudioAdmin(admin.ModelAdmin):
         return False
 
     class Media:
-        js = ('js/admin/estudio.js',)
+        js = (u'js/admin/estudio.js',)
+        css = {u'all': (u'css/admin/estudio.css', )}
 
 admin.site.register(Estudio, EstudioAdmin)
 
