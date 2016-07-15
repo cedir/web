@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('usedLevel', models.IntegerField()),
             ],
             options={
-                'db_table': 'cedirData"."AlmacenEstudios',
+                'db_table': 'AlmacenEstudios',
             },
             bases=(models.Model,),
         ),

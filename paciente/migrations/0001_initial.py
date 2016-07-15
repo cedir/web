@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('email', models.CharField(max_length=200, verbose_name='Email', db_column='e_mail')),
             ],
             options={
-                'db_table': 'cedirData"."tblPacientes',
+                'db_table': 'tblPacientes',
             },
             bases=(models.Model,),
         ),

@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('img', models.CharField(max_length=200)),
             ],
             options={
-                'db_table': 'cedirData"."turnos_estados',
+                'db_table': 'turnos_estados',
             },
             bases=(models.Model,),
         ),
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 ('sala', models.ForeignKey(to='sala.Sala')),
             ],
             options={
-                'db_table': 'cedirData"."turnos_turnos',
+                'db_table': 'turnos_turnos',
             },
             bases=(models.Model,),
         ),

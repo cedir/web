@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('nombre', models.CharField(max_length=200, db_column=b'obraSocial')),
             ],
             options={
-                'db_table': 'cedirData"."AlmacenObraSocial',
+                'db_table': 'AlmacenObraSocial',
             },
             bases=(models.Model,),
         ),

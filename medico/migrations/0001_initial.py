@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('fecha', models.CharField(max_length=100)),
             ],
             options={
-                'db_table': 'cedirData"."turnos_disponibilidad_medicos',
+                'db_table': 'turnos_disponibilidad_medicos',
             },
             bases=(models.Model,),
         ),
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ('apellido', models.CharField(max_length=200, verbose_name=b'Apellido', db_column=b'apellidoMedicoAct')),
             ],
             options={
-                'db_table': 'cedirData"."tblMedicosAct',
+                'db_table': 'tblMedicosAct',
             },
             bases=(models.Model,),
         ),

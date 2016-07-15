@@ -10,7 +10,7 @@ class ObraSocial(models.Model):
     #observaciones = models.CharField()
 
     class Meta:
-        db_table = 'cedirData\".\"AlmacenObraSocial'
+        db_table = 'AlmacenObraSocial'
         ordering = ['nombre']
 
     def __unicode__(self):

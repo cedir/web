@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('observacion', models.CharField(max_length=300)),
             ],
             options={
-                'db_table': 'cedirData"."AuditUserActionsLog',
+                'db_table': 'AuditUserActionsLog',
             },
             bases=(models.Model,),
         ),
