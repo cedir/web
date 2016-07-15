@@ -14,8 +14,8 @@ class Estudio(models.Model):
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
     fechaEstudio = models.DateField(u'Fecha')
     practica = models.ForeignKey(Practica, db_column="idEstudio")
-    motivoEstudio = models.CharField(u'Motivo', max_length=300)
-    informe = models.TextField()
+    motivoEstudio = models.CharField(u'Motivo', max_length=300, blank=True)
+    informe = models.TextField(blank=True)
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo", blank=True)
     public_id = models.CharField(max_length=100, db_column="publicID")
 
