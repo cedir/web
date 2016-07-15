@@ -35,7 +35,7 @@ def generar_informe(response, estudio):
 
 
 def _datos_estudio(p, estudio):
-    top = margin_left + 50*mm
+    top = margin_left + 48*mm
     th = 9
     ld = 12
 
@@ -60,7 +60,7 @@ def _datos_estudio(p, estudio):
     t.setFont(font_std, th)
     t.setLeading(ld)
     if estudio.paciente.get_edad():
-        t.textLine(u'{} ({})'.format(str(estudio.paciente), str(estudio.paciente.get_edad())))
+        t.textLine(u'{} ({} años)'.format(str(estudio.paciente), str(estudio.paciente.get_edad())))
     else:
         t.textLine(u'{}'.format(str(estudio.paciente)))
 
