@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from medico.models import Medico
+from medico.models import Medico, Anestesista
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
@@ -12,11 +12,11 @@ MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
 class Estudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
-    fechaEstudio = models.DateField()
-    practica = models.ForeignKey(Practica, db_column="idEstudio")  # TODO: esto estaba asociado a Estado en vez de practica. Por que??? ver si no estaba rompiendo
-    motivoEstudio = models.CharField(max_length=300)
+    fechaEstudio = models.DateField(u'Fecha')
+    practica = models.ForeignKey(Practica, db_column="idEstudio")
+    motivoEstudio = models.CharField(u'Motivo', max_length=300)
     informe = models.TextField()
-    enlace_video = models.CharField(max_length=256, db_column="enlaceVideo")
+    enlace_video = models.CharField(max_length=256, db_column="enlaceVideo", blank=True)
     public_id = models.CharField(max_length=100, db_column="publicID")
 
     medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name=u'medico_actuante')
@@ -24,9 +24,8 @@ class Estudio(models.Model):
     medicoSolicitante = models.ForeignKey(Medico, db_column="idMedicoSolicitante", related_name=u'medico_solicitante')
     idFacturacion = models.IntegerField()
     nroDeOrden = models.CharField(max_length=200)
-    idAnestesista = models.IntegerField()
+    anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
     esPagoContraFactura = models.IntegerField()
-    #estudio = models.ForeignKey(Estudio, db_column="nro")
 
     fechaCobro = models.CharField(null=True, max_length=100)
     importeEstudio = models.FloatField()
@@ -48,19 +47,13 @@ class Estudio(models.Model):
     class Meta:
         db_table = 'tblEstudios'
 
+    def __unicode__(self):
+        return u'%s %s' % (self.fechaEstudio, self.paciente)
+
     @property
     def fecha_vencimiento_link_video(self):
         return self.fechaEstudio + datetime.timedelta(days=MAX_DAYS_VIDEO_LINK_AVAILABLE)
 
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
-
-    def save(self, *args, **kwargs):
-        """
-        Disable save from admin. Passing param 'force' to allow saving from code.
-        """
-        if self.pk is None or kwargs.pop(u'force', None):
-            super(Estudio, self).save(*args, **kwargs)
-
-
 

@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date
 
 
 class Paciente(models.Model):
@@ -15,10 +16,15 @@ class Paciente(models.Model):
     email = models.CharField(u'Email', max_length=200, db_column=u"e_mail")
 
     def get_edad(self):
-        return self.id
+        if not self.fechaNacimiento:
+            return None
+
+        today = date.today()
+        return today.year - self.fechaNacimiento.year - ((today.month, today.day) < (self.fechaNacimiento.month, self.fechaNacimiento.day))
 
     class Meta:
         db_table = u'tblPacientes'
 
     def __unicode__(self):
         return u'%s, %s' % (self.nombre, self.apellido)
+
