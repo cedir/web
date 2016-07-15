@@ -150,6 +150,6 @@ def _pie(p, estudio):
     p.drawCentredString(width/2, height - 755, u'-------------------------------------------------------------------------------------------------------')
 
     p.setFont(font_std, 10)
-    p.drawCentredString(width/2, height - 770, str(estudio.enlace_video))
+    p.drawCentredString(width/2, height - 770, u'http://www.cedirsalud.com.ar/video/{}'.format(str(estudio.public_id)))
 
     p.restoreState()
