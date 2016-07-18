@@ -26,5 +26,5 @@ class Paciente(models.Model):
         db_table = u'tblPacientes'
 
     def __unicode__(self):
-        return u'%s, %s' % (self.nombre, self.apellido)
+        return u'%s, %s' % (self.apellido, self.nombre)
 
