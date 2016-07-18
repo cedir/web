@@ -52,7 +52,7 @@ def _datos_estudio(p, estudio):
     t.textOut(u'Fecha del estudio.....: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
-    t.textLine(str(estudio.fechaEstudio.strftime("%d/%m/%Y")))
+    t.textLine(unicode(estudio.fechaEstudio.strftime("%d/%m/%Y")))
 
     # Paciente
     t.setFont(font_bld, th)
@@ -60,16 +60,16 @@ def _datos_estudio(p, estudio):
     t.setFont(font_std, th)
     t.setLeading(ld)
     if estudio.paciente.get_edad():
-        t.textLine(u'{} ({} años)'.format(str(estudio.paciente), str(estudio.paciente.get_edad())))
+        t.textLine(u'{} ({} años)'.format(estudio.paciente, estudio.paciente.get_edad()))
     else:
-        t.textLine(u'{}'.format(str(estudio.paciente)))
+        t.textLine(u'{}'.format(estudio.paciente))
 
     # Obra Social
     t.setFont(font_bld, th)
     t.textOut(u'Obra Social ...............: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
-    t.textLine(str(estudio.obraSocial))
+    t.textLine(estudio.obraSocial.nombre)
 
     # Nro de afiliado
     if estudio.paciente.nroAfiliado:
@@ -77,21 +77,21 @@ def _datos_estudio(p, estudio):
         t.textOut(u'Nro de afiliado ..........: ')
         t.setFont(font_std, th)
         t.setLeading(ld)
-        t.textLine(str(estudio.paciente.nroAfiliado))
+        t.textLine(unicode(estudio.paciente.nroAfiliado))
 
     # Medico Solicitante
     t.setFont(font_bld, th)
     t.textOut(u'Medico Solicitante ...: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
-    t.textLine(str(estudio.medicoSolicitante))
+    t.textLine(unicode(estudio.medicoSolicitante))
 
     # Motivo del estudio
     t.setFont(font_bld, th)
     t.textOut(u'Motivo del estudio ...: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
-    t.textLine(str(estudio.motivoEstudio))
+    t.textLine(estudio.motivoEstudio)
 
 
     p.drawText(t)
