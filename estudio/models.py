@@ -4,6 +4,7 @@ from medico.models import Medico, Anestesista
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
+from medicamento.models import Medicamento
 
 
 MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
@@ -26,6 +27,7 @@ class Estudio(models.Model):
     nroDeOrden = models.CharField(max_length=200)
     anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
     esPagoContraFactura = models.IntegerField()
+    medicacion = models.ManyToManyField(Medicamento, through='Medicacion')
 
     fechaCobro = models.CharField(null=True, max_length=100)
     importeEstudio = models.FloatField()
@@ -56,4 +58,14 @@ class Estudio(models.Model):
 
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
+
+
+class Medicacion(models.Model):
+    id = models.AutoField(primary_key=True, db_column="idMedicacion")
+    medicamento = models.ForeignKey(Medicamento, db_column="idMedicamento")
+    estudio = models.ForeignKey(Estudio, db_column="nroEstudio", related_name='estudioXmedicamento')
+    importe = models.DecimalField(max_digits=16, decimal_places=2, default='0.00')
+
+    class Meta:
+        db_table = 'tblMedicacion'
 

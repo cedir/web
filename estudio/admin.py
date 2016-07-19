@@ -1,5 +1,9 @@
 from django.contrib import admin
-from models import Estudio
+from models import Estudio, Medicacion
+
+class MedicacionInline(admin.TabularInline):
+    model = Medicacion
+    extra = 1
 
 
 class EstudioAdmin(admin.ModelAdmin):
@@ -11,6 +15,7 @@ class EstudioAdmin(admin.ModelAdmin):
     ordering = (u'-fechaEstudio',)
     list_filter = (u'fechaEstudio',)
     readonly_fields = (u'public_id', )
+    inlines = (MedicacionInline,)
 
     def has_add_permission(self, request):
         return False
