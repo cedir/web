@@ -6,7 +6,6 @@ from practica.models import Practica
 from sala.models import Sala
 from obra_social.models import ObraSocial
 
-
 class Estado(models.Model):
     descripcion = models.CharField(max_length=200)
     img = models.CharField(max_length=200)
@@ -17,7 +16,7 @@ class Estado(models.Model):
 
 class Turno(models.Model):
     fecha_otorgamiento = models.CharField("Fecha Otorgamiento", max_length=200, null=False, blank=False)
-    fechaTurno = models.CharField("Fecha Turno", max_length=200, null=False, blank=False)
+    fechaTurno = models.DateField("Fecha Turno", null=False, blank=False)
     horaInicio = models.CharField("Hora Inicio", max_length=200, null=False, blank=False)
     horaFinEstimada = models.CharField("Hora Fin Estimada", max_length=200, null=False, blank=False)
     horaFinReal = models.CharField("Hora Fin Real", max_length=200, null=False, blank=False)
