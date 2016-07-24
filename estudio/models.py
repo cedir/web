@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from medico.models import Medico, Anestesista
+from medico.models import Medico, Anestesista, PagoMedico
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
@@ -35,11 +35,11 @@ class Estudio(models.Model):
     pagoContraFactura = models.FloatField()
     diferenciaPaciente = models.FloatField()
     pension = models.FloatField()
-    importePagoMedico = models.FloatField()
-    importePagoMedicoSol = models.FloatField()
-    #diferenciaPacienteMedicacion = models.FloatField(null=True)
-    #nroPagoMedicoAct = models.IntegerField(null=True)
-    #nroPagoMedicoSol = models.IntegerField(null=True)
+    importe_pago_medico = models.FloatField(db_column=u'importePagoMedico')
+    importe_pago_medico_solicitante = models.FloatField(db_column=u'importePagoMedicoSol')
+    #diferencia_paciente_medicacion = models.FloatField(db_column=u'diferenciaPacienteMedicacion')
+    pago_medico_actuante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoAct', null=True, blank=True, related_name=u'estudios_actuantes')
+    pago_medico_solicitante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoSol', null=True, blank=True, related_name=u'estudios_solicitantes')
     importeCobradoPension = models.FloatField()
     importeCobradoArancelAnestesia = models.FloatField()
     importeEstudioCobrado = models.FloatField()

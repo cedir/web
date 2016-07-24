@@ -1,16 +1,43 @@
 # -*- coding: utf-8
 from django.db import models
+from medico.models import Medico
+
+TIPOS_MEDICAMENTOS = (
+    ('Mat Esp', 'Material Especifico'),
+    ('Medicación', 'Medicación'),
+)
+
 
 class Medicamento(models.Model):
-    id = models.AutoField(primary_key=True, db_column="idMedicamento")
-    descripcion = models.CharField(db_column="descripcionMedicamento", max_length=300, blank=True)
-
-    importe = models.DecimalField(db_column="importeMedicamento", max_digits=16, decimal_places=2, default='0.00')
+    id = models.AutoField(primary_key=True, db_column=u'idMedicamento')
+    descripcion = models.CharField(db_column=u'descripcionMedicamento', max_length=300, blank=True)
+    importe = models.DecimalField(db_column=u'importeMedicamento', max_digits=16, decimal_places=2, default='0.00')
     stock = models.PositiveSmallIntegerField(max_length=16, )
-
-
-  #tipo character varying(20) DEFAULT 'Medicación'::character varying,
-  #"codigoMedicoOSDE" character varying DEFAULT ''::character varying,
+    tipo = models.CharField(max_length=100, default=u'Medicación', choices=TIPOS_MEDICAMENTOS)
+    codigo_osde = models.CharField(max_length=100, db_column=u'codigoMedicoOSDE', default=u'')
 
     class Meta:
         db_table = 'tblMedicamentos'
+
+    def __unicode__(self):
+        return u'%s (%s)' % (self.descripcion, self.tipo)
+
+
+class Movimiento(models.Model):
+    fecha = models.DateField()
+    hora = models.TimeField()
+    cantidad = models.IntegerField(max_length=10, )
+    descripcion = models.CharField(max_length=300)
+    medicamento = models.ForeignKey(Medico, db_column=u'idMedicamento')
+
+    class Meta:
+        db_table = 'tblMovimientosDeMedicamentos'
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+# TODO: ver por que esta medico anestesista en la pantalla, donde se guarda
+# TODO: ver por que muestra el ususario que hizo el movimiento si siempre parece decir "tecnico"
+# TODO: ver si cuando guarda un movimiento hay que actualizar el valor del stock en medicamento
+# TODO: en estudios, el campo "diferenciaPacienteMedicacion" no existe? quedo una referencia en el modelo pero no esta en la BD
