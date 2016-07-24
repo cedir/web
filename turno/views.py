@@ -43,11 +43,11 @@ def anunciar(request, id_turno):
             estudio.pagoContraFactura = 0
             estudio.diferenciaPaciente = 0
             estudio.pension = 0
-            estudio.importePagoMedico = 0
-            estudio.importePagoMedicoSol = 0
-            estudio.diferenciaPacienteMedicacion = None
-            estudio.nroPagoMedicoAct = None
-            estudio.nroPagoMedicoSol = None
+            estudio.importe_pago_medico = 0
+            estudio.importe_pago_medico_solicitante = 0
+            #estudio.diferenciaPacienteMedicacion = None
+            estudio.pago_medico_actuante = None
+            estudio.pago_medico_solicitante = None
             estudio.importeCobradoPension = 0
             estudio.importeCobradoArancelAnestesia = 0
             estudio.importeEstudioCobrado = 0

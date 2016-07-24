@@ -14,10 +14,10 @@ from medico.models import PagoMedico
 def eliminar_pagos(fecha, apply_changes):
     fecha = datetime.strptime(fecha, '%d/%m/%Y')
 
-    pagos = PagoMedico.objects.filter(fecha__lte=fecha)
+    pagos = PagoMedico.objects.filter(fecha__gte=fecha)
     for pago in pagos:
+        print u'Empezando con pago {} del {}'.format(pago.id, pago.fecha)
         estudios_actuantes = pago.estudios_actuantes
-
         for estudio in estudios_actuantes:
             print u'{}, {}, {}'.format(estudio.id, estudio.pago_medico_actuante.id, estudio.importe_pago_medico)
             estudio.importe_pago_medico = Decimal(0)
@@ -32,6 +32,12 @@ def eliminar_pagos(fecha, apply_changes):
             estudio.pago_medico_solicitante = None
             if apply_changes:
                 estudio.save()
+
+        if apply_changes:
+            print u'eliminando pago {}'.format(pago.id)
+            pago.delete()
+
+    print u'Fin.'
 
 
 if __name__ == '__main__':

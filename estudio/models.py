@@ -68,4 +68,3 @@ class Medicacion(models.Model):
 
     class Meta:
         db_table = 'tblMedicacion'
-
