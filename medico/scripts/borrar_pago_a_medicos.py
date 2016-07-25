@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.append('/opt/pythonenv/v2_ordergroove-py27/v2/api/')
+sys.path.append('/home/walter/Documents/cedir')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 import django
 django.setup()
@@ -16,25 +16,30 @@ def eliminar_pagos(fecha, apply_changes):
 
     pagos = PagoMedico.objects.filter(fecha__gte=fecha)
     for pago in pagos:
-        print u'Empezando con pago {} del {}'.format(pago.id, pago.fecha)
-        estudios_actuantes = pago.estudios_actuantes
+        importe_total = 0
+        print u'Empezando con pago {} del {} {}'.format(pago.id, pago.fecha, pago.medico)
+        estudios_actuantes = pago.estudios_actuantes.all()
         for estudio in estudios_actuantes:
+            importe_total += estudio.importe_pago_medico
             print u'{}, {}, {}'.format(estudio.id, estudio.pago_medico_actuante.id, estudio.importe_pago_medico)
             estudio.importe_pago_medico = Decimal(0)
             estudio.pago_medico_actuante = None
             if apply_changes:
                 estudio.save()
 
-        estudios_solicitantes = pago.estudios_solicitantes
+        print u'Pagos solicitantes'
+        estudios_solicitantes = pago.estudios_solicitantes.all()
         for estudio in estudios_solicitantes:
+            importe_total += estudio.importe_pago_medico_solicitante
             print u'{}, {}, {}'.format(estudio.id, estudio.pago_medico_solicitante.id, estudio.importe_pago_medico_solicitante)
             estudio.importe_pago_medico_solicitante = Decimal(0)
             estudio.pago_medico_solicitante = None
             if apply_changes:
                 estudio.save()
 
+        print u'Total pago: {}'.format(importe_total)
         if apply_changes:
-            print u'eliminando pago {}'.format(pago.id)
+            print u'Eliminando pago {}'.format(pago.id)
             pago.delete()
 
     print u'Fin.'

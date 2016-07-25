@@ -35,9 +35,3 @@ class Movimiento(models.Model):
 
     def has_delete_permission(self, request, obj=None):
         return False
-
-
-# TODO: ver por que esta medico anestesista en la pantalla, donde se guarda
-# TODO: ver por que muestra el ususario que hizo el movimiento si siempre parece decir "tecnico"
-# TODO: ver si cuando guarda un movimiento hay que actualizar el valor del stock en medicamento
-# TODO: en estudios, el campo "diferenciaPacienteMedicacion" no existe? quedo una referencia en el modelo pero no esta en la BD
