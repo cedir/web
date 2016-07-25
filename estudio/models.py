@@ -1,9 +1,10 @@
 import datetime
 from django.db import models
-from medico.models import Medico, Anestesista
+from medico.models import Medico, Anestesista, PagoMedico
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
+from medicamento.models import Medicamento
 
 
 MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
@@ -26,6 +27,7 @@ class Estudio(models.Model):
     nroDeOrden = models.CharField(max_length=200)
     anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
     esPagoContraFactura = models.IntegerField()
+    medicacion = models.ManyToManyField(Medicamento, through='Medicacion')
 
     fechaCobro = models.CharField(null=True, max_length=100)
     importeEstudio = models.FloatField()
@@ -33,11 +35,11 @@ class Estudio(models.Model):
     pagoContraFactura = models.FloatField()
     diferenciaPaciente = models.FloatField()
     pension = models.FloatField()
-    importePagoMedico = models.FloatField()
-    importePagoMedicoSol = models.FloatField()
-    #diferenciaPacienteMedicacion = models.FloatField(null=True)
-    #nroPagoMedicoAct = models.IntegerField(null=True)
-    #nroPagoMedicoSol = models.IntegerField(null=True)
+    importe_pago_medico = models.FloatField(db_column=u'importePagoMedico')
+    importe_pago_medico_solicitante = models.FloatField(db_column=u'importePagoMedicoSol')
+    #diferencia_paciente_medicacion = models.FloatField(db_column=u'diferenciaPacienteMedicacion')
+    pago_medico_actuante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoAct', null=True, blank=True, related_name=u'estudios_actuantes')
+    pago_medico_solicitante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoSol', null=True, blank=True, related_name=u'estudios_solicitantes')
     importeCobradoPension = models.FloatField()
     importeCobradoArancelAnestesia = models.FloatField()
     importeEstudioCobrado = models.FloatField()
@@ -57,3 +59,12 @@ class Estudio(models.Model):
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
 
+
+class Medicacion(models.Model):
+    id = models.AutoField(primary_key=True, db_column="idMedicacion")
+    medicamento = models.ForeignKey(Medicamento, db_column="idMedicamento")
+    estudio = models.ForeignKey(Estudio, db_column="nroEstudio", related_name='estudioXmedicamento')
+    importe = models.DecimalField(max_digits=16, decimal_places=2, default='0.00')
+
+    class Meta:
+        db_table = 'tblMedicacion'
