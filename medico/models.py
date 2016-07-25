@@ -52,3 +52,12 @@ class Disponibilidad(models.Model):
     class Meta:
         db_table = 'turnos_disponibilidad_medicos'
 
+
+class PagoMedico(models.Model):
+    id = models.AutoField(primary_key=True, db_column=u'nroPago')
+    fecha = models.DateField(db_column=u'fechaPago')
+    medico = models.ForeignKey(Medico, db_column=u'idMedico')
+    observacion = models.TextField(db_column=u'observacionPago')
+
+    class Meta:
+        db_table = 'tblPagosMedicos'
