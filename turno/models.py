@@ -15,11 +15,11 @@ class Estado(models.Model):
 
 
 class Turno(models.Model):
-    fecha_otorgamiento = models.CharField("Fecha Otorgamiento", max_length=200, null=False, blank=False)
+    fecha_otorgamiento = models.DateTimeField("Fecha Otorgamiento", null=False, blank=False)
     fechaTurno = models.DateField("Fecha Turno", null=False, blank=False)
-    horaInicio = models.CharField("Hora Inicio", max_length=200, null=False, blank=False)
-    horaFinEstimada = models.CharField("Hora Fin Estimada", max_length=200, null=False, blank=False)
-    horaFinReal = models.CharField("Hora Fin Real", max_length=200, null=False, blank=False)
+    horaInicio = models.TimeField("Hora Inicio", null=False, blank=False)
+    horaFinEstimada = models.TimeField("Hora Fin Estimada", null=False, blank=False)
+    horaFinReal = models.TimeField("Hora Fin Real", null=False, blank=False)
     observacion = models.CharField("Observacion", max_length=200, null=False, blank=True)
     obraSocial = models.ForeignKey(ObraSocial, db_column="idObraSocial")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
