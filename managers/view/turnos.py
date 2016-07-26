@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.template import Template, Context, loader
-from datetime import datetime
 import simplejson
 
 
@@ -233,12 +233,12 @@ class ViewTurnos():
 
         return t.render(c)
 
-    def getTurno(self,**kwargs):
+    def getTurno(self, **kwargs):
         turno = kwargs['turno']
         createdUser = kwargs['createdUser'] or '-no disponible-'
         response_dict = {}
         response_dict['id'] = turno.id
-        response_dict['fecha'] = self._sqlDateToNormalDate(turno.fechaTurno)
+        response_dict['fecha'] = turno.fechaTurno.strftime(settings.FORMAT_DATE)
         response_dict["paciente"] = turno.paciente.apellido + ", " + turno.paciente.nombre
         response_dict["tel"] = turno.paciente.telefono
         response_dict["dni"] = turno.paciente.dni
@@ -247,27 +247,22 @@ class ViewTurnos():
         response_dict["hora_fin_real"] = str(turno.horaFinReal)
         response_dict["hora_fin"] = str(turno.horaFinEstimada)
         response_dict["observacion"] = turno.observacion
-        response_dict["fecha_otorgamiento"] = self._sqlDateToNormalDate(turno.fecha_otorgamiento)
+        response_dict["fecha_otorgamiento"] = turno.fecha_otorgamiento.strftime(settings.FORMAT_DATETIME)
         response_dict["medico"] = turno.medico.apellido + ", " + turno.medico.nombre
-        response_dict["obra_social"] =  turno.obraSocial.id
-        response_dict["obra_social_nombre"] =  turno.obraSocial.nombre
-        response_dict["sala"] =  turno.sala.nombre
-        response_dict["estado"] =  turno.estado.descripcion
-        response_dict["creado_por"] =  createdUser
+        response_dict["obra_social"] = turno.obraSocial.id
+        response_dict["obra_social_nombre"] = turno.obraSocial.nombre
+        response_dict["sala"] = turno.sala.nombre
+        response_dict["estado"] = turno.estado.descripcion
+        response_dict["creado_por"] = createdUser
         #response_dict["anulado_por"] =
         #response_dict["observacion_anulacion"] =
 
-        practicas = turno.practicas.all()
-        strPracticas = ""
-        for practica in practicas:
-            strPracticas += practica.descripcion + ' - '
-
-        response_dict["practicas"] =  strPracticas
+        response_dict["practicas"] = ' - '.join(map(lambda p: p.descripcion, turno.practicas.all()))
 
         json = simplejson.dumps(response_dict)
         return json
 
-    def _sqlDateToNormalDate(self,dateTime):
+    def _sqlDateToNormalDate(self, dateTime):
         if str(dateTime) == "":
             return ""
         try:
