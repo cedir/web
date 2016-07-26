@@ -157,6 +157,10 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
 }
 
+FORMAT_DATETIME = u'%d/%m/%Y %H:%M:%S'
+FORMAT_TIME = u'%H:%M:%S',
+FORMAT_DATE = u'%d/%m/%Y'
+
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
