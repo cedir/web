@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, date
 import simplejson
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
+from django.utils.dateparse import parse_date
 from turno.models import Turno, Estado
 from paciente.models import Paciente
 from medico.models import Medico, Disponibilidad
@@ -13,6 +14,10 @@ from practica.models import Practica
 from managers.models import AuditLog, Usuario
 from managers.view.turnos import *
 
+spaDayNumbers = {u'lunes': 0, u'martes': 1, u'miercoles': 2, u'jueves': 3, u'viernes': 4, u'sabado': 5, u'domingo': 6}
+spaDays = [u'lunes', u'martes', u'miércoles', u'jueves', u'viernes', u'sábado', u'domingo']
+spaMonths = [None, u'enero', u'febrero', u'marzo', u'abril', u'mayo', u'junio', u'julio', u'agosto', u'setiembre',
+             u'octubre', u'noviembre', u'diciembre']
 
 class Turnos():
 
@@ -57,8 +62,6 @@ class Turnos():
     
     selectedDate = selectedDate - timedelta(days=1)#resto uno ya que nextDay le va a sumar uno luego
 
-    spanishDays = {'Sun':'domingo','Sat':'sabado','Mon':'lunes','Tue':'martes','Wed':'miercoles','Thu':'jueves','Fri':'viernes' }
-
     dayLines = []
     if idSala:
       for i in range(0, 4):#estudiar si los arreglos se estan devolviendo por referencia y llamar aca a _getDayLines q hace exact. lo mismo que este codigo
@@ -74,7 +77,7 @@ class Turnos():
 	#ano = str(time.strftime("%Y", time.gmtime(t) ))
 	#line["dia"] = spanishDays[dia] + ' ' + diaNumero + ' de ' + mes + ' del ' + ano
 
-	#arrTurnos = Turno.objects.filter(fechaTurno=str(lineDate),sala__id=int(idSala),estado__id__lt = 3)
+	#arrTurnos = Turno.objects.filter(fechaTurno=lineDate,sala__id=int(idSala),estado__id__lt = 3)
 	#line["turnos"] = arrTurnos
 	#line["disponibilidad"] = self._getDisponibilidad(spanishDays[dia],idSala)
 	
@@ -96,12 +99,9 @@ class Turnos():
     idMedico = request.GET.get('id-medico') or 0
     sp = fecha.split('-')
     c = date(int(sp[0]),int(sp[1]),int(sp[2]))
-    #nextDate = c + timedelta(days=1)
-    nextDate = self._getNextDay(c,idSala,idMedico)
-    #return self._getDayLines(nextDate,idSala)
-    
+    nextDate = self._getNextDay(c, idSala, idMedico)
     dayLines = []
-    dayLines.append(self._getDayLines(nextDate,idSala))
+    dayLines.append(self._getDayLines(nextDate, idSala))
     viewTurnos= ViewTurnos()
     return viewTurnos.getDayLines(dayLines)
 
@@ -111,92 +111,66 @@ class Turnos():
     idSala = request.GET['id-sala']
     idMedico = request.GET.get('id-medico') or 0
     sp = fecha.split('-')
-    c = date(int(sp[0]),int(sp[1]),int(sp[2]))
-    #backDate = c - timedelta(days=1)
-    backDate = self._getPreviousDay(c,idSala,idMedico)
-    #return self._getDayLines(backDate,idSala)
-    
+    c = date(int(sp[0]), int(sp[1]), int(sp[2]))
+    backDate = self._getPreviousDay(c, idSala, idMedico)
     dayLines = []
-    dayLines.append(self._getDayLines(backDate,idSala))
+    dayLines.append(self._getDayLines(backDate, idSala))
     viewTurnos= ViewTurnos()
     return viewTurnos.getDayLines(dayLines)
 
-  def _getDayLines(self,fecha,idSala):
-    spanishDays = {'Sun':'domingo','Sat':'sabado','Mon':'lunes','Tue':'martes','Wed':'miercoles','Thu':'jueves','Fri':'viernes' }
-    #dayLines = []
-    line = {}
-    line["fecha"] = str(fecha)
-    t = time.mktime((fecha.year,fecha.month,fecha.day,0,0,0,0,0,0))
-    dia = str(time.strftime("%a", time.gmtime(t) ))
-    diaNumero = str(time.strftime("%d", time.gmtime(t) ))
-    mes = str(time.strftime("%B", time.gmtime(t) ))
-    ano = str(time.strftime("%Y", time.gmtime(t) ))
-    line["dia"] = spanishDays[dia] + ' ' + diaNumero + ' de ' + mes + ' del ' + ano
-    arrTurnos = Turno.objects.filter(fechaTurno=str(fecha),sala__id=int(idSala),estado__id__lt = 3)
-    line["turnos"] = arrTurnos
-    line["disponibilidad"] = self._getDisponibilidad(spanishDays[dia],idSala)
-    #dayLines.append(line)
-    #return dayLines
-    return line
+  def _getDayLines(self, fecha, idSala):
+    dia = spaDays[fecha.weekday()]
+    mes = spaMonths[fecha.month]
+    return {
+      "fecha": str(fecha),
+      "dia": dia + ' ' + str(fecha.day) + ' de ' + mes + ' del ' + str(fecha.year),
+      "turnos": Turno.objects.filter(fechaTurno=fecha, sala__id=int(idSala), estado__id__lt=3),
+      "disponibilidad": self._getDisponibilidad(dia, idSala)
+    }
     
-  def _getNextDay(self,date,idSala,idMedico=None):
-    spanishDays = {'Sun':'domingo','Sat':'sabado','Mon':'lunes','Tue':'martes','Wed':'miercoles','Thu':'jueves','Fri':'viernes' }
-    daysIndexes = {'domingo':0,'lunes':1,'martes':2,'miercoles':3,'jueves':4,'viernes':5,'sabado':6 }
-    days = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado' ]
+  def _getNextDay(self, date, idSala, idMedico=None):
     if idMedico == 0:
       return date + timedelta(days=1)
     
-    disponibilidades = Disponibilidad.objects.filter(medico__id=idMedico,sala__id=idSala)
-    if len(disponibilidades) == 0:
+    disponibilidades = Disponibilidad.objects.filter(medico__id=idMedico, sala__id=idSala)
+    if not disponibilidades.count():
       return date + timedelta(days=1)
       
     hshDisponibilidades = {}
     for disp in disponibilidades:
-      hshDisponibilidades[disp.dia] = disp.horaInicio
-      
-    t = time.mktime((date.year,date.month,date.day,0,0,0,0,0,0))
-    dateDay = str(time.strftime("%a", time.gmtime(t) ))
-    
-    index = daysIndexes[spanishDays[dateDay]]
-    for i in range(0, 7):
-      index = index + 1
-      if index == 7:
-	index = 0
-      if hshDisponibilidades.has_key(days[index]):
-	return date + timedelta(days=i + 1)
+      hshDisponibilidades[spaDayNumbers[disp.dia]] = disp.horaInicio
+
+    cur_day = date.weekday()
+    for i in range(1, 8):
+      if (cur_day + i) % 7 in hshDisponibilidades:
+        return date + timedelta(days=i)
+
+    return date + timedelta(days=1)
   
   
-  def _getPreviousDay(self,date,idSala,idMedico=None):
-    spanishDays = {'Sun':'domingo','Sat':'sabado','Mon':'lunes','Tue':'martes','Wed':'miercoles','Thu':'jueves','Fri':'viernes' }
-    daysIndexes = {'domingo':6,'lunes':5,'martes':4,'miercoles':3,'jueves':2,'viernes':1,'sabado':0 }
-    days = ['sabado','viernes','jueves','miercoles','martes','lunes','domingo' ]
+  def _getPreviousDay(self, date, idSala, idMedico=None):
     if idMedico == 0:
       return date - timedelta(days=1)
 
-    disponibilidades = Disponibilidad.objects.filter(medico__id=idMedico,sala__id=idSala)
-    if len(disponibilidades) == 0:
+    disponibilidades = Disponibilidad.objects.filter(medico__id=idMedico, sala__id=idSala)
+    if not disponibilidades.count():
       return date - timedelta(days=1)
 
     hshDisponibilidades = {}
     for disp in disponibilidades:
-      hshDisponibilidades[disp.dia] = disp.horaInicio
-      
-    t = time.mktime((date.year,date.month,date.day,0,0,0,0,0,0))
-    dateDay = str(time.strftime("%a", time.gmtime(t) ))
-    
-    index = daysIndexes[spanishDays[dateDay]]
-    for i in range(0, 6):
-      index = index + 1
-      if index == 7:
-	index = 0
-      if hshDisponibilidades.has_key(days[index]):
-	return date - timedelta(days=i + 1)
+      hshDisponibilidades[spaDayNumbers[disp.dia]] = disp.horaInicio
+
+    cur_day = date.weekday()
+    for i in range(1, 8):
+      if (cur_day - i) % 7 in hshDisponibilidades:
+        return date - timedelta(days=i)
+
+    return date - timedelta(days=1)
 
 
-
-  def _getDisponibilidad(self,dia,idSala):
+  def _getDisponibilidad(self, dia, idSala):
     today = date.today()
-    disponibilidades = Disponibilidad.objects.filter(dia=dia,sala__id=idSala, fecha__lte = today).order_by('horaInicio')
+    disponibilidades = Disponibilidad.objects.filter(dia=dia, sala__id=idSala, fecha__lte=today).order_by('horaInicio')
     #como se trae el historial de disp menor a hoy, hay que tomar la de fecha mas alta por medico*. Esa logica puede hacerse aca
     #*se asume que en un dia determinado (lunes) el medico solo atiende una vez en esa sala
     return disponibilidades
@@ -213,7 +187,7 @@ class Turnos():
     
     hora_inicio = request.GET['hora_inicio']
     hora_fin_estimada = request.GET['hora_fin_estimada']
-    fecha_turno = request.GET['fecha_turno']
+    fecha_turno = parse_date(request.GET['fecha_turno'])
     idMedico = request.GET['id-medico']
     idObraSocial = request.GET['id-obra-social']
     idSala = request.GET['id-sala']
@@ -222,8 +196,8 @@ class Turnos():
     observacion_turno = request.GET['observacion_turno']
 
     #gte...>=  -  lte...<=  -  gt....>  -  lt....<
-    #arrTurnos = Turno.objects.filter(Q(fechaTurno=str(fecha_turno)), Q(horaInicio__lt= hora_inicio, horaFinEstimada__gt = hora_inicio) | Q(horaInicio__lt= hora_fin_estimada, horaFinEstimada__gt = hora_fin_estimada)  )
-    arrTurnos = Turno.objects.filter(Q(fechaTurno=str(fecha_turno),sala__id=idSala,estado__id__lt = 3), Q(horaInicio__lte= hora_inicio, horaFinEstimada__gt = hora_inicio)  | Q(horaInicio__lt= hora_fin_estimada, horaFinEstimada__gte = hora_fin_estimada) )
+    #arrTurnos = Turno.objects.filter(Q(fechaTurno=fecha_turno), Q(horaInicio__lt= hora_inicio, horaFinEstimada__gt = hora_inicio) | Q(horaInicio__lt= hora_fin_estimada, horaFinEstimada__gt = hora_fin_estimada)  )
+    arrTurnos = Turno.objects.filter(Q(fechaTurno=fecha_turno, sala__id=idSala, estado__id__lt=3), Q(horaInicio__lte= hora_inicio, horaFinEstimada__gt = hora_inicio) | Q(horaInicio__lt= hora_fin_estimada, horaFinEstimada__gte = hora_fin_estimada))
     #w = open('/tmp/debug.w','w')
     #w.write('fecha:' + str(fecha_turno))
     #w.write('Hora:' + str(hora_inicio))
@@ -259,7 +233,7 @@ class Turnos():
       turno.save(force_insert=True)
 
       for practica in practicas:
-	turno.practicas.add(practica)
+        turno.practicas.add(practica)
       
       turno.save()
       
