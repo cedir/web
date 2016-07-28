@@ -99,10 +99,7 @@
 <div class="module">
 	<h3>Turnos</h3>
 
-	<form name='frmBuscar' id='frmBuscar' action="/app/">
-		<input type="hidden" name="controlador" value="Turnos" />
-		<input type="hidden" name="accion" value="getBuscarTurnos" />
-
+	<form name='frmBuscar' id='frmBuscar' action="/turnos/buscar/">
 		<div class="form-row">
 			<label>Paciente:</label>
 			<input type="text" name="paciente" value="{{paciente}}" />
