@@ -61,7 +61,7 @@ location.href = "/app/?controlador=Pacientes&accion=getCreate";
 		  <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshPaciente.id }}">{{ hshPaciente.apellido }}, {{ hshPaciente.nombre }} </a></td>
 		  <td>{{ hshPaciente.domicilio }}</td>
 		  <td>{{ hshPaciente.telefono }}</td>
-		  <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshPaciente.id }}">Modificar</a>&nbsp;|&nbsp;<a href="/app/?controlador=Turnos&accion=getTurnosDisponibles&id-paciente={{ hshPaciente.id }}">Nuevo turno</a></td>
+		  <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshPaciente.id }}">Modificar</a>&nbsp;|&nbsp;<a href="/turnos/disponibles/?id-paciente={{ hshPaciente.id }}">Nuevo turno</a></td>
 	      </tr>
 	      {% endfor %}
 	  </tbody>

@@ -78,8 +78,8 @@ function getNext() {
   var medico = $("#id-medico").val();
 
   $.ajax({
-    url: '/app/',
-    data: "controlador=Turnos&accion=getNextDayLine&fecha=" + fecha + "&id-sala=" + sala + "&id-medico=" + medico + "&_nocache=" + rand,
+    url: '/turnos/nextday/',
+    data: "fecha=" + fecha + "&id-sala=" + sala + "&id-medico=" + medico + "&_nocache=" + rand,
     success: function(data) {
       // 	$('#lineasSector').html(data);
       var main = document.getElementById('lineasSector');
@@ -104,8 +104,8 @@ function getBack() {
   var medico = $("#id-medico").val();
 
   $.ajax({
-    url: '/app/',
-    data: "controlador=Turnos&accion=getBackDayLine&fecha=" + fecha + "&id-sala=" + sala + "&id-medico=" + medico + "&_nocache=" + rand,
+    url: '/turnos/backday/',
+    data: "fecha=" + fecha + "&id-sala=" + sala + "&id-medico=" + medico + "&_nocache=" + rand,
     success: function(data) {
       var main = document.getElementById('lineasSector');
       var child = main.lastElementChild;
@@ -166,13 +166,13 @@ function save() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/turnos/guardar/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=guardar&hora_inicio=" + hora_inicio + "&hora_fin_estimada=" + hora_fin_estimada + "&fecha_turno=" + fecha + "&id-medico=" + medico + "&id-obra-social=" + obraSocial + "&id-sala=" + sala + "&id-paciente=" + idPaciente + strPracticas + "&observacion_turno=" + observacion + "&_nocache=" + rand,
+    data: "hora_inicio=" + hora_inicio + "&hora_fin_estimada=" + hora_fin_estimada + "&fecha_turno=" + fecha + "&id-medico=" + medico + "&id-obra-social=" + obraSocial + "&id-sala=" + sala + "&id-paciente=" + idPaciente + strPracticas + "&observacion_turno=" + observacion + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
-        window.location.href = "/app/?controlador=Turnos&accion=getBuscarTurnos&fecha=" + fecha + "&id-sala=" + sala
+        window.location.href = "/turnos/buscar/?fecha=" + fecha + "&id-sala=" + sala
       } else {
         alert(data.message);
       }
@@ -225,9 +225,8 @@ function getEdit(event) {
   var modal = $(this)
 
   $.ajax({
-    url: '/app/',
+    url: '/turnos/' + idTurno + '/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=getTurno&id=" + idTurno,
     success: function(data) {
       modal.find("#popup-paciente")
            .text(data.paciente)
@@ -269,15 +268,12 @@ function updateTurno() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/turnos/' + idTurno + '/actualizar/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=update&id-obra-social=" + obraSocial + "&id-turno=" + idTurno + "&observacion=" + observacion + "&id-estado=" + 1 + "&_nocache=" + rand,
+    data: "id-obra-social=" + obraSocial + "&observacion=" + observacion + "&id-estado=" + 1 + "&_nocache=" + rand,
     success: function(data) {
-      // 	  if(data.status){
       alert(data.message);
       $("#frmBuscar").submit();
-      // 	  }
-
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -292,9 +288,9 @@ function confirmar() {
     return;
   }
   $.ajax({
-    url: '/app/',
+    url: '/turnos/' +idTurno + '/confirmar/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=confirmar&id-turno=" + idTurno + "&_nocache=" + rand,
+    data: "&_nocache=" + rand,
     success: function(data) {
       alert(data.message);
       $('#frmBuscar').trigger('submit');
@@ -312,9 +308,9 @@ function anular() {
     return;
   }
   $.ajax({
-    url: '/app/',
+    url: '/turnos/' + idTurno + '/anular/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=anular&id-turno=" + idTurno + "&_nocache=" + rand,
+    data: "&_nocache=" + rand,
     success: function(data) {
       alert(data.message);
       $('#frmBuscar').trigger('submit');
@@ -328,7 +324,7 @@ function anular() {
 function reprogramar() {
   var idTurno = $("#current-turno-id").val();
   if (confirm('¿Seguro desea reprogramar el turno?')) {
-    window.location.href = "/app/?controlador=Turnos&accion=reprogramar&id-turno=" + idTurno;
+    window.location.href = "/turnos/" + idTurno + "/reprogramar/";
   }
 }
 
@@ -339,7 +335,7 @@ function anunciarTurno() {
     return;
   }
   $.ajax({
-    url: '/turnos/anunciar/' + idTurno,
+    url: '/turnos/' + idTurno + '/anunciar/',
     dataType: 'json',
     data: "_nocache=" + rand,
     success: function(data) {
@@ -460,7 +456,7 @@ function createPaciente(createTurno) {
       if (data.status) {
         alert(data.message);
         if (createTurno) {
-          window.location.href = "/app/?controlador=Turnos&accion=getTurnosDisponibles&id-paciente=" + data.idPaciente;
+          window.location.href = "/turnos/disponibles/?id-paciente=" + data.idPaciente;
         } else {
           window.location.href = "/app/?controlador=Pacientes&accion=getBuscar&dni=" + dni;
         }

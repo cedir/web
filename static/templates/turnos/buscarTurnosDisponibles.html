@@ -197,9 +197,7 @@
 <div class="module">
   <h3>Asignar turno al paciente: <span id="selectedPaciente" style="font-style:italic;">{{ apellidoPaciente}} {{ nombrePaciente}}</span><a data-toggle="modal" data-target="#dialogPaciente" style="font-size:10px">[Elegir]</a></h3>
 
-  <form name="ver-planilla" id="ver-planilla" action="/app/">
-    <input type="hidden" name="controlador" value="Turnos" />
-    <input type="hidden" name="accion" value="getTurnosDisponibles" />
+  <form name="ver-planilla" id="ver-planilla" action="/turnos/disponibles/">
     <input type="hidden" name="id-paciente" id="id-paciente" value="{{idPaciente}}">
 
     <div class="section">
