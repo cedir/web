@@ -2,14 +2,14 @@
 from datetime import datetime, timedelta, date
 
 from django.db.models import Q
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, QueryDict
+from django.conf import settings
+from django.template import Context, loader
 from django.utils.dateparse import parse_date
 from rest_framework import viewsets
 
 from estudio.models import Estudio
 from managers.models import AuditLog, Usuario
-from managers.view.turnos import *
 from medico.models import Medico, Disponibilidad
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
@@ -19,6 +19,10 @@ from turno.models import InfoTurno
 from turno.models import Turno, Estado
 from turno.serializers import InfoTurnoSerializer
 from utils.security import encode
+
+import simplejson
+
+PIXELS_PER_MINUTE = 1.333
 
 spaDayNumbers = dict(lunes=0, martes=1, miercoles=2, jueves=3, viernes=4, sabado=5, domingo=6)
 spaDays = [u'lunes', u'martes', u'miércoles', u'jueves', u'viernes', u'sábado', u'domingo']
@@ -33,27 +37,23 @@ def get_buscar_turnos(request):
 
     cond = {}
 
-    paciente = ""
-    if 'paciente' in request.GET and request.GET['paciente'] != "":
-        paciente = request.GET['paciente']
+    paciente = request.GET.get('paciente', "")
+    if paciente:
         cond["paciente__apellido__icontains"] = paciente
 
-    fecha = ""
-    if 'fecha' in request.GET and request.GET['fecha'] != "":
-        fecha = request.GET['fecha']
+    fecha = request.GET.get('fecha', "")
+    if fecha:
         if "/" in fecha:
             fecha = fecha.replace(" ", "")
             fecha = fecha.split("/")[2] + "-" + fecha.split("/")[1] + "-" + fecha.split("/")[0]
         cond["fechaTurno"] = fecha
 
-    id_medico = 0
-    if 'id-medico' in request.GET and request.GET['id-medico'] != "":
-        id_medico = request.GET['id-medico']
+    id_medico = request.GET.get('id-medico') or 0
+    if id_medico:
         cond["medico__id"] = id_medico
 
-    id_sala = 0
-    if 'id-sala' in request.GET and request.GET['id-sala'] != "":
-        id_sala = request.GET['id-sala']
+    id_sala = request.GET.get('id-sala') or 0
+    if id_sala:
         cond["sala__id"] = id_sala
 
     ocultar_anulados = request.GET.get('ocultar-turnos-anulados', "false")
@@ -61,9 +61,9 @@ def get_buscar_turnos(request):
         cond["estado__id__lte"] = 2
 
     rows_limit = 110
+
     # default filter if its empty
-    a = cond.keys()
-    if len(a) == 0:
+    if not cond.keys():
         rows_limit = 50
 
     arr_turnos = Turno.objects.filter(**cond).order_by("-fechaTurno", 'horaInicio')[:rows_limit]
@@ -71,105 +71,109 @@ def get_buscar_turnos(request):
     obra_sociales = ObraSocial.objects.all().order_by('nombre')
     salas = Sala.objects.all().order_by('id')
 
-    view_turnos = ViewTurnos(request)
-    kwargs = {
-        'turnos': arr_turnos, 'fecha': fecha, 'idMedico': id_medico, 'medicos': medicos,
-        'obraSociales': obra_sociales, 'salas': salas, 'idSala': id_sala, 'paciente': paciente,
-        'ocultarAnulados': ocultar_anulados
-    }
-    return HttpResponse(view_turnos.getBuscarTurnos(**kwargs))
+    arr_hsh_turnos = [{
+        "id": turno.id,
+        "nombre": turno.paciente.nombre,
+        "apellido": turno.paciente.apellido,
+        "id_paciente": turno.paciente.id,
+        "fecha": _sql_date_to_normal_date(turno.fechaTurno),
+        "hora_inicio": turno.horaInicio,
+        "medico": turno.medico.apellido + ", " + turno.medico.nombre,
+        "obra_social": turno.obraSocial.nombre,
+        "observacion": turno.observacion,
+        "img_estado": turno.estado.img,
+        "practica": " - ".join([practica.mostrar() for practica in turno.practicas.all()])
+    } for turno in arr_turnos]
+
+    arr_medicos = [{
+       "id": medico.id,
+       "nombre": medico.nombre,
+       "apellido": medico.apellido,
+       "selected": 1 if medico.id == int(id_medico) else 0
+    } for medico in medicos]
+
+    arr_salas = [{
+        "id": sala.id,
+        "nombre": sala.nombre,
+        "selected": 1 if sala.id == int(id_sala) else 0
+    } for sala in salas]
+
+    arr_obras_sociales = [{
+        "id": medico.id,
+        "nombre": medico.nombre
+    } for medico in obra_sociales]
+
+    c = Context({
+        'turnos': arr_hsh_turnos,
+        'medicos': arr_medicos,
+        'fecha': _sql_date_to_normal_date(fecha),
+        'obrasSociales': arr_obras_sociales,
+        'salas': arr_salas,
+        'paciente': paciente,
+        'ocultarAnuladosState': 'checked' if ocultar_anulados == 'true' else '',
+        'logged_user_name': request.session["cedir_user_name"],
+    })
+
+    t = loader.get_template('turnos/buscarTurnos.html')
+
+    return HttpResponse(t.render(c))
 
 
 def get_turno(request, id_turno):
     turno = Turno.objects.get(id=id_turno)
     created_log = AuditLog.objects.filter(objectId=int(id_turno), objectTypeId=3, userActionId=1)
-    user = None
-    if len(created_log) > 0:
-        user = created_log[0].user.nombreUsuario
 
-    view_turnos = ViewTurnos()
-    kwargs = {'turno': turno, 'createdUser': user}
-    return HttpResponse(view_turnos.getTurno(**kwargs))
+    response_dict = {
+        "id": turno.id,
+        "fecha": turno.fechaTurno.strftime(settings.FORMAT_DATE),
+        "paciente": turno.paciente.apellido + ", " + turno.paciente.nombre,
+        "tel": turno.paciente.telefono,
+        "dni": turno.paciente.dni,
+        "paciente_id": turno.paciente.id,
+        "hora_inicio": str(turno.horaInicio),
+        "hora_fin_real": str(turno.horaFinReal),
+        "hora_fin": str(turno.horaFinEstimada),
+        "observacion": turno.observacion,
+        "fecha_otorgamiento": turno.fecha_otorgamiento.strftime(settings.FORMAT_DATETIME),
+        "medico": turno.medico.apellido + ", " + turno.medico.nombre,
+        "obra_social": turno.obraSocial.id,
+        "obra_social_nombre": turno.obraSocial.nombre,
+        "sala": turno.sala.nombre,
+        "estado": turno.estado.descripcion,
+        "creado_por": created_log[0].user.nombreUsuario if created_log else '-no disponible-',
+        "practicas": ' - '.join(map(lambda p: p.mostrar(), turno.practicas.all()))
+        # TODO: registrar el usuario que anula el turno y una observación al respecto
+        # "anulado_por": ...
+        # observacion_anulacion": ...
+    }
+
+    return HttpResponse(simplejson.dumps(response_dict))
 
 
-def get_turnos_disponibles(request, **kwargs):
-    # session check
-    if request.session.get('cedir_user_id') is None:
-        return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=2&next=%s' % request.path)
-
-    id_paciente = request.GET.get('id-paciente', kwargs.get('id-paciente')) or None
-    id_sala = request.GET.get('id-sala', kwargs.get('id-sala')) or 0
-    id_medico = request.GET.get('id-medico', kwargs.get('id-medico')) or 0
-    id_obra_social = request.GET.get('id-obra-social', kwargs.get('id-obra-social')) or 0
-
-    id_practicas = []
-    if 'id-practicas[]' in request.GET and request.GET['id-practicas[]'] != "":
-        id_practicas = request.GET.getlist('id-practicas[]')
-    else:
-        by_ref = kwargs.get('id-practicas[]', "")
-        if by_ref != "":
-            id_practicas = kwargs['id-practicas[]']
-
-    fecha = ""
-    if 'fecha' in request.GET and request.GET['fecha'] != "":
-        fecha = request.GET['fecha']
-
-    medicos = Medico.objects.all().order_by("apellido")
-    obra_sociales = ObraSocial.objects.all().order_by('nombre')
-    practicas = Practica.objects.all().order_by('-usedLevel', 'descripcion')
-    salas = Sala.objects.all().order_by('id')
-
-    paciente_seleccionado = None
-    if id_paciente is not None:
-        paciente_seleccionado = Paciente.objects.get(id=id_paciente)
-
-    selected_date = date.today()
-    if fecha != "":
-        selected_date = date(int(fecha.split("/")[2]), int(fecha.split("/")[1]), int(fecha.split("/")[0]))
-
-    selected_date = selected_date - timedelta(days=1)  # resto uno ya que nextDay le va a sumar uno luego
-
-    day_lines = []
-    if id_sala:
-        # estudiar si los arreglos se estan devolviendo por referencia y llamar aca a _get_day_lines q hace exact.
-        # lo mismo que este codigo
-        for i in range(0, 4):
-            next_date = _get_next_day(selected_date, id_sala, id_medico)
-            line = _get_day_lines(next_date, id_sala)
-            selected_date = next_date
-
-            day_lines.append(line)
-
-    view_turnos = ViewTurnos(request)
-    kwargs = {'dayLines': day_lines, 'pacienteSeleccionado': paciente_seleccionado, 'idMedico': id_medico,
-              'medicos': medicos, 'obraSociales': obra_sociales, 'idObraSocial': id_obra_social,
-              'practicas': practicas, 'idPracticas': id_practicas, 'salas': salas, 'idSala': id_sala,
-              'fecha': fecha}
-    return HttpResponse(view_turnos.getTurnosDisponibles(**kwargs))
+def get_turnos_disponibles(request):
+    return _get_turnos_disponibles(request.session, request.GET, request.path)
 
 
 def get_next_day_line(request):
     fecha = request.GET['fecha']
-    id_sala = request.GET['id-sala']
+    id_sala = request.GET['id-sala'] or 0
     id_medico = request.GET.get('id-medico') or 0
     sp = fecha.split('-')
     c = date(int(sp[0]), int(sp[1]), int(sp[2]))
     next_date = _get_next_day(c, id_sala, id_medico)
-    day_lines = [_get_day_lines(next_date, id_sala)]
-    view_turnos = ViewTurnos()
-    return HttpResponse(view_turnos.getDayLines(day_lines))
+    day_lines = _get_day_line(next_date, id_sala)
+    return HttpResponse(day_lines)
 
 
 def get_back_day_line(request):
     fecha = request.GET['fecha']
-    id_sala = request.GET['id-sala']
+    id_sala = request.GET['id-sala'] or 0
     id_medico = request.GET.get('id-medico') or 0
     sp = fecha.split('-')
     c = date(int(sp[0]), int(sp[1]), int(sp[2]))
     back_date = _get_previous_day(c, id_sala, id_medico)
-    day_lines = [_get_day_lines(back_date, id_sala)]
-    view_turnos = ViewTurnos()
-    return HttpResponse(view_turnos.getDayLines(day_lines))
+    day_lines = _get_day_line(back_date, id_sala)
+    return HttpResponse(day_lines)
 
 
 def guardar(request):
@@ -363,14 +367,18 @@ def reprogramar(request, id_turno):
         turno.estado = estado
         turno.save()
         practicas = turno.practicas.all()
-        kwargs = {
+
+        # generamos una estructura de datos similar a request.GET
+        data = QueryDict('', mutable=True)
+        data.update({
             'id-sala': turno.sala.id,
             'id-paciente': turno.paciente.id,
             'id-medico': turno.medico.id,
             'id-obra-social': turno.obraSocial.id,
             'id-practicas[]': [str(practica.id) for practica in practicas]
-        }
-        return get_turnos_disponibles(request, **kwargs)
+        })
+
+        return _get_turnos_disponibles(request.session, data, request.path)
     except Exception as err:
         return str(err)
 
@@ -393,15 +401,52 @@ def confirmar(request, id_turno):
         return str(err)
 
 
-def _get_day_lines(fecha, id_sala):
+def _get_day_line(fecha, id_sala):
     dia = spaDays[fecha.weekday()]
     mes = spaMonths[fecha.month]
-    return {
-        "fecha": str(fecha),
-        "dia": dia + ' ' + str(fecha.day) + ' de ' + mes + ' del ' + str(fecha.year),
-        "turnos": Turno.objects.filter(fechaTurno=fecha, sala__id=int(id_sala), estado__id__lt=3),
-        "disponibilidad": _get_disponibilidad(dia, id_sala)
-    }
+
+    fecha_format = str(fecha)
+    dia_format = dia + ' ' + str(fecha.day) + ' de ' + mes + ' del ' + str(fecha.year)
+    turnos = Turno.objects.filter(fechaTurno=fecha, sala__id=int(id_sala), estado__id__lt=3)
+    disponibilidad = Disponibilidad.objects \
+        .filter(dia=dia, sala__id=id_sala, fecha__lte=date.today()) \
+        .order_by('horaInicio')
+
+    colors = ('#71FF86', '#fffccc', '#A6C4FF')
+    day_line_template = loader.get_template('turnos/dayLine.html')
+
+    arr_hsh_turnos = [{
+          "id": turno.id,
+          "paciente": turno.paciente.nombre + ' ' + turno.paciente.apellido,
+          "top": (((turno.horaInicio.hour - 7) * 60) + turno.horaInicio.minute) * PIXELS_PER_MINUTE + 11,
+          "fecha": turno.fechaTurno,
+          "hora": turno.horaInicio,
+          "duracion": turno.getDuracionEnMinutos(),
+          "duracionEnPixeles": turno.getDuracionEnMinutos() * PIXELS_PER_MINUTE - (1 * PIXELS_PER_MINUTE),
+          "medico": turno.medico.nombre + ' ' + turno.medico.apellido,
+          "obra_social": turno.obraSocial.nombre,
+          "practicas": u'-'.join([p.mostrar() for p in turno.practicas.all()])
+      } for turno in turnos]
+
+    arr_hsh_disponibilidad = [{
+          "id": disp.id,
+          "top": (((disp.horaInicio.hour - 7) * 60) + disp.horaInicio.minute) * PIXELS_PER_MINUTE + 9,
+          "fecha": disp.fecha,
+          "hora": disp.horaInicio,
+          "duracionEnPixeles": disp.getDuracionEnMinutos() * PIXELS_PER_MINUTE,
+          "medico": " ".join(list(disp.medico.apellido)),
+          "color": colors[index % 3],
+          "sala": disp.sala.nombre
+      } for (index, disp) in enumerate(disponibilidad)]
+
+    day_line_context = Context({
+        'lineDay': dia_format,
+        'fechaTurno': fecha_format,
+        'turnos': arr_hsh_turnos,
+        'disponibilidades': arr_hsh_disponibilidad
+    })
+
+    return day_line_template.render(day_line_context)
 
 
 def _get_next_day(cur_date, id_sala, id_medico=None):
@@ -445,16 +490,96 @@ def _get_previous_day(curr_date, id_sala, id_medico=None):
     return curr_date - timedelta(days=1)
 
 
-def _get_disponibilidad(dia, id_sala):
-    today = date.today()
-    disponibilidades = Disponibilidad.objects \
-        .filter(dia=dia, sala__id=id_sala, fecha__lte=today) \
-        .order_by('horaInicio')
+def _get_turnos_disponibles(session, data, path):
+    # session check
+    if not session.get('cedir_user_id'):
+        return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=2&next=%s' % path)
 
-    # como se trae el historial de disp menor a hoy, hay que tomar la de fecha mas alta por medico*.
-    # Esa logica puede hacerse aca
-    # *se asume que en un dia determinado (lunes) el medico solo atiende una vez en esa sala
-    return disponibilidades
+    id_paciente = data.get('id-paciente')
+    id_sala = data.get('id-sala') or 0
+    id_medico = data.get('id-medico') or 0
+    id_obra_social = data.get('id-obra-social') or 0
+    id_practicas = data.getlist('id-practicas[]') or []
+    fecha = data.get('fecha', "")
+
+    medicos = Medico.objects.all().order_by("apellido")
+    obra_sociales = ObraSocial.objects.all().order_by('nombre')
+    practicas = Practica.objects.all().order_by('-usedLevel', 'descripcion')
+    salas = Sala.objects.all().order_by('id')
+
+    paciente_seleccionado = Paciente.objects.get(id=id_paciente) if id_paciente else None
+
+    selected_date = date(int(fecha.split("/")[2]), int(fecha.split("/")[1]), int(fecha.split("/")[0]))\
+        if fecha else date.today()
+
+    selected_date = selected_date - timedelta(days=1)  # resto uno ya que nextDay le va a sumar uno luego
+
+    day_lines = []
+    if id_sala:
+        # estudiar si los arreglos se estan devolviendo por referencia y llamar aca a _get_day_line q hace exact.
+        # lo mismo que este codigo
+        for i in range(0, 4):
+            next_date = _get_next_day(selected_date, id_sala, id_medico)
+            line = _get_day_line(next_date, id_sala)
+            selected_date = next_date
+            day_lines.append(line)
+
+    arr_medicos = [{
+        "id": medico.id,
+        "nombre": medico.nombre,
+        "apellido": medico.apellido,
+        "selected": 1 if medico.id == int(id_medico) else 0
+    } for medico in medicos]
+
+    arr_salas = [{
+        "id": sala.id,
+        "nombre": sala.nombre,
+        "selected": 1 if sala.id == int(id_sala) else 0
+    } for sala in salas]
+
+    arr_obras_sociales = [{
+        "id": medico.id,
+        "nombre": medico.nombre,
+        "selected": 1 if medico.id == int(id_obra_social) else 0
+    } for medico in obra_sociales]
+
+    arr_practicas = [{
+        "id": practica.id,
+        "nombre": practica.descripcion,
+        "selected": 1 if str(practica.id) in id_practicas else 0
+    } for practica in practicas]
+
+    c = Context({
+        'dayLines': day_lines,
+        'nombrePaciente': paciente_seleccionado.nombre if paciente_seleccionado else "",
+        'apellidoPaciente': paciente_seleccionado.apellido if paciente_seleccionado else "",
+        'idPaciente': paciente_seleccionado.id if paciente_seleccionado else "",
+        'showLines': bool(day_lines),
+        'medicos': arr_medicos,
+        'obrasSociales': arr_obras_sociales,
+        'practicas': arr_practicas,
+        'salas': arr_salas,
+        'fecha': fecha,
+        'logged_user_name': session["cedir_user_name"],
+    })
+
+    t = loader.get_template('turnos/buscarTurnosDisponibles.html')
+
+    return HttpResponse(t.render(c))
+
+
+def _sql_date_to_normal_date(date_time):
+    if str(date_time) == "":
+        return ""
+    try:
+        arr = str(date_time).split(" ")
+        arr2 = arr[0].split("-")
+        time = ""
+        if len(arr) > 1:
+            time = arr[1]
+        return arr2[2] + "/" + arr2[1] + "/" + arr2[0] + " " + time
+    except Exception:
+        return str(date_time)
 
 
 class InfoTurnoViewSet(viewsets.ModelViewSet):
