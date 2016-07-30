@@ -1,6 +1,3 @@
-from django.http import HttpResponse
-
-from managers.controller.turnos import *
 from managers.controller.root import *
 from managers.controller.pacientes import *
 

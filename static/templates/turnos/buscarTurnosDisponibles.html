@@ -260,7 +260,7 @@
       <a href='javascript:getBack();'><img src="/media/images/turnos/back_button_64.png" title="back" alt="back" border=0></a>
       <a href="javascript:getNext();"><img src="/media/images/turnos/next_button_64.png" title="next" alt="next" border=0></a>
     </div>
-    <div id="lineasSector">{{dayLines}}</div>
+    <div id="lineasSector">{% for dayLine in dayLines %} {{dayLine}} {% endfor %}</div>
   </div>
 
 
