@@ -14,7 +14,7 @@ class Medicamento(models.Model):
     importe = models.DecimalField(db_column=u'importeMedicamento', max_digits=16, decimal_places=2, default='0.00')
     stock = models.PositiveSmallIntegerField(max_length=16, )
     tipo = models.CharField(max_length=100, default=u'Medicación', choices=TIPOS_MEDICAMENTOS)
-    codigo_osde = models.CharField(max_length=100, db_column=u'codigoMedicoOSDE', default=u'')
+    codigo_osde = models.CharField(max_length=100, db_column=u'codigoMedicoOSDE', blank=True, default=u'')
 
     class Meta:
         db_table = 'tblMedicamentos'
@@ -28,10 +28,24 @@ class Movimiento(models.Model):
     hora = models.TimeField()
     cantidad = models.IntegerField(max_length=10, )
     descripcion = models.CharField(max_length=300)
-    medicamento = models.ForeignKey(Medico, db_column=u'idMedicamento')
+    medicamento = models.ForeignKey(Medicamento, db_column=u'idMedicamento')
 
     class Meta:
         db_table = 'tblMovimientosDeMedicamentos'
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def save(self, *args, **kwargs):
+        """ Disable update"""
+        if self.id:
+            return
+        super(Movimiento, self).save(*args, **kwargs)
+
+        # actualizar stock en medicamento
+        medicamento = Medicamento.objects.get(pk=self.medicamento.id)  # refresh data
+        medicamento.stock += self.cantidad
+        medicamento.save()
+
+# TODO: ver si se peude hacer esto con el post-save de signals
+# TODO: ver por que aparece None en el listado de medicamentos para el campo tipo solo cuando es medicamento
