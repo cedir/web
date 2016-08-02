@@ -49,5 +49,5 @@ def update_stock_medicamento(sender, instance, **kwargs):
     medicamento.stock += instance.cantidad
     medicamento.save()
 
-post_save.connect(update_stock_medicamento, sender=Movimiento, dispatch_uid="update_template_params")
+post_save.connect(update_stock_medicamento, sender=Movimiento, dispatch_uid="update_stock_medicamentos")
 
