@@ -1,10 +1,11 @@
 # -*- coding: utf-8
 from django.db import models
+from django.db.models.signals import post_save
 from medico.models import Medico
 
 TIPOS_MEDICAMENTOS = (
-    ('Mat Esp', 'Material Especifico'),
-    ('Medicación', 'Medicación'),
+    (u'Mat Esp', 'Material Especifico'),
+    (u'Medicación', 'Medicación'),
 )
 
 
@@ -42,10 +43,11 @@ class Movimiento(models.Model):
             return
         super(Movimiento, self).save(*args, **kwargs)
 
-        # actualizar stock en medicamento
-        medicamento = Medicamento.objects.get(pk=self.medicamento.id)  # refresh data
-        medicamento.stock += self.cantidad
-        medicamento.save()
 
-# TODO: ver si se peude hacer esto con el post-save de signals
-# TODO: ver por que aparece None en el listado de medicamentos para el campo tipo solo cuando es medicamento
+def update_stock_medicamento(sender, instance, **kwargs):
+    medicamento = Medicamento.objects.get(pk=instance.medicamento.id)  # refresh data
+    medicamento.stock += instance.cantidad
+    medicamento.save()
+
+post_save.connect(update_stock_medicamento, sender=Movimiento, dispatch_uid="update_template_params")
+
