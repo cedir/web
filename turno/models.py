@@ -44,3 +44,14 @@ class InfoTurno(models.Model):
     obra_sociales = models.ManyToManyField(ObraSocial, null=True, blank=True)
     practicas = models.ManyToManyField(Practica, null=True, blank=True)
     texto = models.TextField()
+
+    def get_obras_sociales_as_string(self):
+        return u' - '.join([obra_social.nombre for obra_social in self.obra_sociales.all()])
+
+    get_obras_sociales_as_string.short_description = 'Obras Sociales'
+
+    def get_practicas_as_string(self):
+        return u' - '.join([practica.abreviatura if practica.abreviatura else practica.descripcion for practica in self.practicas.all()])
+
+    get_practicas_as_string.short_description = 'Practicas'
+
