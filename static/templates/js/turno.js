@@ -229,7 +229,7 @@ function getEdit(event) {
     success: function(data) {
       modal.find("#popup-paciente")
            .text(data.paciente)
-           .attr("href", "/app/?controlador=Pacientes&accion=getUpdate&id=" + data.paciente_id);
+           .attr("href", "/paciente/" + data.paciente_id + "/editar/");
 
       modal.find("#popup-paciente-tel").text(data.tel);
       modal.find("#popup-paciente-dni").text(data.dni);
@@ -445,10 +445,10 @@ function createPaciente(createTurno) {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/paciente/nuevo/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Pacientes&accion=crear&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
+    data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
       "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
       "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
     success: function(data) {
@@ -457,7 +457,7 @@ function createPaciente(createTurno) {
         if (createTurno) {
           window.location.href = "/turnos/disponibles/?id-paciente=" + data.idPaciente;
         } else {
-          window.location.href = "/app/?controlador=Pacientes&accion=getBuscar&dni=" + dni;
+          window.location.href = "/paciente/buscar/?dni=" + dni;
         }
       } else { //error
         alert(data.message);
@@ -500,10 +500,10 @@ function createAndAsignPaciente(createTurno) { //TODO: aca llamar a createPacien
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/paciente/nuevo/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Pacientes&accion=crear&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
+    data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
       "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
       "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
     success: function(data) {
@@ -522,7 +522,7 @@ function createAndAsignPaciente(createTurno) { //TODO: aca llamar a createPacien
 
 function updatePaciente() { //TODO: aca llamar a createPaciente para no repetir codigo
   var rand = Math.round(100 * Math.random());
-  var id = $("#id").val();
+  var form = $("#form1");
   var nombre = $("#txtNombre").val();
   var apellido = $("#txtApellido").val();
   var dni = $("#txtDni").val();
@@ -552,16 +552,16 @@ function updatePaciente() { //TODO: aca llamar a createPaciente para no repetir 
   }
 
   $.ajax({
-    url: '/app/',
+    url: form.attr('action'),
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Pacientes&accion=update&id=" + id + "&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
-      "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
+    data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
+      "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
       "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
-        window.location.href = "/app/?controlador=Pacientes&accion=getBuscar&dni=" + dni;
+        window.location.href = "/paciente/buscar/?dni=" + dni;
       } else { //error
         alert(data.message);
       }
@@ -578,7 +578,7 @@ function buscarPacientes() {
   var nombre = $("#nombrePacienteBuscar").val();
   var dni = $("#dniPacienteBuscar").val();
 
-  $.get("/app/?controlador=Pacientes&accion=getBuscar&apellido=" + apellido + "&nombre=" + nombre + "&dni=" + dni + "&requestType=ajax" + "&_nocache=" + rand, function(data) {
+  $.get("/paciente/buscar/?apellido=" + apellido + "&nombre=" + nombre + "&dni=" + dni + "&requestType=ajax" + "&_nocache=" + rand, function(data) {
     $('.result').html(data);
   });
 }

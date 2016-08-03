@@ -1,5 +1,4 @@
 from managers.controller.root import *
-from managers.controller.pacientes import *
 
 def dispatch(request):
     if (request.GET.has_key('controlador')):
