@@ -50,3 +50,8 @@ class InfoTurno(models.Model):
 
     get_obras_sociales_as_string.short_description = 'Obras Sociales'
 
+    def get_practicas_as_string(self):
+        return u' - '.join([practica.abreviatura if practica.abreviatura else practica.descripcion for practica in self.practicas.all()])
+
+    get_practicas_as_string.short_description = 'Practicas'
+
