@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.http import HttpResponse,HttpResponseRedirect
+from django.shortcuts import redirect
+from django.http import HttpResponse
 from django.template import Context, loader
 from paciente.models import Paciente
 from datetime import datetime
@@ -8,15 +9,15 @@ import simplejson
 
 def get_create(request):
     # session check
-    if request.session.get('cedir_user_id') is None:
-        return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=2&next=%s' % request.path)
+    if not request.user.is_authenticated():
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     if request.method == 'POST':
         return HttpResponse(_create(request))
     else:
         c = Context({
             'isCreate': 1,
-            'logged_user_name': request.session["cedir_user_name"],
+            'logged_user_name': request.user.username,
         })
 
         t = loader.get_template('turnos/ABMPaciente.html')
@@ -25,8 +26,8 @@ def get_create(request):
 
 def get_update(request, id_paciente):
     # session check
-    if request.session.get('cedir_user_id') is None:
-        return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=2&next=%s' % request.path)
+    if not request.user.is_authenticated():
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     paciente = Paciente.objects.get(pk=id_paciente)
 
@@ -48,7 +49,7 @@ def get_update(request, id_paciente):
             u'sexo': paciente.sexo,
             u'nro_afiliado': paciente.nroAfiliado,
             u'email': paciente.email or u'',
-            u'logged_user_name': request.session["cedir_user_name"],
+            u'logged_user_name': request.user.username,
         })
 
         t = loader.get_template('turnos/ABMPaciente.html')
@@ -57,8 +58,8 @@ def get_update(request, id_paciente):
 
 def get_buscar(request):
     # session check
-    if request.session.get('cedir_user_id') is None:
-        return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=2&next=%s' % request.path)
+    if not request.user.is_authenticated():
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     cond = {}
 
@@ -90,7 +91,7 @@ def get_buscar(request):
     } for paciente in pacientes]
 
     c = Context({
-        'logged_user_name': request.session["cedir_user_name"],
+        'logged_user_name': request.user.username,
         'pacientes': arr_hsh_pacientes,
         'apellido': apellido,
         'dni': dni,

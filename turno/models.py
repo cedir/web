@@ -36,7 +36,7 @@ class Turno(models.Model):
         return (self.horaFinEstimada.hour * 60 + self.horaFinEstimada.minute) - (self.horaInicio.hour * 60 + self.horaInicio.minute)
 
     def __unicode__(self):
-        return str(self.id)
+        return u"Turno: id={0}, fecha={1}, paciente={2}, OS={3}".format(self.id, self.fechaTurno, self.paciente, self.obraSocial)
 
 
 class InfoTurno(models.Model):

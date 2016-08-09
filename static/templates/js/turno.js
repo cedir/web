@@ -364,7 +364,7 @@ function getHorarioAtencionMedico() {
   $.ajax({
     url: '/app/',
     dataType: 'json',
-    data: "controlador=Root&accion=getDisponibilidadMedicosJson&id-medico=" + medicoId + "&_nocache=" + rand,
+    data: "/medicos/disponibilidad/json/?id-medico=" + medicoId + "&_nocache=" + rand,
     success: function(data) {
       var medico = $("#id-medico option:selected").text();
       $('#med-horario').html("<b>" + medico + "</b>" + data.horario);
@@ -578,7 +578,7 @@ function buscarPacientes() {
   var nombre = $("#nombrePacienteBuscar").val();
   var dni = $("#dniPacienteBuscar").val();
 
-  $.get("/paciente/buscar/?apellido=" + apellido + "&nombre=" + nombre + "&dni=" + dni + "&requestType=ajax" + "&_nocache=" + rand, function(data) {
+  $.get("/paciente/buscar/?apellido=" + apellido + "&nombre=" + nombre + "&dni=" + dni + "&request_type=ajax" + "&_nocache=" + rand, function(data) {
     $('.result').html(data);
   });
 }
@@ -612,10 +612,10 @@ function createHorario() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/disponibilidad/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Root&accion=crearDisponibilidad&hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
+    data: "hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
@@ -665,9 +665,9 @@ function getUpdateHorario(event) {
   $("#btnGuardar").show();
 
   $.ajax({
-    url: '/app/',
+    url: '/disponibilidad/',
     dataType: 'json',
-    data: "controlador=Root&accion=getDisponibilidad&id=" + id,
+    data: "id=" + id,
     success: function(data) {
       modal.find("#hora_desde").val(data.hora_inicio);
       modal.find("#hora_hasta").val(data.hora_fin);
@@ -717,10 +717,10 @@ function updateHorario() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/disponibilidad/actualizar/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Root&accion=updateDisponibilidad&id=" + id + "&hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
+    data: "id=" + id + "&hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
@@ -743,10 +743,10 @@ function eliminarHorario() {
   }
   var id = $("#current-disponibilidad-id").val();
   $.ajax({
-    url: '/app/',
+    url: '/disponibilidad/eliminar/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Root&accion=deleteDisponibilidad&id=" + id,
+    data: "id=" + id,
     success: function(data) {
       if (data.status) {
         alert(data.message);

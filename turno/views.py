@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
 
+from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect, QueryDict
+from django.shortcuts import redirect
+from django.http import HttpResponse, QueryDict
 from django.conf import settings
 from django.template import Context, loader
 from django.utils.dateparse import parse_date
 from rest_framework import viewsets
 
 from estudio.models import Estudio
-from managers.models import AuditLog, Usuario
 from medico.models import Medico, Disponibilidad
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
@@ -23,17 +25,29 @@ from utils.security import encode
 import simplejson
 
 PIXELS_PER_MINUTE = 1.333
-
+err_ses = 'Error, la sesión se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo.'
 spaDayNumbers = dict(lunes=0, martes=1, miercoles=2, jueves=3, viernes=4, sabado=5, domingo=6)
 spaDays = [u'lunes', u'martes', u'miércoles', u'jueves', u'viernes', u'sábado', u'domingo']
 spaMonths = [None, u'enero', u'febrero', u'marzo', u'abril', u'mayo', u'junio', u'julio', u'agosto', u'setiembre',
              u'octubre', u'noviembre', u'diciembre']
 
 
+def get_home(request):
+    # session check
+    if not request.user.is_authenticated():
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+    c = Context({
+        'logged_user_name': request.user.username,
+    })
+    t = loader.get_template('turnos/home.html')
+    return HttpResponse(t.render(c))
+
+
 def get_buscar_turnos(request):
     # session check
-    if request.session.get('cedir_user_id') is None:
-        return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=2&next=%s' % request.path)
+    if not request.user.is_authenticated():
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     cond = {}
 
@@ -111,7 +125,7 @@ def get_buscar_turnos(request):
         'salas': arr_salas,
         'paciente': paciente,
         'ocultarAnuladosState': 'checked' if ocultar_anulados == 'true' else '',
-        'logged_user_name': request.session["cedir_user_name"],
+        'logged_user_name': request.user.username,
     })
 
     t = loader.get_template('turnos/buscarTurnos.html')
@@ -121,7 +135,8 @@ def get_buscar_turnos(request):
 
 def get_turno(request, id_turno):
     turno = Turno.objects.get(id=id_turno)
-    created_log = AuditLog.objects.filter(objectId=int(id_turno), objectTypeId=3, userActionId=1)
+    ct = ContentType.objects.get_for_model(Turno)
+    created_log = LogEntry.objects.filter(content_type_id=ct.id, action_flag=ADDITION, object_id=id_turno)
 
     response_dict = {
         "id": turno.id,
@@ -140,7 +155,7 @@ def get_turno(request, id_turno):
         "obra_social_nombre": turno.obraSocial.nombre,
         "sala": turno.sala.nombre,
         "estado": turno.estado.descripcion,
-        "creado_por": created_log[0].user.nombreUsuario if created_log else '-no disponible-',
+        "creado_por": created_log[0].user.username if created_log else '-no disponible-',
         "practicas": ' - '.join(map(lambda p: p.mostrar(), turno.practicas.all()))
         # TODO: registrar el usuario que anula el turno y una observación al respecto
         # "anulado_por": ...
@@ -151,7 +166,11 @@ def get_turno(request, id_turno):
 
 
 def get_turnos_disponibles(request):
-    return _get_turnos_disponibles(request.session, request.GET, request.path)
+    # session check
+    if not request.user.is_authenticated():
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+
+    return _get_turnos_disponibles(request.user, request.GET)
 
 
 def get_next_day_line(request):
@@ -177,13 +196,11 @@ def get_back_day_line(request):
 
 
 def guardar(request):
-    err_ses = 'Error, la sesión se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo.'
     err_sup = 'Error, se ha detectado superposición de turnos. Por favor, haga click en Mostrar y vuelva a intentarlo.'
     # session check
-    if request.session.get('cedir_user_id') is None:
+    if not request.user.is_authenticated():
         resp_dict = {'status': 0, 'message': err_ses}
-        json = simplejson.dumps(resp_dict)
-        return HttpResponse(json)
+        return HttpResponse(simplejson.dumps(resp_dict))
 
     hora_inicio = request.GET['hora_inicio']
     hora_fin_estimada = request.GET['hora_fin_estimada']
@@ -232,24 +249,21 @@ def guardar(request):
 
         turno.save()
 
-        log = AuditLog()
-        log.user = Usuario.objects.get(id=int(request.session.get('cedir_user_id')))
-        log.userActionId = 1
-        log.objectTypeId = 3
-        log.objectId = turno.id
-        log.dateTime = datetime.now()
-        log.observacion = ''
-        log.save()
+        _log_state_changed(turno, request.user, ADDITION, 'NUEVO')
 
         resp_dict = {'status': 1, 'message': "El turno se ha creado correctamente."}
-        json = simplejson.dumps(resp_dict)
-        return HttpResponse(json)
+        return HttpResponse(simplejson.dumps(resp_dict))
 
     except Exception as err:
         return str(err)
 
 
 def update(request, id_turno):
+    # session check
+    if not request.user.is_authenticated():
+        resp_dict = {'status': 0, 'message': err_ses}
+        return HttpResponse(simplejson.dumps(resp_dict))
+
     id_obra_social = request.GET['id-obra-social']
     observacion = request.GET['observacion']
 
@@ -268,6 +282,8 @@ def update(request, id_turno):
         turno.observacion = observacion
         turno.save()
 
+        _log_state_changed(turno, request.user, CHANGE, "MODIFICACION: Obs={0}, OS={1}".format(observacion, obra_social))
+
         response_dict = {'status': 1, 'message': "El turno se ha guardado correctamente."}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
@@ -277,6 +293,10 @@ def update(request, id_turno):
 
 
 def anunciar(request, id_turno):
+    if not request.user.is_authenticated():
+        resp_dict = {'status': 0, 'message': err_ses}
+        return HttpResponse(simplejson.dumps(resp_dict))
+
     try:
         turno = Turno.objects.get(id=id_turno)
     except Turno.DoesNotExist:
@@ -320,14 +340,7 @@ def anunciar(request, id_turno):
             estudio.save()
 
             # log estudio
-            log = AuditLog()
-            log.user = Usuario.objects.get(id=int(request.session.get('cedir_user_id')))
-            log.userActionId = 1
-            log.objectTypeId = 1
-            log.objectId = estudio.id
-            log.dateTime = datetime.now()
-            log.observacion = 'creado desde turnos'
-            log.save()
+            _log_state_changed(estudio, request.user, ADDITION, 'NUEVO (desde turnos)')
 
         response_dict = {'status': True, 'message': "Success"}
         json = simplejson.dumps(response_dict)
@@ -340,6 +353,10 @@ def anunciar(request, id_turno):
 
 
 def anular(request, id_turno):
+    if not request.user.is_authenticated():
+        resp_dict = {'status': 0, 'message': err_ses}
+        return HttpResponse(simplejson.dumps(resp_dict))
+
     turno = Turno.objects.get(id=id_turno)
     if turno is None:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
@@ -350,6 +367,9 @@ def anular(request, id_turno):
     try:
         turno.estado = estado
         turno.save()
+
+        _log_state_changed(turno, request.user, CHANGE, "ANULACION")
+
         response_dict = {'status': 1, 'message': "El turno se ha anulado correctamente."}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
@@ -358,6 +378,10 @@ def anular(request, id_turno):
 
 
 def reprogramar(request, id_turno):
+    if not request.user.is_authenticated():
+        resp_dict = {'status': 0, 'message': err_ses}
+        return HttpResponse(simplejson.dumps(resp_dict))
+
     turno = Turno.objects.get(id=id_turno)
     if turno is None:
         return get_buscar_turnos(request)
@@ -366,6 +390,9 @@ def reprogramar(request, id_turno):
     try:
         turno.estado = estado
         turno.save()
+
+        _log_state_changed(turno, request.user, CHANGE, "REPROGRAMA")
+
         practicas = turno.practicas.all()
 
         # generamos una estructura de datos similar a request.GET
@@ -378,12 +405,16 @@ def reprogramar(request, id_turno):
             'id-practicas[]': [str(practica.id) for practica in practicas]
         })
 
-        return _get_turnos_disponibles(request.session, data, request.path)
+        return _get_turnos_disponibles(request.user, data)
     except Exception as err:
         return str(err)
 
 
 def confirmar(request, id_turno):
+    if not request.user.is_authenticated():
+        resp_dict = {'status': 0, 'message': err_ses}
+        return HttpResponse(simplejson.dumps(resp_dict))
+
     turno = Turno.objects.get(id=id_turno)
     if turno is None:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
@@ -394,6 +425,8 @@ def confirmar(request, id_turno):
     try:
         turno.estado = estado
         turno.save()
+        _log_state_changed(turno, request.user, CHANGE, "CONFIRMACION")
+
         response_dict = {'status': 1, 'message': "El turno se ha confirmado correctamente."}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
@@ -490,11 +523,7 @@ def _get_previous_day(curr_date, id_sala, id_medico=None):
     return curr_date - timedelta(days=1)
 
 
-def _get_turnos_disponibles(session, data, path):
-    # session check
-    if not session.get('cedir_user_id'):
-        return HttpResponseRedirect('?controlador=Root&accion=getLogin&error_id=2&next=%s' % path)
-
+def _get_turnos_disponibles(user, data):
     id_paciente = data.get('id-paciente')
     id_sala = data.get('id-sala') or 0
     id_medico = data.get('id-medico') or 0
@@ -560,7 +589,7 @@ def _get_turnos_disponibles(session, data, path):
         'practicas': arr_practicas,
         'salas': arr_salas,
         'fecha': fecha,
-        'logged_user_name': session["cedir_user_name"],
+        'logged_user_name': user.username,
     })
 
     t = loader.get_template('turnos/buscarTurnosDisponibles.html')
@@ -580,6 +609,17 @@ def _sql_date_to_normal_date(date_time):
         return arr2[2] + "/" + arr2[1] + "/" + arr2[0] + " " + time
     except Exception:
         return str(date_time)
+
+
+def _log_state_changed(turno, user, mode, message):
+    ct = ContentType.objects.get_for_model(type(turno))
+    LogEntry.objects.log_action(
+        user_id=user.id,
+        content_type_id=ct.pk,
+        object_id=turno.pk,
+        object_repr=turno.__unicode__(),
+        action_flag=mode,
+        change_message=message)
 
 
 class InfoTurnoViewSet(viewsets.ModelViewSet):

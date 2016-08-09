@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from rest_framework import routers
-from turno.views import anunciar, anular, reprogramar, confirmar, guardar, update, get_turno, get_buscar_turnos, get_turnos_disponibles, get_next_day_line, get_back_day_line, InfoTurnoViewSet
+from turno.views import anunciar, anular, reprogramar, confirmar, guardar, update, get_home, get_turno, get_buscar_turnos, get_turnos_disponibles, get_next_day_line, get_back_day_line, InfoTurnoViewSet
 
 
 router = routers.DefaultRouter()
@@ -10,6 +10,7 @@ urlpatterns = patterns(
     '',
     url(r'^api/turno/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^turnos/$', get_home),
     url(r'^turnos/buscar/', get_buscar_turnos),
     url(r'^turnos/disponibles/', get_turnos_disponibles),
     url(r'^turnos/nextday/', get_next_day_line),
