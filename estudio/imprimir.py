@@ -31,7 +31,7 @@ def generar_informe(response, estudio):
     _datos_estudio(elements, estudio)
     _informe(elements, estudio)
 
-    doc.build(elements, onFirstPage=_draw_firstpage_frame(estudio))
+    doc.build(elements, onFirstPage=_draw_firstpage_frame(estudio), onLaterPages=_draw_firstpage_frame(estudio, False))
     return response
 
 
@@ -81,7 +81,7 @@ def _informe(elements, estudio):
     elements.append(Paragraph(estudio.informe.replace(u'\r', u'').replace(u'\n', u'<br/>'), font_std))
 
 
-def _draw_firstpage_frame(estudio):
+def _draw_firstpage_frame(estudio, imprimeLinea=True):
     # armamos un clausura porque necesitamos acceder a información del estudio
     def _pie(canvas, doc):
         # calculamos algunas dimensiones
@@ -92,7 +92,9 @@ def _draw_firstpage_frame(estudio):
         canvas.saveState()
 
         # dibujamos las dos líneas
-        canvas.line(doc.leftMargin, linea_superior, width - doc.rightMargin, linea_superior)
+        if imprimeLinea:
+            canvas.line(doc.leftMargin, linea_superior, width - doc.rightMargin, linea_superior)
+
         canvas.line(doc.leftMargin, linea_inferior, width - doc.rightMargin, linea_inferior)
 
         # dibujamos la imágen
