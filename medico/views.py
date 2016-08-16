@@ -52,11 +52,13 @@ def get_disponibilidad_medicos(request):
       'salas': arr_salas,
       'dias': dias,
     })
+
     t = loader.get_template('turnos/disponibilidadMedicosAMB.html')
+
     return HttpResponse(t.render(c))
 
 
-def get_disponibilidad_medicos_json(request):
+def get_disponibilidad_medico(request, id_medico):
     # session check
     if not request.user.is_authenticated():
         response_dict = {
@@ -67,7 +69,6 @@ def get_disponibilidad_medicos_json(request):
 
     cond = {}
 
-    id_medico = request.GET.get('id-medico', 0)
     if id_medico:
         cond["medico__id"] = id_medico
 
@@ -81,7 +82,7 @@ def get_disponibilidad_medicos_json(request):
     return HttpResponse(simplejson.dumps(response_dict))
 
 
-def get_disponibilidad(request):
+def get_disponibilidad(request, id_disponibilidad):
     # session check
     if not request.user.is_authenticated():
         response_dict = {
@@ -90,34 +91,18 @@ def get_disponibilidad(request):
         }
         return simplejson.dumps(response_dict)
 
-    if request.method == 'POST':
-        disponibilidad = Disponibilidad()
-        disponibilidad.dia = request.POST['id-dia']
-        disponibilidad.horaInicio = request.POST['hora_desde']
-        disponibilidad.horaFin = request.POST['hora_hasta']
-        disponibilidad.fecha = datetime.now()
-        disponibilidad.medico_id = request.POST['id-medico']
-        disponibilidad.sala_id = request.POST['id-sala']
-        disponibilidad.save(force_insert=True)
+    disponibilidad = Disponibilidad.objects.get(id=id_disponibilidad)
 
-        response_dict = {
-            'status': 1,
-            'message': "El horario se ha creado correctamente."
-        }
-    else:
-        id_disponibilidad = request.GET['id']
-        disponibilidad = Disponibilidad.objects.get(id=id_disponibilidad)
-
-        response_dict = {
-            'id': disponibilidad.id, "hora_inicio": str(disponibilidad.horaInicio),
-            "hora_fin": str(disponibilidad.horaFin), "medico": disponibilidad.medico.id,
-            "dia": disponibilidad.dia, "sala": disponibilidad.sala.id
-        }
+    response_dict = {
+        'id': disponibilidad.id, "hora_inicio": str(disponibilidad.horaInicio),
+        "hora_fin": str(disponibilidad.horaFin), "medico": disponibilidad.medico.id,
+        "dia": disponibilidad.dia, "sala": disponibilidad.sala.id
+    }
 
     return HttpResponse(simplejson.dumps(response_dict))
 
 
-def update_disponibilidad(request):
+def create_disponibilidad(request):
     # session check
     if not request.user.is_authenticated():
         response_dict = {
@@ -126,7 +111,32 @@ def update_disponibilidad(request):
         }
         return simplejson.dumps(response_dict)
 
-    id_disponibilidad = request.POST['id']
+    disponibilidad = Disponibilidad()
+    disponibilidad.dia = request.POST['id-dia']
+    disponibilidad.horaInicio = request.POST['hora_desde']
+    disponibilidad.horaFin = request.POST['hora_hasta']
+    disponibilidad.fecha = datetime.now()
+    disponibilidad.medico_id = request.POST['id-medico']
+    disponibilidad.sala_id = request.POST['id-sala']
+    disponibilidad.save(force_insert=True)
+
+    response_dict = {
+        'status': 1,
+        'message': "El horario se ha creado correctamente."
+    }
+
+    return HttpResponse(simplejson.dumps(response_dict))
+
+
+def update_disponibilidad(request, id_disponibilidad):
+    # session check
+    if not request.user.is_authenticated():
+        response_dict = {
+            'status': 0,
+            'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
+        }
+        return simplejson.dumps(response_dict)
+
     disponibilidad = Disponibilidad.objects.get(id=id_disponibilidad)
     disponibilidad.dia = request.POST['id-dia']
     disponibilidad.horaInicio = request.POST['hora_desde']
@@ -143,7 +153,7 @@ def update_disponibilidad(request):
     return HttpResponse(simplejson.dumps(response_dict))
 
 
-def delete_disponibilidad(request):
+def delete_disponibilidad(request, id_disponibilidad):
     # session check
     if not request.user.is_authenticated():
         response_dict = {
@@ -152,12 +162,11 @@ def delete_disponibilidad(request):
         }
         return simplejson.dumps(response_dict)
 
-    id_disponibilidad = request.POST['id']
     disponibilidad = Disponibilidad.objects.get(id=id_disponibilidad)
     disponibilidad.delete()
 
     response_dict = {
         'status': 1,
-        'message': "El horario ha sido eleiminado correctamente."
+        'message': "El horario ha sido eliminado correctamente."
     }
     return HttpResponse(simplejson.dumps(response_dict))

@@ -275,7 +275,7 @@ function updateTurno() {
     data: "id-obra-social=" + obraSocial + "&observacion=" + observacion + "&id-estado=" + 1 + "&_nocache=" + rand,
     success: function(data) {
       alert(data.message);
-      $("#frmBuscar").submit();
+      location.reload();
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -295,7 +295,7 @@ function confirmar() {
     data: "&_nocache=" + rand,
     success: function(data) {
       alert(data.message);
-      $('#frmBuscar').trigger('submit');
+      location.reload();
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -315,7 +315,7 @@ function anular() {
     data: "&_nocache=" + rand,
     success: function(data) {
       alert(data.message);
-      $('#frmBuscar').trigger('submit');
+      location.reload();
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -365,9 +365,8 @@ function getHorarioAtencionMedico() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: "/medico/" + medicoId + "/disponibilidad/?_nocache=" + rand,
     dataType: 'json',
-    data: "/medicos/disponibilidad/json/?id-medico=" + medicoId + "&_nocache=" + rand,
     success: function(data) {
       var medico = $("#id-medico option:selected").text();
       $('#med-horario').html("<b>" + medico + "</b>" + data.horario);
@@ -620,13 +619,10 @@ function createHorario() {
     type: 'POST',
     data: "hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
     success: function(data) {
+      alert(data.message);
       if (data.status) {
-        alert(data.message);
-        $('#frmBuscar').trigger('submit');
-      } else {
-        alert(data.message);
+        location.reload();
       }
-
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -668,9 +664,8 @@ function getUpdateHorario(event) {
   $("#btnGuardar").show();
 
   $.ajax({
-    url: '/disponibilidad/',
+    url: '/disponibilidad/' + id + '/',
     dataType: 'json',
-    data: "id=" + id,
     success: function(data) {
       modal.find("#hora_desde").val(data.hora_inicio);
       modal.find("#hora_hasta").val(data.hora_fin);
@@ -720,18 +715,16 @@ function updateHorario() {
   }
 
   $.ajax({
-    url: '/disponibilidad/actualizar/',
+    url: '/disponibilidad/' + id + '/actualizar/',
     dataType: 'json',
     type: 'POST',
-    data: "id=" + id + "&hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
+    data: "hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
     success: function(data) {
+      alert(data.message);
       if (data.status) {
-        alert(data.message);
-        $('#frmBuscar').trigger('submit');
-      } else {
-        alert(data.message);
+        $('#dialog').modal('hide');
+        location.reload();
       }
-
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -746,18 +739,15 @@ function eliminarHorario() {
   }
   var id = $("#current-disponibilidad-id").val();
   $.ajax({
-    url: '/disponibilidad/eliminar/',
+    url: '/disponibilidad/' + id + '/eliminar/',
     dataType: 'json',
     type: 'POST',
-    data: "id=" + id,
     success: function(data) {
+      alert(data.message);
       if (data.status) {
-        alert(data.message);
-        $('#frmBuscar').trigger('submit');
-      } else {
-        alert(data.message);
+        $('#dialog').modal('hide');
+        location.reload();
       }
-
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
