@@ -137,6 +137,7 @@ def get_turno(request, id_turno):
     turno = Turno.objects.get(id=id_turno)
     ct = ContentType.objects.get_for_model(Turno)
     created_log = LogEntry.objects.filter(content_type_id=ct.id, action_flag=ADDITION, object_id=id_turno)
+    last_modified_log = LogEntry.objects.filter(content_type_id=ct.id, action_flag=CHANGE, object_id=id_turno)
 
     response_dict = {
         "id": turno.id,
@@ -150,12 +151,15 @@ def get_turno(request, id_turno):
         "hora_fin": str(turno.horaFinEstimada),
         "observacion": turno.observacion,
         "fecha_otorgamiento": turno.fecha_otorgamiento.strftime(settings.FORMAT_DATETIME),
+        "fecha_ult_mod": last_modified_log[0].action_time.strftime(settings.FORMAT_DATETIME) if last_modified_log else '-',
         "medico": turno.medico.apellido + ", " + turno.medico.nombre,
         "obra_social": turno.obraSocial.id,
         "obra_social_nombre": turno.obraSocial.nombre,
         "sala": turno.sala.nombre,
         "estado": turno.estado.descripcion,
         "creado_por": created_log[0].user.username if created_log else '-no disponible-',
+        "ult_mod_por": last_modified_log[0].user.username if last_modified_log else '-no disponible-',
+        "motivo_ult_mod": last_modified_log[0].change_message if last_modified_log else '-',
         "practicas": ' - '.join(map(lambda p: p.mostrar(), turno.practicas.all()))
         # TODO: registrar el usuario que anula el turno y una observación al respecto
         # "anulado_por": ...

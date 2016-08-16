@@ -241,6 +241,8 @@ function getEdit(event) {
       modal.find("#popup-hora-inicio").text(data.hora_inicio);
       modal.find("#popup-hora-fin").text(data.hora_fin);
       modal.find("#popup-fecha-otorgamiento").text(data.fecha_otorgamiento);
+      modal.find("#popup-fecha-ult-mod").text(data.fecha_ult_mod);
+      modal.find("#popup-motivo-ult-mod").text(data.motivo_ult_mod);
       modal.find("#popup-observacion_turno")
            .text(data.observacion)
            .val(data.observacion);
@@ -248,6 +250,7 @@ function getEdit(event) {
       modal.find("#id-obra-social").val(data.obra_social);
       modal.find("#id-obra-social").trigger("chosen:updated");
       modal.find("#popup-creado-por").text(data.creado_por);
+      modal.find("#popup-ult-mod-por").text(data.ult_mod_por);
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
