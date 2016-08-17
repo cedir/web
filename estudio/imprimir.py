@@ -83,7 +83,17 @@ def _informe(elements, estudio):
 
 def _draw_firstpage_frame(estudio, imprimeLinea=True):
     def _nada(canvas, doc):
-        pass
+        # calculamos algunas dimensiones
+        width, height = doc.pagesize
+        linea_superior = height - doc.topMargin - 46*mm
+
+        canvas.saveState()
+
+        # dibujamos las dos líneas
+        if imprimeLinea:
+            canvas.line(doc.leftMargin, linea_superior, width - doc.rightMargin, linea_superior)
+
+        canvas.restoreState()
 
     # armamos un clausura porque necesitamos acceder a información del estudio
     def _pie(canvas, doc):
