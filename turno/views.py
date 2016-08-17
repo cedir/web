@@ -134,7 +134,14 @@ def get_buscar_turnos(request):
 
 
 def get_turno(request, id_turno):
-    turno = Turno.objects.get(id=id_turno)
+
+    try:
+        turno = Turno.objects.get(id=id_turno)
+    except Turno.DoesNotExist:
+        response_dict = {'status': 0, 'message': "Error, no existe turno"}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
+
     ct = ContentType.objects.get_for_model(Turno)
     created_log = LogEntry.objects.filter(content_type_id=ct.id, action_flag=ADDITION, object_id=id_turno)
     last_modified_log = LogEntry.objects.filter(content_type_id=ct.id, action_flag=CHANGE, object_id=id_turno)
@@ -230,7 +237,13 @@ def guardar(request):
     id_obra_social = request.GET['id-obra-social']
     observacion_turno = request.GET['observacion_turno']
 
-    paciente = Paciente.objects.get(id=id_paciente)
+    try:
+        paciente = Paciente.objects.get(id=id_paciente)
+    except Turno.DoesNotExist:
+        response_dict = {'status': 0, 'message': "Error, no existe el paciente"}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
+
     practicas = Practica.objects.filter(id__in=id_practicas)
 
     try:
@@ -253,7 +266,7 @@ def guardar(request):
 
         turno.save()
 
-        _log_state_changed(turno, request.user, ADDITION, 'NUEVO')
+        _add_log_entry(turno, request.user, ADDITION, 'CREA')
 
         resp_dict = {'status': 1, 'message': "El turno se ha creado correctamente."}
         return HttpResponse(simplejson.dumps(resp_dict))
@@ -271,22 +284,20 @@ def update(request, id_turno):
     id_obra_social = request.GET['id-obra-social']
     observacion = request.GET['observacion']
 
-    turno = Turno.objects.get(id=id_turno)
-
-    if turno is None:
+    try:
+        turno = Turno.objects.get(id=id_turno)
+    except Turno.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
 
-    obra_social = ObraSocial.objects.get(id=id_obra_social)
-
     try:
         # turno.estado_id = idEstado
-        turno.obraSocial = obra_social
+        turno.obraSocial = ObraSocial.objects.get(id=id_obra_social)
         turno.observacion = observacion
         turno.save()
 
-        _log_state_changed(turno, request.user, CHANGE, "MODIFICACION: Obs={0}, OS={1}".format(observacion, obra_social))
+        _add_log_entry(turno, request.user, CHANGE, "MODIFICA")
 
         response_dict = {'status': 1, 'message': "El turno se ha guardado correctamente."}
         json = simplejson.dumps(response_dict)
@@ -344,7 +355,8 @@ def anunciar(request, id_turno):
             estudio.save()
 
             # log estudio
-            _log_state_changed(estudio, request.user, ADDITION, 'NUEVO (desde turnos)')
+            _add_log_entry(turno, request.user, CHANGE, "ANUNCIA")
+            _add_log_entry(estudio, request.user, ADDITION, 'CREA (desde turnos)')
 
         response_dict = {'status': True, 'message': "Success"}
         json = simplejson.dumps(response_dict)
@@ -361,18 +373,18 @@ def anular(request, id_turno):
         resp_dict = {'status': 0, 'message': err_ses}
         return HttpResponse(simplejson.dumps(resp_dict))
 
-    turno = Turno.objects.get(id=id_turno)
-    if turno is None:
+    try:
+        turno = Turno.objects.get(id=id_turno)
+    except Turno.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
 
-    estado = Estado.objects.get(id=3)
     try:
-        turno.estado = estado
+        turno.estado = Estado.objects.get(id=3)
         turno.save()
 
-        _log_state_changed(turno, request.user, CHANGE, "ANULACION")
+        _add_log_entry(turno, request.user, CHANGE, "ANULA")
 
         response_dict = {'status': 1, 'message': "El turno se ha anulado correctamente."}
         json = simplejson.dumps(response_dict)
@@ -385,17 +397,16 @@ def reprogramar(request, id_turno):
     if not request.user.is_authenticated():
         resp_dict = {'status': 0, 'message': err_ses}
         return HttpResponse(simplejson.dumps(resp_dict))
-
-    turno = Turno.objects.get(id=id_turno)
-    if turno is None:
+    try:
+        turno = Turno.objects.get(id=id_turno)
+    except Turno.DoesNotExist:
         return get_buscar_turnos(request)
 
-    estado = Estado.objects.get(id=3)
     try:
-        turno.estado = estado
+        turno.estado = Estado.objects.get(id=3)
         turno.save()
 
-        _log_state_changed(turno, request.user, CHANGE, "REPROGRAMA")
+        _add_log_entry(turno, request.user, CHANGE, "REPROGRAMA")
 
         practicas = turno.practicas.all()
 
@@ -419,17 +430,17 @@ def confirmar(request, id_turno):
         resp_dict = {'status': 0, 'message': err_ses}
         return HttpResponse(simplejson.dumps(resp_dict))
 
-    turno = Turno.objects.get(id=id_turno)
-    if turno is None:
+    try:
+        turno = Turno.objects.get(id=id_turno)
+    except Turno.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
 
-    estado = Estado.objects.get(id=2)
     try:
-        turno.estado = estado
+        turno.estado = Estado.objects.get(id=2)
         turno.save()
-        _log_state_changed(turno, request.user, CHANGE, "CONFIRMACION")
+        _add_log_entry(turno, request.user, CHANGE, "CONFIRMA")
 
         response_dict = {'status': 1, 'message': "El turno se ha confirmado correctamente."}
         json = simplejson.dumps(response_dict)
@@ -540,7 +551,10 @@ def _get_turnos_disponibles(user, data):
     practicas = Practica.objects.all().order_by('-usedLevel', 'descripcion')
     salas = Sala.objects.all().order_by('id')
 
-    paciente_seleccionado = Paciente.objects.get(id=id_paciente) if id_paciente else None
+    try:
+        paciente_seleccionado = Paciente.objects.get(id=id_paciente) if id_paciente else None
+    except Paciente.DoesNotExist:
+        paciente_seleccionado = None
 
     selected_date = date(int(fecha.split("/")[2]), int(fecha.split("/")[1]), int(fecha.split("/")[0]))\
         if fecha else date.today()
@@ -615,7 +629,7 @@ def _sql_date_to_normal_date(date_time):
         return str(date_time)
 
 
-def _log_state_changed(turno, user, mode, message):
+def _add_log_entry(turno, user, mode, message):
     ct = ContentType.objects.get_for_model(type(turno))
     LogEntry.objects.log_action(
         user_id=user.id,
