@@ -1,155 +1,153 @@
-
 # -*- coding: utf-8
 import os.path
-from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import cm, mm
-from reportlab.lib.colors import black
-from reportlab.platypus import Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.lib.enums import TA_JUSTIFY
+from reportlab.platypus import Paragraph
+from reportlab.platypus.doctemplate import SimpleDocTemplate
 
-width, height = A4
-margin_left = 13*mm
-font_std = u'Helvetica'
-font_bld = u'Helvetica-Bold'
+styles = getSampleStyleSheet()
+
+font_std = styles["Normal"]
+font_std.fontName = 'Helvetica'
+font_std.alignment = TA_JUSTIFY
+font_std.fontSize = 10
 
 
 def generar_informe(response, estudio):
     # Create the PDF object, using the response object as its "file."
-    p = canvas.Canvas(response, pagesize=A4)
-    p.setTitle(u'Imprimir estudio de {}'.format(estudio.paciente))
-    p.setLineWidth(0.5)
+    doc = SimpleDocTemplate(
+        response,
+        pagesize=A4,
+        topMargin=55*mm,
+        bottomMargin=65*mm,
+        rightMargin=17*mm,
+        leftMargin=17*mm
+    )
 
-    _datos_estudio(p, estudio)
+    elements = []
 
-    _informe(p, estudio)
+    _datos_estudio(elements, estudio)
+    _informe(elements, estudio)
 
-    if estudio.enlace_video:
-        _pie(p, estudio)
-
-    # Close the PDF object cleanly, and we're done.
-    p.showPage()
-
-    p.save()
+    doc.build(elements, onFirstPage=_draw_firstpage_frame(estudio), onLaterPages=_draw_firstpage_frame(estudio, False))
     return response
 
 
-def _datos_estudio(p, estudio):
-    top = margin_left + 48*mm
-    th = 9
-    ld = 12
-
-    p.saveState()
-
+def _datos_estudio(elements, estudio):
     # Practica (titulo)
-    p.setFont(font_bld, 10)
-    p.drawCentredString(width/2, height - top, estudio.practica.descripcion)
+    elements.append(Paragraph(u'<para align="CENTER" spaceAfter="15"><b>{}</b></para>'.format(estudio.practica.descripcion), font_std))
 
-    t = p.beginText(1.5*margin_left, height - top - 25)
+    # reducimos momentáneamente el tamaño de la fuente
+    font_std.fontSize = 9
 
-    # Fecha del estudio
-    t.setFont(font_bld, th)
-    t.textOut(u'Fecha del estudio.....: ')
-    t.setFont(font_std, th)
-    t.setLeading(ld)
-    t.textLine(unicode(estudio.fechaEstudio.strftime("%d/%m/%Y")))
+    # fecha estudio
+    fecha = u'<b>Fecha del estudio.....:</b> {0}'.format(unicode(estudio.fechaEstudio.strftime("%d/%m/%Y")))
+    elements.append(Paragraph(fecha, font_std))
 
     # Paciente
-    t.setFont(font_bld, th)
-    t.textOut(u'Paciente ....................: ')
-    t.setFont(font_std, th)
-    t.setLeading(ld)
-    if estudio.paciente.get_edad():
-        t.textLine(u'{} ({} años)'.format(estudio.paciente, estudio.paciente.get_edad()))
+    edad = estudio.paciente.get_edad()
+    if edad:
+        paciente = u'<b>Paciente ....................:</b> {} ({} años)'.format(estudio.paciente, edad)
     else:
-        t.textLine(u'{}'.format(estudio.paciente))
+        paciente = u'<b>Paciente ....................:</b> {}'.format(estudio.paciente, edad)
+
+    elements.append(Paragraph(paciente, font_std))
 
     # Obra Social
-    t.setFont(font_bld, th)
-    t.textOut(u'Obra Social ...............: ')
-    t.setFont(font_std, th)
-    t.setLeading(ld)
-    t.textLine(estudio.obraSocial.nombre)
+    obra_social = u'<b>Obra Social ...............:</b> {0}'.format(estudio.obraSocial.nombre)
+    elements.append(Paragraph(obra_social, font_std))
 
     # Nro de afiliado
     if estudio.paciente.nroAfiliado:
-        t.setFont(font_bld, th)
-        t.textOut(u'Nro de afiliado ..........: ')
-        t.setFont(font_std, th)
-        t.setLeading(ld)
-        t.textLine(unicode(estudio.paciente.nroAfiliado))
+        nro_afiliado = u'<b>Nro de afiliado ..........:</b> {0}'.format(unicode(estudio.paciente.nroAfiliado))
+        elements.append(Paragraph(nro_afiliado, font_std))
 
     # Medico Solicitante
-    t.setFont(font_bld, th)
-    t.textOut(u'Medico Solicitante ...: ')
-    t.setFont(font_std, th)
-    t.setLeading(ld)
-    t.textLine(unicode(estudio.medicoSolicitante))
+    medico_sol = u'<b>Medico Solicitante ...:</b> {0}'.format(unicode(estudio.medicoSolicitante))
+    elements.append(Paragraph(medico_sol, font_std))
 
     # Motivo del estudio
-    t.setFont(font_bld, th)
-    t.textOut(u'Motivo del estudio ...: ')
-    t.setFont(font_std, th)
-    t.setLeading(ld)
-    t.textLine(estudio.motivoEstudio)
+    motivo = u'<para spaceAfter="43" ><b>Motivo del estudio ...:</b> {0}</para>'.format(estudio.motivoEstudio)
+    elements.append(Paragraph(motivo, font_std))
+
+    # restauramos el tamaño de la fuente
+    font_std.fontSize = 10
 
 
-    p.drawText(t)
-    p.restoreState()
+def _informe(elements, estudio):
+    elements.append(Paragraph(u'<para alignment="CENTER" spaceAfter="10"><b>INFORME</b></para>', font_std))
+    elements.append(Paragraph(estudio.informe.replace(u'\r', u'').replace(u'\n', u'<br/>'), font_std))
 
 
-def _informe(p, estudio):
-    top = margin_left + 88*mm
-    eh = 13*mm
+def _draw_firstpage_frame(estudio, imprimeLinea=True):
+    # armamos un clausura porque necesitamos acceder a información del estudio
+    def _pie(canvas, doc):
+        # calculamos algunas dimensiones
+        width, height = doc.pagesize
+        linea_superior = height - doc.topMargin - 46*mm
+        linea_inferior = doc.bottomMargin
 
-    p.saveState()
-    p.line(1.5*margin_left, height - top, 520 + margin_left, height - top)
+        canvas.saveState()
 
-    p.setFillColor(black)
-    p.setFont(font_bld, 10)
-    p.drawCentredString(width/2, height - top - eh + 10, u'INFORME')
+        # dibujamos las dos líneas
+        if imprimeLinea:
+            canvas.line(doc.leftMargin, linea_superior, width - doc.rightMargin, linea_superior)
 
-    styles = getSampleStyleSheet()
-    paragraph = Paragraph(estudio.informe.replace(u'\r', u'').replace(u'\n', u'<br/>'), styles["Normal"])
+        canvas.line(doc.leftMargin, linea_inferior, width - doc.rightMargin, linea_inferior)
 
-    w, h = paragraph.wrapOn(p, 170*mm, 150*mm)
-    paragraph.drawOn(p, 1.5*margin_left, height - 265*mm + (150*mm - h))
+        # dibujamos la imágen
+        filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), u'./savetheearth.jpg')
+        canvas.drawImage(
+            filename,
+            1.2 * doc.leftMargin,
+            height - 810,
+            width=30 * mm,
+            height=35 * mm
+            )
 
-    p.restoreState()
+        # dibujamos las leyendas
+        t = canvas.beginText(1.2 * doc.leftMargin, height - 680)
 
+        t.setFont(font_std.fontName, font_std.fontSize - 1)
+        t.textLine(u'- El siguiente enlace web permitirá descargar el video del estudio a partir '
+                   u'de las próximas 48hs de realizado.')
 
-def _pie(p, estudio):
-    th = 9
+        t.textLine(u'- Recordar que sólo estará disponible para descarga durante los próximos 30 días '
+                   u'de realizado el mismo.')
 
-    p.saveState()
-    p.line(1.5*margin_left, height - 660, 520 + margin_left, height - 660)
+        t.textLine(u'- Coloque el siguiente enlace en la barra de direcciones de su explorador web, '
+                   u'para proceder con la descarga del video.')
 
-    filename = u'./savetheearth.jpg'
-    fn = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
-    p.drawImage(fn, 1.5*margin_left, height - 810, width=30*mm, height=35*mm)
+        canvas.drawText(t)
 
-    p.setFont(font_std, 8)
+        canvas.setFont(font_std.fontName, font_std.fontSize - 2)
+        canvas.drawCentredString(
+            width / 2,
+            height - 735,
+            u'Al utilizar el link de descarga en vez de un DVD estas contribuyendo al cuidado'
+            )
 
-    t = p.beginText(1.5*margin_left, height - 680)
+        canvas.drawCentredString(
+            width / 2,
+            height - 745,
+            u'del medio ambiente'
+            )
 
-    t.setFont(font_std, th)
-    t.textLine(u'- El siguiente enlace web permitirá descargar el video del estudio a partir de las próximas 48hs de realizado.')
-    p.drawText(t)
+        canvas.drawCentredString(
+            width / 2,
+            height - 755,
+            u'-------------------------------------------------------------------------------------------------------'
+            )
 
-    t.setFont(font_std, th)
-    t.textLine(u'- Recordar que sólo estará disponible para descarga durante los próximos 30 días de realizado el mismo.')
-    p.drawText(t)
+        canvas.setFont(font_std.fontName, 10)
+        canvas.drawCentredString(
+            width / 2,
+            height - 770,
+            u'http://www.cedirsalud.com.ar/video/{0}'.format(str(estudio.public_id))
+            )
 
-    t.setFont(font_std, th)
-    t.textLine(u'- Coloque el siguiente enlace en la barra de direcciones de su explorador web, para proceder con la descarga del video.')
-    p.drawText(t)
+        canvas.restoreState()
 
-    p.setFont(font_std, 8)
-    p.drawCentredString(width/2, height - 735, u'Al utilizar el link de descarga en vez de un DVD estas contribuyendo al cuidado')
-    p.drawCentredString(width/2, height - 745, u'del medio ambiente')
-    p.drawCentredString(width/2, height - 755, u'-------------------------------------------------------------------------------------------------------')
-
-    p.setFont(font_std, 10)
-    p.drawCentredString(width/2, height - 770, u'http://www.cedirsalud.com.ar/video/{}'.format(str(estudio.public_id)))
-
-    p.restoreState()
+    return _pie

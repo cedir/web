@@ -13,3 +13,4 @@ def imprimir(request, id_estudio):
     response['Content-Disposition'] = u'filename="Estudio de {0}.pdf"'.format(estudio.paciente.apellido)
 
     return generar_informe(response, estudio)
+
