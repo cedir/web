@@ -21,7 +21,7 @@ def generar_informe(response, estudio):
         response,
         pagesize=A4,
         topMargin=55*mm,
-        bottomMargin=65*mm,
+        bottomMargin=65*mm if estudio.enlace_video else 25*mm,
         rightMargin=17*mm,
         leftMargin=17*mm
     )
@@ -82,6 +82,9 @@ def _informe(elements, estudio):
 
 
 def _draw_firstpage_frame(estudio, imprimeLinea=True):
+    def _nada(canvas, doc):
+        pass
+
     # armamos un clausura porque necesitamos acceder a información del estudio
     def _pie(canvas, doc):
         # calculamos algunas dimensiones
@@ -149,5 +152,7 @@ def _draw_firstpage_frame(estudio, imprimeLinea=True):
             )
 
         canvas.restoreState()
-
-    return _pie
+    if estudio.enlace_video:
+        return _pie
+    else:
+        return _nada
