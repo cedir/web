@@ -39,6 +39,7 @@ def anular_cobro_presentacion(id_presentacion, apply_changes):
     print u'Eliminando pago {}'.format(pago.id)
     if apply_changes:
         pago.delete()
+        presentacion.save()
 
     print u'Fin.'
 
