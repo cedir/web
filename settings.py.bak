@@ -146,7 +146,9 @@ INSTALLED_APPS = (
     'medico',
     'turno',
     'estudio',
-    "comprobante",
+    'comprobante',
+    'medicamento',
+    'presentacion',
 )
 
 

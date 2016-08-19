@@ -1,6 +1,5 @@
 from django.db import models
 from comprobante.models import Comprobante
-from estudio.models import Estudio
 from obra_social.models import ObraSocial
 
 PENDIENTE = 0
@@ -38,7 +37,7 @@ class Presentacion(models.Model):
 
 class PagoPresentacion(models.Model):
     id = models.AutoField(primary_key=True, db_column=u'idPagoFact')
-    presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion')
+    presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion', related_name=u'pago')
     fecha = models.DateField(u'Fecha', db_column=u'fechaPagoFact')
     nro_recivo = models.CharField(max_length=128, db_column=u'nroRecivo')
     importe = models.FloatField(db_column=u'importePago')
@@ -46,4 +45,3 @@ class PagoPresentacion(models.Model):
     
     class Meta:
         db_table = 'tblPagoFacturacion'
-
