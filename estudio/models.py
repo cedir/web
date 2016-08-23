@@ -5,6 +5,7 @@ from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
 from medicamento.models import Medicamento
+from presentacion.models import Presentacion
 
 
 MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
@@ -23,7 +24,7 @@ class Estudio(models.Model):
     medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name=u'medico_actuante')
     obraSocial = models.ForeignKey(ObraSocial, db_column="idObraSocial")
     medicoSolicitante = models.ForeignKey(Medico, db_column="idMedicoSolicitante", related_name=u'medico_solicitante')
-    idFacturacion = models.IntegerField()
+    presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion', null=True, blank=True, related_name=u'estudios')
     nroDeOrden = models.CharField(max_length=200)
     anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
     esPagoContraFactura = models.IntegerField()
