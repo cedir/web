@@ -17,6 +17,17 @@ class Gravado(models.Model):
 
 
 class Comprobante(models.Model):
+
+    ANULADO = u'ANULADO'
+    NO_COBRADO = u'NO COBRADO'
+    COBRADO = u'COBRADO'
+
+    ESTADOS = (
+        (ANULADO, u'ANULADO'),  # 'estado = 0 significa que esta facturado, y no se pueden agregar mas estudios ni modificar nada porque esta cerrado
+        (NO_COBRADO, u'NO COBRADO'),    # 'estado = 1 significa que se facturo y se cobro
+        (COBRADO, u'COBRADO'),    # 'estado = 2 la facturacion esta abierta a agregar o modificar estudios
+    )
+
     nombre_cliente = models.CharField(max_length=128, db_column=u'nombreCliente')
     domicilio_cliente = models.CharField(max_length=128, db_column=u'domicilioCliente')
     nro_cuit = models.CharField(max_length=128, db_column=u'nroCuit')
@@ -24,10 +35,9 @@ class Comprobante(models.Model):
     condicion_fiscal = models.CharField(max_length=128, db_column=u'condicionFiscal')
     responsable = models.CharField(max_length=128, )
     sub_tipo = models.CharField(max_length=50, db_column=u'subTipo')
-    estado = models.CharField(max_length=50, )
+    estado = models.CharField(max_length=50, choices=ESTADOS )
     numero = models.IntegerField(db_column=u'nroComprobante', )
     nro_terminal = models.SmallIntegerField(db_column=u'nroTerminal', default=1)
-    cae = models.CharField(max_length=128, db_column=u'CAE')
     total_facturado = models.FloatField(db_column=u'totalFacturado', default=0)
     total_cobrado = models.FloatField(db_column=u'totalCobrado')
     fecha_emision = models.DateField(db_column=u'fechaEmision')
@@ -37,7 +47,7 @@ class Comprobante(models.Model):
     factura = models.ForeignKey(u'comprobante.Comprobante', db_column=u'idFactura', null=True, blank=True)
     gravado = models.ForeignKey(Gravado, db_column=u'gravado', null=True, blank=True)
 
-    cae = models.TextField(db_column='CAE', blank=True)
+    cae = models.CharField(max_length=128, db_column=u'CAE', null=True, blank=True)
     vencimiento_cae = models.DateField(db_column='vencimientoCAE', blank=True, null=True)
 
     @property

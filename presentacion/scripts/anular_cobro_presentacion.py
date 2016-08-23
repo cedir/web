@@ -7,6 +7,8 @@ django.setup()
 
 import argparse
 from decimal import Decimal
+from django.core import serializers
+from comprobante.models import Comprobante
 from presentacion.models import Presentacion
 
 
@@ -17,10 +19,22 @@ def anular_cobro_presentacion(id_presentacion, apply_changes):
     
     presentacion = Presentacion.objects.get(pk=id_presentacion, estado=Presentacion.COBRADO)
     presentacion.estado = Presentacion.PENDIENTE
-    # TODO: ver si hay que cambiar algo mas de presentacion, como total
+    presentacion.total = presentacion.total_facturado
+    presentacion.comprobante.estado = Comprobante.NO_COBRADO
+    presentacion.comprobante.total_cobrado = 0
+
+    comprobante_relacionados = Comprobante.objects.filter(factura=presentacion.comprobante)
+    assert len(comprobante_relacionados) <= 1, u'Mas de un comprobante relacionado'
+
+    print u'presentacion {} comprobante {} comprobante relaionado {}'.format(presentacion.id, presentacion.comprobante.id,
+                                                                             comprobante_relacionados.first())
 
     estudios = presentacion.estudios.all()
     for estudio in estudios:
+
+        assert estudio.pago_medico_actuante == None, u'Error, pago medico actuante no es nulo'
+        assert estudio.pago_medico_solicitante == None, u'Error, pago medico solicitante no es nulo'
+
         print '{}, {}, {}, {}, {}, {}'.format(estudio.id, estudio.fechaCobro, estudio.importeCobradoPension,
                                 estudio.importeCobradoArancelAnestesia, estudio.importeEstudioCobrado,
                                 estudio.importeMedicacionCobrado)
@@ -35,11 +49,12 @@ def anular_cobro_presentacion(id_presentacion, apply_changes):
 
     pagos = presentacion.pago.all()
     assert pagos.count() == 1, u'Error, hay mas de un pago para esta presentacion'
-    pago = pagos.first()
-    print u'Eliminando pago {}'.format(pago.id)
+    data = serializers.serialize("json", pagos)
+    print data
     if apply_changes:
-        pago.delete()
+        pagos.delete()
         presentacion.save()
+        presentacion.comprobante.save()
 
     print u'Fin.'
 
