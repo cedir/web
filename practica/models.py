@@ -9,12 +9,9 @@ class Practica(models.Model):
     usedLevel = models.IntegerField()
     #duracion = models.CharField("Duracion",max_length=200, null=False,blank=False)
 
-    def mostrar(self):
-        return u'%s' % (self.abreviatura or self.descripcion)
-
     class Meta:
         db_table = u'AlmacenEstudios'
         ordering = ['descripcion']
 
     def __unicode__(self):
-        return u'%s' % self.descripcion
+        return u'%s' % (self.abreviatura or self.descripcion)

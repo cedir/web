@@ -96,7 +96,7 @@ def get_buscar_turnos(request):
         "obra_social": turno.obraSocial.nombre,
         "observacion": turno.observacion,
         "img_estado": turno.estado.img,
-        "practica": " - ".join([practica.mostrar() for practica in turno.practicas.all()])
+        "practica": " - ".join([practica.__unicode__() for practica in turno.practicas.all()])
     } for turno in arr_turnos]
 
     arr_medicos = [{
@@ -167,7 +167,7 @@ def get_turno(request, id_turno):
         "creado_por": created_log[0].user.username if created_log else '-no disponible-',
         "ult_mod_por": last_modified_log[0].user.username if last_modified_log else '-no disponible-',
         "motivo_ult_mod": last_modified_log[0].change_message if last_modified_log else '-',
-        "practicas": ' - '.join(map(lambda p: p.mostrar(), turno.practicas.all()))
+        "practicas": ' - '.join(map(lambda p: p.__unicode__(), turno.practicas.all()))
         # TODO: registrar el usuario que anula el turno y una observación al respecto
         # "anulado_por": ...
         # observacion_anulacion": ...
@@ -473,7 +473,7 @@ def _get_day_line(fecha, id_sala):
           "duracionEnPixeles": turno.getDuracionEnMinutos() * PIXELS_PER_MINUTE - (1 * PIXELS_PER_MINUTE),
           "medico": turno.medico.nombre + ' ' + turno.medico.apellido,
           "obra_social": turno.obraSocial.nombre,
-          "practicas": u'-'.join([p.mostrar() for p in turno.practicas.all()])
+          "practicas": u'-'.join([p.__unicode__() for p in turno.practicas.all()])
       } for turno in turnos]
 
     arr_hsh_disponibilidad = [{
