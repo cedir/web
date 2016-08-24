@@ -1,5 +1,6 @@
 import datetime
 from django.db import models
+from django.db.models.signals import pre_save
 from medico.models import Medico, Anestesista, PagoMedico
 from practica.models import Practica
 from obra_social.models import ObraSocial
@@ -59,6 +60,22 @@ class Estudio(models.Model):
 
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
+
+
+def asignar_presentacion_nula(sender, instance, **kwargs):
+    """
+    Esto es un hook para asgnar una presentacion nula cuando se crea un estudio.
+    Esto es porque por defecto el campo idFacturacion = 0 cuando deberia ser igual a None.
+    Cuando se actualice esto, este codigo puede ser eliminado.
+    """
+    if instance.id:
+        return  # is no esta creando, no hay nada que hacer
+
+    presentacion = Presentacion()
+    presentacion.id = 0
+    instance.presentacion = presentacion
+
+pre_save.connect(asignar_presentacion_nula, sender=Estudio, dispatch_uid="asignar_presentacion_nula")
 
 
 class Medicacion(models.Model):
