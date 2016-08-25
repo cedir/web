@@ -614,7 +614,7 @@ function createHorario() {
   }
 
   $.ajax({
-    url: '/disponibilidad/',
+    url: '/disponibilidad/nueva/',
     dataType: 'json',
     type: 'POST',
     data: "hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
