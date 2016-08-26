@@ -1,7 +1,7 @@
 	      {% for hshPaciente in pacientes %}
 	      <tr class="ui-widget-content">
 		  <td>{{ hshPaciente.id }}</td>
-		  <td><a href="/paciente/{{ hshPaciente.id }}/editar/" target="_blank">{{ hshPaciente.apellido }}, {{ hshPaciente.nombre }} </a></td>
+		  <td><a href="/paciente/{{ hshPaciente.id }}/" target="_blank">{{ hshPaciente.apellido }}, {{ hshPaciente.nombre }} </a></td>
 		  <td>{{ hshPaciente.domicilio }}</td>
 		  <td><a href="#" onclick="setPaciente({{ hshPaciente.id }}, '{{ hshPaciente.nombre }}', '{{ hshPaciente.apellido }}');">Seleccionar</a></td>
 	      </tr>

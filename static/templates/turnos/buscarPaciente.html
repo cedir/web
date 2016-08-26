@@ -5,7 +5,7 @@
 // <!CDATA[
 
 function btbNuevoPaciente_onclick(){
-location.href = "/paciente/nuevo/";
+location.href = "/paciente/";
 
 }
 
@@ -56,10 +56,10 @@ location.href = "/paciente/nuevo/";
 	      {% for hshPaciente in pacientes %}
 	      <tr class="ui-widget-content">
 		  <td>{{ hshPaciente.dni }}</td>
-		  <td><a href="/paciente/{{ hshPaciente.id }}/editar/">{{ hshPaciente.apellido }}, {{ hshPaciente.nombre }} </a></td>
+		  <td><a href="/paciente/{{ hshPaciente.id }}/">{{ hshPaciente.apellido }}, {{ hshPaciente.nombre }} </a></td>
 		  <td>{{ hshPaciente.domicilio }}</td>
 		  <td>{{ hshPaciente.telefono }}</td>
-		  <td><a href="/paciente/{{ hshPaciente.id }}/editar/">Modificar</a>&nbsp;|&nbsp;<a href="/turno/disponibles/?id-paciente={{ hshPaciente.id }}">Nuevo turno</a></td>
+		  <td><a href="/paciente/{{ hshPaciente.id }}/">Modificar</a>&nbsp;|&nbsp;<a href="/turno/disponibles/?id-paciente={{ hshPaciente.id }}">Nuevo turno</a></td>
 	      </tr>
 	      {% endfor %}
 	  </tbody>

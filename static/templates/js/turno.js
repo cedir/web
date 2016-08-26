@@ -229,7 +229,7 @@ function getEdit(event) {
     success: function(data) {
       modal.find("#popup-paciente")
            .text(data.paciente)
-           .attr("href", "/paciente/" + data.paciente_id + "/editar/");
+           .attr("href", "/paciente/" + data.paciente_id + "/");
 
       modal.find("#popup-paciente-tel").text(data.tel);
       modal.find("#popup-paciente-dni").text(data.dni);
