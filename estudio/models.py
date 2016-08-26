@@ -1,10 +1,12 @@
 import datetime
 from django.db import models
+from django.db.models.signals import pre_save
 from medico.models import Medico, Anestesista, PagoMedico
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
 from medicamento.models import Medicamento
+from presentacion.models import Presentacion
 
 
 MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
@@ -23,7 +25,7 @@ class Estudio(models.Model):
     medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name=u'medico_actuante')
     obraSocial = models.ForeignKey(ObraSocial, db_column="idObraSocial")
     medicoSolicitante = models.ForeignKey(Medico, db_column="idMedicoSolicitante", related_name=u'medico_solicitante')
-    idFacturacion = models.IntegerField()
+    presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion', null=True, blank=True, related_name=u'estudios')
     nroDeOrden = models.CharField(max_length=200)
     anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
     esPagoContraFactura = models.IntegerField()
@@ -58,6 +60,22 @@ class Estudio(models.Model):
 
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
+
+
+def asignar_presentacion_nula(sender, instance, **kwargs):
+    """
+    Esto es un hook para asgnar una presentacion nula cuando se crea un estudio.
+    Esto es porque por defecto el campo idFacturacion = 0 cuando deberia ser igual a None.
+    Cuando se actualice esto, este codigo puede ser eliminado.
+    """
+    if instance.id:
+        return  # is no esta creando, no hay nada que hacer
+
+    presentacion = Presentacion()
+    presentacion.id = 0
+    instance.presentacion = presentacion
+
+pre_save.connect(asignar_presentacion_nula, sender=Estudio, dispatch_uid="asignar_presentacion_nula")
 
 
 class Medicacion(models.Model):
