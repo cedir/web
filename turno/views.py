@@ -239,14 +239,7 @@ def guardar(request):
 
     try:
         paciente = Paciente.objects.get(id=id_paciente)
-    except Turno.DoesNotExist:
-        response_dict = {'status': 0, 'message': "Error, no existe el paciente"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
-
-    practicas = Practica.objects.filter(id__in=id_practicas)
-
-    try:
+        practicas = Practica.objects.filter(id__in=id_practicas)
         turno = Turno()
         turno.horaInicio = hora_inicio
         turno.horaFinEstimada = hora_fin_estimada
@@ -271,6 +264,10 @@ def guardar(request):
         resp_dict = {'status': 1, 'message': "El turno se ha creado correctamente."}
         return HttpResponse(simplejson.dumps(resp_dict))
 
+    except Turno.DoesNotExist:
+        response_dict = {'status': 0, 'message': "Error, no existe el paciente"}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
     except Exception as err:
         return str(err)
 
@@ -286,12 +283,6 @@ def update(request, id_turno):
 
     try:
         turno = Turno.objects.get(id=id_turno)
-    except Turno.DoesNotExist:
-        response_dict = {'status': 0, 'message': "Error, no existe turno"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
-
-    try:
         # turno.estado_id = idEstado
         turno.obraSocial = ObraSocial.objects.get(id=id_obra_social)
         turno.observacion = observacion
@@ -303,6 +294,10 @@ def update(request, id_turno):
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
 
+    except Turno.DoesNotExist:
+        response_dict = {'status': 0, 'message': "Error, no existe turno"}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
     except Exception as err:
         return str(err)
 
@@ -314,12 +309,6 @@ def anunciar(request, id_turno):
 
     try:
         turno = Turno.objects.get(id=id_turno)
-    except Turno.DoesNotExist:
-        response_dict = {'status': False, 'message': "Error, no existe turno"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
-
-    try:
         practicas = turno.practicas.all()
         for practica in practicas:
             estudio = Estudio()
@@ -362,6 +351,10 @@ def anunciar(request, id_turno):
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
 
+    except Turno.DoesNotExist:
+        response_dict = {'status': False, 'message': "Error, no existe turno"}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
     except Exception as err:
         response_dict = {'status': False, 'message': str(err)}
         json = simplejson.dumps(response_dict)
@@ -375,18 +368,17 @@ def anular(request, id_turno):
 
     try:
         turno = Turno.objects.get(id=id_turno)
-    except Turno.DoesNotExist:
-        response_dict = {'status': 0, 'message': "Error, no existe turno"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
-
-    try:
         turno.estado = Estado.objects.get(id=3)
         turno.save()
 
         _add_log_entry(turno, request.user, CHANGE, "ANULA")
 
         response_dict = {'status': 1, 'message': "El turno se ha anulado correctamente."}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
+
+    except Turno.DoesNotExist:
+        response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
     except Exception as err:
@@ -399,10 +391,6 @@ def reprogramar(request, id_turno):
         return HttpResponse(simplejson.dumps(resp_dict))
     try:
         turno = Turno.objects.get(id=id_turno)
-    except Turno.DoesNotExist:
-        return get_buscar_turnos(request)
-
-    try:
         turno.estado = Estado.objects.get(id=3)
         turno.save()
 
@@ -421,6 +409,9 @@ def reprogramar(request, id_turno):
         })
 
         return _get_turnos_disponibles(request.user, data)
+
+    except Turno.DoesNotExist:
+        return get_buscar_turnos(request)
     except Exception as err:
         return str(err)
 
@@ -432,17 +423,16 @@ def confirmar(request, id_turno):
 
     try:
         turno = Turno.objects.get(id=id_turno)
-    except Turno.DoesNotExist:
-        response_dict = {'status': 0, 'message': "Error, no existe turno"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
-
-    try:
         turno.estado = Estado.objects.get(id=2)
         turno.save()
         _add_log_entry(turno, request.user, CHANGE, "CONFIRMA")
 
         response_dict = {'status': 1, 'message': "El turno se ha confirmado correctamente."}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
+
+    except Turno.DoesNotExist:
+        response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
     except Exception as err:
