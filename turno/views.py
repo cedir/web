@@ -264,7 +264,7 @@ def guardar(request):
         resp_dict = {'status': 1, 'message': "El turno se ha creado correctamente."}
         return HttpResponse(simplejson.dumps(resp_dict))
 
-    except Turno.DoesNotExist:
+    except Paciente.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe el paciente"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
