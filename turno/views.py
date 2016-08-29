@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
 
+from django.core.exceptions import ValidationError
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
@@ -283,7 +284,10 @@ def update(request, id_turno):
 
     try:
         turno = Turno.objects.get(id=id_turno)
-        # turno.estado_id = idEstado
+
+        if turno.estado.id == Estado.ANULADO:
+            raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
+
         turno.obraSocial = ObraSocial.objects.get(id=id_obra_social)
         turno.observacion = observacion
         turno.save()
@@ -298,6 +302,10 @@ def update(request, id_turno):
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
+    except ValidationError, e:
+        response_dict = {'status': 0, 'message': e.message}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
     except Exception as err:
         return str(err)
 
@@ -309,6 +317,10 @@ def anunciar(request, id_turno):
 
     try:
         turno = Turno.objects.get(id=id_turno)
+
+        if turno.estado.id == Estado.ANULADO:
+            raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
+
         practicas = turno.practicas.all()
         for practica in practicas:
             estudio = Estudio()
@@ -354,6 +366,10 @@ def anunciar(request, id_turno):
         response_dict = {'status': False, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
+    except ValidationError, e:
+        response_dict = {'status': 0, 'message': e.message}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
     except Exception as err:
         response_dict = {'status': False, 'message': str(err)}
         json = simplejson.dumps(response_dict)
@@ -367,7 +383,11 @@ def anular(request, id_turno):
 
     try:
         turno = Turno.objects.get(id=id_turno)
-        turno.estado = Estado.objects.get(id=3)
+
+        if turno.estado.id == Estado.ANULADO:
+            raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
+
+        turno.estado = Estado.objects.get(id=Estado.ANULADO)
         turno.save()
 
         _add_log_entry(turno, request.user, CHANGE, "ANULA")
@@ -380,6 +400,10 @@ def anular(request, id_turno):
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
+    except ValidationError, e:
+        response_dict = {'status': 0, 'message': e.message}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
     except Exception as err:
         return str(err)
 
@@ -390,10 +414,12 @@ def reprogramar(request, id_turno):
         return HttpResponse(simplejson.dumps(resp_dict))
     try:
         turno = Turno.objects.get(id=id_turno)
-        turno.estado = Estado.objects.get(id=3)
-        turno.save()
 
-        _add_log_entry(turno, request.user, CHANGE, "REPROGRAMA")
+        if turno.estado.id != Estado.ANULADO:
+            turno.estado = Estado.objects.get(id=Estado.ANULADO)
+            turno.save()
+
+            _add_log_entry(turno, request.user, CHANGE, "REPROGRAMA")
 
         practicas = turno.practicas.all()
 
@@ -422,7 +448,11 @@ def confirmar(request, id_turno):
 
     try:
         turno = Turno.objects.get(id=id_turno)
-        turno.estado = Estado.objects.get(id=2)
+
+        if turno.estado.id == Estado.ANULADO:
+            raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
+
+        turno.estado = Estado.objects.get(id=Estado.CONFIRMADO)
         turno.save()
         _add_log_entry(turno, request.user, CHANGE, "CONFIRMA")
 
@@ -432,6 +462,10 @@ def confirmar(request, id_turno):
 
     except Turno.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
+    except ValidationError, e:
+        response_dict = {'status': 0, 'message': e.message}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
     except Exception as err:

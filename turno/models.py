@@ -8,6 +8,10 @@ from obra_social.models import ObraSocial
 
 
 class Estado(models.Model):
+    PENDIENTE = 1
+    CONFIRMADO = 2
+    ANULADO = 3
+
     descripcion = models.CharField(max_length=200)
     img = models.CharField(max_length=200)
 
