@@ -76,6 +76,7 @@ $(document).ready(function() {
         ESTUDIOS_BAJOS = [2, 19, 23];
         ESTUDIOS_COLANGIOS = [13, 34];
 
+        /******Estudios altos******/
         var ALTA_NORMAL = "<b>Esófago:</b> Normal, cardias a 37 cm de la arcada dentaria superior. No se evidencia reflujo gastro-esofágico, hernia hiatal, ni esofagitis por reflujo. \n\n" +
             "<b>Estómago:</b> Mucosa de características normales. Por retroflexión se observa el techo gástrico con un buen cierre cardial. \n\n" +
             "<b>Píloro:</b> Permeable. \n\n" +
@@ -88,17 +89,89 @@ $(document).ready(function() {
             "<b>Bulbo duodenal y segunda porción duodenal:</b> Normales. \n\n" +
             "<b>Conclusión diagnóstica: Gastritis superficial no erosiva de antro gástrico.</b> \n";
 
-        var COLONO_NORMAL = "Ampolla rectal sin lesión mucosa. \n\n" +
-            "Se franquea el ángulo recto-sigmoides observando el colon sigmoides de características normales. \n\n" +
-            "Se progresa por el colon descendente hasta franquear el ángulo esplénico observando el colon transverso, ángulo hepático y colon ascendente sin evidenciar lesión mucosa.\n\n" +
-            "<b>Conclusión diagnóstica: Ampolla rectal y marco colónico visualizado hasta ciego de características normales.</b> \n";
 
-        var COLANGIO_NORMAL = "En segunda porción duodenal, se visualiza la Ampolla de Vater de características normales.\n\n" +
-            "Se canula sin dificultad observando la vía biliar intra-hepática de calibre normal.\n\n" +
-            "La vía biliar extra hepática presenta tanto el conducto hepático como el colédoco de aspecto y calibre normal.\n\n" +
-            "No se observan imágenes radiolúcidas en su interior y el drenaje de la sustancia de contraste se realiza en tiempo aceptable. \n\n" +
-            "Buena tolerancia al procedimiento.\n\n" +
-            "Las imágenes radioscópicas son digitalizadas e impresas en papel, acompañando el presente informe.\n";
+
+        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
+            "<b>Estómago:</b> \n\n" +
+            "<b>Píloro:</b> \n\n" +
+            "<b>Bulbo duodenal:</b> \n\n" +
+            "<b>Segunda porción duodenal:</b> \n\n" +
+            "<b></b> \n\n" +
+            "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
+
+        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
+            "<b>Estómago:</b> \n\n" +
+            "<b>Píloro:</b> \n\n" +
+            "<b>Bulbo duodenal:</b> \n\n" +
+            "<b>Segunda porción duodenal:</b> \n\n" +
+            "<b></b> \n\n" +
+            "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
+
+        /*new*/
+        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
+            "<b>Estómago:</b> \n\n" +
+            "<b>Píloro:</b> \n\n" +
+            "<b>Bulbo duodenal:</b> \n\n" +
+            "<b>Segunda porción duodenal:</b> \n\n" +
+            "<b></b> \n\n" +
+            "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
+
+        /*new*/
+        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
+            "<b>Estómago:</b> \n\n" +
+            "<b>Píloro:</b> \n\n" +
+            "<b>Bulbo duodenal:</b> \n\n" +
+            "<b>Segunda porción duodenal:</b> \n\n" +
+            "<b></b> \n\n" +
+            "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
+
+        /*new*/
+        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
+            "<b>Estómago:</b> \n\n" +
+            "<b>Píloro:</b> \n\n" +
+            "<b>Bulbo duodenal:</b> \n\n" +
+            "<b>Segunda porción duodenal:</b> \n\n" +
+            "<b></b> \n\n" +
+            "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
+
+
+
+
+
+        /******Estudios bajos******/
+        var COLONO_NORMAL = "Ampolla rectal sin lesión mucosa.\n\n" +
+            "Se avanza por el ángulo rectosigmoides observando el colon sigmoides de características normales.\n\n" +
+            "Se progresa por el colon descendente hasta franquear el ángulo esplénico observando el colon transverso, ángulo hepático y colon ascendente sin evidenciar lesión mucosa.\n\n" +
+            "Se identifica el fondo cecal comprobado por sus cuatro signos endoscópicos de pliegue radiado, fosa apendicular , válvula Ileocecal y trans iluminación parietal en fosa iliaca derecha.\n\n" +
+            "<b>Conclusión Diagnóstica : Ampolla rectal y marco colónico visualizado hasta ciego de características normales.</b>\n";
+
+        /*new*/
+        var COLONO_CON_HEMORROIDES = "Inspección anal: Hemorroides internas grado I.\n\n";
+            "Ampolla rectal sin lesión mucosa." +
+            "Se avanza por el ángulo rectosigmoides observando el colon sigmoides de características normales." +
+            "Se progresa por el colon descendente hasta franquear el ángulo esplénico observando el colon transverso, ángulo hepático y colon ascendente sin evidenciar lesión mucosa." +
+            "Se identifica el fondo cecal comprobado por sus cuatro signos endoscópicos de pliegue radiado, fosa apendicular, válvula Ileocecal y trans iluminación parietal en fosa iliaca derecha." +
+            "<b>Conclusión Diagnóstica: Hemorroides internas grado I. Ampolla rectal y marco colónico visualizado hasta ciego de características normales.</b>";
+
+
+        /******Estudios COLANGIOGRAFIAS******/
+        var COLANGIO_NORMAL = 'Procedimiento realizado con el paciente bajo sedación neurolepto analgesica con equipo de Video Endoscopía Olympus TJF 180 monitorizado con Radioscopia Digital Arco en "C" General Electric.\n\n' +
+            "En segunda porción duodenal se visualiza la papila mayor de características normales.\n" +
+            "Se canula selectivamente con Canulotomo triple lumen Boston Scientific montado con alambre guía Hydra Jag Wire  0,035 visualizando radioscopicamente la totalidad del árbol biliar.\n" +
+            "La vía biliar intra hepática presenta un calibre normal con una distribución anatómica de sus ramas derecha e izquierda de aspecto normales.\n" +
+            "La vía biliar extra hepática se encuentra dilatada, de aproximadamente....  mm en promedio,  con una imagen radio-lucida móvil de ...mm en tercio distal de colédoco que corresponde a un lito coledociano.\n\n" +
+
+            "Se realiza papilotomia amplia , se pasa canastilla de Dormia extrayendo el / los calculo/s rescriptos en las imágenes radioscópicas.\n" +
+            "Para asegurar su completo drenaje se pasa balón extractor de cálculos coledocianos que sale por la papila insuflado seguido de bilis clara.\n\n" +
+
+            "<b><u>Resumen del procedimiento:</u></b>\n" +
+            "<b>Canulación selectiva de vía biliar, visualización de lito coledociano por radioscopia,  papilotomía ámplia, extracción de calculo coledociano con canastilla de Dormia, pasaje de balón extractor de litos coledocianos.</b>\n\n" +
+
+            "<b>Las imágenes visualizadas por radioscopia digital son impresas en papel al igual que las principales imágenes endoscopicas.</b>\n\n" +
+
+            "<b>Estimado Dr.: Le recordamos que Ud. puede visualizar la totalidad del procedimiento en tiempo real ingresando al link ubicado al pie de pagina.</b>";
+
+
 
         var COLANGIO_CON_CALCULO = "En segunda porción duodenal se visualiza la Ampolla de Vater de características normales. \n\n" +
             "Se canula sin dificultad observando la vía biliar intra-hepática de calibre conservado. \n\n" +
