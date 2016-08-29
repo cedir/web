@@ -1,11 +1,11 @@
 from django.conf.urls import patterns, url
-from paciente.views import get_create, get_update, post_create, post_update, get_buscar
+from paciente.views import create_form, update_form, create, update, buscar_form
 
 urlpatterns = patterns(
     '',
-    url(r'^paciente/$', get_create),
-    url(r'^paciente/nuevo/$', post_create),
-    url(r'^paciente/buscar/$', get_buscar),
-    url(r'^paciente/(?P<id_paciente>\d+)/$', get_update),
-    url(r'^paciente/(?P<id_paciente>\d+)/actualizar/$', post_update)
+    url(r'^paciente/$', create_form),
+    url(r'^paciente/nuevo/$', create),
+    url(r'^paciente/buscar/$', buscar_form),
+    url(r'^paciente/(?P<id_paciente>\d+)/$', update_form),
+    url(r'^paciente/(?P<id_paciente>\d+)/actualizar/$', update)
 )

@@ -7,7 +7,7 @@ from datetime import datetime
 import simplejson
 
 
-def get_create(request):
+def create_form(request):
     # session check
     if not request.user.is_authenticated():
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -21,7 +21,7 @@ def get_create(request):
     return HttpResponse(t.render(c))
 
 
-def get_update(request, id_paciente):
+def update_form(request, id_paciente):
     # session check
     if not request.user.is_authenticated():
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -50,7 +50,7 @@ def get_update(request, id_paciente):
     return HttpResponse(t.render(c))
 
 
-def get_buscar(request):
+def buscar_form(request):
     # session check
     if not request.user.is_authenticated():
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -99,7 +99,7 @@ def get_buscar(request):
     return HttpResponse(t.render(c))
 
 
-def post_create(request):
+def create(request):
     domicilio = request.POST.get(u'domicilio', u'')
     sexo = request.POST.get(u'sexo', u'')
     dni = request.POST.get(u'dni')
@@ -140,7 +140,7 @@ def post_create(request):
         return HttpResponse(simplejson.dumps(response_dict))
 
 
-def post_update(request, id_paciente):
+def update(request, id_paciente):
     domicilio = request.POST.get(u'domicilio', u'')
     sexo = request.POST.get(u'sexo', u'')
     dni = request.POST.get(u'dni')
