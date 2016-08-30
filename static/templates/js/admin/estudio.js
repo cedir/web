@@ -28,17 +28,29 @@ $(document).ready(function() {
         $(".field-informe").append(gastritisButton);
         $("#gastritisButton").click(function() {load_informe(GASTRITIS);});
 
+        var altaHerniaReflujoGastritisButton = $('<input type="button" value="HERNIA, REFLUJO, ESOFAGITIS, GASTRITIS" id="altaHerniaReflujoGastritisButton" class="admin-informe-buttons" style="display:none;"/>');
+        $(".field-informe").append(altaHerniaReflujoGastritisButton);
+        $("#altaHerniaReflujoGastritisButton").click(function() {load_informe(HERNIA_REFLUJO_ESOFAGITIS_GASTRITIS);});
+
+        var altaCierreCardialIncompletoButton = $('<input type="button" value="CIERRE CARDIAL INCOMPLETO  REFLUJO, ESOFAGITIS, GASTRTITIS" id="altaCierreCardialIncompletoButton" class="admin-informe-buttons" style="display:none;"/>');
+        $(".field-informe").append(altaCierreCardialIncompletoButton);
+        $("#altaCierreCardialIncompletoButton").click(function() {load_informe(CIERRE_CARDIAL_INCOMPLETO_REFLUJO_ESOFAGITIS_GASTRTITIS);});
+
+        var altaReflujoEsofagitisSinHerniaHiatalButton = $('<input type="button" value="REFLUJO, ESOFAGITIS SIN HERNIA HIATAL, GASTRITIS" id="altaReflujoEsofagitisSinHerniaHiatalButton" class="admin-informe-buttons" style="display:none;"/>');
+        $(".field-informe").append(altaReflujoEsofagitisSinHerniaHiatalButton);
+        $("#altaReflujoEsofagitisSinHerniaHiatalButton").click(function() {load_informe(REFLUJO_ESOFAGITIS_SIN_HERNIA_HIATAL_GASTRITIS);});
+
         var colonoNormalButton = $('<input type="button" value="Colono Normal" id="colonoNormalButton" class="admin-informe-buttons" style="display:none;"/>');
         $(".field-informe").append(colonoNormalButton);
         $("#colonoNormalButton").click(function() {load_informe(COLONO_NORMAL);});
 
-        var colangioNormalButton = $('<input type="button" value="Colangio Normal" id="colangioNormalButton" class="admin-informe-buttons" style="display:none;"/>');
+        var colonoConHemorroidesButton = $('<input type="button" value="Colono con Hemorroides" id="colonoConHemorroidesButton" class="admin-informe-buttons" style="display:none;"/>');
+        $(".field-informe").append(colonoConHemorroidesButton);
+        $("#colonoConHemorroidesButton").click(function() {load_informe(COLONO_CON_HEMORROIDES);});
+
+        var colangioNormalButton = $('<input type="button" value="Colangio Standard" id="colangioNormalButton" class="admin-informe-buttons" style="display:none;"/>');
         $(".field-informe").append(colangioNormalButton);
         $("#colangioNormalButton").click(function() {load_informe(COLANGIO_NORMAL);});
-
-        var colangioConCalculoButton = $('<input type="button" value="Colangio Con Calclulo" id="colangioConCalculoButton" class="admin-informe-buttons" style="display:none;"/>');
-        $(".field-informe").append(colangioConCalculoButton);
-        $("#colangioConCalculoButton").click(function() {load_informe(COLANGIO_CON_CALCULO);});
 
         function load_informe(text){
             $("#id_informe").val(text);
@@ -77,64 +89,45 @@ $(document).ready(function() {
         ESTUDIOS_COLANGIOS = [13, 34];
 
         /******Estudios altos******/
-        var ALTA_NORMAL = "<b>Esófago:</b> Normal, cardias a 37 cm de la arcada dentaria superior. No se evidencia reflujo gastro-esofágico, hernia hiatal, ni esofagitis por reflujo. \n\n" +
-            "<b>Estómago:</b> Mucosa de características normales. Por retroflexión se observa el techo gástrico con un buen cierre cardial. \n\n" +
-            "<b>Píloro:</b> Permeable. \n\n" +
-            "<b>Bulbo duodenal y segunda porción duodenal:</b> Normales. \n\n" +
-            "<b>Conclusión diagnóstica: Esófagogastroduodeno de características normales.</b> \n";
+        var ALTA_NORMAL = "<b>Esófago:</b> Mucosa de aspecto normal. Cardias a 39 cm del margen dentario superior. Buen cierre cardial sin evidencias de reflujo gastro esofagico.\n\n" +
+            "<b>Estómago:</b> Lago mucoso con escaso contenido claro. La mucosa gástrica presenta un patrón endoscopico normal.\n\n" +
+            "<b>Píloro:</b> Permeable.\n\n" +
+            "<b>Bulbo duodenal:</b> Normal.\n\n" +
+            "<b>Segunda porción duodenal:</b> Patrón endoscopico dentro de limites normales.\n\n" +
+            "<b>Conclusión diagnostica: Mucosa esófago gastro duodenal dentro de parámetros normales. No se observan lesiones parietales ni intrínsecas que deformen la pared del tubo digestivo superior.</b> \n\n" +
+            "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
 
-        var GASTRITIS = "<b>Esófago:</b> Normal, cardias a 37 cm de la arcada dentaria superior. \n\n" +
+        var GASTRITIS = "<b>Esófago:</b> Mucosa de aspecto normal, cardias a 39 cm. del margen dentario superior. Buen cierre cardial sin evidencias de reflujo gastro esofagico.\n\n" +
             "<b>Estómago:</b> Mucosa antral difusamente congestiva eritematosa a predominio pre pilórico.\n\n" +
             "<b>Píloro:</b> Permeable.\n\n" +
-            "<b>Bulbo duodenal y segunda porción duodenal:</b> Normales. \n\n" +
-            "<b>Conclusión diagnóstica: Gastritis superficial no erosiva de antro gástrico.</b> \n";
-
-
-
-        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
-            "<b>Estómago:</b> \n\n" +
-            "<b>Píloro:</b> \n\n" +
-            "<b>Bulbo duodenal:</b> \n\n" +
-            "<b>Segunda porción duodenal:</b> \n\n" +
-            "<b></b> \n\n" +
+            "<b>Bulbo duodenal:</b> Normal.\n\n" +
+            "<b>Segunda porción duodenal:</b> Patrón endoscopico dentro de limites normales.\n\n" +
+            "<b>Conclusión diagnostica: Mucosa antral difusamente congestiva sugestiva de antropatía inflamatoria superficial no erosiva. Se toman múltiples biopsias. </b> \n\n" +
             "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
 
-        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
-            "<b>Estómago:</b> \n\n" +
-            "<b>Píloro:</b> \n\n" +
-            "<b>Bulbo duodenal:</b> \n\n" +
-            "<b>Segunda porción duodenal:</b> \n\n" +
-            "<b></b> \n\n" +
+        var HERNIA_REFLUJO_ESOFAGITIS_GASTRITIS = '<b>Esófago:</b> Cardias a 39 cm del margen dentario superior, hernia hiatal por deslizamiento, reflujo gastro esofágico de leve a moderado. Erosión lineal menor de 5 mm de longitud que no compromete el extremo proximal de un pliegue cardial. La lesión descripta es sugestiva de Esofagitis por reflujo grado "A" de la clasificación de Los Ángeles. Se toman múltiples biopsias.\n\n' +
+            "<b>Estómago:</b> Mucosa antral difusamente congestiva eritematosa a predominio pre pilórico.\n\n" +
+            "<b>Píloro:</b> Permeable.\n\n" +
+            "<b>Bulbo duodenal:</b> Normal.\n\n" +
+            "<b>Segunda porción duodenal:</b> Patrón endoscopico dentro de limites normales.\n\n" +
+            '<b>Conclusión diagnostica: Hernia hiatal por deslizamiento, reflujo gastro esofagico, esofagitis por reflujo grado "A" de la clasificación de Los Angeles. Mucosa antral difusamente congestiva sugestiva de antropatía inflamatoria superficial no erosiva. Se toman múltiples biopsias.</b> \n\n' +
             "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
 
-        /*new*/
-        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
-            "<b>Estómago:</b> \n\n" +
-            "<b>Píloro:</b> \n\n" +
-            "<b>Bulbo duodenal:</b> \n\n" +
-            "<b>Segunda porción duodenal:</b> \n\n" +
-            "<b></b> \n\n" +
+        var CIERRE_CARDIAL_INCOMPLETO_REFLUJO_ESOFAGITIS_GASTRTITIS = '<b>Esófago:</b> Cardias a 39 cm del margen dentario superior, cierre cardial incompleto, reflujo gastro esofágico de leve a moderado. Erosión lineal menor de 5 mm de longitud que no compromete el extremo proximal de un pliegue cardial. La lesión descripta es sugestiva de Esofagitis por reflujo grado "A" de la clasificación de Los Ángeles. Se toman múltiples biopsias.\n\n' +
+            "<b>Estómago:</b> Mucosa antral difusamente congestiva eritematosa a predominio pre pilórico.\n\n" +
+            "<b>Píloro:</b> Permeable.\n\n" +
+            "<b>Bulbo duodenal:</b> Normal.\n\n" +
+            "<b>Segunda porción duodenal:</b> Patrón endoscopico dentro de limites normales.\n\n" +
+            '<b>Conclusión diagnostica: Cierre cardial incompleto, reflujo gastro esofagico, esofagitis por reflujo grado "A" de la clasificación de Los Angeles. Mucosa antral difusamente congestiva sugestiva de antropatía inflamatoria superficial no erosiva. Se toman múltiples biopsias.</b>\n\n' +
             "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
 
-        /*new*/
-        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
-            "<b>Estómago:</b> \n\n" +
-            "<b>Píloro:</b> \n\n" +
-            "<b>Bulbo duodenal:</b> \n\n" +
-            "<b>Segunda porción duodenal:</b> \n\n" +
-            "<b></b> \n\n" +
+        var REFLUJO_ESOFAGITIS_SIN_HERNIA_HIATAL_GASTRITIS  = '<b>Esófago:</b> Cardias a 38 cm del margen dentario superior, reflujo gastro esofágico de leve a moderado. Erosión lineal menor de 5 mm de longitud que no compromete el extremo proximal de un pliegue cardial. La lesión descripta es sugestiva de Esofagitis por reflujo grado "A" de la clasificación de Los Ángeles. Se toman múltiples biopsias.\n\n' +
+            "<b>Estómago:</b> Mucosa antral difusamente congestiva eritematosa a predominio pre pilórico.\n\n" +
+            "<b>Píloro:</b> Permeable.\n\n" +
+            "<b>Bulbo duodenal:</b> Normal.\n\n" +
+            "<b>Segunda porción duodenal:</b> Patrón endoscopico dentro de limites normales.\n\n" +
+            '<b>Conclusión diagnostica: Reflujo gastro esofagico, esofagitis por reflujo grado "A" de la clasificación de Los Angeles. Mucosa antral difusamente congestiva sugestiva de antropatía inflamatoria superficial no erosiva. Se toman múltiples biopsias.</b> \n\n' +
             "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
-
-        /*new*/
-        var ALTA_NORMAL = "<b>Esófago:</b> \n\n" +
-            "<b>Estómago:</b> \n\n" +
-            "<b>Píloro:</b> \n\n" +
-            "<b>Bulbo duodenal:</b> \n\n" +
-            "<b>Segunda porción duodenal:</b> \n\n" +
-            "<b></b> \n\n" +
-            "<b>Estimado Dr. Recuerde que Ud. puede visualizar este estudio ingresando al Link que se muestra al pie de este informe.</b>";
-
-
 
 
 
@@ -145,12 +138,11 @@ $(document).ready(function() {
             "Se identifica el fondo cecal comprobado por sus cuatro signos endoscópicos de pliegue radiado, fosa apendicular , válvula Ileocecal y trans iluminación parietal en fosa iliaca derecha.\n\n" +
             "<b>Conclusión Diagnóstica : Ampolla rectal y marco colónico visualizado hasta ciego de características normales.</b>\n";
 
-        /*new*/
-        var COLONO_CON_HEMORROIDES = "Inspección anal: Hemorroides internas grado I.\n\n";
-            "Ampolla rectal sin lesión mucosa." +
-            "Se avanza por el ángulo rectosigmoides observando el colon sigmoides de características normales." +
-            "Se progresa por el colon descendente hasta franquear el ángulo esplénico observando el colon transverso, ángulo hepático y colon ascendente sin evidenciar lesión mucosa." +
-            "Se identifica el fondo cecal comprobado por sus cuatro signos endoscópicos de pliegue radiado, fosa apendicular, válvula Ileocecal y trans iluminación parietal en fosa iliaca derecha." +
+        var COLONO_CON_HEMORROIDES = "Inspección anal: Hemorroides internas grado I.\n\n" +
+            "Ampolla rectal sin lesión mucosa.\n\n" +
+            "Se avanza por el ángulo rectosigmoides observando el colon sigmoides de características normales.\n\n" +
+            "Se progresa por el colon descendente hasta franquear el ángulo esplénico observando el colon transverso, ángulo hepático y colon ascendente sin evidenciar lesión mucosa.\n\n" +
+            "Se identifica el fondo cecal comprobado por sus cuatro signos endoscópicos de pliegue radiado, fosa apendicular, válvula Ileocecal y trans iluminación parietal en fosa iliaca derecha.\n\n" +
             "<b>Conclusión Diagnóstica: Hemorroides internas grado I. Ampolla rectal y marco colónico visualizado hasta ciego de características normales.</b>";
 
 
@@ -172,14 +164,6 @@ $(document).ready(function() {
             "<b>Estimado Dr.: Le recordamos que Ud. puede visualizar la totalidad del procedimiento en tiempo real ingresando al link ubicado al pie de pagina.</b>";
 
 
-
-        var COLANGIO_CON_CALCULO = "En segunda porción duodenal se visualiza la Ampolla de Vater de características normales. \n\n" +
-            "Se canula sin dificultad observando la vía biliar intra-hepática de calibre conservado. \n\n" +
-            "La vía biiliar extra-hepática se observa dilatada de aproximadamente 20 mm en promedio con una imagen radiolúcida en su interior con límites netos que podría corresponder a un lito coledociano.\n\n" +
-            "Se realiza papilotomía ámplia y con canastilla de dormia se extrae un lito con las características descriptas en al imagen radiológica. \n\n" +
-            "Buena tolerancia al procedimiento. \n\n" +
-            "Las imágenes radioscópicas son digitalizadas e impresas en papel que acompañan al presente informe.";
-
     }
 
     function practicaChangeHandler(){
@@ -190,13 +174,16 @@ $(document).ready(function() {
         if (ESTUDIOS_ALTOS.indexOf(practica_id) != -1){
             $("#altaNormalButton").css("display", "block");
             $("#gastritisButton").css("display", "block");
+            $("#altaHerniaReflujoGastritisButton").css("display", "block");
+            $("#altaCierreCardialIncompletoButton").css("display", "block");
+            $("#altaReflujoEsofagitisSinHerniaHiatalButton").css("display", "block");
         }
         else if (ESTUDIOS_BAJOS.indexOf(practica_id) != -1){
             $("#colonoNormalButton").css("display", "block");
+            $("#colonoConHemorroidesButton").css("display", "block");
         }
         else if (ESTUDIOS_COLANGIOS.indexOf(practica_id) != -1){
             $("#colangioNormalButton").css("display", "block");
-            $("#colangioConCalculoButton").css("display", "block");
         };
     }
 
