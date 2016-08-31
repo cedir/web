@@ -10,7 +10,7 @@ class MedicacionInline(admin.TabularInline):
 class EstudioAdmin(admin.ModelAdmin):
     actions = None
     fields = (u'fechaEstudio', u'paciente', u'practica', u'medico', u'medicoSolicitante', u'obraSocial', u'anestesista', u'motivoEstudio', u'informe', u'public_id', u'enlace_video')
-    search_fields = [u'paciente__apellido', u'fechaEstudio', ]
+    search_fields = [u'paciente__apellido', u'paciente__dni', u'fechaEstudio', ]
     list_display = (u'fechaEstudio', u'paciente', u'practica', u'medico', u'obraSocial')
     raw_id_fields = (u'paciente', )
     ordering = (u'-fechaEstudio',)

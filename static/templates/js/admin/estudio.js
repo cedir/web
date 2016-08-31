@@ -20,37 +20,41 @@ $(document).ready(function() {
     function cargarVistaChangeEstudio(){
 
         /* Crear botones de informes*/
+        $(".field-informe").append('<table id="informeButtons"><tbody><tr></tr></tbody></table>');  // TODO: crear diferentes tablas y ocular y mostrar las tablas en vez de los botones.
+
+
         var altaNormalButton = $('<input type="button" value="Alta Normal" id="altaNormalButton" class="admin-informe-buttons" style="display:none;"/>');
-        $(".field-informe").append(altaNormalButton);
+        $('#informeButtons tr').append('<td></td>').append(altaNormalButton);
         $("#altaNormalButton").click(function() {load_informe(ALTA_NORMAL);});
 
         var gastritisButton = $('<input type="button" value="Gastritis" id="gastritisButton" class="admin-informe-buttons" style="display:none;"/>');
-        $(".field-informe").append(gastritisButton);
+        $('#informeButtons tr').append('<td></td>').append(gastritisButton);
         $("#gastritisButton").click(function() {load_informe(GASTRITIS);});
 
         var altaHerniaReflujoGastritisButton = $('<input type="button" value="HERNIA, REFLUJO, ESOFAGITIS, GASTRITIS" id="altaHerniaReflujoGastritisButton" class="admin-informe-buttons" style="display:none;"/>');
-        $(".field-informe").append(altaHerniaReflujoGastritisButton);
+        $('#informeButtons tr').append('<td></td>').append(altaHerniaReflujoGastritisButton);
         $("#altaHerniaReflujoGastritisButton").click(function() {load_informe(HERNIA_REFLUJO_ESOFAGITIS_GASTRITIS);});
 
         var altaCierreCardialIncompletoButton = $('<input type="button" value="CIERRE CARDIAL INCOMPLETO  REFLUJO, ESOFAGITIS, GASTRTITIS" id="altaCierreCardialIncompletoButton" class="admin-informe-buttons" style="display:none;"/>');
-        $(".field-informe").append(altaCierreCardialIncompletoButton);
+        $('#informeButtons tr').append('<td></td>').append(altaCierreCardialIncompletoButton);
         $("#altaCierreCardialIncompletoButton").click(function() {load_informe(CIERRE_CARDIAL_INCOMPLETO_REFLUJO_ESOFAGITIS_GASTRTITIS);});
 
         var altaReflujoEsofagitisSinHerniaHiatalButton = $('<input type="button" value="REFLUJO, ESOFAGITIS SIN HERNIA HIATAL, GASTRITIS" id="altaReflujoEsofagitisSinHerniaHiatalButton" class="admin-informe-buttons" style="display:none;"/>');
-        $(".field-informe").append(altaReflujoEsofagitisSinHerniaHiatalButton);
+        $('#informeButtons tr').append('<td></td>').append(altaReflujoEsofagitisSinHerniaHiatalButton);
         $("#altaReflujoEsofagitisSinHerniaHiatalButton").click(function() {load_informe(REFLUJO_ESOFAGITIS_SIN_HERNIA_HIATAL_GASTRITIS);});
 
         var colonoNormalButton = $('<input type="button" value="Colono Normal" id="colonoNormalButton" class="admin-informe-buttons" style="display:none;"/>');
-        $(".field-informe").append(colonoNormalButton);
+        $('#informeButtons tr').append('<td></td>').append(colonoNormalButton);
         $("#colonoNormalButton").click(function() {load_informe(COLONO_NORMAL);});
 
         var colonoConHemorroidesButton = $('<input type="button" value="Colono con Hemorroides" id="colonoConHemorroidesButton" class="admin-informe-buttons" style="display:none;"/>');
-        $(".field-informe").append(colonoConHemorroidesButton);
+        $('#informeButtons tr').append('<td></td>').append(colonoConHemorroidesButton);
         $("#colonoConHemorroidesButton").click(function() {load_informe(COLONO_CON_HEMORROIDES);});
 
         var colangioNormalButton = $('<input type="button" value="Colangio Standard" id="colangioNormalButton" class="admin-informe-buttons" style="display:none;"/>');
-        $(".field-informe").append(colangioNormalButton);
+        $('#informeButtons tr').append('<td></td>').append(colangioNormalButton);
         $("#colangioNormalButton").click(function() {load_informe(COLANGIO_NORMAL);});
+
 
         function load_informe(text){
             $("#id_informe").val(text);
@@ -135,8 +139,8 @@ $(document).ready(function() {
         var COLONO_NORMAL = "Ampolla rectal sin lesión mucosa.\n\n" +
             "Se avanza por el ángulo rectosigmoides observando el colon sigmoides de características normales.\n\n" +
             "Se progresa por el colon descendente hasta franquear el ángulo esplénico observando el colon transverso, ángulo hepático y colon ascendente sin evidenciar lesión mucosa.\n\n" +
-            "Se identifica el fondo cecal comprobado por sus cuatro signos endoscópicos de pliegue radiado, fosa apendicular , válvula Ileocecal y trans iluminación parietal en fosa iliaca derecha.\n\n" +
-            "<b>Conclusión Diagnóstica : Ampolla rectal y marco colónico visualizado hasta ciego de características normales.</b>\n";
+            "Se identifica el fondo cecal comprobado por sus cuatro signos endoscópicos de pliegue radiado, fosa apendicular, válvula Ileocecal y trans iluminación parietal en fosa iliaca derecha.\n\n" +
+            "<b>Conclusión Diagnóstica: Ampolla rectal y marco colónico visualizado hasta ciego de características normales.</b>\n";
 
         var COLONO_CON_HEMORROIDES = "Inspección anal: Hemorroides internas grado I.\n\n" +
             "Ampolla rectal sin lesión mucosa.\n\n" +
