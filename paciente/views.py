@@ -154,7 +154,7 @@ def update(request, id_paciente):
 
     if dni > 0:  # revisar que el DNI no este duplicado, a menos que sea 0
         pacientes = Paciente.objects.filter(dni=dni).exclude(id=paciente.id)
-        if len(pacientes):
+        if pacientes.exists():
             response_dict = {'status': 0, 'message': "Error, ya existe un paciente con DNI " + str(dni)}
             return HttpResponse(simplejson.dumps(response_dict))
 

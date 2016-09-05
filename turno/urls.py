@@ -10,7 +10,7 @@ urlpatterns = patterns(
     '',
     url(r'^api/turno/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^turno/$', get_home),
+    url(r'^turnos/$', get_home),
     url(r'^turno/buscar/', get_buscar_turnos),
     url(r'^turno/disponibles/', get_turnos_disponibles),
     url(r'^turno/nextday/', get_next_day_line),
