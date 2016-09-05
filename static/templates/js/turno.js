@@ -453,7 +453,7 @@ function createPaciente(createTurno) {
     dataType: 'json',
     type: 'POST',
     data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
-      "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
+      "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
       "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
@@ -508,7 +508,7 @@ function createAndAsignPaciente(createTurno) { //TODO: aca llamar a createPacien
     dataType: 'json',
     type: 'POST',
     data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
-      "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
+      "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
       "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
