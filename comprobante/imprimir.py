@@ -311,8 +311,8 @@ def detalle_lineas(p, header, sizes, lineas):
         ('ALIGN', (3, 1), (-1, -1), 'RIGHT'),
         ('FONTSIZE',(0,0),(-1,-1),9),
         ])
-    table.wrapOn(p, width, height)
-    table.drawOn(p, margin, height - 121*mm)
+    mw, mh = table.wrapOn(p, width, height)
+    table.drawOn(p, margin, height - 94*mm - mh)
 
 
 def detalle_iva(p, detalle):
