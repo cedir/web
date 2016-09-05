@@ -168,7 +168,7 @@ function save() {
   $.ajax({
     url: '/turno/guardar/',
     dataType: 'json',
-    data: "hora_inicio=" + hora_inicio + "&hora_fin_estimada=" + hora_fin_estimada + "&fecha_turno=" + fecha + "&id-medico=" + medico + "&id-obra-social=" + obraSocial + "&id-sala=" + sala + "&id-paciente=" + idPaciente + strPracticas + "&observacion_turno=" + observacion + "&_nocache=" + rand,
+    data: "hora_inicio=" + hora_inicio + "&hora_fin_estimada=" + hora_fin_estimada + "&fecha_turno=" + fecha + "&id-medico=" + medico + "&id-obra-social=" + obraSocial + "&id-sala=" + sala + "&id-paciente=" + idPaciente + strPracticas + "&observacion_turno=" + encodeURIComponent(observacion) + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
@@ -272,7 +272,7 @@ function updateTurno() {
   $.ajax({
     url: '/turno/' + idTurno + '/actualizar/',
     dataType: 'json',
-    data: "id-obra-social=" + obraSocial + "&observacion=" + observacion + "&id-estado=" + 1 + "&_nocache=" + rand,
+    data: "id-obra-social=" + obraSocial + "&observacion=" + encodeURIComponent(observacion) + "&id-estado=" + 1 + "&_nocache=" + rand,
     success: function(data) {
       alert(data.message);
       location.reload();
@@ -306,13 +306,15 @@ function confirmar() {
 function anular() {
   var rand = Math.round(100 * Math.random());
   var idTurno = $("#current-turno-id").val();
+  var observacion = $("#popup-observacion_turno").val();
+
   if (!confirm('¿Seguro desea anular el turno?')) {
     return;
   }
   $.ajax({
     url: '/turno/' + idTurno + '/anular/',
     dataType: 'json',
-    data: "&_nocache=" + rand,
+    data: "&_nocache=" + rand + "&observacion_turno=" + encodeURIComponent(observacion),
     success: function(data) {
       alert(data.message);
       location.reload();

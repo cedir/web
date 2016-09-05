@@ -388,6 +388,12 @@ def anular(request, id_turno):
             raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
 
         turno.estado = Estado.objects.get(id=Estado.ANULADO)
+
+        observacion_turno = request.GET['observacion_turno']
+
+        if observacion_turno:
+            turno.observacion = observacion_turno
+
         turno.save()
 
         _add_log_entry(turno, request.user, CHANGE, "ANULA")
