@@ -43,7 +43,7 @@
 				<div class="form-row">
 					<div class="form-subrow form-subrow_first">
 						<label>Paciente:</label>
-						<a href="/app/?controlador=Pacientes&accion=getUpdate&id=" id="popup-paciente" target="_blank"></a> (DNI: <span id="popup-paciente-dni"></span>)</div>
+						<a href="/paciente/[ID_PACIENTE]/editar/" id="popup-paciente" target="_blank"></a> (DNI: <span id="popup-paciente-dni"></span>)</div>
 					<div class="form-subrow">
 						<label>Telefono:</label><span id="popup-paciente-tel"></span></div>
 					<div style="clear:both;"></div>
@@ -75,7 +75,11 @@
 					<div style="clear:both;"></div>
 				</div>
 				<div class="form-row">
-					<label>Creado por:</label> <span id="popup-creado-por"></span> el <span id="popup-fecha-otorgamiento"></span></div>
+					<label>Creado por:</label> <span id="popup-creado-por"></span> el <span id="popup-fecha-otorgamiento"></span>
+				</div>
+				<div class="form-row">
+					<label>Modificado por:</label> <span id="popup-ult-mod-por"></span> el <span id="popup-fecha-ult-mod"></span> (<span id="popup-motivo-ult-mod"></span>)
+				</div>
 				<div class="form-row">
 					<label>Observacion</label>
 					<textarea name="popup-observacion_turno" id="popup-observacion_turno" value="" style="width: 379px; height: 68px;" maxlength="200"></textarea>
@@ -99,10 +103,7 @@
 <div class="module">
 	<h3>Turnos</h3>
 
-	<form name='frmBuscar' id='frmBuscar' action="/app/">
-		<input type="hidden" name="controlador" value="Turnos" />
-		<input type="hidden" name="accion" value="getBuscarTurnos" />
-
+	<form name='frmBuscar' id='frmBuscar' action="/turno/buscar/">
 		<div class="form-row">
 			<label>Paciente:</label>
 			<input type="text" name="paciente" value="{{paciente}}" />
@@ -158,7 +159,7 @@
 				<td><img src="/media/images/turnos/{{hshTurnos.img_estado}}" title="estado" alt="estado" /></td>
 				<td>{{ hshTurnos.fecha }}</td>
 				<td>{{ hshTurnos.hora_inicio }}</td>
-				<td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshTurnos.id_paciente }}">{{ hshTurnos.apellido }}, {{ hshTurnos.nombre }} </a></td>
+				<td><a href="/paciente/{{ hshTurnos.id_paciente }}/">{{ hshTurnos.apellido }}, {{ hshTurnos.nombre }} </a></td>
 				<td>{{ hshTurnos.medico }}</td>
 				<td>{{ hshTurnos.obra_social }}</td>
 				<td>{{ hshTurnos.practica }}</td>

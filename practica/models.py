@@ -14,4 +14,4 @@ class Practica(models.Model):
         ordering = ['descripcion']
 
     def __unicode__(self):
-        return u'%s' % self.descripcion
+        return u'%s' % (self.abreviatura or self.descripcion)
