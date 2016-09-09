@@ -1,0 +1,568 @@
+{% extends "home/base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<!-- banner start -->
+<!-- ================ -->
+<div class="banner clearfix">
+
+	<!-- slideshow start -->
+	<!-- ================ -->
+	<div class="slideshow">
+
+		<!-- slider revolution start -->
+		<!-- ================ -->
+		<div class="slider-banner-container">
+			<div class="slider-banner-fullwidth-big-height">
+				<ul class="slides">
+					<!-- slide 1 start -->
+					<!-- ================ -->
+					<li data-transition="random" data-slotamount="7" data-masterspeed="500" data-saveperformance="on" data-title="Wellcome">
+
+					<!-- main image -->
+					<img src="{% static 'images/medical-slider-slide-1.jpg' %}" alt="slidebg1" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
+
+					<!-- Transparent Background -->
+					<div class="tp-caption light-translucent-bg"
+						data-x="center"
+						data-y="bottom"
+						data-speed="600"
+						data-start="0">
+					</div>
+
+					<!-- LAYER NR. 1 -->
+					<div class="tp-caption sfb fadeout large_dark"
+						data-x="left"
+						data-y="180"
+						data-speed="500"
+						data-start="1000"
+						data-easing="easeOutQuad">Compassionate care
+					</div>
+
+					<!-- LAYER NR. 2 -->
+					<div class="tp-caption sfb fadeout medium_dark hidden-xs"
+						data-x="left"
+						data-y="250"
+						data-speed="500"
+						data-start="1300"
+						data-easing="easeOutQuad"
+						data-endspeed="600">Lorem ipsum dolor sit amet, consectetur adipisicing elit. <br> Nesciunt, maiores, aliquid. Repellat eum numquam aliquid culpa offici, <br> tenetur fugiat dolorum sapiente eligendi...
+					</div>
+
+					<!-- LAYER NR. 3 -->
+					<div class="tp-caption sfb fadeout small_dark text-center"
+						data-x="left"
+						data-y="360"
+						data-speed="500"
+						data-start="1600"
+						data-easing="easeOutQuad"
+						data-endspeed="600"><a href="#" class="btn btn-dark btn-default btn-animated">Learn More <i class="fa fa-arrow-right"></i></a>
+					</div>
+
+					</li>
+					<!-- slide 1 end -->
+
+					<!-- slide 2 start -->
+					<!-- ================ -->
+					<li data-transition="random" data-slotamount="7" data-masterspeed="500" data-saveperformance="on" data-title="Top Doctors">
+
+					<!-- main image -->
+					<img src="{% static 'images/medical-slider-slide-2.jpg' %}" alt="slidebg2" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
+
+					<!-- Transparent Background -->
+					<div class="tp-caption dark-translucent-bg"
+						data-x="center"
+						data-y="bottom"
+						data-speed="600"
+						data-start="0">
+					</div>
+
+					<!-- LAYER NR. 1 -->
+					<div class="tp-caption sfb fadeout text-right large_white"
+						data-x="right"
+						data-y="180"
+						data-speed="500"
+						data-start="1000"
+						data-easing="easeOutQuad">Top doctors providing quality care
+					</div>
+
+					<!-- LAYER NR. 2 -->
+					<div class="tp-caption sfb fadeout text-right large_white tp-resizeme hidden-xs"
+						data-x="right"
+						data-y="250"
+						data-speed="500"
+						data-start="1300"
+						data-easing="easeOutQuad"><div class="separator-3 light"></div>
+					</div>
+
+					<!-- LAYER NR. 3 -->
+					<div class="tp-caption sfb fadeout medium_white text-right hidden-xs"
+						data-x="right"
+						data-y="270"
+						data-speed="500"
+						data-start="1300"
+						data-easing="easeOutQuad"
+						data-endspeed="600">Lorem ipsum dolor sit amet, consectetur adipisicing elit. <br> Nesciunt, maiores, aliquid. Repellat eum numquam aliquid culpa offici, <br> tenetur fugiat dolorum sapiente eligendi...
+					</div>
+
+					<!-- LAYER NR. 4 -->
+					<div class="tp-caption sfb fadeout small_white text-right"
+						data-x="right"
+						data-y="380"
+						data-speed="500"
+						data-start="1600"
+						data-easing="easeOutQuad"
+						data-endspeed="600"><a href="#" class="btn btn-dark btn-default btn-animated">Learn More <i class="fa fa-arrow-right"></i></a>
+					</div>
+
+					</li>
+					<!-- slide 2 end -->
+				</ul>
+				<div class="tp-bannertimer"></div>
+			</div>
+		</div>
+		<!-- slider revolution end -->
+
+	</div>
+	<!-- slideshow end -->
+
+</div>
+<!-- banner end -->
+
+<div id="page-start"></div>
+
+<!-- section start -->
+<!-- ================ -->
+<section class="pv-30 light-gray-bg clearfix">
+	<div class="container">
+		<h3 class="title logo-font text-center text-default">The Clinic</h3>
+		<div class="separator"></div>
+		<p class="text-center">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea aut voluptates quia <br> eveniet velit inventore, corporis, rem laboriosam. Ex ipsam nihil, quos dicta atque alias vel sunt. Libero, molestiae quidem?</p>
+		<br>
+		<div class="row grid-space-10">
+			<div class="col-sm-6 col-md-3">
+				<div class="pv-30 ph-20 white-bg feature-box bordered text-center">
+					<span class="icon default-bg circle"><i class="fa fa-plus-square"></i></span>
+					<h3>Since 1930</h3>
+					<div class="separator clearfix"></div>
+					<p>Voluptatem ad provident non repudiandae beatae cupiditate amet reiciendis lorem ipsum dolor sit amet, consectetur.</p>
+					<a href="#" class="btn btn-default btn-animated">Read More <i class="fa fa-angle-double-right"></i></a>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div class="pv-30 ph-20 white-bg feature-box bordered text-center">
+					<span class="icon default-bg circle"><i class="fa fa-hospital-o"></i></span>
+					<h3>Apointments</h3>
+					<div class="separator clearfix"></div>
+					<p>Iure sequi unde hic. Sapiente quaerat sequi inventore veritatis cumque lorem ipsum dolor sit amet, consectetur.</p>
+					<a href="#" class="btn btn-default btn-animated">Make An Apointment <i class="pl-5 fa fa-stethoscope"></i></a>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div class="pv-30 ph-20 default-bg feature-box bordered text-center">
+					<span class="icon dark-bg circle"><i class="fa fa-ambulance"></i></span>
+					<h3>Emergency Calls</h3>
+					<div class="separator clearfix"></div>
+					<p>Inventore dolores aut laboriosam cum consequuntur delectus sequi lorem ipsum dolor sit amet, consectetur.</p>
+					<a href="#" class="btn btn-default btn-animated">Call Us <i class="pl-5 fa fa-phone"></i></a>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div class="pv-30 ph-20 white-bg feature-box bordered text-center">
+					<span class="icon default-bg circle"><i class="glyphicon glyphicon-time"></i></span>
+					<h3>Opening Hours</h3>
+					<div class="separator-2 mt-20 clearfix"></div>
+					<ul class="list-unstyled small list-icons text-left">
+						<li><strong class="text-default">Monday - Friday</strong> <span class="pull-right">8.00 - 18.00</span></li>
+						<li><strong class="text-default">Saturday</strong> <span class="pull-right">9.00 - 16.30</span></li>
+						<li><strong class="text-default">Sunday</strong> <span class="pull-right">9.30 - 16.00</span></li>
+					</ul>
+					<div class="separator-3 mt-20 clearfix"></div>
+					<p class="small text-default">Lorem ipsum dolor sit amet, consectetur.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- section end -->
+
+<!-- section start -->
+<!-- ================ -->
+<section class="section dark-bg clearfix">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="call-to-action text-center">
+					<div class="row">
+						<div class="col-sm-8">
+							<h1 class="title"><i class="fa fa-user-md pr-10"></i>Find A Doctor</h1>
+							<ul class="list-inline">
+								<li><i class="icon-dot text-default"></i> <a href="#" class="link-light">Cardiologists‎</a></li>
+								<li><i class="icon-dot text-default"></i> <a href="#" class="link-light">Dermatologists‎</a></li>
+								<li><i class="icon-dot text-default"></i> <a href="#" class="link-light">Diabetologists‎</a></li>
+								<li><i class="icon-dot text-default"></i> <a href="#" class="link-light">Gastroenterologists</a></li>
+								<li><i class="icon-dot text-default"></i> <a href="#" class="link-light">Gynaecologists‎</a></li>
+							</ul>
+						</div>
+						<div class="col-sm-4">
+							<br>
+							<p><a href="#" class="btn btn-lg btn-default btn-animated">More Specialties<i class="fa fa-search pl-20"></i></a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- section end -->
+
+<!-- section start -->
+<!-- ================ -->
+<section class="section clearfix">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<h3>Latest <span class="text-default">News</span></h3>
+				<div class="separator-2"></div>
+				<div class="block">
+					<div class="media margin-clear">
+						<div class="media-left">
+							<div class="overlay-container">
+								<img class="media-object" src="{% static 'images/medical-blog-thumb-1.jpg' %}" alt="blog-thumb">
+								<a href="blog-post.html" class="overlay-link small"><i class="fa fa-link"></i></a>
+							</div>
+						</div>
+						<div class="media-body">
+							<h5 class="media-heading"><a href="blog-post.html">Lorem ipsum dolor sit amet</a></h5>
+							<p class="small"><i class="fa fa-calendar pr-10"></i>Mar 23, 2015</p>
+							<p class="margin-clear small">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt corrupti, cum exercitationem.</p>
+							<a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+						</div>
+						<hr>
+					</div>
+					<div class="media margin-clear">
+						<div class="media-left">
+							<div class="overlay-container">
+								<img class="media-object" src="{% static 'images/medical-blog-thumb-2.jpg' %}" alt="blog-thumb">
+								<a href="blog-post.html" class="overlay-link small"><i class="fa fa-link"></i></a>
+							</div>
+						</div>
+						<div class="media-body">
+							<h5 class="media-heading"><a href="blog-post.html">Perspiciatis laborum necess</a></h5>
+							<p class="small"><i class="fa fa-calendar pr-10"></i>Mar 22, 2015</p>
+							<p class="margin-clear small">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt corrupti, cum exercitationem.</p>
+							<a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+						</div>
+						<hr>
+					</div>
+					<div class="media margin-clear">
+						<div class="media-left">
+							<div class="overlay-container">
+								<img class="media-object" src="{% static 'images/medical-blog-thumb-3.jpg' %}" alt="blog-thumb">
+								<a href="blog-post.html" class="overlay-link small"><i class="fa fa-link"></i></a>
+							</div>
+						</div>
+						<div class="media-body">
+							<h5 class="media-heading"><a href="blog-post.html">Cum eligendi nisi rerum porro</a></h5>
+							<p class="small"><i class="fa fa-calendar pr-10"></i>Mar 21, 2015</p>
+							<p class="margin-clear small">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Incidunt corrupti, cum exercitationem.</p>
+							<a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<h3>Our <span class="text-default">Departments</span></h3>
+				<div class="separator-2"></div>
+				<!-- accordion start -->
+				<!-- ================ -->
+				<div class="panel-group collapse-style-2" id="accordion-2">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseOne-2">
+									<i class="fa fa-eye pr-10"></i>Ophthalmology
+								</a>
+							</h4>
+						</div>
+						<div id="collapseOne-2" class="panel-collapse collapse in">
+							<div class="panel-body bordered p-15">
+								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseTwo-2" class="collapsed">
+									<i class="fa fa-leaf pr-10"></i>Primary care
+								</a>
+							</h4>
+						</div>
+						<div id="collapseTwo-2" class="panel-collapse collapse">
+							<div class="panel-body bordered p-15">
+								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseThree-2" class="collapsed">
+									<i class="icon-users-1 pr-10"></i>Paediatrics
+								</a>
+							</h4>
+						</div>
+						<div id="collapseThree-2" class="panel-collapse collapse">
+							<div class="panel-body bordered p-15">
+								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseFour-2" class="collapsed">
+									<i class="fa-female fa pr-10"></i>Gynaecology
+								</a>
+							</h4>
+						</div>
+						<div id="collapseFour-2" class="panel-collapse collapse">
+							<div class="panel-body bordered p-15">
+								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseFive-2" class="collapsed">
+									<i class="fa-road fa pr-10"></i>Orthopaedics
+								</a>
+							</h4>
+						</div>
+						<div id="collapseFive-2" class="panel-collapse collapse">
+							<div class="panel-body bordered p-15">
+								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseSix-2" class="collapsed">
+									<i class="fa-heart fa pr-10"></i>Cardiology
+								</a>
+							</h4>
+						</div>
+						<div id="collapseSix-2" class="panel-collapse collapse">
+							<div class="panel-body bordered p-15">
+								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- accordion end -->
+			</div>
+			<div class="col-md-3">
+				<h3>Health <span class="text-default">Services</span></h3>
+				<div class="separator-2"></div>
+				<div class="owl-carousel content-slider-with-large-controls-autoplay dark-controls light-gray-bg buttons-hide">
+					<div class="image-box style-2">
+						<div class="overlay-container overlay-visible">
+							<img src="{% static 'images/medical-service-1.jpg' %}" alt="">
+							<a href="#" class="overlay-link"><i class="fa fa-link"></i></a>
+							<div class="overlay-bottom hidden-xs">
+								<div class="text">
+									<p class="lead margin-clear text-left">Medical Education</p>
+								</div>
+							</div>
+						</div>
+						<div class="body padding-horizontal-clear">
+							<p>Lorem ipsum dolor sit amet, consectetur adipis elit. Aliquam atque ipsam nihil dood truck quinoa.</p>
+							<a class="link-dark" href="page-services.html">Read More<i class="pl-5 fa fa-angle-double-right"></i></a>
+						</div>
+					</div>
+					<div class="image-box style-2">
+						<div class="overlay-container overlay-visible">
+							<img src="{% static 'images/medical-service-2.jpg' %}" alt="">
+							<a href="#" class="overlay-link"><i class="fa fa-link"></i></a>
+							<div class="overlay-bottom hidden-xs">
+								<div class="text">
+									<p class="lead margin-clear text-left">Seminars For Medicals Professionals</p>
+								</div>
+							</div>
+						</div>
+						<div class="body padding-horizontal-clear">
+							<p>Lorem ipsum dolor sit amet, consectetur adipis elit. Aliquam atque ipsam nihil dood truck quinoa.</p>
+							<a class="link-dark" href="page-services.html">Read More<i class="pl-5 fa fa-angle-double-right"></i></a>
+						</div>
+					</div>
+					<div class="image-box style-2">
+						<div class="overlay-container overlay-visible">
+							<img src="{% static 'images/medical-service-3.jpg' %}" alt="">
+							<a href="#" class="overlay-link"><i class="fa fa-link"></i></a>
+							<div class="overlay-bottom hidden-xs">
+								<div class="text">
+									<p class="lead margin-clear text-left">Research &amp; Development</p>
+								</div>
+							</div>
+						</div>
+						<div class="body padding-horizontal-clear">
+							<p>Lorem ipsum dolor sit amet, consectetur adipis elit. Aliquam atque ipsam nihil dood truck quinoa.</p>
+							<a class="link-dark" href="page-services.html">Read More<i class="pl-5 fa fa-angle-double-right"></i></a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- section end -->
+
+<!-- section start -->
+<!-- ================ -->
+<section class="full-width-section">
+	<div class="full-image-container light-gray-bg">
+		<img class="to-right-block" src="{% static 'images/medical-section-image-1.jpg' %}" alt="">
+		<div class="full-image-overlay text-right">
+			<h3>With Compassionate Care Since 1930</h3>
+			<ul class="list-icons">
+				<li>We are here to support you <i class="icon-check-1"></i></li>
+				<li>Free updates <i class="icon-check-1"></i></li>
+				<li>ipsam asperiores fugiat quo <i class="icon-check-1"></i></li>
+				<li>Animi veniam veritatis sint <i class="icon-check-1"></i></li>
+				<li>Voluptatum officia suscipit <i class="icon-check-1"></i></li>
+				<li>Unlimited options and variations <i class="icon-check-1"></i></li>
+			</ul>
+		</div>
+	</div>
+	<div class="full-text-container light-gray-bg">
+		<h3 class="logo-font"><span class="text-muted">The</span> <span class="text-default">Clinic</span></h3>
+		<div class="separator-2 visible-lg"></div>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi veniam, veritatis sint consequuntur! Natus, culpa, explicabo! Non quo laboriosam nobis quia, amet excepturi optio dolor impedit. Perferendis libero unde, nulla deserunt sequi. Voluptatum, officia suscipit porro reprehenderit vitae quo rem reiciendis, a vero quae. Vero beatae voluptatum.</p>
+		<div class="separator-3 visible-lg"></div>
+	</div>
+</section>
+<!-- section end -->
+
+<!-- section start -->
+<!-- ================ -->
+<section class="clearfix">
+	<div class="container pv-20">
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2">
+				<h3 class="text-center">Meet Our <span class="text-default">Team</span></h3>
+				<div class="separator"></div>
+				<p class="lead text-center">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo dignissimos, adipisci ipsa aut voluptate consequuntur ad minus rerum reprehenderit fuga quis eum eveniet eligendi, fugit neque laboriosam unde quae incidunt.</p>
+			</div>
+		</div>
+	</div>
+	<div class="row grid-space-0">
+		<div class="col-md-3 col-sm-6">
+			<div class="image-box team-member shadow mb-20">
+				<div class="overlay-container overlay-visible">
+					<img src="{% static 'images/medical-team-member-1.jpg' %}" alt="">
+					<a href="#" class="overlay-link" title="Jane Doe - CEO"><i class="icon-link"></i></a>
+					<div class="overlay-bottom">
+						<div class="text">
+							<h3 class="title">Dr. Jane Doe</h3>
+							<div class="separator light"></div>
+							<p class="small margin-clear"><em>Diabetologists‎ <br> Lorem ipsum dolor sit</em></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-6">
+			<div class="image-box team-member shadow mb-20">
+				<div class="overlay-container overlay-visible">
+					<img src="{% static 'images/medical-team-member-2.jpg' %}" alt="">
+					<a href="#" class="overlay-link" title="Jane Doe - CEO"><i class="icon-link"></i></a>
+					<div class="overlay-bottom">
+						<div class="text">
+							<h3 class="title">Prof. Jane Doe</h3>
+							<div class="separator light"></div>
+							<p class="small margin-clear"><em>Dermatologists‎ <br> Lorem ipsum dolor sit</em></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-6">
+			<div class="image-box team-member shadow mb-20">
+				<div class="overlay-container overlay-visible">
+					<img src="{% static 'images/medical-team-member-3.jpg' %}" alt="">
+					<a href="#" class="overlay-link" title="Jane Doe - CEO"><i class="icon-link"></i></a>
+					<div class="overlay-bottom">
+						<div class="text">
+							<h3 class="title">Dr. Jane Doe</h3>
+							<div class="separator light"></div>
+							<p class="small margin-clear"><em>Gastroenterologists <br> Lorem ipsum dolor sit</em></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-6">
+			<div class="image-box team-member shadow mb-20">
+				<div class="overlay-container overlay-visible">
+					<img src="{% static 'images/medical-team-member-4.jpg' %}" alt="">
+					<a href="#" class="overlay-link" title="Jane Doe - CEO"><i class="icon-link"></i></a>
+					<div class="overlay-bottom">
+						<div class="text">
+							<h3 class="title">Prof. Jooly Doe</h3>
+							<div class="separator light"></div>
+							<p class="small margin-clear"><em>Gynaecologists‎ <br> Lorem ipsum dolor sit</em></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="owl-carousel space-bottom content-slider">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="testimonial text-center">
+						<div class="testimonial-image">
+							<img src="{% static 'images/testimonial-1.jpg' %}" alt="Jane Doe" title="Jane Doe" class="img-circle">
+						</div>
+						<h3>Thank You!</h3>
+						<div class="separator"></div>
+						<div class="testimonial-body">
+							<blockquote>
+								<p>Sed ut perspiciatis unde omnis iste natu error sit voluptatem accusan tium dolore laud antium, totam rem dolor sit amet tristique pulvinar, turpis arcu rutrum nunc, ac laoreet turpis augue a justo.</p>
+							</blockquote>
+							<div class="testimonial-info-1">- Jane Doe</div>
+							<div class="testimonial-info-2">By Company</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="testimonial text-center">
+						<div class="testimonial-image">
+							<img src="{% static 'images/testimonial-1.jpg' %}" alt="Jane Doe" title="Jane Doe" class="img-circle">
+						</div>
+						<h3>I'm so Happy!</h3>
+						<div class="separator"></div>
+						<div class="testimonial-body">
+							<blockquote>
+								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Et cupiditate deleniti ratione in. Expedita nemo, quisquam, fuga adipisci omnis ad mollitia libero culpa nostrum est quia eos esse vel!</p>
+							</blockquote>
+							<div class="testimonial-info-1">- Jane Doe</div>
+							<div class="testimonial-info-2">By Company</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- section end -->
+
+{% endblock %}

@@ -7,7 +7,8 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
-    (r'', include('contenidos.urls')),
+    (r'', include('contenidos.urls_new')),
+    (r'^oldsite/', include('contenidos.urls')),
     (r'^sendMail/', sendMail),
     (r'^app/', dispatch),
     (r'^turnos/$', getLogin),

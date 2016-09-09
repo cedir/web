@@ -9,6 +9,9 @@ from estudio.models import Estudio
 
 logger = logging.getLogger(u'videos')
 
+def get_home(request):
+    return render(request, 'home/index.html')
+
 def get_video(request, public_id):
     """
     Get the estudio for the given public_id, and displays the video link that redirects to the video download page.
