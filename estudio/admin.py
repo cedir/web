@@ -13,7 +13,7 @@ class EstudioAdmin(admin.ModelAdmin):
     search_fields = [u'paciente__apellido', u'paciente__dni', u'fechaEstudio', ]
     list_display = (u'fechaEstudio', u'paciente', u'practica', u'medico', u'obraSocial')
     raw_id_fields = (u'paciente', )
-    ordering = (u'-fechaEstudio',)
+    ordering = (u'-fechaEstudio', u'paciente__apellido')
     list_filter = (u'fechaEstudio',)
     readonly_fields = (u'public_id', )
     #inlines = (MedicacionInline,)  # permite modificar la medicacion en crear/editar estudio
