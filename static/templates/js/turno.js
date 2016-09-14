@@ -78,8 +78,8 @@ function getNext() {
   var medico = $("#id-medico").val();
 
   $.ajax({
-    url: '/app/',
-    data: "controlador=Turnos&accion=getNextDayLine&fecha=" + fecha + "&id-sala=" + sala + "&id-medico=" + medico + "&_nocache=" + rand,
+    url: '/turno/nextday/',
+    data: "fecha=" + fecha + "&id-sala=" + sala + "&id-medico=" + medico + "&_nocache=" + rand,
     success: function(data) {
       // 	$('#lineasSector').html(data);
       var main = document.getElementById('lineasSector');
@@ -104,8 +104,8 @@ function getBack() {
   var medico = $("#id-medico").val();
 
   $.ajax({
-    url: '/app/',
-    data: "controlador=Turnos&accion=getBackDayLine&fecha=" + fecha + "&id-sala=" + sala + "&id-medico=" + medico + "&_nocache=" + rand,
+    url: '/turno/backday/',
+    data: "fecha=" + fecha + "&id-sala=" + sala + "&id-medico=" + medico + "&_nocache=" + rand,
     success: function(data) {
       var main = document.getElementById('lineasSector');
       var child = main.lastElementChild;
@@ -166,13 +166,13 @@ function save() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/turno/guardar/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=guardar&hora_inicio=" + hora_inicio + "&hora_fin_estimada=" + hora_fin_estimada + "&fecha_turno=" + fecha + "&id-medico=" + medico + "&id-obra-social=" + obraSocial + "&id-sala=" + sala + "&id-paciente=" + idPaciente + strPracticas + "&observacion_turno=" + observacion + "&_nocache=" + rand,
+    data: "hora_inicio=" + hora_inicio + "&hora_fin_estimada=" + hora_fin_estimada + "&fecha_turno=" + fecha + "&id-medico=" + medico + "&id-obra-social=" + obraSocial + "&id-sala=" + sala + "&id-paciente=" + idPaciente + strPracticas + "&observacion_turno=" + encodeURIComponent(observacion) + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
-        window.location.href = "/app/?controlador=Turnos&accion=getBuscarTurnos&fecha=" + fecha + "&id-sala=" + sala
+        window.location.href = "/turno/buscar/?fecha=" + fecha + "&id-sala=" + sala
       } else {
         alert(data.message);
       }
@@ -224,13 +224,12 @@ function getEdit(event) {
   var modal = $(this)
 
   $.ajax({
-    url: '/app/',
+    url: '/turno/' + idTurno + '/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=getTurno&id=" + idTurno,
     success: function(data) {
       modal.find("#popup-paciente")
            .text(data.paciente)
-           .attr("href", "/app/?controlador=Pacientes&accion=getUpdate&id=" + data.paciente_id);
+           .attr("href", "/paciente/" + data.paciente_id + "/");
 
       modal.find("#popup-paciente-tel").text(data.tel);
       modal.find("#popup-paciente-dni").text(data.dni);
@@ -242,6 +241,8 @@ function getEdit(event) {
       modal.find("#popup-hora-inicio").text(data.hora_inicio);
       modal.find("#popup-hora-fin").text(data.hora_fin);
       modal.find("#popup-fecha-otorgamiento").text(data.fecha_otorgamiento);
+      modal.find("#popup-fecha-ult-mod").text(data.fecha_ult_mod);
+      modal.find("#popup-motivo-ult-mod").text(data.motivo_ult_mod);
       modal.find("#popup-observacion_turno")
            .text(data.observacion)
            .val(data.observacion);
@@ -249,6 +250,7 @@ function getEdit(event) {
       modal.find("#id-obra-social").val(data.obra_social);
       modal.find("#id-obra-social").trigger("chosen:updated");
       modal.find("#popup-creado-por").text(data.creado_por);
+      modal.find("#popup-ult-mod-por").text(data.ult_mod_por);
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -268,15 +270,12 @@ function updateTurno() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/turno/' + idTurno + '/actualizar/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=update&id-obra-social=" + obraSocial + "&id-turno=" + idTurno + "&observacion=" + observacion + "&id-estado=" + 1 + "&_nocache=" + rand,
+    data: "id-obra-social=" + obraSocial + "&observacion=" + encodeURIComponent(observacion) + "&id-estado=" + 1 + "&_nocache=" + rand,
     success: function(data) {
-      // 	  if(data.status){
       alert(data.message);
-      $("#frmBuscar").submit();
-      // 	  }
-
+      location.reload();
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -291,12 +290,12 @@ function confirmar() {
     return;
   }
   $.ajax({
-    url: '/app/',
+    url: '/turno/' +idTurno + '/confirmar/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=confirmar&id-turno=" + idTurno + "&_nocache=" + rand,
+    data: "&_nocache=" + rand,
     success: function(data) {
       alert(data.message);
-      $('#frmBuscar').trigger('submit');
+      location.reload();
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -307,16 +306,18 @@ function confirmar() {
 function anular() {
   var rand = Math.round(100 * Math.random());
   var idTurno = $("#current-turno-id").val();
+  var observacion = $("#popup-observacion_turno").val();
+
   if (!confirm('¿Seguro desea anular el turno?')) {
     return;
   }
   $.ajax({
-    url: '/app/',
+    url: '/turno/' + idTurno + '/anular/',
     dataType: 'json',
-    data: "controlador=Turnos&accion=anular&id-turno=" + idTurno + "&_nocache=" + rand,
+    data: "&_nocache=" + rand + "&observacion_turno=" + encodeURIComponent(observacion),
     success: function(data) {
       alert(data.message);
-      $('#frmBuscar').trigger('submit');
+      location.reload();
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -327,7 +328,7 @@ function anular() {
 function reprogramar() {
   var idTurno = $("#current-turno-id").val();
   if (confirm('¿Seguro desea reprogramar el turno?')) {
-    window.location.href = "/app/?controlador=Turnos&accion=reprogramar&id-turno=" + idTurno;
+    window.location.href = "/turno/" + idTurno + "/reprogramar/";
   }
 }
 
@@ -338,7 +339,7 @@ function anunciarTurno() {
     return;
   }
   $.ajax({
-    url: '/turnos/anunciar/' + idTurno,
+    url: '/turno/' + idTurno + '/anunciar/',
     dataType: 'json',
     data: "_nocache=" + rand,
     success: function(data) {
@@ -366,9 +367,8 @@ function getHorarioAtencionMedico() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: "/medico/" + medicoId + "/disponibilidad/?_nocache=" + rand,
     dataType: 'json',
-    data: "controlador=Root&accion=getDisponibilidadMedicosJson&id-medico=" + medicoId + "&_nocache=" + rand,
     success: function(data) {
       var medico = $("#id-medico option:selected").text();
       $('#med-horario').html("<b>" + medico + "</b>" + data.horario);
@@ -449,19 +449,19 @@ function createPaciente(createTurno) {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/paciente/nuevo/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Pacientes&accion=crear&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
-      "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
+    data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
+      "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
       "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
         if (createTurno) {
-          window.location.href = "/app/?controlador=Turnos&accion=getTurnosDisponibles&id-paciente=" + data.idPaciente;
+          window.location.href = "/turno/disponibles/?id-paciente=" + data.idPaciente;
         } else {
-          window.location.href = "/app/?controlador=Pacientes&accion=getBuscar&dni=" + dni;
+          window.location.href = "/paciente/buscar/?dni=" + dni;
         }
       } else { //error
         alert(data.message);
@@ -504,11 +504,11 @@ function createAndAsignPaciente(createTurno) { //TODO: aca llamar a createPacien
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/paciente/nuevo/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Pacientes&accion=crear&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
-      "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
+    data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
+      "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
       "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
@@ -526,7 +526,7 @@ function createAndAsignPaciente(createTurno) { //TODO: aca llamar a createPacien
 
 function updatePaciente() { //TODO: aca llamar a createPaciente para no repetir codigo
   var rand = Math.round(100 * Math.random());
-  var id = $("#id").val();
+  var form = $("#form1");
   var nombre = $("#txtNombre").val();
   var apellido = $("#txtApellido").val();
   var dni = $("#txtDni").val();
@@ -556,16 +556,16 @@ function updatePaciente() { //TODO: aca llamar a createPaciente para no repetir 
   }
 
   $.ajax({
-    url: '/app/',
+    url: form.attr('action'),
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Pacientes&accion=update&id=" + id + "&nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
-      "&telefono=" + telefono + "&fechaNacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
+    data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
+      "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
       "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
-        window.location.href = "/app/?controlador=Pacientes&accion=getBuscar&dni=" + dni;
+        window.location.href = "/paciente/buscar/?dni=" + dni;
       } else { //error
         alert(data.message);
       }
@@ -582,7 +582,7 @@ function buscarPacientes() {
   var nombre = $("#nombrePacienteBuscar").val();
   var dni = $("#dniPacienteBuscar").val();
 
-  $.get("/app/?controlador=Pacientes&accion=getBuscar&apellido=" + apellido + "&nombre=" + nombre + "&dni=" + dni + "&requestType=ajax" + "&_nocache=" + rand, function(data) {
+  $.get("/paciente/buscar/?apellido=" + apellido + "&nombre=" + nombre + "&dni=" + dni + "&request_type=ajax" + "&_nocache=" + rand, function(data) {
     $('.result').html(data);
   });
 }
@@ -616,18 +616,15 @@ function createHorario() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/disponibilidad/nueva/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Root&accion=crearDisponibilidad&hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
+    data: "hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
     success: function(data) {
+      alert(data.message);
       if (data.status) {
-        alert(data.message);
-        $('#frmBuscar').trigger('submit');
-      } else {
-        alert(data.message);
+        location.reload();
       }
-
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -669,9 +666,8 @@ function getUpdateHorario(event) {
   $("#btnGuardar").show();
 
   $.ajax({
-    url: '/app/',
+    url: '/disponibilidad/' + id + '/',
     dataType: 'json',
-    data: "controlador=Root&accion=getDisponibilidad&id=" + id,
     success: function(data) {
       modal.find("#hora_desde").val(data.hora_inicio);
       modal.find("#hora_hasta").val(data.hora_fin);
@@ -721,18 +717,16 @@ function updateHorario() {
   }
 
   $.ajax({
-    url: '/app/',
+    url: '/disponibilidad/' + id + '/actualizar/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Root&accion=updateDisponibilidad&id=" + id + "&hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
+    data: "hora_desde=" + hora_desde + "&hora_hasta=" + hora_hasta + "&id-medico=" + medico + "&id-dia=" + dia + "&id-sala=" + sala + "&_nocache=" + rand,
     success: function(data) {
+      alert(data.message);
       if (data.status) {
-        alert(data.message);
-        $('#frmBuscar').trigger('submit');
-      } else {
-        alert(data.message);
+        $('#dialog').modal('hide');
+        location.reload();
       }
-
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);
@@ -747,18 +741,15 @@ function eliminarHorario() {
   }
   var id = $("#current-disponibilidad-id").val();
   $.ajax({
-    url: '/app/',
+    url: '/disponibilidad/' + id + '/eliminar/',
     dataType: 'json',
     type: 'POST',
-    data: "controlador=Root&accion=deleteDisponibilidad&id=" + id,
     success: function(data) {
+      alert(data.message);
       if (data.status) {
-        alert(data.message);
-        $('#frmBuscar').trigger('submit');
-      } else {
-        alert(data.message);
+        $('#dialog').modal('hide');
+        location.reload();
       }
-
     },
     error: function(response, err) {
       alert("Error en el servidor: " + err);

@@ -5,7 +5,7 @@
 // <!CDATA[
 
 function btbNuevoPaciente_onclick(){
-location.href = "/app/?controlador=Pacientes&accion=getCreate";
+location.href = "/paciente/";
 
 }
 
@@ -31,9 +31,7 @@ location.href = "/app/?controlador=Pacientes&accion=getCreate";
 
 <div class="module">
   <h3>Buscar paciente</h3>
-  <form name='frmBuscar' action="/app/"  >
-    <input type="hidden" name="controlador" value="Pacientes" />
-    <input type="hidden" name="accion" value="getBuscar" />
+  <form name='frmBuscar' action="/paciente/buscar/"  >
     <div class="form-row"><label>Apellido:</label><input type="text" name="apellido" value="{{apellido}}"/></div>
     <div class="form-row"><label>Nombre:</label><input type="text" name="nombre" value="{{nombre}}"/></div>
     <div class="form-row"><label>Documento:</label><input type="text" name="dni" value="{{dni}}"/><input type= "submit" name="Buscar" value="Buscar" /></div>
@@ -58,10 +56,10 @@ location.href = "/app/?controlador=Pacientes&accion=getCreate";
 	      {% for hshPaciente in pacientes %}
 	      <tr class="ui-widget-content">
 		  <td>{{ hshPaciente.dni }}</td>
-		  <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshPaciente.id }}">{{ hshPaciente.apellido }}, {{ hshPaciente.nombre }} </a></td>
+		  <td><a href="/paciente/{{ hshPaciente.id }}/">{{ hshPaciente.apellido }}, {{ hshPaciente.nombre }} </a></td>
 		  <td>{{ hshPaciente.domicilio }}</td>
 		  <td>{{ hshPaciente.telefono }}</td>
-		  <td><a href="/app/?controlador=Pacientes&accion=getUpdate&id={{ hshPaciente.id }}">Modificar</a>&nbsp;|&nbsp;<a href="/app/?controlador=Turnos&accion=getTurnosDisponibles&id-paciente={{ hshPaciente.id }}">Nuevo turno</a></td>
+		  <td><a href="/paciente/{{ hshPaciente.id }}/">Modificar</a>&nbsp;|&nbsp;<a href="/turno/disponibles/?id-paciente={{ hshPaciente.id }}">Nuevo turno</a></td>
 	      </tr>
 	      {% endfor %}
 	  </tbody>
