@@ -256,7 +256,7 @@ def guardar(request):
         turno.save(force_insert=True)
 
         for practica in practicas:
-            turno.practicas.add(practica)
+            turno.practicas.add(practica)  # esto no anda con django 1.10
 
         turno.save()
 
@@ -270,7 +270,7 @@ def guardar(request):
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
     except Exception as err:
-        return str(err)
+        return str(err)  # TODO devolver un HTTPREsponse aca
 
 
 def update(request, id_turno):
