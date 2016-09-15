@@ -6,7 +6,7 @@ class MedicamentoAdmin(admin.ModelAdmin):
     list_display = (u'descripcion', u'tipo', u'importe', u'stock', u'codigo_osde')
     list_filter = (u'tipo', )
     search_fields = [u'descripcion', ]
-    ordering = (u'tipo', u'descripcion',)
+    ordering = (u'-tipo', u'descripcion',)
     readonly_fields = (u'stock', )
 
     def has_delete_permission(self, request, obj=None):
