@@ -17,10 +17,11 @@ admin.site.register(Medicamento, MedicamentoAdmin)
 
 
 class MovimientoAdmin(admin.ModelAdmin):
-    list_display = (u'fecha', u'hora', u'cantidad', u'descripcion', u'medicamento')
-    search_fields = [u'descripcion', ]
+    list_display = (u'fecha', u'hora', u'cantidad', u'tipo', u'descripcion', u'medicamento')
+    search_fields = [u'descripcion', u'fecha', u'medicamento__descripcion']
     ordering = (u'-fecha', )
     list_filter = (u'fecha', u'medicamento__tipo')
+    readonly_fields = (u'tipo', )
 
     def has_delete_permission(self, request, obj=None):
         return False
