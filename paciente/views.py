@@ -108,6 +108,8 @@ def create(request):
     fecha_nacimiento = request.POST.get('fecha_nacimiento')
     if fecha_nacimiento:
         fecha_nacimiento = datetime.strptime(fecha_nacimiento, settings.FORMAT_DATE)
+    else:
+        fecha_nacimiento = None
 
     if dni > 0:  # revisar que el DNI no este duplicado, a menos que sea 0
         pacientes = Paciente.objects.filter(dni=dni)
@@ -126,7 +128,7 @@ def create(request):
         paciente.fechaNacimiento = fecha_nacimiento
         paciente.nroAfiliado = request.POST.get(u'nro_afiliado', u'')
         paciente.email = request.POST.get(u'email')
-        paciente.save(force_insert=True)
+        paciente.save()
 
         response_dict = {
             'idPaciente': paciente.id,

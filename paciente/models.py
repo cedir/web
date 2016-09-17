@@ -8,7 +8,7 @@ class Paciente(models.Model):
     nombre = models.CharField(u"Nombre", max_length=200, db_column=u"nombres")
     apellido = models.CharField(u"Apellido", max_length=200)
     edad = models.IntegerField()
-    fechaNacimiento = models.DateField()
+    fechaNacimiento = models.DateField(null=True, blank=True)
     domicilio = models.CharField(u"Domicilio", max_length=200, db_column=u"direccion")
     telefono = models.CharField(u"Telefono", max_length=200, db_column=u"tel")
     sexo = models.CharField(max_length=50)
