@@ -328,8 +328,9 @@ function anular() {
 
 function reprogramar() {
   var idTurno = $("#current-turno-id").val();
+  var observacion = $("#popup-observacion_turno").val();
   if (confirm('¿Seguro desea reprogramar el turno?')) {
-    window.location.href = "/turno/" + idTurno + "/reprogramar/";
+    window.location.href = "/turno/" + idTurno + "/reprogramar/" + "?observacion_turno=" + encodeURIComponent(observacion);
   }
 }
 
