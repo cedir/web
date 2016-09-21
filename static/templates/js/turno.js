@@ -200,6 +200,7 @@ function getConfirmarTurno(event) {
 
   var modal = $(this)
 
+  modal.find("#selected-paciente").text($("#selectedPaciente").text().trim() || 'Seleccione..');
   modal.find("#selected-medico").text($("#id-medico option:selected").text());
   modal.find("#selected-obrasocial").text($("#id-obra-social option:selected").text());
   modal.find("#selected-practicas").text($("#id-practicas option:selected").text());
