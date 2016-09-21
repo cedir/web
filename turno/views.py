@@ -435,16 +435,14 @@ def reprogramar(request, id_turno):
         practicas = turno.practicas.all()
 
         # generamos una estructura de datos similar a request.GET
-        practicas_query_dict = u'&id-practicas[]='.join(map(lambda x: unicode(x.id), practicas))
-        query_dict_init = u'id-practicas[]=' + practicas_query_dict
-
-        data = QueryDict(query_dict_init, mutable=True)
+        data = QueryDict('', mutable=True)
         data.update({
             'id-sala': turno.sala.id,
             'id-paciente': turno.paciente.id,
             'id-medico': turno.medico.id,
             'id-obra-social': turno.obraSocial.id
         })
+        data.setlist('id-practicas[]', [unicode(practica.id) for practica in practicas])
 
         return _get_turnos_disponibles(request.user, data)
 
