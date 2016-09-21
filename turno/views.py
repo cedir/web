@@ -28,7 +28,7 @@ import simplejson
 PIXELS_PER_MINUTE = 1.333
 err_ses = 'Error, la sesión se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo.'
 spaDayNumbers = dict(lunes=0, martes=1, miercoles=2, jueves=3, viernes=4, sabado=5, domingo=6)
-spaDays = [u'lunes', u'martes', u'miércoles', u'jueves', u'viernes', u'sábado', u'domingo']
+spaDays = [u'lunes', u'martes', u'miercoles', u'jueves', u'viernes', u'sabado', u'domingo']
 spaMonths = [None, u'enero', u'febrero', u'marzo', u'abril', u'mayo', u'junio', u'julio', u'agosto', u'setiembre',
              u'octubre', u'noviembre', u'diciembre']
 
@@ -381,6 +381,8 @@ def anular(request, id_turno):
         resp_dict = {'status': 0, 'message': err_ses}
         return HttpResponse(simplejson.dumps(resp_dict))
 
+    observacion_turno = request.GET['observacion_turno']
+
     try:
         turno = Turno.objects.get(id=id_turno)
 
@@ -388,8 +390,6 @@ def anular(request, id_turno):
             raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
 
         turno.estado = Estado.objects.get(id=Estado.ANULADO)
-
-        observacion_turno = request.GET['observacion_turno']
 
         if observacion_turno:
             turno.observacion = observacion_turno
@@ -418,11 +418,16 @@ def reprogramar(request, id_turno):
     if not request.user.is_authenticated():
         resp_dict = {'status': 0, 'message': err_ses}
         return HttpResponse(simplejson.dumps(resp_dict))
+
+    observacion_turno = request.GET['observacion_turno']
+
     try:
         turno = Turno.objects.get(id=id_turno)
 
         if turno.estado.id != Estado.ANULADO:
             turno.estado = Estado.objects.get(id=Estado.ANULADO)
+            if observacion_turno:
+                turno.observacion = observacion_turno
             turno.save()
 
             _add_log_entry(turno, request.user, CHANGE, "REPROGRAMA")
@@ -479,14 +484,20 @@ def confirmar(request, id_turno):
 
 
 def _get_day_line(fecha, id_sala):
+    """
+    Arma la linea de tiempo con los turnos existentes y la disponibilidad de los medicos (hora en los que atienden)
+    para el dia y la sala dada.
+    :param fecha: fecha en formato String
+    :param id_sala: Int id de sala.
+    :return: HTML object con la linea de tiempo
+    """
     dia = spaDays[fecha.weekday()]
     mes = spaMonths[fecha.month]
 
     fecha_format = str(fecha)
     dia_format = dia + ' ' + str(fecha.day) + ' de ' + mes + ' del ' + str(fecha.year)
     turnos = Turno.objects.filter(fechaTurno=fecha, sala__id=int(id_sala), estado__id__lt=3)
-    disponibilidad = Disponibilidad.objects \
-        .filter(dia=dia, sala__id=id_sala, fecha__lte=date.today()) \
+    disponibilidad = Disponibilidad.objects.filter(dia=dia, sala__id=id_sala, fecha__lte=date.today())\
         .order_by('horaInicio')
 
     colors = ('#71FF86', '#fffccc', '#A6C4FF')

@@ -37,6 +37,17 @@ class Movimiento(models.Model):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    @property
+    def tipo(self):
+        if not self.id:
+            return u'-'  # creating mode
+
+        if self.cantidad > 0:
+            return u'Ingreso'
+        if self.cantidad < 0:
+            return u'Egreso'
+        return u'-'
+
     def save(self, *args, **kwargs):
         """ Disable update"""
         if self.id:
