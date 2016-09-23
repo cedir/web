@@ -256,7 +256,7 @@ def guardar(request):
         turno.save(force_insert=True)
 
         for practica in practicas:
-            turno.practicas.add(practica)  # esto no anda con django 1.10
+            turno.practicas.add(practica)
 
         turno.save()
 
