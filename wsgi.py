@@ -1,5 +1,5 @@
 """
-WSGI config for walter_env project.
+WSGI config for Cedir project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
