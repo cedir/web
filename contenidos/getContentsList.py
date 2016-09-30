@@ -24,7 +24,7 @@ def getList(request):
       order_by = 'createdDate'
 
 
-    contents = Contenido.objects.filter(categoria__id__exact=categoryId, publishContent='TRUE').order_by(order_by)
+    contents = Contenido.objects.filter(categoria__id__exact=categoryId, publishContent=True).order_by(order_by)
     
     arrContents = []
     for cContent in contents:
