@@ -270,7 +270,9 @@ def guardar(request):
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
     except Exception as err:
-        return str(err)
+        response_dict = {'status': 0, 'message': str(err)}
+        json = simplejson.dumps(response_dict)
+        return HttpResponse(json)
 
 
 def update(request, id_turno):
