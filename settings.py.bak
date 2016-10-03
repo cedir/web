@@ -246,3 +246,6 @@ LOGGING = {
         }
     }
 }
+
+EMAIL_NOTIFICATION_ACCOUNTS = [u'email@address.com']
+
