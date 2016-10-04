@@ -1,7 +1,12 @@
 # Django settings for apps project.
 
+import os
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+#PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = '/app/path'
+
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 DEFAULT_CHARSET = 'utf8'
 
 ADMINS = (
@@ -46,8 +51,6 @@ USE_L10N = True
 
 # If you set this to False, Django will not use timezone-aware datetimes.
 #USE_TZ = True
-
-PROJECT_ROOT = u'/home/wbrunetti/Documents/cedir'
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
@@ -98,37 +101,44 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'c3*36km04w7um-xb#+h13plm7=uc5#k5$kw@dc)f9%&hm&1kn2'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.eggs.Loader',
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
-
-MIDDLEWARE_CLASSES = (
-#   'django.middleware.cache.CacheMiddleware',
-    'django.middleware.common.CommonMiddleware',
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.middleware.doc.XViewMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware', por def esta esta descomentada
     'django.contrib.messages.middleware.MessageMiddleware',
-)
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
 ROOT_URLCONF = 'urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'wsgi.application'
 
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    PROJECT_ROOT + u'/static/templates',
-    #"/var/www/django_projects/cedir/admin/templates",
-)
 
-INSTALLED_APPS = (
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [PROJECT_ROOT + u'/static/templates', ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            #'loaders': [
+            #    'django.template.loaders.eggs.Loader',
+            #    'django.template.loaders.filesystem.Loader',
+            #    'django.template.loaders.app_directories.Loader',
+            #]
+        },
+    },
+]
+
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -148,7 +158,26 @@ INSTALLED_APPS = (
     'comprobante',
     'medicamento',
     'presentacion',
-)
+]
+
+
+# Password validation
+# https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 
 REST_FRAMEWORK = {
@@ -217,3 +246,6 @@ LOGGING = {
         }
     }
 }
+
+EMAIL_NOTIFICATION_ACCOUNTS = [u'email@address.com']
+
