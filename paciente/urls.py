@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.conf.urls import url
 from paciente.views import create_form, update_form, create, update, buscar_form
 
 urlpatterns = [
