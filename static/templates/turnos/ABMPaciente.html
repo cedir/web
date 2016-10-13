@@ -11,11 +11,7 @@ $(document).ready(function() {
 </script>
 <div class="module">
     <h3>Datos Personales</h3>
-    <form id="form1" name="form1" action="/app/"  method="post">
-      <input type="hidden" name="controlador" value="Pacientes" />
-      <input type="hidden" name="accion" value="crear" />
-			<input type="hidden" name="id" id="id" value="{{id}}" />
-
+    <form id="form1" name="form1" action="/paciente/{{ id }}/actualizar/" method="post">
       <div class="form-row">
 	    <label>Nombre:</label><input type="text" id="txtNombre" name="txtNombre" value="{{nombre}}" />
       </div>
@@ -26,14 +22,16 @@ $(document).ready(function() {
 	    <label>Documento:</label><input type="text" id="txtDni" name="txtDni" value="{{dni}}" />
       </div>
       <div class="form-row">
-	    <label>Fecha de Nacimiento:</label><input type="text" name="txtFechaNacimiento" id="txtFechaNacimiento" value="{{fechaNacimiento}}" >
+	    <label>Fecha de Nacimiento:</label><input type="text" name="txtFechaNacimiento" id="txtFechaNacimiento" value="{{fecha_nacimiento}}" >
       </div>
       <div class="form-row">
 	  <label>Sexo:</label>
         <select name="txtSexo" id="txtSexo">
             <option value="">Selecione..</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Masculino">Masculino</option>
+            <option value="Femenino"
+            {% if sexo == 'Femenino' %}selected="selected"{% endif %}>Femenino</option>
+            <option value="Masculino"
+            {% if sexo == 'Masculino' %}selected="selected"{% endif %}>Masculino</option>
         </select>
       </div>
       <div class="form-row">

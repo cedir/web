@@ -23,34 +23,34 @@
 <div id="wrapper">
   <div id="header">
     <div>
-        <div style="display:block;float:left;cursor:pointer;margin-top:2px;" onclick="location.href='/app/?controlador=Root&accion=getHome'">
+        <div style="display:block;float:left;cursor:pointer;margin-top:2px;" onclick="location.href='/turnos/'">
 	    <img  src="/media/images/turnos/cedirLogoMinMin.jpg" alt="Logo de Cedir" />
 	    <img  src="/media/images/turnos/cedirNombre_descripcionMed.jpg" alt="Logo de Cedir" style="height:45px;"/>
       </div>
-      <div id="user-tools">Bienvenido/a,<strong> {{logged_user_name}}</strong>. <a href="#">Cambiar contrase&ntilde;a</a> / <a href="/app/?controlador=Root&accion=logout">Salir</a></div>
+      <div id="user-tools">Bienvenido/a,<strong> {{logged_user_name}}</strong>. <a href="#">Cambiar contrase&ntilde;a</a> / <a href="/usuario/salir/">Salir</a></div>
     </div>
     <ul class="topnav">
       <li>
 	  <a href="#">Pacientes</a>
 	  <span></span>
 	  <ul class="subnav">
-	      <li><a href="/app/?controlador=Pacientes&accion=getCreate">Nuevo</a></li>
-	      <li><a href="/app/?controlador=Pacientes&accion=getBuscar">Buscar</a></li>
+	      <li><a href="/paciente/">Nuevo</a></li>
+	      <li><a href="/paciente/buscar/">Buscar</a></li>
 	  </ul>
       </li>
       <li>
 	  <a href="#">Turnos</a>
 	  <span></span>
 	  <ul class="subnav">
-	      <li><a href="/app/?controlador=Turnos&accion=getTurnosDisponibles">Nuevo</a></li>
-	      <li><a href="/app/?controlador=Turnos&accion=getBuscarTurnos">Buscar</a></li>
+	      <li><a href="/turno/disponibles/">Nuevo</a></li>
+	      <li><a href="/turno/buscar/">Buscar</a></li>
 	  </ul>
       </li>
       <li>
 	  <a href="#">Medicos</a>
 	  <span></span>
 	  <ul class="subnav">
-	      <li><a href="/app/?controlador=Root&accion=getDisponibilidadMedicos">Horarios de atenci&oacute;n</a></li>
+	      <li><a href="/disponibilidad/">Horarios de atenci&oacute;n</a></li>
 	  </ul>
       </li>
     </ul>

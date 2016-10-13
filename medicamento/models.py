@@ -13,7 +13,7 @@ class Medicamento(models.Model):
     id = models.AutoField(primary_key=True, db_column=u'idMedicamento')
     descripcion = models.CharField(db_column=u'descripcionMedicamento', max_length=300, blank=True)
     importe = models.DecimalField(db_column=u'importeMedicamento', max_digits=16, decimal_places=2, default='0.00')
-    stock = models.PositiveSmallIntegerField(max_length=16, )
+    stock = models.PositiveSmallIntegerField(default=0)
     tipo = models.CharField(max_length=100, default=u'Medicación', choices=TIPOS_MEDICAMENTOS)
     codigo_osde = models.CharField(max_length=100, db_column=u'codigoMedicoOSDE', blank=True, default=u'')
 
@@ -27,7 +27,7 @@ class Medicamento(models.Model):
 class Movimiento(models.Model):
     fecha = models.DateField()
     hora = models.TimeField()
-    cantidad = models.IntegerField(max_length=10, )
+    cantidad = models.IntegerField()
     descripcion = models.CharField(max_length=300)
     medicamento = models.ForeignKey(Medicamento, db_column=u'idMedicamento')
 
@@ -36,6 +36,17 @@ class Movimiento(models.Model):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    @property
+    def tipo(self):
+        if not self.id:
+            return u'-'  # creating mode
+
+        if self.cantidad > 0:
+            return u'Ingreso'
+        if self.cantidad < 0:
+            return u'Egreso'
+        return u'-'
 
     def save(self, *args, **kwargs):
         """ Disable update"""

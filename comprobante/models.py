@@ -23,9 +23,9 @@ class Comprobante(models.Model):
     COBRADO = u'COBRADO'
 
     ESTADOS = (
-        (ANULADO, u'ANULADO'),  # 'estado = 0 significa que esta facturado, y no se pueden agregar mas estudios ni modificar nada porque esta cerrado
-        (NO_COBRADO, u'NO COBRADO'),    # 'estado = 1 significa que se facturo y se cobro
-        (COBRADO, u'COBRADO'),    # 'estado = 2 la facturacion esta abierta a agregar o modificar estudios
+        (ANULADO, ANULADO),  # 'estado = 0 significa que esta facturado, y no se pueden agregar mas estudios ni modificar nada porque esta cerrado
+        (NO_COBRADO, NO_COBRADO),    # 'estado = 1 significa que se facturo y se cobro
+        (COBRADO, COBRADO),    # 'estado = 2 la facturacion esta abierta a agregar o modificar estudios
     )
 
     nombre_cliente = models.CharField(max_length=128, db_column=u'nombreCliente')

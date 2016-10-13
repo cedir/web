@@ -64,6 +64,8 @@
       </div>
       <div class="modal-body">
         <div class="form-row">
+          <label>Paciente: </label><span id="selected-paciente"></span></div>
+        <div class="form-row">
           <label>M&eacute;dico: </label><span id="selected-medico"></span></div>
         <div class="form-row">
           <label>Obra Social: </label><span id="selected-obrasocial"></span></div>
@@ -134,7 +136,7 @@
             </div>
           </div>
           <div role="tabpanel" class="tab-pane" id="crear-paciente-tab">
-            <form id="formCrearPaciente" name="formCrearPaciente" action="/app/" method="post">
+            <form id="formCrearPaciente" name="formCrearPaciente" method="post">
               <div class="form-row">
                 <label>Nombre:</label>
                 <input type="text" id="txtNombre" name="txtNombre" value="{{nombre}}" />
@@ -195,9 +197,7 @@
 <div class="module">
   <h3>Asignar turno al paciente: <span id="selectedPaciente" style="font-style:italic;">{{ apellidoPaciente}} {{ nombrePaciente}}</span><a data-toggle="modal" data-target="#dialogPaciente" style="font-size:10px">[Elegir]</a></h3>
 
-  <form name="ver-planilla" id="ver-planilla" action="/app/">
-    <input type="hidden" name="controlador" value="Turnos" />
-    <input type="hidden" name="accion" value="getTurnosDisponibles" />
+  <form name="ver-planilla" id="ver-planilla" action="/turno/disponibles/">
     <input type="hidden" name="id-paciente" id="id-paciente" value="{{idPaciente}}">
 
     <div class="section">
@@ -262,7 +262,7 @@
       <a href='javascript:getBack();'><img src="/media/images/turnos/back_button_64.png" title="back" alt="back" border=0></a>
       <a href="javascript:getNext();"><img src="/media/images/turnos/next_button_64.png" title="next" alt="next" border=0></a>
     </div>
-    <div id="lineasSector">{{dayLines}}</div>
+    <div id="lineasSector">{% for dayLine in dayLines %} {{dayLine}} {% endfor %}</div>
   </div>
 
 
