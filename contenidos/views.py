@@ -2,15 +2,21 @@ import logging
 from django.http import HttpResponse
 from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
-from django.shortcuts import render
-from contenidos.models import *
+#from django.shortcuts import render
+from contenidos.models import Contenido
 from estudio.models import Estudio
 
 
 logger = logging.getLogger(u'videos')
 
 def get_home(request):
-    return render(request, 'home/index.html')
+
+    contents = Contenido.objects.filter(categoria__id__exact=1, publishContent=True).order_by("createdDate")
+    context = {
+        u'video_url': '',
+    }
+    t = select_template(['home/index.html'])
+    return HttpResponse(t.render(RequestContext(request, context)))
 
 def get_video(request, public_id):
     """
