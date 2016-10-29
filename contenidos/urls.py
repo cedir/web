@@ -10,7 +10,7 @@ from contenidos.getSearchContents import getResults
 urlpatterns = [
     url(r'^$', render_home),
     url(r'^content/(\d+)/$', getContent),
-    url(r'^sendMail/', sendMail),
+    url(r'^sendMail/', send_mail),
     url(r'^video/(?P<public_id>\w+={0,2})/$', get_video),
     url(r'^static/', getStatic),
     url(r'^listContents/', getList),
