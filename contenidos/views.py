@@ -1,4 +1,5 @@
 import logging
+import smtplib
 from django.http import HttpResponse
 from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
