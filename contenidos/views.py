@@ -1,4 +1,5 @@
 import logging
+import smtplib
 from django.http import HttpResponse
 from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
@@ -76,11 +77,11 @@ def send_mail(request):
     smtpserver.close()
 
     templateName = 'contacto_ok.html'
-    t = loader.get_template('pages/' + templateName)
+    t = select_template(['pages/' + templateName])
 
     c = Context({
         #'latest_poll_list': latest_poll_list,
 	    #'current_date': now,
     })
-    return HttpResponse(t.render(c))
+    return HttpResponse(t.render(RequestContext(request, c)))
 
