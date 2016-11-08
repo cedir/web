@@ -34,6 +34,10 @@ class Contenido(models.Model):
     footer = models.TextField("Pie",blank=True)
     friendlyURL = models.CharField("Friendly URL", max_length=100,null=True,blank=True )
     categoria = models.ManyToManyField(Categoria, verbose_name="Categoria")
+
+    @property
+    def friendly_url(self):
+        return self.friendlyURL if self.friendlyURL else '/content/{}'.format(self.id)
     
     def save(self):
         super(Contenido, self).save()

@@ -8,12 +8,15 @@ from estudio.models import Estudio
 
 
 logger = logging.getLogger(u'videos')
+NOVEDADES_CATEGORY_ID = 2
 
 def get_home(request):
 
-    contents = Contenido.objects.filter(categoria__id__exact=1, publishContent=True).order_by("createdDate")
+    slide_contents = Contenido.objects.filter(categoria__id__exact=1, publishContent=True).order_by("publishInitDate")
+    novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).order_by("-createdDate")[:3]
     context = {
-        u'video_url': '',
+        u'novedades': novedades,
+        u'slide_contents': slide_contents
     }
     t = select_template(['home/index.html'])
     return HttpResponse(t.render(RequestContext(request, context)))
