@@ -13,7 +13,7 @@ NOVEDADES_CATEGORY_ID = 2
 
 def get_home(request):
 
-    slide_contents = Contenido.objects.filter(categoria__id__exact=1, publishContent=True).order_by("publishInitDate")
+    slide_contents = Contenido.objects.filter(categoria__name__contains='Home slide', publishContent=True).order_by("publishInitDate")
     novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).order_by("-createdDate")[:3]
     context = {
         u'novedades': novedades,

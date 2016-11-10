@@ -19,10 +19,10 @@
                 {% for contenido in slide_contents %}
 
                     {% if contenido|belong_to_category:"Home slide claro izquierdo" %}
-					<li data-transition="random" data-slotamount="7" data-masterspeed="500" data-saveperformance="on" data-title="Wellcome">
+					<li data-transition="random" data-slotamount="7" data-masterspeed="500" data-saveperformance="on" data-title="{{ contenido.title }}">
 
-					    <!-- main image -->
-					    <img src="{% static 'images/medical-slider-slide-1.jpg' %}" alt="slidebg1" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
+					    <!-- main image --> 
+					    <img src="/media/media_files/{{ contenido.img1 }}" alt="slidebg1" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
 
 					    <!-- Transparent Background -->
 					    <div class="tp-caption light-translucent-bg"
@@ -38,7 +38,7 @@
 						    data-y="180"
 						    data-speed="500"
 						    data-start="1000"
-						    data-easing="easeOutQuad">Compassionate care
+						    data-easing="easeOutQuad">{{ contenido.title }}
 					    </div>
 
 					    <!-- LAYER NR. 2 -->
@@ -48,7 +48,7 @@
 						    data-speed="500"
 						    data-start="1300"
 						    data-easing="easeOutQuad"
-						    data-endspeed="600">Lorem ipsum dolor sit amet, consectetur adipisicing elit. <br> Nesciunt, maiores, aliquid. Repellat eum numquam aliquid culpa offici, <br> tenetur fugiat dolorum sapiente eligendi...
+						    data-endspeed="600">{% autoescape off %}{{contenido.description|linebreaks}}{% endautoescape %}
 					    </div>
 
 					    <!-- LAYER NR. 3 -->
@@ -58,15 +58,15 @@
 						    data-speed="500"
 						    data-start="1600"
 						    data-easing="easeOutQuad"
-						    data-endspeed="600"><a href="#" class="btn btn-dark btn-default btn-animated">Learn More <i class="fa fa-arrow-right"></i></a>
+						    data-endspeed="600"><a href="{{ contenido.url }}" class="btn btn-dark btn-default btn-animated">Leer mas <i class="fa fa-arrow-right"></i></a>
 					    </div>
 
 					</li>
 
                     {% else %}
-					<li data-transition="random" data-slotamount="7" data-masterspeed="500" data-saveperformance="on" data-title="Top Doctors">
+					<li data-transition="random" data-slotamount="7" data-masterspeed="500" data-saveperformance="on" data-title="{{ contenido.title }}">
 					    <!-- main image -->
-					    <img src="{% static 'images/medical-slider-slide-2.jpg' %}" alt="slidebg2" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
+					    <img src="/media/media_files/{{ contenido.img1 }}" alt="slidebg2" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
 
 					    <!-- Transparent Background -->
 					    <div class="tp-caption dark-translucent-bg"
@@ -82,7 +82,7 @@
 						    data-y="180"
 						    data-speed="500"
 						    data-start="1000"
-						    data-easing="easeOutQuad">Top doctors providing quality care
+						    data-easing="easeOutQuad">{{ contenido.title }}
 					    </div>
 
 					    <!-- LAYER NR. 2 -->
@@ -101,7 +101,7 @@
 						    data-speed="500"
 						    data-start="1300"
 						    data-easing="easeOutQuad"
-						    data-endspeed="600">Lorem ipsum dolor sit amet, consectetur adipisicing elit. <br> Nesciunt, maiores, aliquid. Repellat eum numquam aliquid culpa offici, <br> tenetur fugiat dolorum sapiente eligendi...
+						    data-endspeed="600">{% autoescape off %}{{contenido.description|linebreaks}}{% endautoescape %}
 					    </div>
 
 					    <!-- LAYER NR. 4 -->
@@ -111,7 +111,7 @@
 						    data-speed="500"
 						    data-start="1600"
 						    data-easing="easeOutQuad"
-						    data-endspeed="600"><a href="#" class="btn btn-dark btn-default btn-animated">Learn More <i class="fa fa-arrow-right"></i></a>
+						    data-endspeed="600"><a href="{{ contenido.url }}" class="btn btn-dark btn-default btn-animated">Leer mas <i class="fa fa-arrow-right"></i></a>
 					    </div>
 					</li>
                     {% endif %}
@@ -236,7 +236,7 @@
 							</div>
 						</div>
 						<div class="media-body">
-							<h5 class="media-heading"><a href="{{ novedad.friendly_url }}">{{ novedad.title }}</a></h5>
+							<h5 class="media-heading"><a href="{{ novedad.url }}">{{ novedad.title }}</a></h5>
 							<p class="small"><i class="fa fa-calendar pr-10"></i>Mar 23, 2015</p>
 							<p class="margin-clear small">{{ novedad.description }}</p>
 							<a href="{{ novedad.friendly_url }}">Leer m&aacute;s<i class="fa fa-long-arrow-right pl-5"></i></a>

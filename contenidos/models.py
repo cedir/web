@@ -36,7 +36,7 @@ class Contenido(models.Model):
     categoria = models.ManyToManyField(Categoria, verbose_name="Categoria")
 
     @property
-    def friendly_url(self):
+    def url(self):
         return self.friendlyURL if self.friendlyURL else '/content/{}'.format(self.id)
     
     def save(self):
@@ -55,16 +55,16 @@ class Contenido(models.Model):
             imgSize = im.size
 
             #min image
-            if (imgSize[0] > minSizes[0]) or (imgSize[1] > minSizes[1]):
-                #f.write('La que lo pario2: ' + self.img2.name )
-                im.thumbnail(minSizes, Image.ANTIALIAS)
-                im.save(filePathName + '_min' + ext, "JPEG")
+            #if (imgSize[0] > minSizes[0]) or (imgSize[1] > minSizes[1]):
+            #    #f.write('La que lo pario2: ' + self.img2.name )
+            #    im.thumbnail(minSizes, Image.ANTIALIAS)
+            #    im.save(filePathName + '_min' + ext, "JPEG")
 
             #med image
-            if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
-                imCopy = Image.open(imgPath)
-                imCopy.thumbnail(medSizes, Image.ANTIALIAS)
-                imCopy.save(filePathName + '_med' + ext, "JPEG")
+            #if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
+            #    imCopy = Image.open(imgPath)
+            #    imCopy.thumbnail(medSizes, Image.ANTIALIAS)
+            #    imCopy.save(filePathName + '_med' + ext, "JPEG")
 
         if self.img2.name <> '':
             imgPath = settings.MEDIA_ROOT + self.img2.name
