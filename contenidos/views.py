@@ -1,3 +1,4 @@
+import os
 import logging
 import smtplib
 from django.http import HttpResponse
@@ -21,6 +22,72 @@ def get_home(request):
     }
     t = select_template(['home/index.html'])
     return HttpResponse(t.render(RequestContext(request, context)))
+
+
+def get_content(request, id_content, templateName='detalle-contenido.html' ):
+
+    if (request.GET.has_key('template') and request.GET['template'] != ''):
+        templateName = request.GET['template']
+
+    cContent = Contenido.objects.get(pk=id_content)
+    filePathName1, ext1 = os.path.splitext(cContent.img1.name)
+    filePathName2, ext2 = os.path.splitext(cContent.img2.name)
+    filePathName3, ext3 = os.path.splitext(cContent.img3.name)
+
+    c = Context({
+        'id':cContent.id,
+        'title':cContent.title,
+        'description':cContent.description,
+        'body':cContent.body,
+        'footer':cContent.footer,
+        'img1':cContent.img1,
+        'img1_med':filePathName1 + '_med' + ext1,
+        'img2':cContent.img2,
+        'img2_med':filePathName2 + '_med' + ext2,
+        'img3':cContent.img3,
+        'img3_med':filePathName3 + '_med' + ext3,
+        'page_title':cContent.title
+    })
+
+    t = select_template(['home/{}'.format(templateName)])
+    return HttpResponse(t.render(RequestContext(request, c)))
+
+def get_list_content(request):
+    categoryId = 1
+    if (request.GET.has_key('categoryId') and request.GET['categoryId'] != ''):
+	    categoryId = request.GET['categoryId']
+
+    #Parche para ordenar novedades for fecha, hacerlo bien
+    order_by = 'title'
+    if (request.GET.has_key('template') and request.GET['template'] == 'novedades.html'):
+        order_by = 'createdDate'
+
+    contents = Contenido.objects.filter(categoria__id__exact=categoryId, publishContent=True).order_by(order_by)
+
+    arrContents = []
+    for cContent in contents:
+        filePathName, ext = os.path.splitext(cContent.img1.name)
+        contents_dicc = {}
+        contents_dicc["id"] = cContent.id
+        contents_dicc["title"] =cContent.title
+        contents_dicc["description"] = cContent.description
+        contents_dicc["footer"] = cContent.footer
+        contents_dicc["friendlyURL"] = cContent.friendlyURL
+        contents_dicc["img1"] = cContent.img1
+        if cContent.img1:
+            contents_dicc["img1_min"] = filePathName + '_min' + ext
+        arrContents.append(contents_dicc)
+
+    c = Context({
+	'contents': arrContents,
+    })
+
+    templateName = 'listado-contenidos.html'
+    if (request.GET.has_key('template') and request.GET['template'] != ''):
+        templateName = request.GET['template']
+    t = select_template(['home/{}'.format(templateName)])
+    return HttpResponse(t.render(RequestContext(request, c)))
+
 
 def get_video(request, public_id):
     """
