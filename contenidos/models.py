@@ -32,7 +32,7 @@ class Contenido(models.Model):
     img2 = models.ImageField("Imagen 2",upload_to='uploads_imgs', blank=True)
     img3 = models.ImageField("Imagen 3",upload_to='uploads_imgs', blank=True)
     footer = models.TextField("Pie",blank=True)
-    friendlyURL = models.CharField("Friendly URL", max_length=100,null=True,blank=True )
+    friendlyURL = models.CharField("Friendly URL", max_length=100,null=True,blank=True)
     categoria = models.ManyToManyField(Categoria, verbose_name="Categoria")
 
     @property

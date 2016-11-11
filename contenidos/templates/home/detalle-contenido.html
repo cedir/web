@@ -142,15 +142,12 @@
 						<!-- main start -->
 						<!-- ================ -->
 						<div class="main col-md-8">
-							<h1 class="title">Project Title</h1>
+							<h1 class="title">{{title}}</h1>
 							<div class="separator-2"></div>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque sed, quidem quis praesentium, ut unde. Quae sed, incidunt laudantium nesciunt, optio corporis quod earum pariatur omnis illo saepe numquam suscipit, nemo placeat dignissimos eius mollitia et quas officia doloremque ipsum labore rem deserunt vero! Magnam totam delectus accusantium voluptas et, tempora quos atque, fugiat, obcaecati voluptatibus commodi illo voluptates dolore nemo quo soluta quis.</p>
-							<p>Molestiae sed enim laboriosam atque delectus voluptates rerum nostrum sapiente obcaecati molestias quasi optio exercitationem, voluptate quis consequatur libero incidunt, in, quod. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eos nobis officiis, autem earum tenetur quidem. Quae non dicta earum. Ipsum autem eaque cum dolor placeat corporis quisquam dolorum at nesciunt.</p>
-							<h3>Client Testimonial</h3>
-							<blockquote class="margin-clear">
-								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius, magni, eos! Dignissimos voluptatum sequi ea sunt, nisi, doloribus facere asperiores dolorem quos laboriosam porro, velit in pariatur necessitatibus. Quisquam, mollitia!</p>	
-								<footer><cite title="Source Title">Happy Client </cite></footer>
-							</blockquote>
+							<p>{% autoescape off %}{{description|linebreaks}}{% endautoescape %}</p>
+                            <div class="separator-2"></div>
+                            <p>{% autoescape off %}{{body|linebreaks}}{% endautoescape %}</p>
+                            <footer><cite title="{{title}}">{% autoescape off %}{{footer|linebreaks}}{% endautoescape %} </cite></footer>
 						</div>
 						<!-- main end -->
 
@@ -159,16 +156,12 @@
 						<aside class="col-md-4 col-lg-3 col-lg-offset-1">
 							<div class="sidebar">
 								<div class="block clearfix">
-									<h3 class="title">Project Info</h3>
+									<h3 class="title">Informaci&oacute;n de la p&aacute;gina</h3>
 									<div class="separator-2"></div>
 									<ul class="list margin-clear">
-										<li><strong>Client: </strong> <span class="text-right">John Doe</span></li>
-										<li><strong>Date: </strong> <span class="text-right">May 2015</span></li>
-										<li><strong>In: </strong> <span class="text-right">Web Design</span></li>
-										<li><strong>Place: </strong> <span class="text-right">Europe</span></li>
-										<li><strong>URL: </strong> <span class="text-right"><a href="#">www.theproject.com</a></span></li>
+										<li><strong>URL: </strong> <span class="text-right"><a href="#">{{url}}</a></span></li>
 									</ul>
-									<a href="#" class="btn btn-animated btn-default btn-lg">External Link <i class="fa fa-external-link"></i></a>
+									<a href="{{url}}" class="btn btn-animated btn-default btn-lg" target="_blank">External Link <i class="fa fa-external-link"></i></a>
 									<h3>Share This</h3>
 									<div class="separator-2"></div>
 									<ul class="social-links colored circle small">
@@ -192,7 +185,7 @@
 			<!-- ================ -->
 			<section class="section pv-40 clearfix">
 				<div class="container">
-					<h3>Related <strong>Projects</strong></h3>
+					<h3>Art&iacute;culos <strong>Relacionados</strong></h3>
 					<div class="row grid-space-10">
 						<div class="col-sm-4">
 							<div class="image-box style-2 mb-20 bordered text-center">
@@ -208,19 +201,19 @@
 									<div class="carousel-inner" role="listbox">
 										<div class="item active">
 											<div class="overlay-container">
-												<img src="images/portfolio-1.jpg" alt="">
+												<img src="{% static 'images/portfolio-item-1-5.jpg' %}" alt="">
 												<a href="portfolio-item.html" class="overlay-link"><i class="fa fa-link"></i></a>
 											</div>
 										</div>
 										<div class="item">
 											<div class="overlay-container">
-												<img src="images/portfolio-1-2.jpg" alt="">
+												<img src="{% static 'images/portfolio-item-1-5.jpg' %}" alt="">
 												<a href="portfolio-item.html" class="overlay-link"><i class="fa fa-link"></i></a>
 											</div>
 										</div>
 										<div class="item">
 											<div class="overlay-container">
-												<img src="images/portfolio-1-3.jpg" alt="">
+												<img src="{% static 'images/portfolio-item-1-5.jpg' %}" alt="">
 												<a href="portfolio-item.html" class="overlay-link"><i class="fa fa-link"></i></a>
 											</div>
 										</div>
@@ -237,7 +230,7 @@
 						<div class="col-sm-4">
 							<div class="image-box style-2 mb-20 shadow bordered light-gray-bg text-center">
 								<div class="overlay-container">
-									<img src="images/portfolio-2.jpg" alt="">
+									<img src="{% static 'images/portfolio-item-1-5.jpg' %}" alt="">
 									<a href="portfolio-item.html" class="overlay-link"><i class="fa fa-link"></i></a>
 								</div>
 								<div class="body">
@@ -251,7 +244,7 @@
 						<div class="col-sm-4">
 							<div class="image-box style-2 mb-20 shadow bordered light-gray-bg text-center">
 								<div class="overlay-container">
-									<img src="images/portfolio-3.jpg" alt="">
+									<img src="{% static 'images/portfolio-item-1-5.jpg' %}" alt="">
 									<a href="portfolio-item.html" class="overlay-link"><i class="fa fa-link"></i></a>
 								</div>
 								<div class="body">

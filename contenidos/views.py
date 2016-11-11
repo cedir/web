@@ -1,7 +1,7 @@
 import os
 import logging
 import smtplib
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
 #from django.shortcuts import render
@@ -22,6 +22,16 @@ def get_home(request):
     }
     t = select_template(['home/index.html'])
     return HttpResponse(t.render(RequestContext(request, context)))
+
+def get_content_friendly_url(request, friendly_url):
+    """
+    Soporte para frinedly URL: content/<friendly-url>
+    """
+    cContent = Contenido.objects.filter(friendlyURL=friendly_url).first()
+    if bool(cContent):
+        return get_content(request, cContent.id)
+    else:
+        raise Http404("No existe contenido: " + friendly_url)
 
 
 def get_content(request, id_content, templateName='detalle-contenido.html' ):
