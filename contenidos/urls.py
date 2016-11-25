@@ -9,8 +9,8 @@ from contenidos.getSearchContents import getResults
 
 urlpatterns = [
     url(r'^$', get_home),
-    url(r'^content/(\w+)\.html/$', get_content_friendly_url),
     url(r'^content/(\d+)/$', get_content),
+    url(r'^content/([\w-]+)/$', get_content_friendly_url),
     url(r'^sendMail/', send_mail),
     url(r'^static/', getStatic),
     url(r'^listContents/', get_list_content),

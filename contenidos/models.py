@@ -37,7 +37,7 @@ class Contenido(models.Model):
 
     @property
     def url(self):
-        return self.friendlyURL if self.friendlyURL else '/content/{}'.format(self.id)
+        return '/content/{}'.format(self.friendlyURL) if self.friendlyURL else '/content/{}'.format(self.id)
     
     def save(self):
         super(Contenido, self).save()
