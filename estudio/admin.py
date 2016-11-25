@@ -9,12 +9,12 @@ class MedicacionInline(admin.TabularInline):
 
 class EstudioAdmin(admin.ModelAdmin):
     actions = None
-    fields = (u'fechaEstudio', u'paciente', u'practica', u'medico', u'medicoSolicitante', u'obraSocial', u'anestesista', u'motivoEstudio', u'informe', u'public_id', u'enlace_video')
-    search_fields = [u'paciente__apellido', u'paciente__dni', u'fechaEstudio', ]
-    list_display = (u'fechaEstudio', u'paciente', u'practica', u'medico', u'obraSocial')
+    fields = (u'fecha', u'paciente', u'practica', u'medico', u'medico_solicitante', u'obra_social', u'anestesista', u'motivo', u'informe', u'public_id', u'enlace_video')
+    search_fields = [u'paciente__apellido', u'paciente__dni', u'fecha', ]
+    list_display = (u'fecha', u'paciente', u'practica', u'medico', u'obra_social')
     raw_id_fields = (u'paciente', )
-    ordering = (u'-fechaEstudio', u'paciente__apellido')
-    list_filter = (u'fechaEstudio',)
+    ordering = (u'-fecha', u'paciente__apellido')
+    list_filter = (u'fecha',)
     readonly_fields = (u'public_id', )
     #inlines = (MedicacionInline,)  # permite modificar la medicacion en crear/editar estudio
 
