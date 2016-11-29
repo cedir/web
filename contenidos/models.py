@@ -10,6 +10,7 @@ from django.conf import settings
 class Categoria(models.Model):
     name = models.CharField("Nombre",max_length=200, null=False,blank=False)
     description = models.TextField("Descripcion",blank=True)
+    friendlyURL = models.CharField("Friendly URL", max_length=100,null=True,blank=True)
     
     def __unicode__ (self):
         return self.name
