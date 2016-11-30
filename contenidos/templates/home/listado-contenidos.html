@@ -8,7 +8,7 @@
 			<div class="breadcrumb-container">
 				<div class="container">
 					<ol class="breadcrumb">
-						<li><i class="fa fa-home pr-10"></i><a href="index.html">Home</a></li>
+						<li><i class="fa fa-home pr-10"></i><a href="/">Home</a></li>
 						<li class="active">Portfolio List - Large Images</li>
 					</ol>
 				</div>
@@ -20,24 +20,26 @@
 			<section class="main-container">
 
 				<div class="container">
+					
 					<div class="row">
-
+							
 						<!-- main start -->
 						<!-- ================ -->
 						<div class="main col-md-12">
 
 							<!-- page-title start -->
 							<!-- ================ -->
-							<h1 class="page-title">Portfolio List - Large Images</h1>
+							<h1 class="page-title">{{ title }}</h1>
 							<div class="separator-2"></div>
 							<!-- page-title end -->
-							<p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit Illo quaerat <br> commodi excepturi dignissimos!</p>
+							<p class="lead">{{ description }}</p>
 
+							{% for content in contents %}
 							<div class="image-box style-3-b">
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="overlay-container">
-											<img src="/media/images/portfolio-1.jpg" alt="">
+											<img src="/media/media_files/{{ content.img1 }}" alt="">
 											<div class="overlay-to-top">
 												<p class="small margin-clear"><em>Some info <br> Lorem ipsum dolor sit</em></p>
 											</div>
@@ -45,120 +47,23 @@
 									</div>
 									<div class="col-sm-6">
 										<div class="body">
-											<h3 class="title"><a href="portfolio-item.html">Project Title</a></h3>
-											<p class="small mb-10"><i class="icon-calendar"></i> Feb, 2015 <i class="pl-10 icon-tag-1"></i> Web Design</p>
+											<h3 class="title"><a href="/content/{{content.url}}/">{{ content.title }}</a></h3>
+											<p class="small mb-10">
+											{% if content.pub_date %}
+											<i class="icon-calendar"></i> {{ content.pub_date | date:"c" }}
+											{% endif %}
+											{% for cat in content.categories %} 
+											<i class="pl-10 icon-tag-1"></i> {{ cat }}
+											{% endfor %}
+											</p>
 											<div class="separator-2"></div>
-											<p class="mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet.</p>
-											<a href="portfolio-item.html" class="btn btn-default btn-sm btn-hvr hvr-shutter-out-horizontal margin-clear">Read More<i class="fa fa-arrow-right pl-10"></i></a>
+											<p class="mb-10">{{ content.description }}</p>
+											<a href="/content/{{content.url}}/" class="btn btn-default btn-sm btn-hvr hvr-shutter-out-horizontal margin-clear">Ver más...<i class="fa fa-arrow-right pl-10"></i></a>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="image-box style-3-b">
-								<div class="row">
-									<div class="col-sm-6">
-										<div class="overlay-container">
-											<img src="/media/images/portfolio-1.jpg" alt="">
-											<div class="overlay-to-top">
-												<p class="small margin-clear"><em>Some info <br> Lorem ipsum dolor sit</em></p>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-6">
-										<div class="body">
-											<h3 class="title"><a href="portfolio-item.html">Project Title</a></h3>
-											<p class="small mb-10"><i class="icon-calendar"></i> Feb, 2015 <i class="pl-10 icon-tag-1"></i> Web Design</p>
-											<div class="separator-2"></div>
-											<p class="mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet.</p>
-											<a href="portfolio-item.html" class="btn btn-default btn-sm btn-hvr hvr-shutter-out-horizontal margin-clear">Read More<i class="fa fa-arrow-right pl-10"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="image-box style-3-b">
-								<div class="row">
-									<div class="col-sm-6">
-										<div class="overlay-container">
-											<img src="/media/images/portfolio-1.jpg" alt="">
-											<div class="overlay-to-top">
-												<p class="small margin-clear"><em>Some info <br> Lorem ipsum dolor sit</em></p>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-6">
-										<div class="body">
-											<h3 class="title"><a href="portfolio-item.html">Project Title</a></h3>
-											<p class="small mb-10"><i class="icon-calendar"></i> Feb, 2015 <i class="pl-10 icon-tag-1"></i> Web Design</p>
-											<div class="separator-2"></div>
-											<p class="mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet.</p>
-											<a href="portfolio-item.html" class="btn btn-default btn-sm btn-hvr hvr-shutter-out-horizontal margin-clear">Read More<i class="fa fa-arrow-right pl-10"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="image-box style-3-b">
-								<div class="row">
-									<div class="col-sm-6">
-										<div class="overlay-container">
-											<img src="/media/images/portfolio-1.jpg" alt="">
-											<div class="overlay-to-top">
-												<p class="small margin-clear"><em>Some info <br> Lorem ipsum dolor sit</em></p>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-6">
-										<div class="body">
-											<h3 class="title"><a href="portfolio-item.html">Project Title</a></h3>
-											<p class="small mb-10"><i class="icon-calendar"></i> Feb, 2015 <i class="pl-10 icon-tag-1"></i> Web Design</p>
-											<div class="separator-2"></div>
-											<p class="mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet.</p>
-											<a href="portfolio-item.html" class="btn btn-default btn-sm btn-hvr hvr-shutter-out-horizontal margin-clear">Read More<i class="fa fa-arrow-right pl-10"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="image-box style-3-b">
-								<div class="row">
-									<div class="col-sm-6">
-										<div class="overlay-container">
-											<img src="/media/images/portfolio-1.jpg" alt="">
-											<div class="overlay-to-top">
-												<p class="small margin-clear"><em>Some info <br> Lorem ipsum dolor sit</em></p>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-6">
-										<div class="body">
-											<h3 class="title"><a href="portfolio-item.html">Project Title</a></h3>
-											<p class="small mb-10"><i class="icon-calendar"></i> Feb, 2015 <i class="pl-10 icon-tag-1"></i> Web Design</p>
-											<div class="separator-2"></div>
-											<p class="mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet.</p>
-											<a href="portfolio-item.html" class="btn btn-default btn-sm btn-hvr hvr-shutter-out-horizontal margin-clear">Read More<i class="fa fa-arrow-right pl-10"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="image-box style-3-b">
-								<div class="row">
-									<div class="col-sm-6">
-										<div class="overlay-container">
-											<img src="/media/images/portfolio-1.jpg" alt="">
-											<div class="overlay-to-top">
-												<p class="small margin-clear"><em>Some info <br> Lorem ipsum dolor sit</em></p>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-6">
-										<div class="body">
-											<h3 class="title"><a href="portfolio-item.html">Project Title</a></h3>
-											<p class="small mb-10"><i class="icon-calendar"></i> Feb, 2015 <i class="pl-10 icon-tag-1"></i> Web Design</p>
-											<div class="separator-2"></div>
-											<p class="mb-10">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam atque ipsam nihialal. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam laudantium, provident culpa saepe. Nam laudantium, provident culpa saepe. Lorem ipsum dolor sit amet.</p>
-											<a href="portfolio-item.html" class="btn btn-default btn-sm btn-hvr hvr-shutter-out-horizontal margin-clear">Read More<i class="fa fa-arrow-right pl-10"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
+							{% endfor %}
 							<nav>
 								<ul class="pagination">
 									<li><a href="#" aria-label="Previous"><i class="fa fa-angle-left"></i></a></li>

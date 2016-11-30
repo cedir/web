@@ -1,6 +1,6 @@
 from django.conf.urls import url
 #from index import render_home
-from contenidos.views import get_video, send_mail, get_home, get_list_content, get_content, get_content_friendly_url
+from contenidos.views import get_video, send_mail, get_home, get_categoria, get_categoria_friendly_url, get_content, get_content_friendly_url
 from contenidos.getStatic import getStatic
 #from contenidos.getContent import getContent
 #from contenidos.getContentsList import getList
@@ -13,7 +13,8 @@ urlpatterns = [
     url(r'^content/([\w-]+)/$', get_content_friendly_url),
     url(r'^sendMail/', send_mail),
     url(r'^static/', getStatic),
-    url(r'^listContents/', get_list_content),
+    url(r'^listContents/', get_categoria),
+    url(r'^categoria/([\w-]+)/$', get_categoria_friendly_url),
     url(r'^search/', getResults),
     url(r'^video/(?P<public_id>\w+={0,2})/$', get_video),
 

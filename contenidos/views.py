@@ -5,7 +5,7 @@ from django.http import HttpResponse, Http404
 from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
 #from django.shortcuts import render
-from contenidos.models import Contenido
+from contenidos.models import Contenido, Categoria
 from estudio.models import Estudio
 
 
@@ -62,41 +62,68 @@ def get_content(request, id_content, templateName='detalle-contenido.html' ):
     t = select_template(['home/{}'.format(templateName)])
     return HttpResponse(t.render(RequestContext(request, c)))
 
-def get_list_content(request):
-    categoryId = 1
-    if (request.GET.has_key('categoryId') and request.GET['categoryId'] != ''):
-	    categoryId = request.GET['categoryId']
+def get_categoria_friendly_url(request, friendly_url):
+    """
+    Soporte para friendly URL: categoria/<friendly-url>
+    """
+    c_categ = Categoria.objects.filter(friendlyURL=friendly_url).first()
+    if bool(c_categ):
+        request.GET = request.GET.copy() #creamos una copia para poder mutarlo
+        request.GET['categoryId'] = c_categ.id
+        return get_categoria(request)
+    else:
+        raise Http404("No existe contenido: " + friendly_url)
+
+def get_categoria(request):
+    """
+    muestra los contenidos de una Categoria
+    """
+    category_id = 1
+    if request.GET.has_key('categoryId') and request.GET['categoryId']:
+        category_id = request.GET['categoryId']
 
     #Parche para ordenar novedades for fecha, hacerlo bien
     order_by = 'title'
-    if (request.GET.has_key('template') and request.GET['template'] == 'novedades.html'):
+    if request.GET.has_key('template') and request.GET['template'] == 'novedades.html':
         order_by = 'createdDate'
 
-    contents = Contenido.objects.filter(categoria__id__exact=categoryId, publishContent=True).order_by(order_by)
+    categoria = Categoria.objects.get(id=category_id)
+    contents = Contenido.objects.filter(categoria__id__exact=category_id, publishContent=True).order_by(order_by)
 
-    arrContents = []
-    for cContent in contents:
-        filePathName, ext = os.path.splitext(cContent.img1.name)
-        contents_dicc = {}
-        contents_dicc["id"] = cContent.id
-        contents_dicc["title"] =cContent.title
-        contents_dicc["description"] = cContent.description
-        contents_dicc["footer"] = cContent.footer
-        contents_dicc["friendlyURL"] = cContent.friendlyURL
-        contents_dicc["img1"] = cContent.img1
-        if cContent.img1:
-            contents_dicc["img1_min"] = filePathName + '_min' + ext
-        arrContents.append(contents_dicc)
+    def create_content(content):
+        """
+        genera un contenido
+        """
+        contents_dicc = {
+            "id" : content.id,
+            "title": content.title,
+            "description": content.description,
+            "pub_date": content.publishInitDate,
+            "footer": content.footer,
+            "url": content.friendlyURL or content.id,
+            "categories": [cat.name for cat in content.categoria.all()],
+            "img1": content.img1
+            }
 
-    c = Context({
-	'contents': arrContents,
-    })
+        if content.img1:
+            file_path_name, ext = os.path.splitext(content.img1.name)
+            contents_dicc["img1_min"] = file_path_name + '_min' + ext
 
-    templateName = 'listado-contenidos.html'
-    if (request.GET.has_key('template') and request.GET['template'] != ''):
-        templateName = request.GET['template']
-    t = select_template(['home/{}'.format(templateName)])
-    return HttpResponse(t.render(RequestContext(request, c)))
+        return contents_dicc
+
+    context = Context({
+        'title': categoria.name,
+        'description': categoria.description,
+        'friendly': categoria.friendlyURL,
+        'contents': [create_content(content) for content in contents],
+        })
+
+    template_name = 'listado-contenidos.html'
+    if request.GET.has_key('template') and request.GET['template']:
+        template_name = request.GET['template']
+
+    template = select_template(['home/{}'.format(template_name)])
+    return HttpResponse(template.render(RequestContext(request, context)))
 
 
 def get_video(request, public_id):
