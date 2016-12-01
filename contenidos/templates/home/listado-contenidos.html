@@ -9,7 +9,7 @@
 				<div class="container">
 					<ol class="breadcrumb">
 						<li><i class="fa fa-home pr-10"></i><a href="/">Home</a></li>
-						<li class="active">Portfolio List - Large Images</li>
+						<li class="active">{{ title }}</li>
 					</ol>
 				</div>
 			</div>
@@ -39,10 +39,16 @@
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="overlay-container">
-											<img src="/media/media_files/{{ content.img1 }}" alt="">
+											{% if content.img1 %}
+											<img src="/media/media_files/{{ content.img1 }}" alt="" style="width:100%">
+											{% else %}
+											<img src="/media/images/medical-blog-thumb-1.jpg" alt="" style="width:100%">
+											{% endif%}
+											{% if content.footer %}
 											<div class="overlay-to-top">
-												<p class="small margin-clear"><em>Some info <br> Lorem ipsum dolor sit</em></p>
+												<p class="small margin-clear"><em>{{ content.footer }}</em></p>
 											</div>
+											{% endif %}
 										</div>
 									</div>
 									<div class="col-sm-6">
@@ -64,6 +70,7 @@
 								</div>
 							</div>
 							{% endfor %}
+							{% comment %}
 							<nav>
 								<ul class="pagination">
 									<li><a href="#" aria-label="Previous"><i class="fa fa-angle-left"></i></a></li>
@@ -75,7 +82,7 @@
 									<li><a href="#" aria-label="Next"><i class="fa fa-angle-right"></i></a></li>
 								</ul>
 							</nav>
-
+							{% endcomment %}
 						</div>
 						<!-- main end -->
 

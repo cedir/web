@@ -7,6 +7,8 @@ from django.template.loader import select_template
 #from django.shortcuts import render
 from contenidos.models import Contenido, Categoria
 from estudio.models import Estudio
+from django.contrib.admin.models import LogEntry, ADDITION
+from django.contrib.contenttypes.models import ContentType
 
 
 logger = logging.getLogger(u'videos')
@@ -83,7 +85,7 @@ def get_categoria(request):
         category_id = request.GET['categoryId']
 
     #Parche para ordenar novedades for fecha, hacerlo bien
-    order_by = 'title'
+    order_by = 'id'
     if request.GET.has_key('template') and request.GET['template'] == 'novedades.html':
         order_by = 'createdDate'
 
@@ -94,15 +96,19 @@ def get_categoria(request):
         """
         genera un contenido
         """
+
+        log = LogEntry.objects.filter(content_type_id=ContentType.objects.get_for_model(type(content)).pk,object_id=content.pk,action_flag=ADDITION).first()
+
         contents_dicc = {
             "id" : content.id,
             "title": content.title,
             "description": content.description,
-            "pub_date": content.publishInitDate,
+            "pub_date": content.publishInitDate or log.action_time.date(),
             "footer": content.footer,
             "url": content.friendlyURL or content.id,
-            "categories": [cat.name for cat in content.categoria.all()],
-            "img1": content.img1
+            "categories": content.keywords.split(',') if content.keywords else [],
+            "img1": content.img1,
+            "footer": content.footer
             }
 
         if content.img1:
