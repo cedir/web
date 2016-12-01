@@ -36,6 +36,7 @@ class Contenido(models.Model):
     friendlyURL = models.CharField("Friendly URL", max_length=100,null=True,blank=True)
     keywords = models.CharField("Keywords", max_length=100,null=True,blank=True)
     categoria = models.ManyToManyField(Categoria, verbose_name="Categoria")
+    created = models.DateTimeField(auto_now_add=True)
 
     @property
     def url(self):
