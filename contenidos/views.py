@@ -103,7 +103,7 @@ def get_categoria(request):
             "id" : content.id,
             "title": content.title,
             "description": content.description,
-            "pub_date": content.publishInitDate or log.action_time.date(),
+            "pub_date": content.publishInitDate or (log.action_time.date() if log else None),
             "footer": content.footer,
             "url": content.friendlyURL or content.id,
             "categories": content.keywords.split(',') if content.keywords else [],
