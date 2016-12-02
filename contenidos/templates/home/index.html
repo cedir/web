@@ -145,10 +145,10 @@
 			<div class="col-sm-6 col-md-3">
 				<div class="pv-30 ph-20 white-bg feature-box bordered text-center">
 					<span class="icon default-bg circle"><i class="fa fa-plus-square"></i></span>
-					<h3>Tecnolog&iacute;a</h3>
+					<h3>Quienes Somos</h3>
 					<div class="separator clearfix"></div>
-					<p>Contamos con la mas alta tecnologia para tratamientos endoscopicos.</p>
-					<a href="#" class="btn btn-default btn-animated">Leer mas <i class="fa fa-angle-double-right"></i></a>
+					<p>Conozca nuestro equipo. Toda la calidad medica en un solo lugar.</p>
+					<a href="/content/1" class="btn btn-default btn-animated">Leer mas <i class="fa fa-angle-double-right"></i></a>
 				</div>
 			</div>
 			<div class="col-sm-6 col-md-3">
@@ -163,10 +163,10 @@
 			<div class="col-sm-6 col-md-3">
 				<div class="pv-30 ph-20 default-bg feature-box bordered text-center">
 					<span class="icon dark-bg circle"><i class="fa fa-ambulance"></i></span>
-					<h3>Emergency Calls</h3>
+					<h3>Emergencias</h3>
 					<div class="separator clearfix"></div>
-					<p>Inventore dolores aut laboriosam cum consequuntur delectus sequi lorem ipsum dolor sit amet, consectetur.</p>
-					<a href="#" class="btn btn-default btn-animated">Call Us <i class="pl-5 fa fa-phone"></i></a>
+					<p>Si ud. necesita una consulta de emergencia, tenemos un especialista de guardia las 24hs. <br /> </p>
+					<!--<a href="#" class="btn btn-default btn-animated">Call Us <i class="pl-5 fa fa-phone"></i></a>-->
 				</div>
 			</div>
 			<div class="col-sm-6 col-md-3">
@@ -247,7 +247,7 @@
 				</div>
 			</div>
 			<div class="col-md-3">
-				<h3><span class="text-default">Especialidades</span></h3>
+				<h3><span class="text-default">Departamentos</span></h3>
 				<div class="separator-2"></div>
 				<!-- accordion start -->
 				<!-- ================ -->
@@ -340,54 +340,30 @@
 				<!-- accordion end -->
 			</div>
 			<div class="col-md-3">
-				<h3>Health <span class="text-default">Services</span></h3>
+				<h3>Prep. para <span class="text-default">Estudios</span></h3>
 				<div class="separator-2"></div>
 				<div class="owl-carousel content-slider-with-large-controls-autoplay dark-controls light-gray-bg buttons-hide">
+                    {% for contenido in preparacion_estudios_contents %}
 					<div class="image-box style-2">
 						<div class="overlay-container overlay-visible">
-							<img src="{% static 'images/medical-service-1.jpg' %}" alt="">
+                            {% if contenido.img1 %}
+							<img src="/media/media_files/{{ contenido.img1 }}" alt="preparacion para estudio">
+                            {% else %}
+                            <img src="{% static 'images/medical-service-1.jpg' %}" alt="preparacion para estudio">
+                            {% endif %}
 							<a href="#" class="overlay-link"><i class="fa fa-link"></i></a>
 							<div class="overlay-bottom hidden-xs">
 								<div class="text">
-									<p class="lead margin-clear text-left">Medical Education</p>
+									<p class="lead margin-clear text-left">{{ contenido.title }}</p>
 								</div>
 							</div>
 						</div>
 						<div class="body padding-horizontal-clear">
-							<p>Lorem ipsum dolor sit amet, consectetur adipis elit. Aliquam atque ipsam nihil dood truck quinoa.</p>
-							<a class="link-dark" href="page-services.html">Read More<i class="pl-5 fa fa-angle-double-right"></i></a>
+							<p>{{ contenido.description }}</p>
+							<a class="link-dark" href="{{ contenido.friendly_url }}">Leer m&aacute;s<i class="pl-5 fa fa-angle-double-right"></i></a>
 						</div>
 					</div>
-					<div class="image-box style-2">
-						<div class="overlay-container overlay-visible">
-							<img src="{% static 'images/medical-service-2.jpg' %}" alt="">
-							<a href="#" class="overlay-link"><i class="fa fa-link"></i></a>
-							<div class="overlay-bottom hidden-xs">
-								<div class="text">
-									<p class="lead margin-clear text-left">Seminars For Medicals Professionals</p>
-								</div>
-							</div>
-						</div>
-						<div class="body padding-horizontal-clear">
-							<p>Lorem ipsum dolor sit amet, consectetur adipis elit. Aliquam atque ipsam nihil dood truck quinoa.</p>
-							<a class="link-dark" href="page-services.html">Read More<i class="pl-5 fa fa-angle-double-right"></i></a>
-						</div>
-					</div>
-					<div class="image-box style-2">
-						<div class="overlay-container overlay-visible">
-							<img src="{% static 'images/medical-service-3.jpg' %}" alt="">
-							<a href="#" class="overlay-link"><i class="fa fa-link"></i></a>
-							<div class="overlay-bottom hidden-xs">
-								<div class="text">
-									<p class="lead margin-clear text-left">Research &amp; Development</p>
-								</div>
-							</div>
-						</div>
-						<div class="body padding-horizontal-clear">
-							<p>Lorem ipsum dolor sit amet, consectetur adipis elit. Aliquam atque ipsam nihil dood truck quinoa.</p>
-							<a class="link-dark" href="page-services.html">Read More<i class="pl-5 fa fa-angle-double-right"></i></a>
-						</div>
-					</div>
+                    {% endfor %}
 				</div>
 			</div>
 		</div>
