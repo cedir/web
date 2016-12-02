@@ -8,7 +8,7 @@
 			<div class="breadcrumb-container">
 				<div class="container">
 					<ol class="breadcrumb">
-						<li><i class="fa fa-home pr-10"></i><a href="index.html">Home</a></li>
+						<li><i class="fa fa-home pr-10"></i><a href="/">Home</a></li>
 						<li class="active">Portfolio Item</li>
 					</ol>
 				</div>
@@ -19,7 +19,7 @@
 			<!-- ================ -->
 			<div class="pv-40 banner light-gray-bg">
 				<div class="container clearfix">
-
+					{% if images %}
 					<!-- slideshow start -->
 					<!-- ================ -->
 					<div class="slideshow">
@@ -29,12 +29,13 @@
 						<div class="slider-banner-container">
 							<div class="slider-banner-boxedwidth-stopped">
 								<ul class="slides">
-									<!-- slide 1 start -->
+									{% for image in images %}
+									<!-- slide {{forloop.counter}} start -->
 									<!-- ================ -->
-									<li data-transition="slidehorizontal" data-slotamount="1" data-masterspeed="500" data-saveperformance="on" data-title="Slide 1">
+									<li data-transition="slidehorizontal" data-slotamount="1" data-masterspeed="500" data-saveperformance="on" data-title="Slide {{forloop.counter}}">
 									
 									<!-- main image -->
-									<img src="/media/images/portfolio-item-banner-1.jpg" alt="slidebg1" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
+									<img src="/media/media_files/{{image.0}}" alt="slidebg{{forloop.counter}}" data-bgposition="center center"  data-bgrepeat="no-repeat" data-bgfit="cover">
 									
 									<!-- Transparent Background -->
 									<div class="tp-caption dark-translucent-bg"
@@ -43,7 +44,8 @@
 										data-speed="600"
 										data-start="0">
 									</div>
-
+									
+									{% comment %}
 									<!-- LAYER NR. 1 -->
 									<div class="tp-caption sfb fadeout text-center large_white"
 										data-x="center"
@@ -51,7 +53,7 @@
 										data-speed="500"
 										data-start="1000"
 										data-easing="easeOutQuad">Project Image 1
-									</div>	
+									</div>
 
 									<!-- LAYER NR. 2 -->
 									<div class="tp-caption sfb fadeout text-center large_white tp-resizeme"
@@ -71,64 +73,19 @@
 										data-easing="easeOutQuad"
 										data-endspeed="600">Lorem ipsum dolor sit amet, consectetur adipisicing elit. <br> Nesciunt, maiores, aliquid. Repellat eum numquam <br> culpa offici, tenetur fugiat dolorum sapiente...
 									</div>
+									{% endcomment %}
 
 									</li>
-									<!-- slide 1 end -->
-
-									<!-- slide 2 start -->
-									<!-- ================ -->
-									<li data-transition="slidehorizontal" data-slotamount="1" data-masterspeed="500" data-saveperformance="on" data-title="Slide 2">
-									
-									<!-- main image -->
-									<img src="/media/images/portfolio-item-banner-1.jpg" alt="slidebg2" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
-
-									<!-- Transparent Background -->
-									<div class="tp-caption dark-translucent-bg"
-										data-x="center"
-										data-y="bottom"
-										data-speed="600"
-										data-start="0">
-									</div>
-
-									<!-- LAYER NR. 1 -->
-									<div class="tp-caption sfb fadeout text-center large_white"
-										data-x="center"
-										data-y="110"
-										data-speed="500"
-										data-start="1000"
-										data-easing="easeOutQuad">Project Image 2
-									</div>	
-
-									<!-- LAYER NR. 2 -->
-									<div class="tp-caption sfb fadeout text-center large_white tp-resizeme"
-										data-x="center"
-										data-y="155"
-										data-speed="500"
-										data-start="1300"
-										data-easing="easeOutQuad"><div class="separator light"></div>
-									</div>	
-
-									<!-- LAYER NR. 3 -->
-									<div class="tp-caption sfb fadeout medium_white text-center"
-										data-x="center"
-										data-y="190"
-										data-speed="500"
-										data-start="1300"
-										data-easing="easeOutQuad"
-										data-endspeed="600">Lorem ipsum dolor sit amet, consectetur adipisicing elit. <br> Nesciunt, maiores, aliquid. Repellat eum numquam <br> culpa offici, tenetur fugiat dolorum sapiente...
-									</div>
-
-									</li>
-									<!-- slide 2 end -->
+									<!-- slide {{forloop.counter}} end -->
+									{% endfor %}
 								</ul>
 								<div class="tp-bannertimer"></div>
 							</div>
 						</div>
 						<!-- slider revolution end -->
-
 					</div>
 					<!-- slideshow end -->
-
+					{% endif %}
 				</div>
 			</div>
 			<!-- banner end -->

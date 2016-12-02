@@ -34,33 +34,32 @@ def get_content_friendly_url(request, friendly_url):
         raise Http404("No existe contenido: " + friendly_url)
 
 
-def get_content(request, id_content, templateName='detalle-contenido.html' ):
-
-    if (request.GET.has_key('template') and request.GET['template'] != ''):
+def get_content(request, id_content, templateName='detalle-contenido.html'):
+    if request.GET.has_key('template') and request.GET['template']:
         templateName = request.GET['template']
 
-    cContent = Contenido.objects.get(pk=id_content)
-    filePathName1, ext1 = os.path.splitext(cContent.img1.name)
-    filePathName2, ext2 = os.path.splitext(cContent.img2.name)
-    filePathName3, ext3 = os.path.splitext(cContent.img3.name)
+    content = Contenido.objects.get(pk=id_content)
 
-    c = Context({
-        'id':cContent.id,
-        'title':cContent.title,
-        'description':cContent.description,
-        'body':cContent.body,
-        'footer':cContent.footer,
-        'img1':cContent.img1,
-        'img1_med':filePathName1 + '_med' + ext1,
-        'img2':cContent.img2,
-        'img2_med':filePathName2 + '_med' + ext2,
-        'img3':cContent.img3,
-        'img3_med':filePathName3 + '_med' + ext3,
-        'page_title':cContent.title
+    all_images = [content.img1, content.img2, content.img3]
+    non_empty_parts = [os.path.splitext(p.name) for p in all_images if p]
+
+    images = [(
+        file_path_name + ext,
+        file_path_name + '_med' + ext,
+    ) for file_path_name, ext in non_empty_parts]
+
+    context = Context({
+        'id':content.id,
+        'title':content.title,
+        'description':content.description,
+        'body':content.body,
+        'footer':content.footer,
+        'images': images,
+        'page_title':content.title
     })
 
-    t = select_template(['home/{}'.format(templateName)])
-    return HttpResponse(t.render(RequestContext(request, c)))
+    template = select_template(['home/{}'.format(templateName)])
+    return HttpResponse(template.render(RequestContext(request, context)))
 
 def get_categoria_friendly_url(request, friendly_url):
     """
@@ -100,7 +99,6 @@ def get_categoria(request):
             "title": content.title,
             "description": content.description,
             "pub_date": content.publishInitDate or content.created.date(),
-            "footer": content.footer,
             "url": content.friendlyURL or content.id,
             "categories": content.keywords.split(',') if content.keywords else [],
             "img1": content.img1,
