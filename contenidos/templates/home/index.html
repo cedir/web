@@ -231,8 +231,12 @@
                     <div class="media margin-clear">
 						<div class="media-left">
 							<div class="overlay-container">
-								<img class="media-object" src="{% static 'images/medical-blog-thumb-1.jpg' %}" alt="blog-thumb">
-								<a href="blog-post.html" class="overlay-link small"><i class="fa fa-link"></i></a>
+                                {% if novedad.img1 %}
+                                <img class="media-object" src="/media/media_files/{{ novedad.img1 }}" alt="novedad" />
+                                {% else %}
+                                <img class="media-object" src="{% static 'images/medical-blog-thumb-1.jpg' %}" alt="novedad" />
+                                {% endif %}
+								<a href="{{ novedad.url }}" class="overlay-link small"><i class="fa fa-link"></i></a>
 							</div>
 						</div>
 						<div class="media-body">
@@ -252,90 +256,22 @@
 				<!-- accordion start -->
 				<!-- ================ -->
 				<div class="panel-group collapse-style-2" id="accordion-2">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseTwo-2" class="collapsed">
-									<i class="fa fa-leaf pr-10"></i>Gastroenterog&iacute;a
-								</a>
-							</h4>
-						</div>
-						<div id="collapseTwo-2" class="panel-collapse collapse">
-							<div class="panel-body bordered p-15">
-								Somos especialistas en gastro. <a href="#">Leer m&aacute;s<i class="fa fa-long-arrow-right pl-5"></i></a>
-							</div>
-						</div>
-					</div>
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseOne-2">
-									<i class="fa fa-eye pr-10"></i>Ecografías
-								</a>
-							</h4>
-						</div>
-						<div id="collapseOne-2" class="panel-collapse collapse in">
-							<div class="panel-body bordered p-15">
-								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Leer m&aacute;s<i class="fa fa-long-arrow-right pl-5"></i></a>
-							</div>
-						</div>
-					</div>
+                    {% for contenido in departamentos_contents %}
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
 								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseThree-2" class="collapsed">
-									<i class="icon-users-1 pr-10"></i>Cirugía General
+									<i class="icon-users-1 pr-10"></i>{{ contenido.title }}
 								</a>
 							</h4>
 						</div>
 						<div id="collapseThree-2" class="panel-collapse collapse">
 							<div class="panel-body bordered p-15">
-								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
+								{{ contenido.description }}. <a href="/categoria/departamentos">Departamentos<i class="fa fa-long-arrow-right pl-5"></i></a>
 							</div>
 						</div>
 					</div>
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseFour-2" class="collapsed">
-									<i class="fa-female fa pr-10"></i>Ginecología
-								</a>
-							</h4>
-						</div>
-						<div id="collapseFour-2" class="panel-collapse collapse">
-							<div class="panel-body bordered p-15">
-								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
-							</div>
-						</div>
-					</div>
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseFive-2" class="collapsed">
-									<i class="fa-road fa pr-10"></i>Oncología
-								</a>
-							</h4>
-						</div>
-						<div id="collapseFive-2" class="panel-collapse collapse">
-							<div class="panel-body bordered p-15">
-								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
-							</div>
-						</div>
-					</div>
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseSix-2" class="collapsed">
-									<i class="fa-heart fa pr-10"></i>Cardiología
-								</a>
-							</h4>
-						</div>
-						<div id="collapseSix-2" class="panel-collapse collapse">
-							<div class="panel-body bordered p-15">
-								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officiaasd. <a href="#">Read More<i class="fa fa-long-arrow-right pl-5"></i></a>
-							</div>
-						</div>
-					</div>
+                    {% endfor %}
 				</div>
 				<!-- accordion end -->
 			</div>
@@ -351,7 +287,7 @@
                             {% else %}
                             <img src="{% static 'images/medical-service-1.jpg' %}" alt="preparacion para estudio">
                             {% endif %}
-							<a href="#" class="overlay-link"><i class="fa fa-link"></i></a>
+							<a href="{{ contenido.url }}" class="overlay-link"><i class="fa fa-link"></i></a>
 							<div class="overlay-bottom hidden-xs">
 								<div class="text">
 									<p class="lead margin-clear text-left">{{ contenido.title }}</p>
@@ -360,7 +296,7 @@
 						</div>
 						<div class="body padding-horizontal-clear">
 							<p>{{ contenido.description }}</p>
-							<a class="link-dark" href="{{ contenido.friendly_url }}">Leer m&aacute;s<i class="pl-5 fa fa-angle-double-right"></i></a>
+							<a class="link-dark" href="{{ contenido.url }}">Leer m&aacute;s<i class="pl-5 fa fa-angle-double-right"></i></a>
 						</div>
 					</div>
                     {% endfor %}

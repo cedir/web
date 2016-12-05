@@ -24,7 +24,6 @@ class Contenido(models.Model):
     title = models.CharField("Titulo", max_length=200,null=False,blank=False )
     description = models.TextField("Resumen",null=False,blank=False)
     body = models.TextField("Desarrollo",blank=True)
-    createdDate = models.DateTimeField("Creado",null=True,blank=True,auto_now_add=True)
     publishInitDate = models.DateField("Inicio de publicacion",null=True,blank=True)
     publishEndDate = models.DateField("Fin de publicacion",null=True,blank=True)
     publishContent = models.BooleanField("Publicar contenido",default=True)
@@ -36,7 +35,8 @@ class Contenido(models.Model):
     friendlyURL = models.CharField("Friendly URL", max_length=100,null=True,blank=True)
     keywords = models.CharField("Keywords", max_length=100,null=True,blank=True)
     categoria = models.ManyToManyField(Categoria, verbose_name="Categoria")
-    created = models.DateTimeField(auto_now_add=True)
+    createdDate = models.DateTimeField("Creado",null=True,blank=True,auto_now_add=True)
+    updated = models.DateTimeField(editable=False, null=True, auto_now=True)
 
     @property
     def url(self):
