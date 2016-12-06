@@ -35,14 +35,14 @@ def anular_cobro_presentacion(id_presentacion, apply_changes):
         assert estudio.pago_medico_actuante == None, u'Error, pago medico actuante no es nulo'
         assert estudio.pago_medico_solicitante == None, u'Error, pago medico solicitante no es nulo'
 
-        print '{}, {}, {}, {}, {}, {}'.format(estudio.id, estudio.fechaCobro, estudio.importeCobradoPension,
-                                estudio.importeCobradoArancelAnestesia, estudio.importeEstudioCobrado,
-                                estudio.importeMedicacionCobrado)
-        estudio.fechaCobro = None
-        estudio.importeCobradoPension = Decimal(0)
-        estudio.importeCobradoArancelAnestesia = Decimal(0)
-        estudio.importeEstudioCobrado = Decimal(0)
-        estudio.importeMedicacionCobrado = Decimal(0)
+        print '{}, {}, {}, {}, {}, {}'.format(estudio.id, estudio.fecha_cobro, estudio.importe_cobrado_pension,
+                                estudio.importe_cobrado_arancel_anestesia, estudio.importe_estudio_cobrado,
+                                estudio.importe_medicacion_cobrado)
+        estudio.fecha_cobro = None
+        estudio.importe_cobrado_pension = Decimal(0)
+        estudio.importe_cobrado_arancel_anestesia = Decimal(0)
+        estudio.importe_estudio_cobrado = Decimal(0)
+        estudio.importe_medicacion_cobrado = Decimal(0)
         
         if apply_changes:
             estudio.save()
