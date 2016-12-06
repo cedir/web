@@ -14,7 +14,7 @@ $(document).ready(function() {
 
         /* values have changed events*/
         $("#id_informe").on('change', function() { estudioFueModificado = true;});
-        $("#id_motivoEstudio").on('change', function() { estudioFueModificado = true;});
+        $("#id_motivo").on('change', function() { estudioFueModificado = true;});
     }
 
     function cargarVistaChangeEstudio(){
