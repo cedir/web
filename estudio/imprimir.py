@@ -43,7 +43,7 @@ def _datos_estudio(elements, estudio):
     font_std.fontSize = 9
 
     # fecha estudio
-    fecha = u'<b>Fecha del estudio.....:</b> {0}'.format(unicode(estudio.fechaEstudio.strftime("%d/%m/%Y")))
+    fecha = u'<b>Fecha del estudio.....:</b> {0}'.format(unicode(estudio.fecha.strftime("%d/%m/%Y")))
     elements.append(Paragraph(fecha, font_std))
 
     # Paciente
@@ -56,7 +56,7 @@ def _datos_estudio(elements, estudio):
     elements.append(Paragraph(paciente, font_std))
 
     # Obra Social
-    obra_social = u'<b>Obra Social ...............:</b> {0}'.format(estudio.obraSocial.nombre)
+    obra_social = u'<b>Obra Social ...............:</b> {0}'.format(estudio.obra_social.nombre)
     elements.append(Paragraph(obra_social, font_std))
 
     # Nro de afiliado
@@ -65,11 +65,11 @@ def _datos_estudio(elements, estudio):
         elements.append(Paragraph(nro_afiliado, font_std))
 
     # Medico Solicitante
-    medico_sol = u'<b>Medico Solicitante ...:</b> {0}'.format(unicode(estudio.medicoSolicitante))
+    medico_sol = u'<b>Medico Solicitante ...:</b> {0}'.format(unicode(estudio.medico_solicitante))
     elements.append(Paragraph(medico_sol, font_std))
 
     # Motivo del estudio
-    motivo = u'<para spaceAfter="43" ><b>Motivo del estudio ...:</b> {0}</para>'.format(estudio.motivoEstudio)
+    motivo = u'<para spaceAfter="43" ><b>Motivo del estudio ...:</b> {0}</para>'.format(estudio.motivo)
     elements.append(Paragraph(motivo, font_std))
 
     # restauramos el tamaño de la fuente

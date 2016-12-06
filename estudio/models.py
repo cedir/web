@@ -15,48 +15,48 @@ MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
 class Estudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
-    fechaEstudio = models.DateField(u'Fecha')
+    fecha = models.DateField(u'Fecha', db_column="fechaEstudio")
     practica = models.ForeignKey(Practica, db_column="idEstudio")
-    motivoEstudio = models.CharField(u'Motivo', max_length=300, blank=True)
+    motivo = models.CharField(u'Motivo', db_column="motivoEstudio", max_length=300, blank=True)
     informe = models.TextField(blank=True)
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo", blank=True)
     public_id = models.CharField(max_length=100, db_column="publicID")
 
     medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name=u'medico_actuante')
-    obraSocial = models.ForeignKey(ObraSocial, db_column="idObraSocial")
-    medicoSolicitante = models.ForeignKey(Medico, db_column="idMedicoSolicitante", related_name=u'medico_solicitante')
+    obra_social = models.ForeignKey(ObraSocial, db_column="idObraSocial")
+    medico_solicitante = models.ForeignKey(Medico, db_column="idMedicoSolicitante", related_name=u'medico_solicitante')
     presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion', null=True, blank=True, related_name=u'estudios')
-    nroDeOrden = models.CharField(max_length=200)
+    nro_de_orden = models.CharField(db_column=u'nroDeOrden', max_length=200)
     anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
-    esPagoContraFactura = models.IntegerField()
+    es_pago_contra_factura = models.IntegerField(db_column="esPagoContraFactura", default=0)
     medicacion = models.ManyToManyField(Medicamento, through='Medicacion')
 
-    fechaCobro = models.CharField(null=True, max_length=100)
-    importeEstudio = models.FloatField()
-    importeMedicacion = models.FloatField()
-    pagoContraFactura = models.FloatField()
-    diferenciaPaciente = models.FloatField()
+    fecha_cobro = models.CharField(db_column="fechaCobro", null=True, max_length=100)
+    importe_estudio = models.FloatField(db_column="importeEstudio")
+    importe_medicacion = models.FloatField(db_column="importeMedicacion")
+    pago_contra_factura = models.FloatField(db_column="pagoContraFactura")
+    diferencia_paciente = models.FloatField(db_column="diferenciaPaciente")
     pension = models.FloatField()
     importe_pago_medico = models.FloatField(db_column=u'importePagoMedico')
     importe_pago_medico_solicitante = models.FloatField(db_column=u'importePagoMedicoSol')
     #diferencia_paciente_medicacion = models.FloatField(db_column=u'diferenciaPacienteMedicacion')
     pago_medico_actuante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoAct', null=True, blank=True, related_name=u'estudios_actuantes')
     pago_medico_solicitante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoSol', null=True, blank=True, related_name=u'estudios_solicitantes')
-    importeCobradoPension = models.FloatField()
-    importeCobradoArancelAnestesia = models.FloatField()
-    importeEstudioCobrado = models.FloatField()
-    importeMedicacionCobrado = models.FloatField()
-    arancelAnestesia = models.FloatField()
+    importe_cobrado_pension = models.FloatField(db_column="importeCobradoPension")
+    importe_cobrado_arancel_anestesia = models.FloatField(db_column="importeCobradoArancelAnestesia")
+    importe_estudio_cobrado = models.FloatField(db_column="importeEstudioCobrado")
+    importe_medicacion_cobrado = models.FloatField(db_column="importeMedicacionCobrado")
+    arancel_anestesia = models.FloatField(db_column="arancelAnestesia")
 
     class Meta:
         db_table = 'tblEstudios'
 
     def __unicode__(self):
-        return u'%s %s' % (self.fechaEstudio, self.paciente)
+        return u'%s %s' % (self.fecha, self.paciente)
 
     @property
     def fecha_vencimiento_link_video(self):
-        return self.fechaEstudio + datetime.timedelta(days=MAX_DAYS_VIDEO_LINK_AVAILABLE)
+        return self.fecha + datetime.timedelta(days=MAX_DAYS_VIDEO_LINK_AVAILABLE)
 
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False

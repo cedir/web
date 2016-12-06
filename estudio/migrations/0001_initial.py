@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             name='Estudio',
             fields=[
                 ('id', models.AutoField(db_column=b'nroEstudio', primary_key=True, serialize=False)),
-                ('fechaEstudio', models.DateField(verbose_name='Fecha')),
+                ('fecha', models.DateField(db_column='fechaEstudio', verbose_name='Fecha')),
                 ('motivoEstudio', models.CharField(blank=True, max_length=300, verbose_name='Motivo')),
                 ('informe', models.TextField(blank=True)),
                 ('enlace_video', models.CharField(blank=True, db_column=b'enlaceVideo', max_length=256)),
