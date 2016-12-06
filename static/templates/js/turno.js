@@ -399,7 +399,7 @@ function getInfoTurno() {
       data: 'medico=' + medicoId + '&obras_sociales=' + obraSocialId + "&practicas=" + idPracticas,
       success: function(data) {
             $('#info-turno tbody tr').remove();
-            $.each(data, function(index, infoTurno) {
+            $.each(data.results, function(index, infoTurno) {
                 var info_turno_practicas = '';
                 $.each(infoTurno.practicas, function(index, practica) {
                     info_turno_practicas += ' -' + (practica.abreviatura? practica.abreviatura : practica.descripcion);
@@ -410,7 +410,7 @@ function getInfoTurno() {
 
                 $('#info-turno table tbody').append("<tr><td>" + infoTurno.texto + '</td><td>' + info_turno_practicas + "</td></tr>");
             });
-            if (data.length) {
+            if (data.results.length) {
               $('#info-turno').show();
             }else{
               $('#info-turno').hide();
