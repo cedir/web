@@ -43,13 +43,16 @@ def get_content(request, id_content, templateName='detalle-contenido.html'):
         templateName = request.GET['template']
 
     content = Contenido.objects.get(pk=id_content)
+    categorias_id = [c.id for c in content.categoria.all()]
+    related = Contenido.objects.filter(categoria__in=categorias_id).order_by('-createdDate')[:3]
 
-    all_images = [content.img1, content.img2, content.img3]
-    non_empty_parts = [os.path.splitext(p.name) for p in all_images if p]
+    def get_images(c_content):
+        all_images = [c_content.img1, c_content.img2, c_content.img3]
+        non_empty_parts = [os.path.splitext(p.name) for p in all_images if p]
 
-    images = [(
-        file_path_name + ext,
-    ) for file_path_name, ext in non_empty_parts]
+        return [(
+            file_path_name + ext,
+        ) for file_path_name, ext in non_empty_parts]
 
     context = Context({
         'id':content.id,
@@ -57,8 +60,14 @@ def get_content(request, id_content, templateName='detalle-contenido.html'):
         'description':content.description,
         'body':content.body,
         'footer':content.footer,
-        'images': images,
-        'page_title':content.title
+        'images': get_images(content),
+        'page_title':content.title,
+        'related': [{
+            'title': r.title,
+            'description': r.description,
+            'url': r.friendlyURL or r.id,
+            'images': get_images(r)
+        } for r in related]
     })
 
     template = select_template(['home/{}'.format(templateName)])
