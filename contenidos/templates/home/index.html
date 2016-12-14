@@ -243,7 +243,7 @@
 							<h5 class="media-heading"><a href="{{ novedad.url }}">{{ novedad.title }}</a></h5>
 							<p class="small"><i class="fa fa-calendar pr-10"></i>Mar 23, 2015</p>
 							<p class="margin-clear small">{{ novedad.description }}</p>
-							<a href="{{ novedad.friendly_url }}">Leer m&aacute;s<i class="fa fa-long-arrow-right pl-5"></i></a>
+							<a href="{{ novedad.url }}">Leer m&aacute;s<i class="fa fa-long-arrow-right pl-5"></i></a>
 						</div>
 						<hr>
 					</div>
@@ -251,26 +251,43 @@
 				</div>
 			</div>
 			<div class="col-md-3">
-				<h3><span class="text-default">Departamentos</span></h3>
+				<h3><span class="text-default">Unidades</span></h3>
 				<div class="separator-2"></div>
 				<!-- accordion start -->
 				<!-- ================ -->
 				<div class="panel-group collapse-style-2" id="accordion-2">
-                    {% for contenido in departamentos_contents %}
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseThree-2" class="collapsed">
-									<i class="icon-users-1 pr-10"></i>{{ contenido.title }}
-								</a>
-							</h4>
-						</div>
-						<div id="collapseThree-2" class="panel-collapse collapse">
-							<div class="panel-body bordered p-15">
-								{{ contenido.description }}. <a href="/categoria/departamentos">Departamentos<i class="fa fa-long-arrow-right pl-5"></i></a>
+                    {% for contenido in unidades_contents %}
+                        {% if forloop.first %}
+                        <div class="panel panel-default">
+						    <div class="panel-heading">
+							    <h4 class="panel-title">
+								    <a data-toggle="collapse" data-parent="#accordion-2" href="#collapseOne-2">
+									    <i class="icon-users-1 pr-10"></i>{{ contenido.title }}
+								    </a>
+							    </h4>
+						    </div>
+						    <div id="collapseOne-2" class="panel-collapse collapse in">
+							    <div class="panel-body bordered p-15">
+								    {{ contenido.description }} <a href="/categoria/unidades">Unidades<i class="fa fa-long-arrow-right pl-5"></i></a>
+							    </div>
+						    </div>
+					    </div>
+                        {% else %}
+                        <div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseTwo-2" class="collapsed">
+										<i class="icon-users-1 pr-10"></i>{{ contenido.title }}
+									</a>
+								</h4>
+							</div>
+							<div id="collapseTwo-2" class="panel-collapse collapse">
+								<div class="panel-body bordered p-15">
+									{{ contenido.description }} <a href="/categoria/unidades">Unidades<i class="fa fa-long-arrow-right pl-5"></i></a>
+								</div>
 							</div>
 						</div>
-					</div>
+                        {% endif %}
                     {% endfor %}
 				</div>
 				<!-- accordion end -->
@@ -328,12 +345,7 @@
 		<h3 class="logo-font"><span class="text-muted">Cedir</span> <span class="text-default">Centro de Endoscopía digestiva de Rosario</span></h3>
 		<div class="separator-2 visible-lg"></div>
 		<p>
-            Nuestra ciudad de Rosario y su amplia zona de influencia no contaba con un lugar especializado y preparado para esta demanda poblacional para el diagnostico y tratamiento de las enfermedades digestivas.<br />
-
-            En el año 2005 se crea el C.E.Di.R. CENTRO DE ENDOSCOPIA DIGESTIVA DE ROSARIO. Su principal finalidad fue atender esa demanda pero fundamentalmente enfocado al diagnostico prevención y tratamiento de enfermedades digestivas.<br />
-
-            Rápidamente logró el reconocimiento de la población como así también de las distintas áreas publicas y privadas de la salud.<br />
-
+            En el año 2005 se crea el C.E.Di.R. CENTRO DE ENDOSCOPIA DIGESTIVA DE ROSARIO. Su principal finalidad fue atender esa demanda pero fundamentalmente enfocado al diagnóstico prevención y tratamiento de enfermedades digestivas.<br />
             Comprometido con su objetivo y acompañando su crecimiento en el año 2010 se instala en Bv. Oroño 1564 con mayor infraestructura y avanzada tecnología que permite realizar estudios de alta complejidad, con mas de 35 especialistas en gastroenterología y especialidades vinculadas, equipos multidisciplinarios y permanente renovación e incorporación de instrumental médico que mejora resultados diagnósticos y terapéuticos.<br />
             Hoy con mas de 100.000 estudios endoscopicos realizados, 35 diferentes tecnicas entre las que se cuentan polipectomias endoscopicas, mucosectomias, sub mucosectomias, colangiografias retrogradas endoscopicas, hemostasias de lesiones sangrantes, endocapsula, coagulacion de lesiones con argon plasma, enteroscopia, tratamiento endoscopico de hemorroides internas, tratamiento de obesidad con balon intragastrico, manometria y phmetria esofagica entre otras hacen de C.E.DI.R un centro dedicado exclusivamente y con la mayor complejidad en Rosario en zona de influencia.
         </p>

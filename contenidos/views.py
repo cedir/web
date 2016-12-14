@@ -16,13 +16,13 @@ def get_home(request):
 
     slide_contents = Contenido.objects.filter(categoria__name__contains='Home slide', publishContent=True).order_by('publishInitDate')
     prep_estudios_contents = Contenido.objects.filter(categoria__name__contains='Preparaciones para estudio', publishContent=True).order_by('publishInitDate')[:3]
-    departamentos = Contenido.objects.filter(categoria__name='Departamentos', publishContent=True).order_by('publishInitDate')[:10]
-    novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).order_by("-createdDate")[:3]
+    unidades = Contenido.objects.filter(categoria__name='Unidades', publishContent=True).order_by('publishInitDate')[:10]
+    novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).order_by("-publishInitDate")[:3]
     context = {
         u'novedades': novedades,
         u'slide_contents': slide_contents,
         u'preparacion_estudios_contents': prep_estudios_contents,
-        u'departamentos_contents': departamentos,
+        u'unidades_contents': unidades,
     }
     t = select_template(['home/index.html'])
     return HttpResponse(t.render(RequestContext(request, context)))
