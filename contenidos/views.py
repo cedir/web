@@ -93,13 +93,8 @@ def get_categoria(request):
     if request.GET.has_key('categoryId') and request.GET['categoryId']:
         category_id = request.GET['categoryId']
 
-    #Parche para ordenar novedades for fecha, hacerlo bien
-    order_by = 'id'
-    if request.GET.has_key('template') and request.GET['template'] == 'novedades.html':
-        order_by = 'createdDate'
-
     categoria = Categoria.objects.get(id=category_id)
-    contents = Contenido.objects.filter(categoria__id__exact=category_id, publishContent=True).order_by(order_by)
+    contents = Contenido.objects.filter(categoria__id__exact=category_id, publishContent=True).order_by("-publishInitDate", "-id")[:15]
 
     def create_content(content):
         """
@@ -141,7 +136,7 @@ def get_categoria(request):
 def get_video(request, public_id):
     """
     Get the estudio for the given public_id, and displays the video link that redirects to the video download page.
-    """    
+    """
     video_url = None
     paciente = None
     fecha_vencimiento = None
@@ -200,4 +195,3 @@ def send_mail(request):
 	    #'current_date': now,
     })
     return HttpResponse(t.render(RequestContext(request, c)))
-
