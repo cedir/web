@@ -10,4 +10,5 @@ node_modules/
 static/templates/media_files
 static/templates/bower_components/
 .idea
+.vscode
 
