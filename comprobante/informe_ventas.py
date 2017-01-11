@@ -6,9 +6,9 @@ from datetime import date
 def obtener_comprobantes_ventas(responsable, anio, mes):
     anio = int(anio)
     mes = int(mes)
-    not_december = not mes % 12
+    is_december = not mes % 12  # True if mes is december, False otherwise
     primer_dia = date(anio, mes, 1)
-    ultimo_dia = date(anio + int(not_december), 1 + mes % 12, 1)
+    ultimo_dia = date(anio + int(is_december), 1 + mes % 12, 1)
     return Comprobante.objects\
         .filter(responsable__iexact=responsable, fecha_emision__gte=primer_dia, fecha_emision__lt=ultimo_dia)\
         .exclude(tipo_comprobante=2)\
