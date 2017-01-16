@@ -1,7 +1,8 @@
 import datetime
 from django.db import models
 from django.db.models.signals import pre_save
-from medico.models import Medico, Anestesista, PagoMedico
+from medico.models import Medico, PagoMedico
+from anestesista.models import Anestesista
 from practica.models import Practica
 from obra_social.models import ObraSocial
 from paciente.models import Paciente
