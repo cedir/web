@@ -2,6 +2,24 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+class ComplejidadEstudio(models.Model):
+    estudios = models.CharField(max_length=500, blank=True, null=True)
+    formula = models.CharField(max_length=200, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tblComplejidadEstudios'
+
+
+class Complejidad(models.Model):
+    importe = models.CharField(max_length=10, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tblComplejidades'
+
+
+
 # Create your models here.
 class Anestesista(models.Model):
     id = models.AutoField(primary_key=True, db_column="idMedicoAn")

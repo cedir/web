@@ -4,7 +4,6 @@ from estudio.models import Estudio
 
 
 class TipoMovimientoCaja(models.Model):
-    id = models.IntegerField(primary_key=True)
     descripcion = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
