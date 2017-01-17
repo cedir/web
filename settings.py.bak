@@ -162,6 +162,7 @@ INSTALLED_APPS = [
     'paciente',
     'obra_social',
     'medico',
+    'caja',
     'anestesista',
     'turno',
     'estudio',
