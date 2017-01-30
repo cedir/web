@@ -15,14 +15,16 @@ NOVEDADES_CATEGORY_ID = 2
 def get_home(request):
 
     slide_contents = Contenido.objects.filter(categoria__name__contains='Home slide', publishContent=True).order_by('publishInitDate')
-    prep_estudios_contents = Contenido.objects.filter(categoria__name__contains='Preparaciones para estudio', publishContent=True).order_by('publishInitDate')[:3]
+    preguntas_frecuentes_contents = Contenido.objects.filter(categoria__name__contains='nos preguntan nuestros pacientes', publishContent=True).order_by('publishInitDate')[:4]
+    enfermedades_digestivas_contents = Contenido.objects.filter(categoria__name__contains='Enfermedades Digestivas', publishContent=True).order_by('publishInitDate')[:4]
     unidades = Contenido.objects.filter(categoria__name='Unidades', publishContent=True).order_by('publishInitDate')[:10]
     novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).order_by("-publishInitDate")[:3]
     context = {
         u'novedades': novedades,
         u'slide_contents': slide_contents,
-        u'preparacion_estudios_contents': prep_estudios_contents,
+        u'enfermedades_digestivas_contents': enfermedades_digestivas_contents,
         u'unidades_contents': unidades,
+        u'preguntas_frecuentes_contents': preguntas_frecuentes_contents,
     }
     t = select_template(['home/index.html'])
     return HttpResponse(t.render(RequestContext(request, context)))

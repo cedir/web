@@ -21,7 +21,7 @@
                     {% if contenido|belong_to_category:"Home slide claro izquierdo" %}
 					<li data-transition="random" data-slotamount="7" data-masterspeed="500" data-saveperformance="on" data-title="{{ contenido.title }}">
 
-					    <!-- main image --> 
+					    <!-- main image -->
 					    <img src="/media/media_files/{{ contenido.img1 }}" alt="slidebg1" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
 
 					    <!-- Transparent Background -->
@@ -293,10 +293,10 @@
 				<!-- accordion end -->
 			</div>
 			<div class="col-md-3">
-				<h3>Prep. para <span class="text-default">Estudios</span></h3>
+				<h3>Preguntas <span class="text-default">Frecuentes</span></h3>
 				<div class="separator-2"></div>
 				<div class="owl-carousel content-slider-with-large-controls-autoplay dark-controls light-gray-bg buttons-hide">
-                    {% for contenido in preparacion_estudios_contents %}
+                    {% for contenido in preguntas_frecuentes_contents %}
 					<div class="image-box style-2">
 						<div class="overlay-container overlay-visible">
                             {% if contenido.img1 %}
@@ -345,9 +345,9 @@
 		<h3 class="logo-font"><span class="text-muted">Cedir</span> <span class="text-default">Centro de Endoscopía digestiva de Rosario</span></h3>
 		<div class="separator-2 visible-lg"></div>
 		<p>
-            En el año 2005 se crea el C.E.Di.R. CENTRO DE ENDOSCOPIA DIGESTIVA DE ROSARIO. Su principal finalidad fue atender esa demanda pero fundamentalmente enfocado al diagnóstico prevención y tratamiento de enfermedades digestivas.<br />
+            En el año 2005 se crea el C.E.Di.R. CENTRO DE ENDOSCOPIA DIGESTIVA DE ROSARIO fundamentalmente enfocado al diagnóstico, prevención y tratamiento de enfermedades digestivas.<br />
             Comprometido con su objetivo y acompañando su crecimiento en el año 2010 se instala en Bv. Oroño 1564 con mayor infraestructura y avanzada tecnología que permite realizar estudios de alta complejidad, con mas de 35 especialistas en gastroenterología y especialidades vinculadas, equipos multidisciplinarios y permanente renovación e incorporación de instrumental médico que mejora resultados diagnósticos y terapéuticos.<br />
-            Hoy con mas de 100.000 estudios endoscopicos realizados, 35 diferentes tecnicas entre las que se cuentan polipectomias endoscopicas, mucosectomias, sub mucosectomias, colangiografias retrogradas endoscopicas, hemostasias de lesiones sangrantes, endocapsula, coagulacion de lesiones con argon plasma, enteroscopia, tratamiento endoscopico de hemorroides internas, tratamiento de obesidad con balon intragastrico, manometria y phmetria esofagica entre otras hacen de C.E.DI.R un centro dedicado exclusivamente y con la mayor complejidad en Rosario en zona de influencia.
+            Hoy con mas de 100.000 estudios endoscopicos realizados, con 35 diferentes técnicas, hacen de C.E.DI.R un centro dedicado exclusivamente y con la mayor complejidad en Rosario en zona de influencia.
         </p>
 		<div class="separator-3 visible-lg"></div>
 	</div>
@@ -360,36 +360,28 @@
 	<div class="container pv-20">
 		<div class="row">
 			<div class="col-md-8 col-md-offset-2">
-				<h3 class="text-center">Conozca nuestro <span class="text-default">Equipo</span></h3>
+				<h3 class="text-center">Enfermedades Digestivas <span class="text-default">m&aacute;s frecuentes</span></h3>
 				<div class="separator"></div>
-				<p class="lead text-center">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo dignissimos, adipisci ipsa aut voluptate consequuntur ad minus rerum reprehenderit fuga quis eum eveniet eligendi, fugit neque laboriosam unde quae incidunt.</p>
+				<p class="lead text-center">Conozca las enfermedades gastrointestinales m&aacute;s importantes.</p>
 			</div>
 		</div>
 	</div>
 	<div class="row grid-space-0">
+        {% for contenido in enfermedades_digestivas_contents %}
 		<div class="col-md-3 col-sm-6">
 			<div class="image-box team-member shadow mb-20">
 				<div class="overlay-container overlay-visible">
-					<img src="{% static 'images/brunetti2_med.jpg' %}" alt="">
-					<a href="#" class="overlay-link" title="Jane Doe - CEO"><i class="icon-link"></i></a>
+
+                    {% if contenido.img1 %}
+                    <img src="/media/media_files/{{ contenido.img1 }}" alt="enfermedades digestivas">
+                    {% else %}
+                    <img src="{% static 'images/medical-service-1.jpg' %}" alt="enfermedades digestivas">
+                    {% endif %}
+
+					<a href="{{ contenido.url }}" class="overlay-link" title="enfermedades digestivas"><i class="icon-link"></i></a>
 					<div class="overlay-bottom">
 						<div class="text">
-							<h3 class="title">Dr. José Brunetti</h3>
-							<div class="separator light"></div>
-							<p class="small margin-clear"><em>Director Médico <br> Gastroenterólogo</em></p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-3 col-sm-6">
-			<div class="image-box team-member shadow mb-20">
-				<div class="overlay-container overlay-visible">
-					<img src="{% static 'images/medical-team-member-2.jpg' %}" alt="">
-					<a href="#" class="overlay-link" title="Jane Doe - CEO"><i class="icon-link"></i></a>
-					<div class="overlay-bottom">
-						<div class="text">
-							<h3 class="title">Prof. Jane Doe</h3>
+							<h3 class="title">{{ contenido.title }}</h3>
 							<div class="separator light"></div>
 							<p class="small margin-clear"><em>Dermatologists‎ <br> Lorem ipsum dolor sit</em></p>
 						</div>
@@ -397,37 +389,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-md-3 col-sm-6">
-			<div class="image-box team-member shadow mb-20">
-				<div class="overlay-container overlay-visible">
-					<img src="{% static 'images/medical-team-member-3.jpg' %}" alt="">
-					<a href="#" class="overlay-link" title="Jane Doe - CEO"><i class="icon-link"></i></a>
-					<div class="overlay-bottom">
-						<div class="text">
-							<h3 class="title">Dr. Jane Doe</h3>
-							<div class="separator light"></div>
-							<p class="small margin-clear"><em>Gastroenterologists <br> Lorem ipsum dolor sit</em></p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-3 col-sm-6">
-			<div class="image-box team-member shadow mb-20">
-				<div class="overlay-container overlay-visible">
-					<img src="{% static 'images/medical-team-member-4.jpg' %}" alt="">
-					<a href="#" class="overlay-link" title="Jane Doe - CEO"><i class="icon-link"></i></a>
-					<div class="overlay-bottom">
-						<div class="text">
-							<h3 class="title">Prof. Jooly Doe</h3>
-							<div class="separator light"></div>
-							<p class="small margin-clear"><em>Gynaecologists‎ <br> Lorem ipsum dolor sit</em></p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+        {% endfor %}
 	</div>
+
+    <!-- Comentarios de la gente
 	<div class="owl-carousel space-bottom content-slider">
 		<div class="container">
 			<div class="row">
@@ -470,6 +435,9 @@
 			</div>
 		</div>
 	</div>
+    -->
+
+
 </section>
 <!-- section end -->
 
