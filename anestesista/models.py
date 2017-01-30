@@ -1,6 +1,14 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from paciente.models import Paciente
+from obra_social.models import ObraSocial
+
+class PagoAnestesistaVM:
+    pass
+
+class LineaPagoAnestesistaVM:
+    pass
 
 class ComplejidadEstudio(models.Model):
     estudios = models.CharField(max_length=500, blank=True, null=True)
@@ -18,8 +26,6 @@ class Complejidad(models.Model):
         managed = False
         db_table = 'tblComplejidades'
 
-
-
 # Create your models here.
 class Anestesista(models.Model):
     id = models.AutoField(primary_key=True, db_column="idMedicoAn")
@@ -35,5 +41,25 @@ class Anestesista(models.Model):
         return u'%s, %s' % (self.apellido, self.nombre, )
 
     class Meta:
+        managed = False
         db_table = 'tblMedicosAnestesistas'
         ordering = [u'apellido']
+
+
+class PagoAnestesista(models.Model):
+    anestesista = models.ForeignKey(Anestesista)
+    anio = models.IntegerField()
+    mes = models.IntegerField()
+    creado = models.DateTimeField(auto_now_add=True)
+    modificado = models.DateTimeField(auto_now=True)
+
+class LineaPagoAnestesista(models.Model):
+    pago = models.ForeignKey(PagoAnestesista, related_name="lineas")
+    paciente = models.ForeignKey(Paciente)
+    obra_social = models.ForeignKey(ObraSocial)
+    estudios = models.ManyToManyField('estudio.Estudio')
+    es_paciente_diferenciado = models.BooleanField()
+    formula = models.CharField(max_length=200)
+    formula_valorizada = models.CharField(max_length=500)
+    importe = models.DecimalField(max_digits=16, decimal_places=2, default='0.00')
+    alicuota_iva = models.DecimalField(max_digits=16, decimal_places=2, default='0.00')

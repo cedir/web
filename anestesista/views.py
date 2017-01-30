@@ -2,8 +2,11 @@
 from django.shortcuts import render
 from estudio.models import Estudio
 from estudio.serializers import EstudioSerializer
-from anestesista.models import ComplejidadEstudio, Complejidad
+from anestesista.models import ComplejidadEstudio, Complejidad, PagoAnestesistaVM, LineaPagoAnestesistaVM
+from anestesista.serializers import AnestesistaSerializer, PagoAnestesistaVMSerializer, LineaPagoAnestesistaVMSerializer
 from itertools import groupby
+
+from models import Anestesista
 
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -40,34 +43,64 @@ class JSONResponse(HttpResponse):
 
 # Create your views here.
 def pago(request, id_anestesista, anio, mes):
+    
+    pago = PagoAnestesistaVM()
+
+    pago.anestesista = Anestesista.objects.get(id=id_anestesista)
+    pago.anio = anio
+    pago.mes = mes
 
     # obtenemos los estudios por anestesista, año y mes    
     estudios = Estudio.objects.filter(anestesista_id=id_anestesista, fecha__year=anio, fecha__month=mes).order_by('fecha','paciente','obra_social')
     complejidades = Complejidad.objects.all()
 
     # agrupamos en paquetes fecha/paciente/obra_social
-    grupos = groupby(estudios, lambda e: (e.fecha, e.paciente.id, e.obra_social.id))
+    grupos = groupby(estudios, lambda e: (e.fecha, e.paciente, e.obra_social))
+
+    pago.lineas = []
 
     # por cada paquete
-    for clave, grupo in grupos:
+    for (fecha, paciente, obra_social), grupo in grupos:
+        linea = LineaPagoAnestesistaVM()
+        linea.paciente = paciente
+        linea.obra_social = obra_social
+
         estudios = sorted(grupo, key=lambda estudio: estudio.practica.id)
+           
         # obtenemos los movimientos de caja asociados
         mov_caja = [mov
             for estudio in estudios
             for mov     in estudio.movimientos_caja.filter(tipo_id__in=[3,10])
             ]
-
+        
+        # generamos el patrón de búsqueda para la complejidad
+        # (es una lista de codigos destudios ordenada y separada por coma)
         estudios_id = ','.join([str(id) for id in sorted(set([estudio.practica.id for estudio in estudios]))])
 
+        # obtenemos la complejidad de la serie de estudios
         complejidad = ComplejidadEstudio.objects.filter(estudios__contains=estudios_id).first()
 
-        formula = complejidad.formula.lower() if complejidad else '0'
+        # obtenemos la fórmula de cálculo de la complejidad
+        linea.formula = complejidad.formula.lower() if complejidad else '0'
+        linea.formula_valorizada = complejidad.formula.lower() if complejidad else '0'
 
+        # reemplazamos en la fórmula los valores de cada complejidad
         for c in complejidades:
-            formula = formula.replace('c{0}'.format(c.id), c.importe)
+            linea.formula_valorizada = linea.formula_valorizada.replace('c{0}'.format(c.id), c.importe)
+        
+        # obtenermos el importe de la serie de estudios
+        linea.importe = eval_expr(linea.formula_valorizada)
+        linea.alicuota_iva = 21.0
 
-        importeIAPOS = eval_expr(formula)
+        # determinamos si el paciente tiene una edad diferenciada
+        linea.es_paciente_diferenciado = paciente.edad >= 70 or paciente.edad < 12
 
-        print (clave, estudios_id, formula, importeIAPOS)
+        if linea.es_paciente_diferenciado:
+            linea.importe *= 1.3
 
-    return JSONResponse([])
+        linea.estudios = estudios
+
+        pago.lineas.append(linea)
+
+    serializer = PagoAnestesistaVMSerializer(pago, context={'request': request})
+    return JSONResponse(serializer.data)
