@@ -3,6 +3,7 @@ from models import Anestesista, PagoAnestesista, LineaPagoAnestesista
 from estudio.serializers import EstudioSerializer
 from obra_social.serializers import ObraSocialSerializer
 from paciente.serializers import PacienteSerializer
+from caja.serializers import MovimientoCajaSerializer
 
 class AnestesistaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,9 +27,11 @@ class PagoAnestesistaSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class LineaPagoAnestesistaVMSerializer(serializers.Serializer):
+    fecha = serializers.DateField()
     paciente = PacienteSerializer()
     obra_social = ObraSocialSerializer()
     estudios = EstudioSerializer(many=True)
+    mov_caja = MovimientoCajaSerializer(many=True)
     es_paciente_diferenciado = serializers.BooleanField()
     formula = serializers.CharField()
     formula_valorizada = serializers.CharField()
@@ -39,4 +42,5 @@ class PagoAnestesistaVMSerializer(serializers.Serializer):
     anio = serializers.IntegerField()
     mes = serializers.IntegerField()
     anestesista = AnestesistaSerializer()
-    lineas = LineaPagoAnestesistaVMSerializer(many=True)
+    lineas_ARA = LineaPagoAnestesistaVMSerializer(many=True)
+    lineas_no_ARA = LineaPagoAnestesistaVMSerializer(many=True)

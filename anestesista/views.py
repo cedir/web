@@ -57,18 +57,20 @@ def pago(request, id_anestesista, anio, mes):
     # agrupamos en paquetes fecha/paciente/obra_social
     grupos = groupby(estudios, lambda e: (e.fecha, e.paciente, e.obra_social))
 
-    pago.lineas = []
+    pago.lineas_ARA = []
+    pago.lineas_no_ARA = []
 
     # por cada paquete
     for (fecha, paciente, obra_social), grupo in grupos:
         linea = LineaPagoAnestesistaVM()
+        linea.fecha = fecha
         linea.paciente = paciente
         linea.obra_social = obra_social
 
         estudios = sorted(grupo, key=lambda estudio: estudio.practica.id)
            
         # obtenemos los movimientos de caja asociados
-        mov_caja = [mov
+        linea.mov_caja = [mov
             for estudio in estudios
             for mov     in estudio.movimientos_caja.filter(tipo_id__in=[3,10])
             ]
@@ -78,6 +80,7 @@ def pago(request, id_anestesista, anio, mes):
         estudios_id = ','.join([str(id) for id in sorted(set([estudio.practica.id for estudio in estudios]))])
 
         # obtenemos la complejidad de la serie de estudios
+        # TODO: revisar contains vs igual y get
         complejidad = ComplejidadEstudio.objects.filter(estudios__contains=estudios_id).first()
 
         # obtenemos la fórmula de cálculo de la complejidad
@@ -99,8 +102,11 @@ def pago(request, id_anestesista, anio, mes):
             linea.importe *= 1.3
 
         linea.estudios = estudios
-
-        pago.lineas.append(linea)
+        
+        if obra_social.se_presenta_por_ARA:
+            pago.lineas_ARA.append(linea)
+        else:
+            pago.lineas_no_ARA.append(linea)
 
     serializer = PagoAnestesistaVMSerializer(pago, context={'request': request})
     return JSONResponse(serializer.data)
