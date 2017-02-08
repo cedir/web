@@ -1,4 +1,101 @@
 @charset "UTF-8";
+
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  src: url('../fonts/Roboto/Roboto-Light.ttf') format('truetype');
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/Roboto/Roboto-Regular.ttf') format('truetype');
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/Roboto/Roboto-Medium.ttf') format('truetype');
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/Roboto/Roboto-Bold.ttf') format('truetype');
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 300;
+  src: url('../fonts/Roboto/Roboto-LightItalic.ttf') format('truetype');
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  src: url('../fonts/Roboto/Roboto-Italic.ttf') format('truetype');
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 500;
+  src: url('../fonts/Roboto/Roboto-MediumItalic.ttf') format('truetype');
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 700;
+  src: url('../fonts/Roboto/Roboto-BoldItalic.ttf') format('truetype');
+}
+
+
+/* latin-ext */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 300;
+  src: url('../fonts/Raleway/Raleway-Light.ttf') format('truetype');
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/Raleway/Raleway-Regular.ttf') format('truetype');
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/Raleway/Raleway-Bold.ttf') format('truetype');
+}
+
+/* latin-ext */
+@font-face {
+  font-family: 'Pacifico';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/Pacifico/Pacifico-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'PT Serif';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/PT_Serif/PT_Serif-Web-Regular.ttf') format('truetype');
+}
+
+
 /* 1 Typography
 ----------------------------------------------------------------------------- */
 /*Fonts
