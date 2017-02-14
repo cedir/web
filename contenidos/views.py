@@ -4,6 +4,8 @@ import logging
 import smtplib
 import settings
 import json
+import urllib
+import urllib2
 from django.http import HttpResponse, Http404
 from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
@@ -172,32 +174,45 @@ def get_video(request, public_id):
     return HttpResponse(t.render(RequestContext(request, context)))
 
 def send_mail(request):
+    data = { u'sent': u'no' }
+    
     try:
         toaddrs = settings.EMAIL_NOTIFICATION_ACCOUNTS
         gmail_user = settings.EMAIL_ACCOUNT_USER
         gmail_pwd = settings.EMAIL_ACCOUNT_PSW
+        
+        #valida captcha
+        captcha = request.POST['captcha']
 
-        name = request.POST['name']
-        email = request.POST['email']
-        tel = request.POST['tel']
-        message = request.POST['message']
+        
+        greq = urllib2.Request('https://www.google.com/recaptcha/api/siteverify')
+        greq.add_data(urllib.urlencode({ 'secret': settings.CAPTCHA_SECRET, 'response': captcha }))
+        
+        gres = urllib2.urlopen(greq)
+        gdata = json.load(gres) 
 
-        text = 'Nombre: ' + name + "\n" + 'Mail: ' + email + "\n" + 'Tel: ' + tel + "\n" + 'Mensaje: ' + message + "\n"
-        msg = MIMEText(text.encode('utf-8'), _charset='utf-8')
-        msg['Subject'] = "Nuevo mensaje registrado desde cedirsalud.com.ar"
-        msg['From'] = gmail_user
-        msg['To'] = toaddrs
+        if gdata['success']:
+            name = request.POST['name']
+            email = request.POST['email']
+            tel = request.POST['tel']
+            message = request.POST['message']
+            
+            text = 'Nombre: ' + name + "\n" + 'Mail: ' + email + "\n" + 'Tel: ' + tel + "\n" + 'Mensaje: ' + message + "\n"
+            msg = MIMEText(text.encode('utf-8'), _charset='utf-8')
+            msg['Subject'] = "Nuevo mensaje registrado desde cedirsalud.com.ar"
+            msg['From'] = gmail_user
+            msg['To'] = toaddrs
 
-        smtpserver = smtplib.SMTP("smtp.gmail.com",587)
-        smtpserver.ehlo()
-        smtpserver.starttls()
-        smtpserver.ehlo
-        smtpserver.login(gmail_user, gmail_pwd)
-        smtpserver.sendmail(gmail_user, toaddrs, msg.as_string())
-        smtpserver.close()
+            smtpserver = smtplib.SMTP("smtp.gmail.com",587)
+            smtpserver.ehlo()
+            smtpserver.starttls()
+            smtpserver.ehlo
+            smtpserver.login(gmail_user, gmail_pwd)
+            smtpserver.sendmail(gmail_user, toaddrs, msg.as_string())
+            smtpserver.close()
 
-        data = { u'sent': u'yes' }
+            data = { u'sent': u'yes' }
     except:
-        data = { u'sent': u'no' }
+        pass
 
     return HttpResponse(json.dumps(data), content_type = "application/json")

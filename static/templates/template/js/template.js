@@ -1608,7 +1608,8 @@
 							"name": $("#footer-form #name").val(),
 							"email": $("#footer-form #email").val(),
 							"tel": $("#footer-form #tel").val(),
-							"message": $("#footer-form #message").val()
+							"message": $("#footer-form #message").val(),
+							"captcha": $("#g-recaptcha-response").val()
 						},
 						success: function (data) {
 							if (data.sent == "yes") {
@@ -1621,6 +1622,8 @@
 							} else {
 								$("#MessageNotSent2").removeClass("hidden");
 								$("#MessageSent2").addClass("hidden");
+								$(".g-recaptcha").addClass("hidden");
+								$(".submit-button").removeClass("btn-default").addClass("btn-danger").prop('value', 'Error');
 							}
 						}
 					});
