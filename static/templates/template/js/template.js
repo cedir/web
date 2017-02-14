@@ -1603,19 +1603,18 @@
 					$('.submit-button').button("loading");
 					$.ajax({
 						type: "POST",
-						url: "php/email-sender.php",
+						url: "sendMail/",
 						data: {
-							"name": $("#footer-form #name2").val(),
-							"email": $("#footer-form #email2").val(),
-							"subject": "Message from contact form",
-							"message": $("#footer-form #message2").val()
+							"name": $("#footer-form #name").val(),
+							"email": $("#footer-form #email").val(),
+							"tel": $("#footer-form #tel").val(),
+							"message": $("#footer-form #message").val()
 						},
-						dataType: "json",
 						success: function (data) {
 							if (data.sent == "yes") {
 								$("#MessageSent2").removeClass("hidden");
 								$("#MessageNotSent2").addClass("hidden");
-								$(".submit-button").removeClass("btn-default").addClass("btn-success").prop('value', 'Message Sent');
+								$(".submit-button").removeClass("btn-default").addClass("btn-success").prop('value', 'Mensaje enviado');
 								$("#footer-form .form-control").each(function() {
 									$(this).prop('value', '').parent().removeClass("has-success").removeClass("has-error");
 								});
@@ -1632,31 +1631,39 @@
 				onkeyup: false,
 				onclick: false,
 				rules: {
-					name2: {
+					name: {
 						required: true,
 						minlength: 2
 					},
-					email2: {
+					email: {
 						required: true,
 						email: true
 					},
-					message2: {
+					tel: {
+						required: true,
+						digits: true
+					},
+					message: {
 						required: true,
 						minlength: 10
 					}
 				},
 				messages: {
-					name2: {
-						required: "Please specify your name",
-						minlength: "Your name must be longer than 2 characters"
+					name: {
+						required: "Por favor indique su nombre",
+						minlength: "Su nombre debe poseer más de dos caracteres"
 					},
-					email2: {
-						required: "We need your email address to contact you",
-						email: "Please enter a valid email address e.g. name@domain.com"
+					email: {
+						required: "Necesitamos su correo electrónico para poder contactarlo",
+						email: "Por favor ingrese una dirección válida. Ej: nombre@dominio.com"
 					},
-					message2: {
-						required: "Please enter a message",
-						minlength: "Your message must be longer than 10 characters"
+					tel: {
+						required: "Necesitamos su teléfono para poder contactarlo",
+						digits: "Por favor ingrese un número telefónico"
+					},
+					message: {
+						required: "Por favor ingrese un mensaje",
+						minlength: "Su mensaje de poseer más de 10 caracteres."
 					}
 				},
 				errorElement: "span",

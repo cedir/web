@@ -1,6 +1,9 @@
+# coding: utf-8
 import os
 import logging
 import smtplib
+import settings
+import json
 from django.http import HttpResponse, Http404
 from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
@@ -8,6 +11,7 @@ from django.template.loader import select_template
 from contenidos.models import Contenido, Categoria
 from estudio.models import Estudio
 
+from email.mime.text import MIMEText
 
 logger = logging.getLogger(u'videos')
 NOVEDADES_CATEGORY_ID = 2
@@ -168,32 +172,32 @@ def get_video(request, public_id):
     return HttpResponse(t.render(RequestContext(request, context)))
 
 def send_mail(request):
-    toaddrs = settings.EMAIL_NOTIFICATION_ACCOUNTS
-    subject = "Subject: Nuevo mensaje registrado desde cedirsalud.com.ar\n\n"
+    try:
+        toaddrs = settings.EMAIL_NOTIFICATION_ACCOUNTS
+        gmail_user = settings.EMAIL_ACCOUNT_USER
+        gmail_pwd = settings.EMAIL_ACCOUNT_PSW
 
-    gmail_user = settings.EMAIL_ACCOUNT_USER
-    gmail_pwd = settings.EMAIL_ACCOUNT_PSW
+        name = request.POST['name']
+        email = request.POST['email']
+        tel = request.POST['tel']
+        message = request.POST['message']
 
-    name = request.POST['name']
-    email = request.POST['email']
-    tel = request.POST['tel']
-    message = request.POST['message']
+        text = 'Nombre: ' + name + "\n" + 'Mail: ' + email + "\n" + 'Tel: ' + tel + "\n" + 'Mensaje: ' + message + "\n"
+        msg = MIMEText(text.encode('utf-8'), _charset='utf-8')
+        msg['Subject'] = "Nuevo mensaje registrado desde cedirsalud.com.ar"
+        msg['From'] = gmail_user
+        msg['To'] = toaddrs
 
-    msg = subject + 'Nombre: ' + name + "\n" + 'Mail: ' + email + "\n" + 'Tel: ' + tel + "\n" + 'Mensaje: ' + message + "\n"
+        smtpserver = smtplib.SMTP("smtp.gmail.com",587)
+        smtpserver.ehlo()
+        smtpserver.starttls()
+        smtpserver.ehlo
+        smtpserver.login(gmail_user, gmail_pwd)
+        smtpserver.sendmail(gmail_user, toaddrs, msg.as_string())
+        smtpserver.close()
 
-    smtpserver = smtplib.SMTP("smtp.gmail.com",587)
-    smtpserver.ehlo()
-    smtpserver.starttls()
-    smtpserver.ehlo
-    smtpserver.login(gmail_user, gmail_pwd)
-    smtpserver.sendmail(gmail_user, toaddrs, msg)
-    smtpserver.close()
+        data = { u'sent': u'yes' }
+    except:
+        data = { u'sent': u'no' }
 
-    templateName = 'contacto_ok.html'
-    t = select_template(['pages/' + templateName])
-
-    c = Context({
-        #'latest_poll_list': latest_poll_list,
-	    #'current_date': now,
-    })
-    return HttpResponse(t.render(RequestContext(request, c)))
+    return HttpResponse(json.dumps(data), content_type = "application/json")
