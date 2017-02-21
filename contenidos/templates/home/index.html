@@ -370,8 +370,11 @@
         {% for contenido in enfermedades_digestivas_contents %}
 		<div class="col-md-3 col-sm-6">
 			<div class="image-box team-member shadow mb-20">
-				<div class="overlay-container overlay-visible">
-
+				{% if contenido.img1 %}
+				<div class="overlay-container overlay-visible novedades" style="background-image: url(/media/media_files/{{ contenido.img1 }})">
+				{% else %}
+				<div class="overlay-container overlay-visible novedades" style="background-image: url({% static 'images/medical-service-1.jpg' %})">
+				{% endif %}
                     {% if contenido.img1 %}
                     <img src="/media/media_files/{{ contenido.img1 }}" alt="enfermedades digestivas">
                     {% else %}
