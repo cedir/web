@@ -4,7 +4,13 @@ import glob
 import os
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
+
+IMG_MAX_SIZE = 700 * 1024  # 700 kB
+IMG_MIN_SIZE = 25 * 1024  # 25 kB
+IMG_MIN_WIDTH = 40  # pixels
+IMG_MIN_HEIGHT = 40  # pixels
 
 # Create your models here.
 class Categoria(models.Model):
@@ -38,54 +44,28 @@ class Contenido(models.Model):
     def url(self):
         return '/content/{}'.format(self.friendlyURL) if self.friendlyURL else '/content/{}'.format(self.id)
 
-    def save(self):
-        super(Contenido, self).save()
+    def validate_image(self, image):
+        #imgPath = settings.MEDIA_ROOT + self.img1.name
+        #im = Image.open(imgPath)
+        #filePathName, ext = os.path.splitext(imgPath)
+        #width, height = im.size
 
-        minSizes = [147,140]
-        medSizes = [200,200]
+        if image.size < IMG_MIN_SIZE:
+            raise ValidationError("La imagen es menor a 25 kB que es el tamanio minimo permitido")
+        if image.size > IMG_MAX_SIZE:
+            raise ValidationError("La imagen es mayor a 700 kB que es el tamanio maximo permitido")
+        if image.width < IMG_MIN_WIDTH:
+            raise ValidationError("Error: imagen es muy chica: {} px que es el tamanio minimo para el ancho".format(IMG_MIN_WIDTH))
+        if image.height < IMG_MIN_HEIGHT:
+            raise ValidationError("Error: imagen es muy chica: {} px que es el tamanio minimo para el alto".format(IMG_MIN_HEIGHT))
 
-        #TODO: checkear que no hay otra imagen con el mismo nombre y renomabrar, si es que no lo hace PIL automaticamente
-
+    def clean(self):
         if self.img1.name <> '':
-            import ipdb; ipdb.set_trace()
-            imgPath = settings.MEDIA_ROOT + self.img1.name
-            im = Image.open(imgPath)
-            filePathName, ext = os.path.splitext(imgPath)
-            imgSize = im.size
-
-            #min image
-            #if (imgSize[0] > minSizes[0]) or (imgSize[1] > minSizes[1]):
-            #    #f.write('La que lo pario2: ' + self.img2.name )
-            #    im.thumbnail(minSizes, Image.ANTIALIAS)
-            #    im.save(filePathName + '_min' + ext, "JPEG")
-
-            #med image
-            #if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
-            #    imCopy = Image.open(imgPath)
-            #    imCopy.thumbnail(medSizes, Image.ANTIALIAS)
-            #    imCopy.save(filePathName + '_med' + ext, "JPEG")
-
-        # if self.img2.name <> '':
-        #     imgPath = settings.MEDIA_ROOT + self.img2.name
-        #     im = Image.open(imgPath)
-        #     filePathName, ext = os.path.splitext(imgPath)
-        #     imgSize = im.size
-        #
-        #     #med image
-        #     if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
-        #         im.thumbnail(medSizes, Image.ANTIALIAS)
-        #         im.save(filePathName + '_med' + ext, "JPEG")
-        #
-        # if self.img3.name <> '':
-        #     imgPath = settings.MEDIA_ROOT + self.img3.name
-        #     im = Image.open(imgPath)
-        #     filePathName, ext = os.path.splitext(imgPath)
-        #     imgSize = im.size
-        #
-        #     #med image
-        #     if (imgSize[0] > medSizes[0]) or (imgSize[1] > medSizes[1]):
-        #         im.thumbnail(medSizes, Image.ANTIALIAS)
-        #         im.save(filePathName + '_med' + ext, "JPEG")
+            self.validate_image(self.img1)
+        if self.img2.name <> '':
+            self.validate_image(self.img2)
+        if self.img3.name <> '':
+            self.validate_image(self.img3)
 
     def __unicode__ (self):
         return self.title
