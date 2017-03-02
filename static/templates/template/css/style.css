@@ -9072,8 +9072,8 @@ h6.media-heading {
     margin-left:auto;
     margin-right:auto;
     width:100%;
-    object-position:center;
-    object-fit:none;
+    object-position:top;
+    object-fit:cover;
     height:250px!important
 }
 
