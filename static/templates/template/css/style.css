@@ -9066,6 +9066,17 @@ h6.media-heading {
     background-size: cover;
 }
 
+
+.carousel-image {
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    width:100%;
+    object-position:center;
+    object-fit:none;
+    height:250px!important
+}
+
 /*# sourceMappingURL=style.css.map */
 
 /*# sourceMappingURL=style.css.map */
