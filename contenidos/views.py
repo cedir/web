@@ -52,7 +52,7 @@ def get_content(request, id_content, templateName='detalle-contenido.html'):
 
     content = Contenido.objects.get(pk=id_content)
     categorias_id = [c.id for c in content.categoria.all()]
-    related = Contenido.objects.filter(categoria__in=categorias_id).order_by('-createdDate')[:3]
+    related = Contenido.objects.filter(categoria__in=categorias_id).exclude(pk=id_content).distinct().order_by('-createdDate')[:3]
 
     def get_images(c_content):
         all_images = [c_content.img1, c_content.img2, c_content.img3]
