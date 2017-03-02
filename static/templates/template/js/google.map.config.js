@@ -7,7 +7,7 @@
 			var map, myLatlng, myZoom, marker;
 			// Set the coordinates of your location
 			myLatlng = new google.maps.LatLng(-32.952996, -60.655827);
-			myZoom = 14;
+			myZoom = 15;
 			function initialize() {
 				var mapOptions = {
 					zoom: myZoom,
