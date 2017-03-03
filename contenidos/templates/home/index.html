@@ -300,13 +300,13 @@
 					<div class="image-box style-2">
 						<div class="overlay-container overlay-visible">
                             {% if contenido.img1 %}
-							<img src="/media/media_files/{{ contenido.img1 }}" alt="preparacion para estudio">
+							<img src="/media/media_files/{{ contenido.img1 }}" alt="preparacion para estudio" class="carousel-image">
                             {% else %}
-                            <img src="{% static 'images/medical-service-1.jpg' %}" alt="preparacion para estudio">
+                            <img src="{% static 'images/medical-service-1.jpg' %}" alt="preparacion para estudio" class="carousel-image">
                             {% endif %}
 							<a href="{{ contenido.url }}" class="overlay-link"><i class="fa fa-link"></i></a>
-							<div class="overlay-bottom hidden-xs">
-								<div class="text">
+							<div class="overlay-bottom">
+								<div>
 									<p class="lead margin-clear text-left">{{ contenido.title }}</p>
 								</div>
 							</div>
