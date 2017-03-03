@@ -1,4 +1,5 @@
 
+# -*- coding: utf-8 -*-
 from PIL import Image
 import glob
 import os
@@ -12,6 +13,22 @@ IMG_MIN_SIZE = 25 * 1024  # 25 kB
 IMG_MIN_WIDTH = 40  # pixels
 IMG_MIN_HEIGHT = 40  # pixels
 
+
+def validate_friendly_url(url, instance):
+    if not url:
+        return
+    if ' ' in url:
+        raise ValidationError("La URL friendlyURL no puede contener espacios")
+    try:
+        url.decode('ascii')
+    except UnicodeEncodeError:
+        raise ValidationError("La URL friendlyURL no puede contener caracteres con acentos o eñes")
+    try:
+        instance._meta.model.objects.exclude(id=instance.id).get(friendlyURL=url)
+        raise ValidationError("Ya existe otro contenido con la misma friendlyURL ingresada. Solo puede haber 1.")
+    except instance._meta.model.DoesNotExist:
+        pass  ## all good
+
 # Create your models here.
 class Categoria(models.Model):
     name = models.CharField("Nombre",max_length=200, null=False,blank=False)
@@ -20,6 +37,9 @@ class Categoria(models.Model):
 
     def __unicode__ (self):
         return self.name
+
+    def clean(self):
+        validate_friendly_url(self.friendlyURL, self)
 
 
 class Contenido(models.Model):
@@ -60,12 +80,15 @@ class Contenido(models.Model):
             raise ValidationError("Error: imagen es muy chica: {} px que es el tamanio minimo para el alto".format(IMG_MIN_HEIGHT))
 
     def clean(self):
+
         if self.img1.name <> '':
             self.validate_image(self.img1)
         if self.img2.name <> '':
             self.validate_image(self.img2)
         if self.img3.name <> '':
             self.validate_image(self.img3)
+
+        validate_friendly_url(self.friendlyURL, self)
 
     def __unicode__ (self):
         return self.title
