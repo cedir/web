@@ -66,6 +66,7 @@ def get_content(request, id_content, templateName='detalle-contenido.html'):
         'id':content.id,
         'title':content.title,
         'description':content.description,
+        'keywords':content.keywords,
         'body':content.body,
         'footer':content.footer,
         'images': get_images(content),
