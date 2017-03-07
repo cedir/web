@@ -9077,6 +9077,10 @@ h6.media-heading {
     height:250px!important
 }
 
+#logo_img {
+  max-height: 35px
+}
+
 /*# sourceMappingURL=style.css.map */
 
 /*# sourceMappingURL=style.css.map */
