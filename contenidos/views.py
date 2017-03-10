@@ -6,9 +6,13 @@ import settings
 import json
 import urllib
 import urllib2
+from datetime import date
 from django.http import HttpResponse, Http404
 from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
+from django.db.models import  Value
+from django.db.models.functions import Coalesce
+
 #from django.shortcuts import render
 from contenidos.models import Contenido, Categoria
 from estudio.models import Estudio
@@ -103,7 +107,7 @@ def get_categoria(request):
         category_id = request.GET['categoryId']
 
     categoria = Categoria.objects.get(id=category_id)
-    contents = Contenido.objects.filter(categoria__id__exact=category_id, publishContent=True).order_by("publishInitDate", "-id")[:15]
+    contents = Contenido.objects.filter(categoria__id__exact=category_id, publishContent=True).annotate(publishinitdate_null=Coalesce('publishInitDate', Value(date.min))).order_by("-publishinitdate_null", "-id")[:15]
 
     def create_content(content):
         """

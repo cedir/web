@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 
 
 IMG_MAX_SIZE = 700 * 1024  # 700 kB
-IMG_MIN_SIZE = 25 * 1024  # 25 kB
+IMG_MIN_SIZE = 10 * 1024  # 10 kB
 IMG_MIN_WIDTH = 40  # pixels
 IMG_MIN_HEIGHT = 40  # pixels
 
@@ -77,7 +77,7 @@ class Contenido(models.Model):
         #width, height = im.size
 
         if image.size < IMG_MIN_SIZE:
-            raise ValidationError("La imagen es menor a 25 kB que es el tamanio minimo permitido")
+            raise ValidationError("La imagen es menor a 10 kB que es el tamanio minimo permitido")
         if image.size > IMG_MAX_SIZE:
             raise ValidationError("La imagen es mayor a 700 kB que es el tamanio maximo permitido")
         if image.width < IMG_MIN_WIDTH:
