@@ -24,7 +24,7 @@ def get_home(request):
     preguntas_frecuentes_contents = Contenido.objects.filter(categoria__name__contains='nos preguntan nuestros pacientes', publishContent=True).order_by('publishInitDate')[:4]
     enfermedades_digestivas_contents = Contenido.objects.filter(categoria__name__contains='Enfermedades Digestivas', publishContent=True).order_by('publishInitDate')[:4]
     unidades = Contenido.objects.filter(categoria__name='Unidades', publishContent=True).order_by('publishInitDate')[:10]
-    novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).order_by("-publishInitDate")[:3]
+    novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).order_by("publishInitDate")[:3]
     context = {
         u'novedades': novedades,
         u'slide_contents': slide_contents,
@@ -103,7 +103,7 @@ def get_categoria(request):
         category_id = request.GET['categoryId']
 
     categoria = Categoria.objects.get(id=category_id)
-    contents = Contenido.objects.filter(categoria__id__exact=category_id, publishContent=True).order_by("-publishInitDate", "-id")[:15]
+    contents = Contenido.objects.filter(categoria__id__exact=category_id, publishContent=True).order_by("publishInitDate", "-id")[:15]
 
     def create_content(content):
         """
@@ -176,28 +176,28 @@ def get_video(request, public_id):
 
 def send_mail(request):
     data = { u'sent': u'no' }
-    
+
     try:
         toaddrs = settings.EMAIL_NOTIFICATION_ACCOUNTS
         gmail_user = settings.EMAIL_ACCOUNT_USER
         gmail_pwd = settings.EMAIL_ACCOUNT_PSW
-        
+
         #valida captcha
         captcha = request.POST['captcha']
 
-        
+
         greq = urllib2.Request('https://www.google.com/recaptcha/api/siteverify')
         greq.add_data(urllib.urlencode({ 'secret': settings.CAPTCHA_SECRET, 'response': captcha }))
-        
+
         gres = urllib2.urlopen(greq)
-        gdata = json.load(gres) 
+        gdata = json.load(gres)
 
         if gdata['success']:
             name = request.POST['name']
             email = request.POST['email']
             tel = request.POST['tel']
             message = request.POST['message']
-            
+
             text = 'Nombre: ' + name + "\n" + 'Mail: ' + email + "\n" + 'Tel: ' + tel + "\n" + 'Mensaje: ' + message + "\n"
             msg = MIMEText(text.encode('utf-8'), _charset='utf-8')
             msg['Subject'] = "Nuevo mensaje registrado desde cedirsalud.com.ar"

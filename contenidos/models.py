@@ -61,6 +61,12 @@ class Contenido(models.Model):
     updated = models.DateTimeField(editable=False, null=True, auto_now=True)
 
     @property
+    def fecha_display(self):
+        if self.publishInitDate:
+            return self.publishInitDate.strftime('%d/%m/%Y')
+        return self.createdDate.strftime('%d/%m/%Y')
+
+    @property
     def url(self):
         return '/content/{}'.format(self.friendlyURL) if self.friendlyURL else '/content/{}'.format(self.id)
 
