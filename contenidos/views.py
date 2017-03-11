@@ -24,11 +24,11 @@ NOVEDADES_CATEGORY_ID = 2
 
 def get_home(request):
 
-    slide_contents = Contenido.objects.filter(categoria__name__contains='Home slide', publishContent=True).order_by('publishInitDate')
-    preguntas_frecuentes_contents = Contenido.objects.filter(categoria__name__contains='nos preguntan nuestros pacientes', publishContent=True).order_by('publishInitDate')[:4]
-    enfermedades_digestivas_contents = Contenido.objects.filter(categoria__name__contains='Enfermedades Digestivas', publishContent=True).order_by('publishInitDate')[:4]
-    unidades = Contenido.objects.filter(categoria__name='Unidades', publishContent=True).order_by('publishInitDate')[:10]
-    novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).order_by("publishInitDate")[:3]
+    slide_contents = Contenido.objects.filter(categoria__name__contains='Home slide', publishContent=True).annotate(publishinitdate_null=Coalesce('publishInitDate', Value(date.min))).order_by('-publishinitdate_null')
+    preguntas_frecuentes_contents = Contenido.objects.filter(categoria__name__contains='nos preguntan nuestros pacientes', publishContent=True).annotate(publishinitdate_null=Coalesce('publishInitDate', Value(date.min))).order_by('-publishinitdate_null')[:4]
+    enfermedades_digestivas_contents = Contenido.objects.filter(categoria__name__contains='Enfermedades Digestivas', publishContent=True).annotate(publishinitdate_null=Coalesce('publishInitDate', Value(date.min))).order_by('-publishinitdate_null')[:4]
+    unidades = Contenido.objects.filter(categoria__name='Unidades', publishContent=True).annotate(publishinitdate_null=Coalesce('publishInitDate', Value(date.min))).order_by('-publishinitdate_null')[:10]
+    novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).annotate(publishinitdate_null=Coalesce('publishInitDate', Value(date.min))).order_by("-publishinitdate_null")[:3]
     context = {
         u'novedades': novedades,
         u'slide_contents': slide_contents,
