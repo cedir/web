@@ -182,7 +182,7 @@ def send_mail(request):
     data = { u'sent': u'no' }
 
     try:
-        toaddrs = settings.EMAIL_NOTIFICATION_ACCOUNTS
+        toaddrs = ','.join(settings.EMAIL_NOTIFICATION_ACCOUNTS)
         gmail_user = settings.EMAIL_ACCOUNT_USER
         gmail_pwd = settings.EMAIL_ACCOUNT_PSW
 
