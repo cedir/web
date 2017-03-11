@@ -51,7 +51,7 @@
 						    data-endspeed="600">{% autoescape off %}{{contenido.description|linebreaks}}{% endautoescape %}
 					    </div>
 
-					    <!-- LAYER NR. 3 -->
+					    <!-- LAYER NR. 3 
 					    <div class="tp-caption sfb fadeout small_dark text-center"
 						    data-x="left"
 						    data-y="360"
@@ -60,6 +60,7 @@
 						    data-easing="easeOutQuad"
 						    data-endspeed="600"><a href="{{ contenido.url }}" class="btn btn-dark btn-default btn-animated">Leer mas <i class="fa fa-arrow-right"></i></a>
 					    </div>
+						-->
 
 					</li>
 
@@ -104,7 +105,7 @@
 						    data-endspeed="600">{% autoescape off %}{{contenido.description|linebreaks}}{% endautoescape %}
 					    </div>
 
-					    <!-- LAYER NR. 4 -->
+					    <!-- LAYER NR. 4 
 					    <div class="tp-caption sfb fadeout small_white text-right"
 						    data-x="right"
 						    data-y="380"
@@ -113,6 +114,7 @@
 						    data-easing="easeOutQuad"
 						    data-endspeed="600"><a href="{{ contenido.url }}" class="btn btn-dark btn-default btn-animated">Leer mas <i class="fa fa-arrow-right"></i></a>
 					    </div>
+						-->
 					</li>
                     {% endif %}
 
@@ -260,12 +262,12 @@
                         <div class="panel panel-default">
 						    <div class="panel-heading">
 							    <h4 class="panel-title">
-								    <a data-toggle="collapse" data-parent="#accordion-2" href="#collapseOne-2">
+								    <a data-toggle="collapse" data-parent="#accordion-2" href="#collapse-{{forloop.counter}}">
 									    <i class="icon-users-1 pr-10"></i>{{ contenido.title }}
 								    </a>
 							    </h4>
 						    </div>
-						    <div id="collapseOne-2" class="panel-collapse collapse in">
+						    <div id="collapse-{{forloop.counter}}" class="panel-collapse collapse in">
 							    <div class="panel-body bordered p-15">
 								    {{ contenido.description }} <a href="/categoria/unidades">Unidades<i class="fa fa-long-arrow-right pl-5"></i></a>
 							    </div>
@@ -275,12 +277,12 @@
                         <div class="panel panel-default">
 							<div class="panel-heading">
 								<h4 class="panel-title">
-									<a data-toggle="collapse" data-parent="#accordion-2" href="#collapseTwo-2" class="collapsed">
+									<a data-toggle="collapse" data-parent="#accordion-2" href="#collapse-{{forloop.counter}}" class="collapsed">
 										<i class="icon-users-1 pr-10"></i>{{ contenido.title }}
 									</a>
 								</h4>
 							</div>
-							<div id="collapseTwo-2" class="panel-collapse collapse">
+							<div id="collapse-{{forloop.counter}}" class="panel-collapse collapse">
 								<div class="panel-body bordered p-15">
 									{{ contenido.description }} <a href="/categoria/unidades">Unidades<i class="fa fa-long-arrow-right pl-5"></i></a>
 								</div>
@@ -385,7 +387,7 @@
 						<div class="text">
 							<h3 class="title">{{ contenido.title }}</h3>
 							<div class="separator light"></div>
-							<p class="small margin-clear"><em>Dermatologists‎ <br> Lorem ipsum dolor sit</em></p>
+							<p class="small margin-clear"><em>{{ contenido.description | truncatechars:100 }}</em></p>
 						</div>
 					</div>
 				</div>

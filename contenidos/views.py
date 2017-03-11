@@ -206,7 +206,7 @@ def send_mail(request):
             msg = MIMEText(text.encode('utf-8'), _charset='utf-8')
             msg['Subject'] = "Nuevo mensaje registrado desde cedirsalud.com.ar"
             msg['From'] = gmail_user
-            msg['To'] = toaddrs
+            msg['To'] = ','.join(toaddrs)
 
             smtpserver = smtplib.SMTP("smtp.gmail.com",587)
             smtpserver.ehlo()
