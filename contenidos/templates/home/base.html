@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<!--[if IE 9]> <html lang="es" class="ie9"> <![endif]-->
+<!--[if gt IE 9]> <html lang="es" class="ie"> <![endif]-->
+<!--[if !IE]><!-->
+{% load staticfiles %}
+<html lang="es">
+	<!--<![endif]-->
+
+	<head>
+		<meta charset="utf-8">
+		{% block title %}
+		<title>Cedir - Centro de Endoscopía Digestiva de Rosario</title>
+		{% endblock %}
+
+		{% block description %}
+		<meta name="description" content="Cedir. Centro de Endoscopía Digestiva de Rosario">
+		{% endblock %}
+
+		{% block keywords %}
+		<meta name="Keywords" content="balon gastrico,endoscopia,gastroenterologia,gastroenterologo,videoscopia,videoendoscopia,endocapsula,colangiografia">
+		{% endblock %}
+
+		<meta name="author" content="cedir">
+
+		<!-- Mobile Meta -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Favicon -->
+		<link rel="shortcut icon" href="images/favicon.ico">
+
+		<!-- Bootstrap core CSS -->
+		<link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.css' %}" rel="stylesheet">
+
+		<!-- Font Awesome CSS -->
+		<link href="{% static 'template/fonts/font-awesome/css/font-awesome.css' %}" rel="stylesheet">
+
+		<!-- Fontello CSS -->
+		<link href="{% static 'template/fonts/fontello/css/fontello.css' %}" rel="stylesheet">
+
+		<!-- Plugins -->
+		<link href="{% static 'bower_components/magnific-popup/dist/magnific-popup.css' %}" rel="stylesheet">
+		<link href="{% static 'template/rs-plugin/css/settings.css' %}" rel="stylesheet">
+		<link href="{% static 'template/css/animations.css' %}" rel="stylesheet">
+		<link href="{% static 'bower_components/owl-carousel/owl-carousel/owl.carousel.css' %}" rel="stylesheet">
+		<link href="{% static 'bower_components/owl-carousel/owl-carousel/owl.transitions.css' %}" rel="stylesheet">
+		<link href="{% static 'bower_components/hover/css/hover-min.css' %}" rel="stylesheet">
+
+		<!-- The Project's core CSS file -->
+		<link href="{% static 'template/css/style.css' %}" rel="stylesheet">
+		<!-- The Project's Typography CSS file, includes used fonts -->
+		<!-- Used font for body: Roboto -->
+		<!-- Used font for headings: Raleway -->
+		<link href="{% static 'template/css/typography-default.css' %}" rel="stylesheet">
+		<!-- Color Scheme (In order to change the color scheme, replace the blue.css with the color scheme that you prefer)-->
+		<link href="{% static 'template/css/skins/dark_cyan.css' %}" rel="stylesheet">
+
+
+		<!-- Custom css -->
+		<link href="{% static 'template/css/custom.css' %}" rel="stylesheet">
+	</head>
+
+	<!-- body classes:  -->
+	<!-- "boxed": boxed layout mode e.g. <body class="boxed"> -->
+	<!-- "pattern-1 ... pattern-9": background patterns for boxed layout mode e.g. <body class="boxed pattern-1"> -->
+	<!-- "transparent-header": makes the header transparent and pulls the banner to top -->
+	<!-- "gradient-background-header": applies gradient background to header -->
+	<!-- "page-loader-1 ... page-loader-6": add a page loader to the page (more info @components-page-loaders.html) -->
+	<body class="no-trans  transparent-header  ">
+
+		<!-- scrollToTop -->
+		<!-- ================ -->
+		<div class="scrollToTop circle"><i class="icon-up-open-big"></i></div>
+
+		<!-- page wrapper start -->
+		<!-- ================ -->
+		<div class="page-wrapper">
+
+			<!-- header-container start -->
+			<div class="header-container">
+
+				<!-- header-top start -->
+				<!-- classes:  -->
+				<!-- "dark": dark version of header top e.g. class="header-top dark" -->
+				<!-- "colored": colored version of header top e.g. class="header-top colored" -->
+				<!-- ================ -->
+				<div class="header-top  colored">
+					<div class="container">
+						<div class="row">
+							<div class="col-xs-2 col-sm-5">
+								<!-- header-top-first start -->
+								<!-- ================ -->
+								<div class="header-top-first clearfix">
+									<ul class="social-links circle small clearfix hidden-xs">
+										<li class="twitter"><a target="_blank" href="https://twitter.com/CEDIR3"><i class="fa fa-twitter"></i></a></li>
+										<li class="instagram"><a target="_blank" href="https://www.instagram.com/cedirsalud/"><i class="fa fa-instagram"></i></a></li>
+										<li class="facebook"><a target="_blank" href="https://www.facebook.com/profile.php?id=100013245134188&fref=ts"><i class="fa fa-facebook"></i></a></li>
+									</ul>
+									<div class="social-links hidden-lg hidden-md hidden-sm circle small">
+										<div class="btn-group dropdown">
+											<button type="button" class="btn dropdown-toggle" data-toggle="dropdown"><i class="fa fa-share-alt"></i></button>
+											<ul class="dropdown-menu dropdown-animation">
+												<li class="twitter"><a target="_blank" href="https://twitter.com/CEDIR3"><i class="fa fa-twitter"></i></a></li>
+												<li class="instagram"><a target="_blank" href="https://www.instagram.com/cedirsalud/"><i class="fa fa-instagram"></i></a></li>
+												<li class="facebook"><a target="_blank" href="https://www.facebook.com/profile.php?id=100013245134188&fref=ts"><i class="fa fa-facebook"></i></a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- header-top-first end -->
+							</div>
+							<div class="col-xs-10 col-sm-7">
+
+								<!-- header-top-second start -->
+								<!-- ================ -->
+								<div id="header-top-second"  class="clearfix text-right">
+									<nav>
+										<ul class="list-inline">
+											<li><a class="link-light " href="/content/quienes-somos/#cuerpo-medico"><i class="fa fa-user-md pr-5"></i>Staff M&eacute;dico</a></li>
+											<!--<li><a class="link-light" href="#"><i class="fa fa-flask pr-5"></i>Investigaciones</a></li>-->
+											<li><a class="link-light" href="/categoria/preparaciones-para-estudios"><i class="fa fa-info-circle pr-5"></i>Preparaci&oacute;n para estudios</a></li>
+											<li class="hidden-sm hidden-xs"><strong class="pl-5">Turnos:</strong> (0341) 449-9536 / 449-1184 / 447-2459</li>
+										</ul>
+									</nav>
+								</div>
+								<!-- header-top-second end -->
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- header-top end -->
+
+				<!-- header start -->
+				<!-- classes:  -->
+				<!-- "fixed": enables fixed navigation mode (sticky menu) e.g. class="header fixed clearfix" -->
+				<!-- "dark": dark version of header e.g. class="header dark clearfix" -->
+				<!-- "full-width": mandatory class for the full-width menu layout -->
+				<!-- "centered": mandatory class for the centered logo layout -->
+				<!-- ================ -->
+				<header class="header  fixed    clearfix">
+
+					<div class="container">
+						<div class="row">
+							<div class="col-md-3 ">
+								<!-- header-left start -->
+								<!-- ================ -->
+								<div class="header-left clearfix">
+
+									<!-- logo -->
+									<div id="logo" class="logo">
+										<a href="/"><img id="logo_img" src="{% static 'images/logo.cedir.small.png' %}" alt="Cedir"></a>
+									</div>
+
+									<!-- name-and-slogan -->
+									<div class="site-slogan">
+										Centro de Endoscop&iacute;a Digestiva de Rosario
+									</div>
+
+								</div>
+								<!-- header-left end -->
+
+							</div>
+							<div class="col-md-9">
+
+								<!-- header-right start -->
+								<!-- ================ -->
+								<div class="header-right clearfix">
+
+								<!-- main-navigation start -->
+								<!-- classes: -->
+								<!-- "onclick": Makes the dropdowns open on click, this the default bootstrap behavior e.g. class="main-navigation onclick" -->
+								<!-- "animated": Enables animations on dropdowns opening e.g. class="main-navigation animated" -->
+								<!-- "with-dropdown-buttons": Mandatory class that adds extra space, to the main navigation, for the search and cart dropdowns -->
+								<!-- ================ -->
+								<div class="main-navigation  animated with-dropdown-buttons">
+
+									<!-- navbar start -->
+									<!-- ================ -->
+									<nav class="navbar navbar-default" role="navigation">
+										<div class="container-fluid">
+
+											<!-- Toggle get grouped for better mobile display -->
+											<div class="navbar-header">
+												<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+													<span class="sr-only">Toggle navigation</span>
+													<span class="icon-bar"></span>
+													<span class="icon-bar"></span>
+													<span class="icon-bar"></span>
+												</button>
+
+											</div>
+
+											<!-- Collect the nav links, forms, and other content for toggling -->
+											<div class="collapse navbar-collapse" id="navbar-collapse-1">
+												<!-- main-menu -->
+												<ul class="nav navbar-nav ">
+
+													<!-- mega-menu start -->
+													<li class="dropdown active mega-menu">
+														<a href="/" class="dropdown-toggle" data-toggle="dropdown">Inicio</a>
+														<ul class="dropdown-menu">
+															<li>
+																<div class="row">
+																	<div class="col-md-12">
+																		<h4 class="title"><i class="fa fa-laptop pr-10"></i> Contenidos</h4>
+																		<div class="row">
+																			<div class="col-sm-6 col-md-3">
+																				<div class="divider"></div>
+																				<ul class="menu">
+																					<li ><a href="/"><i class="icon-home pr-10"></i>Inicio</a></li>
+																					<li ><a href="/categoria/educacion-al-paciente"><i class="fa fa-user pr-10"></i>Educación al paciente</a></li>
+                                                                                    <li ><a href="/categoria/enfermedades-digestivas"><i class="fa fa-heartbeat pr-10"></i>Enfermedades Digestivas</a></li>
+																					<li ><a href="/categoria/que-nos-preguntan-nuestros-pacientes"><i class="fa fa-users pr-10"></i>Qué nos preguntan nuestros pacientes?</a></li>
+																				</ul>
+																			</div>
+																			<div class="col-sm-6 col-md-3">
+																				<div class="divider"></div>
+																				<ul class="menu">
+																					<li ><a href="/categoria/preparaciones-para-estudios"><i class="icon-info-circled pr-10"></i>Preparaciones para estudios</a></li>
+																					<li ><a href="/categoria/nuestros-servicios"><i class="icon-briefcase pr-10"></i>Nuestros Servicios</a></li>
+                                                                                    <li class="active"><a href="/categoria/cuerpo-medico"><i class="fa fa-ambulance pr-10"></i>Cuerpo Médico</a></li>
+                                                                                    <li ><a href="/categoria/informacion-general"><i class="fa fa-pencil pr-10"></i>Información General</a></li>
+																				</ul>
+																			</div>
+                                                                            <div class="col-sm-6 col-md-3">
+																				<div class="divider"></div>
+																				<ul class="menu">
+																					<li ><a href="/categoria/novedades"><i class="icon-megaphone pr-10"></i>Novedades</a></li>
+																					<li ><a href="/categoria/unidades"><i class="icon-suitcase pr-10"></i>Unidades</a></li>
+                                                                                    <li ><a href="/categoria/articulos-para-medicos"><i class="fa fa-graduation-cap pr-10"></i>Artí­culos para Médicos</a></li>
+																				</ul>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</li>
+														</ul>
+													</li>
+													<!-- mega-menu end -->
+													<!-- mega-menu start -->
+													<li class="mega-menu" >
+														<a href="/content/quienes-somos">Quienes Somos</a>
+														<!--QUIENES-SOMOS-SUB-MENU <ul class="dropdown-menu">
+															<li>
+																<div class="row">
+																	<div class="col-lg-8 col-md-9">
+																		<h4 class="title">Pages</h4>
+																		<div class="row">
+																			<div class="col-sm-4">
+																				<div class="divider"></div>
+																				<ul class="menu">
+																					<li ><a href="page-about.html"><i class="fa fa-angle-right"></i>About Us 1</a></li>
+																					<li ><a href="page-about-2.html"><i class="fa fa-angle-right"></i>About Us 2</a></li>
+																					<li ><a href="page-about-3.html"><i class="fa fa-angle-right"></i>About Us 3</a></li>
+																					<li ><a href="page-about-4.html"><i class="fa fa-angle-right"></i>About Us 4</a></li>
+																					<li ><a href="page-about-me.html"><i class="fa fa-angle-right"></i>About Me</a></li>
+																					<li ><a href="page-team.html"><i class="fa fa-angle-right"></i>Our Team - Options 1</a></li>
+																					<li ><a href="page-team-2.html"><i class="fa fa-angle-right"></i>Our Team - Options 2</a></li>
+																					<li ><a href="page-team-3.html"><i class="fa fa-angle-right"></i>Our Team - Options 3</a></li>
+																					<li ><a href="page-coming-soon.html"><i class="fa fa-angle-right"></i>Coming Soon Page</a></li>
+																					<li ><a href="page-faq.html"><i class="fa fa-angle-right"></i>FAQ page</a></li>
+																				</ul>
+																			</div>
+																			<div class="col-sm-4">
+																				<div class="divider"></div>
+																				<ul class="menu">
+																					<li ><a href="page-services.html"><i class="fa fa-angle-right"></i>Services 1</a></li>
+																					<li ><a href="page-services-2.html"><i class="fa fa-angle-right"></i>Services 2</a></li>
+																					<li ><a href="page-services-3.html"><i class="fa fa-angle-right"></i>Services 3</a></li>
+																					<li ><a href="page-contact.html"><i class="fa fa-angle-right"></i>Contact 1</a></li>
+																					<li ><a href="page-contact-2.html"><i class="fa fa-angle-right"></i>Contact 2</a></li>
+																					<li ><a href="page-contact-3.html"><i class="fa fa-angle-right"></i>Contact 3</a></li>
+																					<li ><a href="page-login.html"><i class="fa fa-angle-right"></i>Login 1</a></li>
+																					<li ><a href="page-login-2.html"><i class="fa fa-angle-right"></i>Login 2 - Fullsreen</a></li>
+																					<li ><a href="page-signup.html"><i class="fa fa-angle-right"></i>Sign Up 1</a></li>
+																					<li ><a href="page-signup-2.html"><i class="fa fa-angle-right"></i>Sign Up 2 - Fullsreen</a></li>
+																				</ul>
+																			</div>
+																			<div class="col-sm-4">
+																				<div class="divider"></div>
+																				<ul class="menu">
+																					<li ><a href="page-404.html"><i class="fa fa-angle-right"></i>404 error</a></li>
+																					<li ><a href="page-404-2.html"><i class="fa fa-angle-right"></i>404 error - Parallax</a></li>
+																					<li ><a href="page-affix-sidebar.html"><i class="fa fa-angle-right"></i>Sidebar - Affix Menu</a></li>
+																					<li ><a href="page-left-sidebar.html"><i class="fa fa-angle-right"></i>Left Sidebar</a></li>
+																					<li ><a href="page-right-sidebar.html"><i class="fa fa-angle-right"></i>Right Sidebar</a></li>
+																					<li ><a href="page-two-sidebars.html"><i class="fa fa-angle-right"></i>Two Sidebars</a></li>
+																					<li ><a href="page-two-sidebars-left.html"><i class="fa fa-angle-right"></i>Two Sidebars Left</a></li>
+																					<li ><a href="page-two-sidebars-right.html"><i class="fa fa-angle-right"></i>Two Sidebars Right</a></li>
+																					<li ><a href="page-no-sidebars.html"><i class="fa fa-angle-right"></i>No Sidebars</a></li>
+																					<li ><a href="page-sitemap.html"><i class="fa fa-angle-right"></i>Sitemap</a></li>
+																				</ul>
+																			</div>
+																		</div>
+																	</div>
+																	<div class="col-lg-4 col-md-3 hidden-sm">
+																		<h4 class="title">Premium HTML5 Template</h4>
+																		<p class="mb-10">The Project is perfectly suitable for corporate, business and company webpages.</p>
+																		<img src="{% static 'images/section-image-3.png' %}" alt="The Project">
+																	</div>
+																</div>
+															</li>
+														</ul> QUIENES-SOMOS-SUB-MENU-->
+													</li>
+													<!-- mega-menu end -->
+													<li class="mega-menu">
+														<a href="/categoria/preparaciones-para-estudios">Preparaci&oacute;n para Estudios</a>
+													</li>
+													<!-- mega-menu end -->
+													<li class="mega-menu">
+														<a href="/categoria/cuerpo-medico" >Cuerpo M&eacute;dico</a>
+													</li>
+												</ul>
+												<!-- main-menu end -->
+
+												<!-- header dropdown buttons -->
+												<div class="header-dropdown-buttons">
+													<a href="#footer-form" class="btn btn-sm hidden-xs btn-default">Dejanos tu consulta <i class="fa fa-hospital-o pl-5"></i></a>
+													<a href="#footer-form" class="btn btn-lg visible-xs btn-block btn-default">Dejanos tu consulta <i class="fa fa-hospital-o pl-5"></i></a>
+												</div>
+												<!-- header dropdown buttons end-->
+
+											</div>
+
+										</div>
+									</nav>
+									<!-- navbar end -->
+
+								</div>
+								<!-- main-navigation end -->
+								</div>
+								<!-- header-right end -->
+
+							</div>
+						</div>
+					</div>
+
+				</header>
+				<!-- header end -->
+			</div>
+			<!-- header-container end -->
+
+			{% block content %}{% endblock %}
+
+			<!-- footer start (Add "dark" class to #footer in order to enable dark footer) -->
+			<!-- ================ -->
+			<footer id="footer" class="clearfix ">
+
+				<!-- .footer start -->
+				<!-- ================ -->
+				<div class="footer">
+					<div class="container">
+						<div class="footer-inner">
+							<div class="row">
+								<div class="col-md-8">
+									<div class="footer-content">
+										<div class="logo-footer"><img id="logo-footer" src="{% static 'images/logo.cedir.small.png' %}" alt="Cedir Logo"></div>
+										<div class="row">
+											<div class="col-md-6">
+												<p>Estamos para ayudarlo. <br />
+                                                   Si usted no cree haber encontrado en este sitio la respuesta que esperaba o el servicio que buscaba por favor contactase con nosotros.
+                                                </p>
+												<ul class="social-links circle animated-effect-1">
+													<li class="facebook"><a target="_blank" href="https://www.facebook.com/profile.php?id=100013245134188&fref=ts"><i class="fa fa-facebook"></i></a></li>
+													<li class="twitter"><a target="_blank" href="https://twitter.com/CEDIR3"><i class="fa fa-twitter"></i></a></li>
+                                                    <li class="instagram"><a target="_blank" href="https://www.instagram.com/cedirsalud/"><i class="fa fa-instagram"></i></a></li>
+													<!--<li class="youtube"><a target="_blank" href="https://www.youtube.com"><i class="fa fa-youtube"></i></a></li>-->
+												</ul>
+												<ul class="list-icons">
+													<li><i class="fa fa-map-marker pr-10 text-default"></i> Bv. Oroño 1564 - Rosario - Santa Fe</li>
+													<li><a href="tel:+543414499536"><i class="fa fa-phone pr-10 text-default"></i> +54 0341 4499536</li>
+													<li><a href="tel:+543416751535"><i class="fa fa-mobile pr-10 text-default"></i> +54 0341 6751535</li>
+													<li><a href="mailto:cedirsalud@gmail.com"><i class="fa fa-envelope-o pr-10"></i>cedirsalud@gmail.com</a></li>
+												</ul>
+											</div>
+											<div class="col-md-6">
+												<div id="map-canvas"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="footer-content">
+										<h2 class="title">Contáctenos</h2>
+										<br>
+										<div class="alert alert-success hidden" id="MessageSent2">
+											Hemos recibido su mensaje. Nos contactaremos a la brevedad.
+										</div>
+										<div class="alert alert-danger hidden" id="MessageNotSent2">
+											Algo no salió bien. Por favor recargue la página y vuelva a intentar. Recuerde completar la verificación de identidad.
+										</div>
+										<form role="form" id="footer-form" class="margin-clear">
+											<div class="form-group has-feedback">
+												<label class="sr-only" for="name">Nombre</label>
+												<input type="text" class="form-control" id="name" placeholder="Nombre" name="name">
+												<i class="fa fa-user form-control-feedback"></i>
+											</div>
+											<div class="form-group has-feedback">
+												<label class="sr-only" for="email">Dirección de e-mail</label>
+												<input type="email" class="form-control" id="email" placeholder="Correo electrónico" name="email">
+												<i class="fa fa-envelope form-control-feedback"></i>
+											</div>
+											<div class="form-group has-feedback">
+												<label class="sr-only" for="tel">Teléfono de contacto</label>
+												<input type="tel" class="form-control" id="tel" placeholder="Teléfono de contacto" name="tel">
+												<i class="fa fa-phone form-control-feedback"></i>
+											</div>
+											<div class="form-group has-feedback">
+												<label class="sr-only" for="message">Mensaje</label>
+												<textarea class="form-control" rows="6" id="message" placeholder="Mensaje" name="message"></textarea>
+												<i class="fa fa-pencil form-control-feedback"></i>
+											</div>
+											<div class="g-recaptcha" data-sitekey="6LckIhUUAAAAAAsZYnp18fbeUoOPy6X5NOKFAVzf"></div>
+											<input type="submit" value="Enviar" class="margin-clear submit-button btn btn-default">
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- .footer end -->
+
+				<!-- .subfooter start -->
+				<!-- ================ -->
+				<div class="subfooter">
+					<div class="container">
+						<div class="subfooter-inner">
+							<div class="row">
+								<div class="col-md-12">
+									<p class="text-center">Cedir - 2017</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- .subfooter end -->
+
+			</footer>
+			<!-- footer end -->
+
+		</div>
+		<!-- page-wrapper end -->
+
+		<!-- JavaScript files placed at the end of the document so the pages load faster -->
+		<!-- ================================================== -->
+		<!-- Jquery and Bootstap core js files -->
+		<script type="text/javascript" src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+		<!-- Modernizr javascript -->
+		<script type="text/javascript" src="{% static 'bower_components/modernizer/modernizr.js' %}"></script>
+		<!-- jQuery Revolution Slider  -->
+		<script type="text/javascript" src="{% static 'template/rs-plugin/js/jquery.themepunch.tools.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'template/rs-plugin/js/jquery.themepunch.revolution.min.js' %}"></script>
+		<!-- Isotope javascript -->
+		<script type="text/javascript" src="{% static 'bower_components/isotope/dist/isotope.pkgd.min.js' %}"></script>
+		<!-- Magnific Popup javascript -->
+		<script type="text/javascript" src="{% static 'bower_components/magnific-popup/dist/jquery.magnific-popup.min.js' %}"></script>
+		<!-- Appear javascript -->
+		<script type="text/javascript" src="{% static 'bower_components/waypoints/lib/jquery.waypoints.min.js' %}"></script>
+		<!-- Count To javascript -->
+		<script type="text/javascript" src="{% static 'bower_components/jquery-countTo/jquery.countTo.js' %}"></script>
+		<!-- Parallax javascript -->
+		<script src="{% static 'bower_components/parallax/deploy/jquery.parallax.min.js' %}"></script>
+		<!-- Contact form -->
+		<script src="{% static 'bower_components/jquery-validation/dist/jquery.validate.js' %}"></script>
+
+		<script type="text/javascript" src="{% static 'template/js/google.map.config.js' %}"></script>
+		<!-- Background Video -->
+		<script src="{% static 'bower_components/vide/dist/jquery.vide.js' %}"></script>
+		<!-- Owl carousel javascript -->
+		<script type="text/javascript" src="{% static 'bower_components/owl-carousel/owl-carousel/owl.carousel.js' %}"></script>
+		<!-- SmoothScroll javascript -->
+		<script type="text/javascript" src="{% static 'bower_components/jquery.browser/dist/jquery.browser.js' %}"></script>
+		<script type="text/javascript" src="{% static 'bower_components/smoothscroll-for-websites/SmoothScroll.js' %}"></script>
+		<!-- Initialization of Plugins -->
+		<script type="text/javascript" src="{% static 'template/js/template.js' %}"></script>
+		<!-- Custom Scripts -->
+		<script type="text/javascript" src="{% static 'template/js/custom.js' %}"></script>
+
+        <!-- Google Maps javascript -->
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&amp;key=AIzaSyCBbTmcpoE99M9ZPGVI8A4s4JzEFxxWdFs"></script>
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+
+        <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+        <script type="text/javascript">_uacct = "UA-3656043-1"; urchinTracker();</script>
+	</body>
+</html>

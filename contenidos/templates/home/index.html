@@ -1,0 +1,448 @@
+{% extends "home/base.html" %}
+{% load staticfiles %}
+{% load contenido_filters %}
+
+{% block content %}
+<!-- banner start -->
+<!-- ================ -->
+<div class="banner clearfix">
+
+	<!-- slideshow start -->
+	<!-- ================ -->
+	<div class="slideshow">
+
+		<!-- slider revolution start -->
+		<!-- ================ -->
+		<div class="slider-banner-container">
+			<div class="slider-banner-fullwidth-big-height">
+				<ul class="slides">
+                {% for contenido in slide_contents %}
+
+                    {% if contenido|belong_to_category:"Home slide claro izquierdo" %}
+					<li data-transition="random" data-slotamount="7" data-masterspeed="500" data-saveperformance="on" data-title="{{ contenido.title }}">
+
+					    <!-- main image -->
+					    <img src="/media/media_files/{{ contenido.img1 }}" alt="slidebg1" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
+
+					    <!-- Transparent Background -->
+					    <div class="tp-caption light-translucent-bg"
+						    data-x="center"
+						    data-y="bottom"
+						    data-speed="600"
+						    data-start="0">
+					    </div>
+
+					    <!-- LAYER NR. 1 -->
+					    <div class="tp-caption sfb fadeout large_dark"
+						    data-x="left"
+						    data-y="180"
+						    data-speed="500"
+						    data-start="1000"
+						    data-easing="easeOutQuad">{{ contenido.title }}
+					    </div>
+
+					    <!-- LAYER NR. 2 -->
+					    <div class="tp-caption sfb fadeout medium_dark hidden-xs"
+						    data-x="left"
+						    data-y="250"
+						    data-speed="500"
+						    data-start="1300"
+						    data-easing="easeOutQuad"
+						    data-endspeed="600">{% autoescape off %}{{contenido.description|linebreaks}}{% endautoescape %}
+					    </div>
+
+					    <!-- LAYER NR. 3 
+					    <div class="tp-caption sfb fadeout small_dark text-center"
+						    data-x="left"
+						    data-y="360"
+						    data-speed="500"
+						    data-start="1600"
+						    data-easing="easeOutQuad"
+						    data-endspeed="600"><a href="{{ contenido.url }}" class="btn btn-dark btn-default btn-animated">Leer mas <i class="fa fa-arrow-right"></i></a>
+					    </div>
+						-->
+
+					</li>
+
+                    {% else %}
+					<li data-transition="random" data-slotamount="7" data-masterspeed="500" data-saveperformance="on" data-title="{{ contenido.title }}">
+					    <!-- main image -->
+					    <img src="/media/media_files/{{ contenido.img1 }}" alt="slidebg2" data-bgposition="center top"  data-bgrepeat="no-repeat" data-bgfit="cover">
+
+					    <!-- Transparent Background -->
+					    <div class="tp-caption dark-translucent-bg"
+						    data-x="center"
+						    data-y="bottom"
+						    data-speed="600"
+						    data-start="0">
+					    </div>
+
+					    <!-- LAYER NR. 1 -->
+					    <div class="tp-caption sfb fadeout text-right large_white"
+						    data-x="right"
+						    data-y="180"
+						    data-speed="500"
+						    data-start="1000"
+						    data-easing="easeOutQuad">{{ contenido.title }}
+					    </div>
+
+					    <!-- LAYER NR. 2 -->
+					    <div class="tp-caption sfb fadeout text-right large_white tp-resizeme hidden-xs"
+						    data-x="right"
+						    data-y="250"
+						    data-speed="500"
+						    data-start="1300"
+						    data-easing="easeOutQuad"><div class="separator-3 light"></div>
+					    </div>
+
+					    <!-- LAYER NR. 3 -->
+					    <div class="tp-caption sfb fadeout medium_white text-right hidden-xs"
+						    data-x="right"
+						    data-y="270"
+						    data-speed="500"
+						    data-start="1300"
+						    data-easing="easeOutQuad"
+						    data-endspeed="600">{% autoescape off %}{{contenido.description|linebreaks}}{% endautoescape %}
+					    </div>
+
+					    <!-- LAYER NR. 4 
+					    <div class="tp-caption sfb fadeout small_white text-right"
+						    data-x="right"
+						    data-y="380"
+						    data-speed="500"
+						    data-start="1600"
+						    data-easing="easeOutQuad"
+						    data-endspeed="600"><a href="{{ contenido.url }}" class="btn btn-dark btn-default btn-animated">Leer mas <i class="fa fa-arrow-right"></i></a>
+					    </div>
+						-->
+					</li>
+                    {% endif %}
+
+                {% endfor %}
+				</ul>
+				<div class="tp-bannertimer"></div>
+			</div>
+		</div>
+		<!-- slider revolution end -->
+
+	</div>
+	<!-- slideshow end -->
+
+</div>
+<!-- banner end -->
+
+<div id="page-start"></div>
+
+<!-- section start -->
+<!-- ================ -->
+<section class="pv-30 light-gray-bg clearfix">
+	<div class="container">
+		<h3 class="title logo-font text-center text-default">Cedir, Centro de Endoscopía digestiva de Rosario</h3>
+		<div class="separator"></div>
+		<p class="text-center">
+            Prevención, diagnostico y tratamiento de enfermedades digestivas.
+        </p>
+		<br>
+		<div class="row grid-space-10 cartas">
+			<div class="col-sm-6 col-md-3">
+				<div class="pv-30 ph-20 white-bg feature-box bordered text-center">
+					<span class="icon default-bg circle"><i class="fa fa-plus-square"></i></span>
+					<h3>Quienes Somos</h3>
+					<div class="separator clearfix"></div>
+					<p>Conozca nuestro equipo. Toda la calidad medica en un solo lugar.</p>
+					<a href="/content/1" class="btn btn-default btn-animated">Leer mas <i class="fa fa-angle-double-right"></i></a>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div class="pv-30 ph-20 white-bg feature-box bordered text-center">
+					<span class="icon default-bg circle"><i class="fa fa-hospital-o"></i></span>
+					<h3>Turnos</h3>
+					<div class="separator clearfix"></div>
+					<p>Podes solicitar un turno a traves de nuestros telefonos o enviandonos un mensaje</p>
+					<a href="#footer-form" class="btn btn-default btn-animated">Enviar mensaje <i class="pl-5 fa fa-stethoscope"></i></a>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div class="pv-30 ph-20 default-bg feature-box bordered text-center">
+					<span class="icon dark-bg circle"><i class="fa fa-ambulance"></i></span>
+					<h3>Emergencias</h3>
+					<div class="separator clearfix"></div>
+					<p>Si ud. necesita una consulta de emergencia, tenemos un especialista de guardia las 24hs. <br /> </p>
+					<!--<a href="#" class="btn btn-default btn-animated">Call Us <i class="pl-5 fa fa-phone"></i></a>-->
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div class="pv-30 ph-20 white-bg feature-box bordered text-center">
+					<span class="icon default-bg circle"><i class="glyphicon glyphicon-time"></i></span>
+					<h3>Horarios de atenci&oacute;n</h3>
+					<div class="separator-2 mt-20 clearfix"></div>
+					<ul class="list-unstyled small list-icons text-left">
+						<li><strong class="text-default">Lunes a Viernes</strong> <span class="pull-right">8.00 - 20.00</span></li>
+						<li><strong class="text-default">S&aacute;bados</strong> <span class="pull-right">8.00 - 12.00</span></li>
+						<li><strong class="text-default">Domingos</strong> <span class="pull-right">Cerrado</span></li>
+					</ul>
+					<div class="separator-3 mt-20 clearfix"></div>
+					<p class="small text-default">Consulte horarios de atenci&oacute;n por m&eacute;dico.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- section end -->
+
+<!-- section start -->
+<!-- ================ -->
+<section class="section dark-bg clearfix">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="call-to-action text-center">
+					<div class="row">
+						<div class="col-sm-8">
+							<h1 class="title"><i class="fa fa-user-md pr-10"></i>Encuntre su M&eacute;dico</h1>
+							<ul class="list-inline">
+								<li><i class="icon-dot text-default"></i> <a href="content/quienes-somos/#gastroenterologos" class="link-light">Gastroenterólogos</a></li>
+								<li><i class="icon-dot text-default"></i> <a href="content/quienes-somos/#proctologos" class="link-light">Proctólogos</a></li>
+								<li><i class="icon-dot text-default"></i> <a href="content/quienes-somos/#hepatologos" class="link-light">Hepatólogos</a></li>
+								<li><i class="icon-dot text-default"></i> <a href="content/quienes-somos/#medicos-clinicos" class="link-light">Médicos Clínicos</a></li>
+							</ul>
+						</div>
+						<div class="col-sm-4">
+							<br>
+							<p><a href="/categoria/cuerpo-medico" class="btn btn-lg btn-default btn-animated">M&aacute;s especialistas<i class="fa fa-search pl-20"></i></a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- section end -->
+
+<!-- section start -->
+<!-- ================ -->
+<section class="section clearfix">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<h3>&Uacute;ltimas <span class="text-default">Novedades</span></h3>
+				<div class="separator-2"></div>
+				<div class="block">
+                    {% for novedad in novedades %}
+                    <div class="media margin-clear">
+						<div class="media-left">
+							<div class="overlay-container">
+                                {% if novedad.img1 %}
+                                <img class="media-object" src="/media/media_files/{{ novedad.img1 }}" alt="novedad" />
+                                {% else %}
+                                <img class="media-object" src="{% static 'images/medical-blog-thumb-1.jpg' %}" alt="novedad" />
+                                {% endif %}
+								<a href="{{ novedad.url }}" class="overlay-link small"><i class="fa fa-link"></i></a>
+							</div>
+						</div>
+						<div class="media-body">
+							<h5 class="media-heading"><a href="{{ novedad.url }}">{{ novedad.title }}</a></h5>
+							<p class="small"><i class="fa fa-calendar pr-10"></i>{{ novedad.fecha_display }}</p>
+							<p class="margin-clear small">{{ novedad.description }}</p>
+							<a href="{{ novedad.url }}">Leer m&aacute;s<i class="fa fa-long-arrow-right pl-5"></i></a>
+						</div>
+						<hr>
+					</div>
+                    {% endfor %}
+				</div>
+			</div>
+			<div class="col-md-3">
+				<h3><span class="text-default">Unidades</span></h3>
+				<div class="separator-2"></div>
+				<!-- accordion start -->
+				<!-- ================ -->
+				<div class="panel-group collapse-style-2" id="accordion-2">
+                    {% for contenido in unidades_contents %}
+                        {% if forloop.first %}
+                        <div class="panel panel-default">
+						    <div class="panel-heading">
+							    <h4 class="panel-title">
+								    <a data-toggle="collapse" data-parent="#accordion-2" href="#collapse-{{forloop.counter}}">
+									    <i class="icon-users-1 pr-10"></i>{{ contenido.title }}
+								    </a>
+							    </h4>
+						    </div>
+						    <div id="collapse-{{forloop.counter}}" class="panel-collapse collapse in">
+							    <div class="panel-body bordered p-15">
+								    {{ contenido.description }} <a href="/categoria/unidades">Unidades<i class="fa fa-long-arrow-right pl-5"></i></a>
+							    </div>
+						    </div>
+					    </div>
+                        {% else %}
+                        <div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-parent="#accordion-2" href="#collapse-{{forloop.counter}}" class="collapsed">
+										<i class="icon-users-1 pr-10"></i>{{ contenido.title }}
+									</a>
+								</h4>
+							</div>
+							<div id="collapse-{{forloop.counter}}" class="panel-collapse collapse">
+								<div class="panel-body bordered p-15">
+									{{ contenido.description }} <a href="/categoria/unidades">Unidades<i class="fa fa-long-arrow-right pl-5"></i></a>
+								</div>
+							</div>
+						</div>
+                        {% endif %}
+                    {% endfor %}
+				</div>
+				<!-- accordion end -->
+			</div>
+			<div class="col-md-3">
+				<h3>Preguntas <span class="text-default">Frecuentes</span></h3>
+				<div class="separator-2"></div>
+				<div class="owl-carousel content-slider-with-large-controls-autoplay dark-controls light-gray-bg buttons-hide">
+                    {% for contenido in preguntas_frecuentes_contents %}
+					<div class="image-box style-2">
+						<div class="overlay-container overlay-visible">
+                            {% if contenido.img1 %}
+							<img src="/media/media_files/{{ contenido.img1 }}" alt="preguntas frecuentes" class="carousel-image">
+                            {% else %}
+                            <img src="{% static 'images/medical-service-1.jpg' %}" alt="preguntas frecuentes" class="carousel-image">
+                            {% endif %}
+							<a href="{{ contenido.url }}" class="overlay-link"><i class="fa fa-link"></i></a>
+							<div class="overlay-bottom">
+								<div>
+									<p class="lead margin-clear text-left">{{ contenido.title }}</p>
+								</div>
+							</div>
+						</div>
+						<div class="body padding-horizontal-clear">
+							<p>{{ contenido.description }}</p>
+							<a class="link-dark" href="{{ contenido.url }}">Leer m&aacute;s<i class="pl-5 fa fa-angle-double-right"></i></a>
+						</div>
+					</div>
+                    {% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- section end -->
+
+<!-- section start -->
+<!-- ================ -->
+<section class="full-width-section">
+	<div class="full-image-container light-gray-bg">
+		<img class="to-right-block" src="{% static 'images/cedir-frente-noche.png' %}" alt="">
+		<div class="full-image-overlay text-right">
+			<h3>Toda la calidad médica en un solo lugar</h3>
+			<ul class="list-icons">
+				<li>videoendoscopía <i class="icon-check-1"></i></li>
+				<li>consultorio de gastroenterología <i class="icon-check-1"></i></li>
+				<li>consultorio de otras especialidades <i class="icon-check-1"></i></li>
+				<li>departamento de cirugía <i class="icon-check-1"></i></li>
+				<li>ecografía <i class="icon-check-1"></i></li>
+				<li>laboratorio <i class="icon-check-1"></i></li>
+			</ul>
+		</div>
+	</div>
+	<div class="full-text-container light-gray-bg">
+		<h3 class="logo-font"><span class="text-muted">Cedir</span> <span class="text-default">Centro de Endoscopía digestiva de Rosario</span></h3>
+		<div class="separator-2 visible-lg"></div>
+		<p>
+            En el año 2005 se crea el C.E.Di.R. CENTRO DE ENDOSCOPIA DIGESTIVA DE ROSARIO fundamentalmente enfocado al diagnóstico, prevención y tratamiento de enfermedades digestivas.<br />
+            Comprometido con su objetivo y acompañando su crecimiento en el año 2010 se instala en Bv. Oroño 1564 con mayor infraestructura y avanzada tecnología que permite realizar estudios de alta complejidad, con mas de 35 especialistas en gastroenterología y especialidades vinculadas, equipos multidisciplinarios y permanente renovación e incorporación de instrumental médico que mejora resultados diagnósticos y terapéuticos.<br />
+            Hoy con mas de 100.000 estudios endoscopicos realizados, con 35 diferentes técnicas, hacen de C.E.DI.R un centro dedicado exclusivamente y con la mayor complejidad en Rosario en zona de influencia.
+        </p>
+		<div class="separator-3 visible-lg"></div>
+	</div>
+</section>
+<!-- section end -->
+
+<!-- section start -->
+<!-- ================ -->
+<section class="clearfix">
+	<div class="container pv-20">
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2">
+				<h3 class="text-center">Enfermedades <span class="text-default">Digestivas</span></h3>
+				<div class="separator"></div>
+				<p class="lead text-center">Conozca las enfermedades gastrointestinales m&aacute;s frecuentes.</p>
+			</div>
+		</div>
+	</div>
+	<div class="row grid-space-0">
+        {% for contenido in enfermedades_digestivas_contents %}
+		<div class="col-md-3 col-sm-6">
+			<div class="image-box team-member shadow mb-20">
+				{% if contenido.img1 %}
+				<div class="overlay-container overlay-visible novedades" style="background-image: url(/media/media_files/{{ contenido.img1 }})">
+				{% else %}
+				<div class="overlay-container overlay-visible novedades" style="background-image: url({% static 'images/medical-service-1.jpg' %})">
+				{% endif %}
+                    {% if contenido.img1 %}
+                    <img src="/media/media_files/{{ contenido.img1 }}" alt="enfermedades digestivas">
+                    {% else %}
+                    <img src="{% static 'images/medical-service-1.jpg' %}" alt="enfermedades digestivas">
+                    {% endif %}
+
+					<a href="{{ contenido.url }}" class="overlay-link" title="enfermedades digestivas"><i class="icon-link"></i></a>
+					<div class="overlay-bottom">
+						<div class="text">
+							<h3 class="title">{{ contenido.title }}</h3>
+							<div class="separator light"></div>
+							<p class="small margin-clear"><em>{{ contenido.description | truncatechars:100 }}</em></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+        {% endfor %}
+	</div>
+
+    <!-- Comentarios de la gente
+	<div class="owl-carousel space-bottom content-slider">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="testimonial text-center">
+						<div class="testimonial-image">
+							<img src="{% static 'images/testimonial-1.jpg' %}" alt="Jane Doe" title="Jane Doe" class="img-circle">
+						</div>
+						<h3>Thank You!</h3>
+						<div class="separator"></div>
+						<div class="testimonial-body">
+							<blockquote>
+								<p>Sed ut perspiciatis unde omnis iste natu error sit voluptatem accusan tium dolore laud antium, totam rem dolor sit amet tristique pulvinar, turpis arcu rutrum nunc, ac laoreet turpis augue a justo.</p>
+							</blockquote>
+							<div class="testimonial-info-1">- Jane Doe</div>
+							<div class="testimonial-info-2">By Company</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2">
+					<div class="testimonial text-center">
+						<div class="testimonial-image">
+							<img src="{% static 'images/testimonial-1.jpg' %}" alt="Jane Doe" title="Jane Doe" class="img-circle">
+						</div>
+						<h3>I'm so Happy!</h3>
+						<div class="separator"></div>
+						<div class="testimonial-body">
+							<blockquote>
+								<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Et cupiditate deleniti ratione in. Expedita nemo, quisquam, fuga adipisci omnis ad mollitia libero culpa nostrum est quia eos esse vel!</p>
+							</blockquote>
+							<div class="testimonial-info-1">- Jane Doe</div>
+							<div class="testimonial-info-2">By Company</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+    -->
+
+
+</section>
+<!-- section end -->
+
+{% endblock %}
