@@ -16,7 +16,7 @@ from rest_framework.parsers import JSONParser
 def eval_expr(expr):
     import ast
     import operator as op
-    
+
     operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
         ast.Div: op.truediv, ast.Pow: op.pow, ast.BitXor: op.xor,
         ast.USub: op.neg}
@@ -43,14 +43,14 @@ class JSONResponse(HttpResponse):
 
 # Create your views here.
 def pago(request, id_anestesista, anio, mes):
-    
+
     pago = PagoAnestesistaVM()
 
     pago.anestesista = Anestesista.objects.get(id=id_anestesista)
     pago.anio = anio
     pago.mes = mes
 
-    # obtenemos los estudios por anestesista, año y mes    
+    # obtenemos los estudios por anestesista, año y mes
     estudios = Estudio.objects.filter(anestesista_id=id_anestesista, fecha__year=anio, fecha__month=mes).order_by('fecha','paciente','obra_social')
     complejidades = Complejidad.objects.all()
 
@@ -68,13 +68,13 @@ def pago(request, id_anestesista, anio, mes):
         linea.obra_social = obra_social
 
         estudios = sorted(grupo, key=lambda estudio: estudio.practica.id)
-           
+
         # obtenemos los movimientos de caja asociados
         linea.mov_caja = [mov
             for estudio in estudios
             for mov     in estudio.movimientos_caja.filter(tipo_id__in=[3,10])
             ]
-        
+
         # generamos el patrón de búsqueda para la complejidad
         # (es una lista de codigos destudios ordenada y separada por coma)
         estudios_id = ','.join([str(id) for id in sorted(set([estudio.practica.id for estudio in estudios]))])
@@ -90,19 +90,34 @@ def pago(request, id_anestesista, anio, mes):
         # reemplazamos en la fórmula los valores de cada complejidad
         for c in complejidades:
             linea.formula_valorizada = linea.formula_valorizada.replace('c{0}'.format(c.id), c.importe)
-        
+
         # obtenermos el importe de la serie de estudios
         linea.importe = eval_expr(linea.formula_valorizada)
-        linea.alicuota_iva = 21.0
 
+
+        linea.alicuota_iva = 21.0  # w se calcula y se muestra.
+        # si va por ara, el iva es del 21 y se aplica al total
+        # Si no va por ara, y es particular o particular especial, hay que ir a buscar la factura que se le hizo para obtener el iva
+        # el comprobante hay que buscarlo usando el DNI del paciente, fechar del comprobante mayor igual a la fecha de estuido y rngo de 30 dias, y buscar palabra anest dentro de la desc del comprobante (factura)
+        # Si no va por ara y es de obra social (no particular) se saca el iva del comprobante asociado a la presentacion.
         # determinamos si el paciente tiene una edad diferenciada
-        linea.es_paciente_diferenciado = paciente.edad >= 70 or paciente.edad < 12
+
+
+        # Mov de caja
+        # Si cualqueira de los estudios de la linea tiene un mov de caja asociado de tipo "mov honorario anestesista"
+        # entonces esta linea va tanto en el listado de ARA como en el de NO ARA.
+        # Para la Linea que va por ARA, el importe sale de la complejidad - el valor del mov de caja
+        # Para la linea que NO va por ARA, el importe sale de total del mov de caja
+
+        # el porcentaje de retencion sale del anestesista (hay que agregar un campo ahi)
+
+        linea.es_paciente_diferenciado = paciente.edad >= 70 or paciente.edad < 12 # TODO esto tiene que ser de 1 a 12, no 0
 
         if linea.es_paciente_diferenciado:
             linea.importe *= 1.3
 
         linea.estudios = estudios
-        
+
         if obra_social.se_presenta_por_ARA:
             pago.lineas_ARA.append(linea)
         else:

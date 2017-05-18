@@ -16,17 +16,16 @@ def imprimir(request, id_estudio):
     return generar_informe(response, estudio)
 
 
-class EstudioFilter(django_filters.FilterSet):
-    fecha_desde = django_filters.DateFilter(name="fecha", lookup_expr='gte')
-    fecha_hasta = django_filters.DateFilter(name="fecha", lookup_expr='lte')
-    class Meta:
-        model = Estudio
-        fields = [u'fecha', u'paciente', u'practica', u'obra_social', u'medico', u'medico_solicitante', u'fecha_desde', u'fecha_hasta']
+#class EstudioFilter(django_filters.FilterSet):
+#    fecha_desde = django_filters.DateFilter(name="fecha", lookup_expr='gte')
+#    fecha_hasta = django_filters.DateFilter(name="fecha", lookup_expr='lte')
+#    class Meta:
+#        model = Estudio
+#        fields = [u'fecha', u'paciente', u'practica', u'obra_social', u'medico', u'medico_solicitante', u'fecha_desde', u'fecha_hasta']
 
 
 class EstudioViewSet(viewsets.ModelViewSet):
     model = Estudio
-    queryset = Estudio.objects.all()
+    queryset = Estudio.objects.all()[:20]
     serializer_class = EstudioSerializer
-    filter_class = EstudioFilter
-
+    #filter_class = EstudioFilter
