@@ -6,5 +6,5 @@ class PacienteSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Paciente
-        fields = (u'id', u'dni', u'nombre', u'apellido', u'edad')
+        fields = (u'id', u'dni', u'nombre', u'apellido', u'_edad')
 
