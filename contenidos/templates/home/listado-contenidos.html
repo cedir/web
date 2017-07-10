@@ -1,0 +1,106 @@
+{% extends "home/base.html" %}
+{% load staticfiles %}
+
+{% block title %}
+<title>Cedir - {{title}}</title>
+{% endblock %}
+
+{% block description %}
+<meta name="description" content="{{description}}">
+{% endblock %}
+
+{% block keywords %}
+<meta name="Keywords" content="{{title}}">
+{% endblock %}
+
+{% block content %}
+
+			<!-- breadcrumb start -->
+			<!-- ================ -->
+			<div class="breadcrumb-container">
+				<div class="container">
+					<ol class="breadcrumb">
+						<li><i class="fa fa-home pr-10"></i><a href="/">Home</a></li>
+						<li class="active">{{ title }}</li>
+					</ol>
+				</div>
+			</div>
+			<!-- breadcrumb end -->
+
+			<!-- main-container start -->
+			<!-- ================ -->
+			<section class="main-container">
+
+				<div class="container">
+					
+					<div class="row">
+							
+						<!-- main start -->
+						<!-- ================ -->
+						<div class="main col-md-12">
+
+							<!-- page-title start -->
+							<!-- ================ -->
+							<h1 class="page-title">{{ title }}</h1>
+							<div class="separator-2"></div>
+							<!-- page-title end -->
+							<p class="lead">{{ description }}</p>
+
+							{% for content in contents %}
+							<div class="image-box style-3-b">
+								<div class="row">
+									<div class="col-sm-6">
+										<div class="overlay-container">
+											{% if content.img1 %}
+											<img src="/media/media_files/{{ content.img1 }}" alt="" style="width:100%">
+											{% else %}
+											<img src="/media/images/medical-blog-thumb-1.jpg" alt="" style="width:100%">
+											{% endif%}
+											{% if content.footer %}
+											<div class="overlay-to-top">
+												<p class="small margin-clear"><em>{{ content.footer }}</em></p>
+											</div>
+											{% endif %}
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div class="body">
+											<h3 class="title"><a href="/content/{{content.url}}/">{{ content.title }}</a></h3>
+											<p class="small mb-10">
+											{% if content.pub_date %}
+											<i class="icon-calendar"></i> {{ content.pub_date | date:"c" }}
+											{% endif %}
+											{% for cat in content.categories %} 
+											<i class="pl-10 icon-tag-1"></i> {{ cat }}
+											{% endfor %}
+											</p>
+											<div class="separator-2"></div>
+											<p class="mb-10">{{ content.description }}</p>
+											<a href="/content/{{content.url}}/" class="btn btn-default btn-sm btn-hvr hvr-shutter-out-horizontal margin-clear">Ver más...<i class="fa fa-arrow-right pl-10"></i></a>
+										</div>
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+							{% comment %}
+							<nav>
+								<ul class="pagination">
+									<li><a href="#" aria-label="Previous"><i class="fa fa-angle-left"></i></a></li>
+									<li class="active"><a href="#">1</a></li>
+									<li><a href="#">2</a></li>
+									<li><a href="#">3</a></li>
+									<li><a href="#">4</a></li>
+									<li><a href="#">5</a></li>
+									<li><a href="#" aria-label="Next"><i class="fa fa-angle-right"></i></a></li>
+								</ul>
+							</nav>
+							{% endcomment %}
+						</div>
+						<!-- main end -->
+
+					</div>
+				</div>
+			</section>
+			<!-- main-container end -->
+
+{% endblock %}
