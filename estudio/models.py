@@ -29,6 +29,8 @@ class Estudio(models.Model):
     presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion', null=True, blank=True, related_name=u'estudios')
     nro_de_orden = models.CharField(db_column=u'nroDeOrden', max_length=200)
     anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
+    #anestesista = models.IntegerField(db_column="idAnestesista")    
+
     es_pago_contra_factura = models.IntegerField(db_column="esPagoContraFactura", default=0)
     medicacion = models.ManyToManyField(Medicamento, through='Medicacion')
 
