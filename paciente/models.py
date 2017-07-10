@@ -15,6 +15,10 @@ class Paciente(models.Model):
     nroAfiliado = models.CharField(u"Nro", max_length=200)
     email = models.CharField(u'Email', max_length=200, db_column=u"e_mail")
 
+    @property
+    def _edad(self):
+        return self.get_edad()
+
     def get_edad(self):
         if not self.fechaNacimiento:
             return None

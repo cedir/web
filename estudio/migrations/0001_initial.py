@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 ('importeEstudioCobrado', models.FloatField()),
                 ('importeMedicacionCobrado', models.FloatField()),
                 ('arancelAnestesia', models.FloatField()),
-                ('anestesista', models.ForeignKey(db_column=b'idAnestesista', on_delete=django.db.models.deletion.CASCADE, related_name='anestesista', to='medico.Anestesista')),
+                #('anestesista', models.ForeignKey(db_column=b'idAnestesista', on_delete=django.db.models.deletion.CASCADE, related_name='anestesista', to='medico.Anestesista')),
             ],
             options={
                 'db_table': 'tblEstudios',

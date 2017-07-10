@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'', include('paciente.urls')),
     url(r'', include('comprobante.urls')),
     url(r'', include('medico.urls')),
+    url(r'', include('anestesista.urls')),
     url(r'', include('usuario.urls')),
     url(r'', include('estudio.urls')),
     url(r'^admin/', include(admin.site.urls)),
