@@ -10,8 +10,8 @@ from rest_framework.parsers import JSONParser
 
 from estudio.models import Estudio
 from estudio.serializers import EstudioSerializer
-#from anestesista.models import Anestesista, ComplejidadEstudio, Complejidad, PagoAnestesistaVM, LineaPagoAnestesistaVM
-#from anestesista.serializers import AnestesistaSerializer, PagoAnestesistaVMSerializer, LineaPagoAnestesistaVMSerializer
+from anestesista.models import Anestesista, ComplejidadEstudio, Complejidad, PagoAnestesistaVM, LineaPagoAnestesistaVM
+from anestesista.serializers import AnestesistaSerializer, PagoAnestesistaVMSerializer, LineaPagoAnestesistaVMSerializer
 
 
 def eval_expr(expr):
