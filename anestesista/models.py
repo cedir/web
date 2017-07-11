@@ -24,7 +24,7 @@ class Anestesista(models.Model):
 
     class Meta:
         managed = False
-        #db_table = 'tblMedicosAnestesistas'
+        db_table = 'tblMedicosAnestesistas'
         ordering = [u'apellido']
 
 
