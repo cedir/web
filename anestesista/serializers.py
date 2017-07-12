@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from models import Anestesista#, PagoAnestesista, LineaPagoAnestesista
+from models import Anestesista
 from estudio.serializers import EstudioSerializer
 from obra_social.serializers import ObraSocialSerializer
 from paciente.serializers import PacienteSerializer
 from caja.serializers import MovimientoCajaSerializer
+from comprobante.serializers import ComprobanteSerializer
 
 
 class AnestesistaSerializer(serializers.ModelSerializer):
@@ -28,16 +29,21 @@ class AnestesistaSerializer(serializers.ModelSerializer):
 #        fields = ('id', 'anio', 'mes', 'anestesista', 'creado', 'modificado')
 
 
+
+
 class LineaPagoAnestesistaVMSerializer(serializers.Serializer):
     fecha = serializers.DateField()
     paciente = PacienteSerializer()
     obra_social = ObraSocialSerializer()
     estudios = EstudioSerializer(many=True)
-    mov_caja = MovimientoCajaSerializer(many=True)
+    movimientos_caja = MovimientoCajaSerializer(many=True)
+    comprobante = ComprobanteSerializer()
     es_paciente_diferenciado = serializers.BooleanField()
     formula = serializers.CharField()
     formula_valorizada = serializers.CharField()
     importe = serializers.DecimalField(18,2)
+    sub_total = serializers.DecimalField(18,2)
+    retencion = serializers.DecimalField(18,2)
     alicuota_iva = serializers.DecimalField(4,2)
 
 

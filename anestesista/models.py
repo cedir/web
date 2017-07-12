@@ -28,12 +28,12 @@ class Anestesista(models.Model):
         ordering = [u'apellido']
 
 
-class PagoAnestesistaVM:
+class PagoAnestesistaVM(object):
     pass
 
 
 
-class LineaPagoAnestesistaVM:
+class LineaPagoAnestesistaVM(object):
     def get_comprobante_particular(self):
         """
         el comprobante hay que buscarlo usando el DNI del paciente, fechar del comprobante mayor igual a la fecha de estuido y rngo de 30 dias, y buscar palabra anest dentro de la desc del comprobante (factura)
@@ -42,7 +42,7 @@ class LineaPagoAnestesistaVM:
         enddate = startdate + timedelta(days=30)
         lineas = LineaDeComprobante.objects.filter(comprobante__nro_cuit=self.paciente.dni, comprobante__fecha_emision__range=[startdate, enddate], concepto__icontains='anest')
         if bool(lineas):
-            return lineas[0]
+            return lineas[0].comprobante
 
     def get_comprobante_desde_facturacion(self):
         """

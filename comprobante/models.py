@@ -10,7 +10,7 @@ class TipoComprobante(models.Model):
 
 class Gravado(models.Model):
     descripcion = models.CharField(max_length=128, db_column=u'descripcionGravado')
-    porcentaje = models.FloatField(db_column=u'porcentajeGravado')
+    porcentaje = models.DecimalField(db_column=u'porcentajeGravado', max_digits=3, decimal_places=2)
 
     class Meta:
         db_table = 'tblGravado'
@@ -38,8 +38,8 @@ class Comprobante(models.Model):
     estado = models.CharField(max_length=50, choices=ESTADOS )
     numero = models.IntegerField(db_column=u'nroComprobante', )
     nro_terminal = models.SmallIntegerField(db_column=u'nroTerminal', default=1)
-    total_facturado = models.FloatField(db_column=u'totalFacturado', default=0)
-    total_cobrado = models.FloatField(db_column=u'totalCobrado')
+    total_facturado = models.DecimalField(db_column=u'totalFacturado', max_digits=10, decimal_places=2, default=0)
+    total_cobrado = models.DecimalField(db_column=u'totalCobrado', max_digits=10, decimal_places=2)
     fecha_emision = models.DateField(db_column=u'fechaEmision')
     fecha_recepcion = models.DateField(db_column=u'fechaRecepcion')
 
@@ -99,9 +99,9 @@ class Comprobante(models.Model):
 class LineaDeComprobante(models.Model):
     comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'lineas')
     concepto = models.CharField(max_length=128, )
-    sub_total = models.FloatField(db_column=u'subtotal', )
-    iva = models.FloatField(db_column=u'importeIVA', )
-    importe_neto = models.FloatField(db_column=u'importeNeto', )
+    sub_total = models.DecimalField(db_column=u'subtotal', max_digits=10, decimal_places=2)
+    iva = models.DecimalField(db_column=u'importeIVA', max_digits=2, decimal_places=2)
+    importe_neto = models.DecimalField(db_column=u'importeNeto', max_digits=10, decimal_places=2)
 
     class Meta:
         db_table = 'tblComprobanteLineas'
