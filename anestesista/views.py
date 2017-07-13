@@ -134,14 +134,12 @@ def pago(request, id_anestesista, anio, mes):
 
             linea_ara.sub_total = linea_ara.importe - (linea_ara.importe * PORCENTAJE_DESCUENTO_CEDIR)
             linea_ara.sub_total = linea_ara.sub_total.quantize(Decimal('.01'), ROUND_UP)
-            linea_ara.retencion = linea_ara.sub_total * pago.porcentaje_anestesista
+            linea_ara.retencion = linea_ara.sub_total * pago.porcentaje_anestesista / 100
 
 
             pago.lineas_ARA.append(linea_ara)
             
         if linea_no_ara:
-            # TODO: iva va como oculto, en cada linea
-
             if obra_social.se_presenta_por_ARA: # (es duplicado de una linea_ara)
                 linea_ara.importe = total_mov_caja.quantize(Decimal('.01'), ROUND_UP)
                 linea_no_ara.alicuota_iva = 0  # es cero porque ya esta incluido en el monto del mov. de caja
@@ -157,7 +155,7 @@ def pago(request, id_anestesista, anio, mes):
 
             linea_no_ara.sub_total = linea_no_ara.importe - (linea_no_ara.importe * PORCENTAJE_DESCUENTO_CEDIR)
             linea_no_ara.sub_total = linea_no_ara.sub_total.quantize(Decimal('.01'), ROUND_UP)
-            linea_no_ara.retencion = linea_no_ara.sub_total * (100 - pago.porcentaje_anestesista)
+            linea_no_ara.retencion = linea_no_ara.sub_total * (100 - pago.porcentaje_anestesista) / 100
 
             pago.lineas_no_ARA.append(linea_no_ara)
             
