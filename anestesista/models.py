@@ -17,7 +17,7 @@ class Anestesista(models.Model):
     localidad = models.CharField("Localidad",max_length=200, db_column="localidadMedico", null=True, blank=True)
     telefono  = models.CharField("Telefono",max_length=200, db_column="telMedico", null=True, blank=True)
     email     = models.EmailField("E-mail",max_length=200, db_column="mail", null=True, blank=True)
-    porcentaje_anestesista = models.DecimalField(max_digits=2, decimal_places=2, default='0.00')
+    porcentaje_anestesista = models.DecimalField(max_digits=4, decimal_places=2, default='0.00')
 
     def __unicode__ (self):
         return u'%s, %s' % (self.apellido, self.nombre, )
@@ -28,12 +28,12 @@ class Anestesista(models.Model):
         ordering = [u'apellido']
 
 
-class PagoAnestesistaVM:
+class PagoAnestesistaVM(object):
     pass
 
 
 
-class LineaPagoAnestesistaVM:
+class LineaPagoAnestesistaVM(object):
     def get_comprobante_particular(self):
         """
         el comprobante hay que buscarlo usando el DNI del paciente, fechar del comprobante mayor igual a la fecha de estuido y rngo de 30 dias, y buscar palabra anest dentro de la desc del comprobante (factura)
@@ -42,7 +42,7 @@ class LineaPagoAnestesistaVM:
         enddate = startdate + timedelta(days=30)
         lineas = LineaDeComprobante.objects.filter(comprobante__nro_cuit=self.paciente.dni, comprobante__fecha_emision__range=[startdate, enddate], concepto__icontains='anest')
         if bool(lineas):
-            return lineas[0]
+            return lineas[0].comprobante
 
     def get_comprobante_desde_facturacion(self):
         """
