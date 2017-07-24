@@ -1,7 +1,7 @@
-import django_filters
 from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework import viewsets, generics
+from rest_framework.pagination import PageNumberPagination
 from estudio.models import Estudio
 from estudio.serializers import EstudioSerializer
 from imprimir import generar_informe
@@ -39,23 +39,23 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
     Filtro de estudios por fecha
     """
     def filter_queryset(self, request, queryset, view):
-        fecha = request.query_params.get(u'fecha')
-        if fecha:
-            queryset = queryset.filter(fecha=fecha)
+        fecha_desde = request.query_params.get(u'fecha_desde')
+        fecha_hasta = request.query_params.get(u'fecha_hasta')
+        if fecha_desde:
+            queryset = queryset.filter(fecha=fecha_desde)
         return queryset
 
-#class EstudioFilter(django_filters.FilterSet):
-#    fecha_desde = django_filters.DateFilter(name="fecha", lookup_expr='gte')
-#    fecha_hasta = django_filters.DateFilter(name="fecha", lookup_expr='lte')
-#    class Meta:
-#        model = Estudio
-#        fields = [u'fecha', u'paciente', u'practica', u'obra_social', u'medico', u'medico_solicitante', u'fecha_desde', u'fecha_hasta']
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
 
 class EstudioViewSet(viewsets.ModelViewSet):
     model = Estudio
-    queryset = Estudio.objects.all()[:20]
+    queryset = Estudio.objects.all()
     serializer_class = EstudioSerializer
     filter_backends = (EstudioPacienteFilterBackend, EstudioFechaFilterBackend, )
-    #filter_class = EstudioFilter
+    pagination_class = StandardResultsSetPagination
 
