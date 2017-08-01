@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
+import simplejson
 
 from django.core.exceptions import ValidationError
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
@@ -21,9 +22,9 @@ from sala.models import Sala
 from turno.models import InfoTurno
 from turno.models import Turno, Estado
 from turno.serializers import InfoTurnoSerializer
-from utils.security import encode
+from security.encryption import encode
+from common.drf.views import StandardResultsSetPagination
 
-import simplejson
 
 PIXELS_PER_MINUTE = 1.333
 err_ses = 'Error, la sesión se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo.'
@@ -686,6 +687,7 @@ class InfoTurnoViewSet(viewsets.ModelViewSet):
     model = InfoTurno
     queryset = InfoTurno.objects.all()
     serializer_class = InfoTurnoSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         queryset = InfoTurno.objects.all()
