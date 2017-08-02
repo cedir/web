@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework import viewsets, generics
-from rest_framework.pagination import PageNumberPagination
+from common.drf.views import StandardResultsSetPagination
 from estudio.models import Estudio
 from estudio.serializers import EstudioSerializer
 from imprimir import generar_informe
@@ -44,12 +44,6 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
         if fecha_desde:
             queryset = queryset.filter(fecha=fecha_desde)
         return queryset
-
-
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 100
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
 
 
 class EstudioViewSet(viewsets.ModelViewSet):
