@@ -40,13 +40,13 @@ class LineaPagoAnestesistaVM(object):
         """
         startdate = self.estudios[0].fecha
         enddate = startdate + timedelta(days=30)
-        lineas = LineaDeComprobante.objects.filter(comprobante__nro_cuit=self.paciente.dni, comprobante__fecha_emision__range=[startdate, enddate], concepto__icontains='anest')
+        lineas = LineaDeComprobante.objects.filter(comprobante__nro_cuit=self.paciente.dni, comprobante__fecha_emision__range=[startdate, enddate], concepto__icontains='anest')  # Busqueda se realiza case insensitive (icontains)
         if bool(lineas):
             return lineas[0].comprobante
 
     def get_comprobante_desde_facturacion(self):
         """
-        # Si no va por ara y es de obra social (no particular) se saca el iva del comprobante asociado a la presentacion.
+        Si no va por ara y es de obra social (no particular) se saca el iva del comprobante asociado a la presentacion.
         """
         estudio = self.estudios[0]
         if estudio.presentacion_id:  # esto puede ser = 0 si no esta facturado
