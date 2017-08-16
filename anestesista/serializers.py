@@ -12,7 +12,7 @@ from comprobante.serializers import ComprobanteSerializer
 class AnestesistaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Anestesista
-        fields = ('id', 'nombre', 'apellido', 'matricula', 'direccion', 'telefono', 'localidad', 'email')
+        fields = ('id', 'nombre', 'apellido', 'matricula', 'telefono', 'porcentaje_anestesista')
 
 
 #class LineaPagoAnestesistaSerializer(serializers.HyperlinkedModelSerializer):
@@ -32,16 +32,11 @@ class AnestesistaSerializer(serializers.ModelSerializer):
 
 
 class EstudioSerializer(serializers.HyperlinkedModelSerializer):
-
-    obra_social = ObraSocialSerializer()
-    paciente = PacienteSerializer()
     practica = PracticaSerializer()
-    medico = MedicoSerializer()
-    medico_solicitante = MedicoSerializer()
     
     class Meta:
         model = Estudio
-        fields = (u'id', u'fecha', u'paciente', u'practica', u'obra_social', u'medico', u'medico_solicitante',)
+        fields = (u'id', u'fecha', u'practica', )
 
 
 
