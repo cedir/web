@@ -88,7 +88,7 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
             linea_ara.importe_iva = ara.get('importe_iva')
             linea_ara.importe_con_iva = ara.get('importe_con_iva')
 
-            iva_key = u'{}'.format(linea_ara.alicuota_iva)
+            iva_key = u'iva{}'.format(linea_ara.alicuota_iva).replace('.', '')  # TODO: warn! el FE esta esperando especificamente 0, 10.5 y 21. De existir otro IVA va a haber que agregarlo en ULI
             pago.totales_ara[iva_key] = linea_ara.importe_con_iva + pago.totales_ara.get(iva_key, 0)
             pago.totales_honorarios_ara[iva_key] = linea_ara.retencion + pago.totales_honorarios_ara.get(iva_key, 0)
 
@@ -104,7 +104,7 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
             linea_no_ara.importe_iva = no_ara.get('importe_iva')
             linea_no_ara.importe_con_iva = no_ara.get('importe_con_iva')
 
-            iva_key = u'{}'.format(linea_no_ara.alicuota_iva)
+            iva_key = u'iva{}'.format(linea_no_ara.alicuota_iva).replace('.', '')  # TODO: warn! el FE esta esperando especificamente 0, 10.5 y 21. De existir otro IVA va a haber que agregarlo en ULI
             pago.totales_no_ara[iva_key] = linea_no_ara.importe_con_iva + pago.totales_no_ara.get(iva_key, 0)
             pago.totales_honorarios_no_ara[iva_key] = linea_no_ara.retencion + pago.totales_honorarios_no_ara.get(iva_key, 0)
 
