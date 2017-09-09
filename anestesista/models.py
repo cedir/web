@@ -3,9 +3,11 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.db import models
+from django.core.exceptions import ValidationError
 from comprobante.models import LineaDeComprobante
 from paciente.models import Paciente
 from obra_social.models import ObraSocial
+from practica.models import Practica
 
 
 class Anestesista(models.Model):
@@ -44,6 +46,34 @@ class ComplejidadEstudio(models.Model):
     class Meta:
         managed = False
         db_table = 'tblComplejidadEstudios'
+
+    @property
+    def practicas(self):
+        practicas_ids = self.estudios.split(',')
+        practicas = Practica.objects.filter(id__in=practicas_ids)
+        return map(lambda p: '{}'.format(p), practicas)
+
+    def clean(self):
+        """Para que el filtro de complefidadEstudio funcione, debe estar guardado en forma ascendente"""
+
+        if ' ' in self.estudios:
+            raise ValidationError("Los estudios (practicas IDs) deben estar separados por comas y sin espacios")
+
+        practicas_ids = self.estudios.split(u',')
+        init = 0
+        for pid in practicas_ids:
+            try:
+                pid = int(pid)
+            except ValueError:
+                raise ValidationError("Algun estudio (practica ID) contiene un valor NO valido como numero.")
+
+            if init > pid:
+                raise ValidationError("Error: Las pracitcas (estudios) no estan ordenadas en forma ascendente: {} ".format(pid))
+            init = pid
+            try:
+                practica = Practica.objects.get(pk=pid)
+            except Practica.DoesNotExist:
+                raise ValidationError("Error: Practica con ID {} no existe".format(pid))
 
 
 class Complejidad(models.Model):

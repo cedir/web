@@ -84,7 +84,7 @@ class CalculadorHonorariosAnestesista(object):
     def _get_complejidad_a_aplicar(self, estudios):
         """
         # generamos el patron de busqueda para la complejidad
-        # (es una lista de codigos destudios ordenada y separada por coma)
+        # (es una lista de codigos de practicas IDs ordenada y separada por coma)
         Para que el filtro de complefidadEstudio funcione, debe estar guardado en forma ascendente
         """
         estudios_id = ','.join([str(practica_id) for practica_id in sorted(set([estudio.practica.id for estudio in estudios]))])
