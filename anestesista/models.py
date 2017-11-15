@@ -40,8 +40,8 @@ class LineaPagoAnestesistaVM(object):
 
 
 class ComplejidadEstudio(models.Model):
-    estudios = models.CharField(max_length=500, blank=True, null=True)
-    formula = models.CharField(max_length=200, blank=True, null=True)
+    estudios = models.CharField(max_length=500)
+    formula = models.CharField(max_length=200)
 
     class Meta:
         managed = False

@@ -63,9 +63,9 @@ class PagoAnestesistaVMSerializer(serializers.Serializer):
     mes = serializers.IntegerField()
     anestesista = AnestesistaSerializer()
     totales_ara = serializers.JSONField()
-    totales_honorarios_ara = serializers.JSONField()
     totales_no_ara = serializers.JSONField()
-    totales_honorarios_no_ara = serializers.JSONField()
+    subtotales_no_ara = serializers.JSONField()
+    totales_iva_no_ara = serializers.JSONField()
     lineas_ARA = LineaPagoAnestesistaVMSerializer(many=True)
     lineas_no_ARA = LineaPagoAnestesistaVMSerializer(many=True)
 
