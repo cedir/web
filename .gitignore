@@ -11,4 +11,4 @@ static/templates/media_files
 static/templates/bower_components/
 .idea
 .vscode
-
+ENV/
