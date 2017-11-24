@@ -85,16 +85,6 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(fecha__lte=fecha_hasta)
         return queryset
 
-class EstudioList(generics.ListAPIView):
-    serializer_class = EstudioSerializer
-
-    def get_queryset(self):
-        """
-        Buscar estudio por id
-        """
-        id_estudio = self.kwargs['id_estudio']
-        return Estudio.objects.get(pk=id_estudio)
-
 class EstudioViewSet(viewsets.ModelViewSet):
     model = Estudio
     queryset = Estudio.objects.all()

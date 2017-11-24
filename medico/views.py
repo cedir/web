@@ -181,10 +181,8 @@ class MedicoNombreApellidoFilterBackend(filters.BaseFilterBackend):
     """
     def filter_queryset(self, request, queryset, view):
         search_text = request.query_params.get(u'search_text')
-        print(search_text)
         if search_text:
             queryset = queryset.filter(Q(nombre__icontains=search_text) | Q(apellido__icontains=search_text))
-            print(queryset.query)
             return queryset
 
 class MedicoViewSet(viewsets.ModelViewSet):
