@@ -31,9 +31,9 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
     pago.lineas_ARA = []
     pago.lineas_no_ARA = []
     pago.totales_ara = {}
-    pago.totales_honorarios_ara = {}
     pago.totales_no_ara = {}
-    pago.totales_honorarios_no_ara = {}
+    pago.subtotales_no_ara = {}
+    pago.totales_iva_no_ara = {}
 
     estudios = Estudio.objects.filter(anestesista_id=id_anestesista, fecha__year=anio, fecha__month=mes).order_by('fecha','paciente','obra_social')
     grupos_de_estudios = groupby(estudios, lambda e: (e.fecha, e.paciente, e.obra_social))
@@ -70,43 +70,37 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
         linea.formula_valorizada = result.get('formula_valorizada')
         linea.movimientos_caja = result.get('movimientos_caja')
 
-        linea_ara = None
-        linea_no_ara = None
-        if obra_social.se_presenta_por_ARA:
-            linea_ara = linea
-            if linea.movimientos_caja:  # R1: si hay movimientos en cualquier estudio, la linea debe ir tanto en ARA como en NO ARA
-                linea_no_ara = copy.deepcopy(linea)
-        else:
-            linea_no_ara = linea
-
         ara = result.get('ara')
-        if linea_ara:
+        if ara:
+            linea_ara = linea
             linea_ara.alicuota_iva = ara.get('alicuota_iva')
             linea_ara.importe = ara.get('importe')
             linea_ara.sub_total = ara.get('sub_total')
             linea_ara.retencion = ara.get('retencion')
-            linea_ara.importe_iva = ara.get('importe_iva')
-            linea_ara.importe_con_iva = ara.get('importe_con_iva')
 
-            iva_key = u'{}'.format(linea_ara.alicuota_iva)
-            pago.totales_ara[iva_key] = linea_ara.importe_con_iva + pago.totales_ara.get(iva_key, 0)
-            pago.totales_honorarios_ara[iva_key] = linea_ara.retencion + pago.totales_honorarios_ara.get(iva_key, 0)
+            pago.totales_ara['subtotal'] = linea_ara.retencion + pago.totales_ara.get('subtotal', Decimal(0))
+
+            # calculo total a continuacion podria hacerse fuera del IF ya que solo el subtotal final sirve
+            pago.totales_ara['iva'] = pago.totales_ara['subtotal'] * linea_ara.alicuota_iva / Decimal(100)
+            pago.totales_ara['total'] = pago.totales_ara['subtotal'] + pago.totales_ara['iva']
 
             pago.lineas_ARA.append(linea_ara)
             
         no_ara = result.get('no_ara')
-        if linea_no_ara:
+        if no_ara:
+            linea_no_ara = copy.deepcopy(linea) if ara else linea
             linea_no_ara.comprobante = no_ara.get('comprobante')
             linea_no_ara.alicuota_iva = no_ara.get('alicuota_iva')
             linea_no_ara.importe = no_ara.get('importe')
             linea_no_ara.sub_total = no_ara.get('sub_total')
             linea_no_ara.retencion = no_ara.get('a_pagar')
-            linea_no_ara.importe_iva = no_ara.get('importe_iva')
-            linea_no_ara.importe_con_iva = no_ara.get('importe_con_iva')
 
-            iva_key = u'{}'.format(linea_no_ara.alicuota_iva)
-            pago.totales_no_ara[iva_key] = linea_no_ara.importe_con_iva + pago.totales_no_ara.get(iva_key, 0)
-            pago.totales_honorarios_no_ara[iva_key] = linea_no_ara.retencion + pago.totales_honorarios_no_ara.get(iva_key, 0)
+            iva_key = u'iva{}'.format(linea_no_ara.alicuota_iva).replace('.', '')  # TODO: warn! el FE esta esperando especificamente 0, 10.5 y 21. De existir otro IVA va a haber que agregarlo en ULI
+            pago.subtotales_no_ara[iva_key] = linea_no_ara.retencion + pago.subtotales_no_ara.get(iva_key, Decimal(0))
+
+            # calculo total a continuacion podria hacerse fuera del IF ya que solo el subtotal final sirve
+            pago.totales_iva_no_ara[iva_key] = pago.subtotales_no_ara[iva_key] * linea_no_ara.alicuota_iva / Decimal(100)
+            pago.totales_no_ara[iva_key] = pago.subtotales_no_ara[iva_key] + pago.totales_iva_no_ara[iva_key]
 
             pago.lineas_no_ARA.append(linea_no_ara)
             

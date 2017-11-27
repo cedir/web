@@ -37,7 +37,7 @@ class CalculadorHonorariosAnestesista(object):
         self.anestesista = anestesista
         self.estudios = estudios
         self.obra_social = obra_social
-        self.complejidades = Complejidad.objects.all()  # TODO: ver si esta consulta se puede evitar (cachear)
+        self.complejidades = Complejidad.objects.all()  # TODO: ver si esta consulta se puede evitar (cachear) ya que se hace por cada instancia
         self.paciente = self.estudios[0].paciente
 
     def calculate(self):
@@ -84,7 +84,7 @@ class CalculadorHonorariosAnestesista(object):
     def _get_complejidad_a_aplicar(self, estudios):
         """
         # generamos el patron de busqueda para la complejidad
-        # (es una lista de codigos destudios ordenada y separada por coma)
+        # (es una lista de codigos de practicas IDs ordenada y separada por coma)
         Para que el filtro de complefidadEstudio funcione, debe estar guardado en forma ascendente
         """
         estudios_id = ','.join([str(practica_id) for practica_id in sorted(set([estudio.practica.id for estudio in estudios]))])
@@ -139,11 +139,8 @@ class CalculadorHonorariosAnestesista(object):
         sub_total = importe - (importe * PORCENTAJE_DESCUENTO_CEDIR)
         sub_total = sub_total.quantize(Decimal('.01'), ROUND_UP)
         retencion = sub_total * self.anestesista.porcentaje_anestesista / 100
-        importe_iva = importe * alicuota_iva / 100
-        importe_con_iva = importe + importe_iva
 
-        return {'importe': importe, 'sub_total': sub_total, 'retencion': retencion, 'alicuota_iva': alicuota_iva, 
-                'importe_iva': importe_iva, 'importe_con_iva': importe_con_iva}
+        return {'importe': importe, 'sub_total': sub_total, 'retencion': retencion, 'alicuota_iva': alicuota_iva}
 
     def _get_importes_no_ara(self, importe, existen_mov_caja, total_mov_caja):
         """
@@ -160,15 +157,13 @@ class CalculadorHonorariosAnestesista(object):
             else:
                 comprobante = self._get_comprobante_desde_facturacion()
             
-            alicuota_iva = comprobante.gravado.porcentaje if comprobante and comprobante.tipo_comprobante.nombre != 'Liquidacion' else Decimal('0.0')
+            alicuota_iva = Decimal(comprobante.gravado.porcentaje) if comprobante and comprobante.tipo_comprobante.nombre != 'Liquidacion' else Decimal('0.0')
             comprobante = comprobante
 
         sub_total = importe - (importe * PORCENTAJE_DESCUENTO_CEDIR)
         sub_total = sub_total.quantize(Decimal('.01'), ROUND_UP)
         a_pagar = sub_total * (100 - self.anestesista.porcentaje_anestesista) / 100
-        importe_iva = importe * Decimal(alicuota_iva) / 100
-        importe_con_iva = importe + importe_iva
         
         return {'importe': importe, 'sub_total': sub_total, 'a_pagar': a_pagar, 'alicuota_iva': alicuota_iva, 
-                'importe_iva': importe_iva, 'importe_con_iva': importe_con_iva, 'comprobante': comprobante}
+                'comprobante': comprobante}
 
