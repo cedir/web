@@ -10,4 +10,3 @@ urlpatterns = [
     url(r'^estudio/(?P<id_estudio>\d+)/imprimir/$', imprimir, name='estudio_imprimir'),
     url(r'^api/', include(router.urls)),
 ]
-

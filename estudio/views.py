@@ -16,15 +16,53 @@ def imprimir(request, id_estudio):
 
     return generar_informe(response, estudio)
 
+class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
+    """
+    Filtro de estudios por obra social
+    """
+    def filter_queryset(self, request, queryset, view):
+        obra_social = request.query_params.get(u'obra_social')
+        if obra_social:
+            queryset = queryset.filter(obra_social__nombre__icontains=obra_social)
+        return queryset
+
+class EstudioMedicoFilterBackend(filters.BaseFilterBackend):
+    """
+    Filtro de estudios por medico actuante
+    """
+    def filter_queryset(self, request, queryset, view):
+        apellido = request.query_params.get(u'medico_apellido')
+        nombre = request.query_params.get(u'medico_nombre')
+        if apellido:
+            queryset = queryset.filter(medico__apellido__icontains=apellido)
+        if nombre:
+            queryset = queryset.filter(medico__nombre__icontains=nombre)
+        return queryset
+
+class EstudioMedicoSolicitanteFilterBackend(filters.BaseFilterBackend):
+    """
+    Filtro de estudios por medico solicitante
+    """
+    def filter_queryset(self, request, queryset, view):
+        apellido = request.query_params.get(u'medico_solicitante_apellido')
+        nombre = request.query_params.get(u'medico_solicitante_nombre')
+        if apellido:
+            queryset = queryset.filter(medico_solicitante__apellido__icontains=apellido)
+        if nombre:
+            queryset = queryset.filter(medico_solicitante__nombre__icontains=nombre)
+        return queryset
 
 class EstudioPacienteFilterBackend(filters.BaseFilterBackend):
     """
     Filtro de estudios por paciente
     """
     def filter_queryset(self, request, queryset, view):
+        dni = request.query_params.get(u'paciente_dni')
         apellido = request.query_params.get(u'paciente_apellido')
         nombre = request.query_params.get(u'paciente_nombre')
         paciente_id = request.query_params.get(u'paciente_id')
+        if dni:
+            queryset = queryset.filter(paciente__dni__icontains=dni)
         if apellido:
             queryset = queryset.filter(paciente__apellido__icontains=apellido)
         if nombre:
@@ -42,14 +80,17 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
         fecha_desde = request.query_params.get(u'fecha_desde')
         fecha_hasta = request.query_params.get(u'fecha_hasta')
         if fecha_desde:
-            queryset = queryset.filter(fecha=fecha_desde)
+            queryset = queryset.filter(fecha__gte=fecha_desde)
+        if fecha_hasta:
+            queryset = queryset.filter(fecha__lte=fecha_hasta)
         return queryset
-
 
 class EstudioViewSet(viewsets.ModelViewSet):
     model = Estudio
     queryset = Estudio.objects.all()
     serializer_class = EstudioSerializer
-    filter_backends = (EstudioPacienteFilterBackend, EstudioFechaFilterBackend, )
+    filter_backends = (EstudioObraSocialFilterBackend, EstudioMedicoFilterBackend,
+        EstudioMedicoSolicitanteFilterBackend, EstudioPacienteFilterBackend,
+        EstudioFechaFilterBackend, )
     pagination_class = StandardResultsSetPagination
-
+    page_size = 20

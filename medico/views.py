@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+from django.http import HttpResponse
+from rest_framework import viewsets, filters
+from django.db.models import Q
 from medico.models import Medico, Disponibilidad
+from medico.serializers import MedicoSerializer
 from sala.models import Sala
 from django.conf import settings
 from django.shortcuts import redirect
 from django.template import Template, Context, loader
-from django.http import HttpResponse
 from datetime import datetime
 import simplejson
 
@@ -170,3 +173,21 @@ def delete_disponibilidad(request, id_disponibilidad):
         'message': "El horario ha sido eliminado correctamente."
     }
     return HttpResponse(simplejson.dumps(response_dict))
+
+class MedicoNombreApellidoFilterBackend(filters.BaseFilterBackend):
+
+    """
+    Filtro de medicos por nombre o apellido
+    """
+    def filter_queryset(self, request, queryset, view):
+        search_text = request.query_params.get(u'search_text')
+        if search_text:
+            queryset = queryset.filter(Q(nombre__icontains=search_text) | Q(apellido__icontains=search_text))
+            return queryset
+
+class MedicoViewSet(viewsets.ModelViewSet):
+    model = Medico
+    queryset = Medico.objects.all()
+    serializer_class = MedicoSerializer
+    filter_backends = (MedicoNombreApellidoFilterBackend, )
+    pagination_class = None

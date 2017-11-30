@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'', include('anestesista.urls')),
     url(r'', include('usuario.urls')),
     url(r'', include('estudio.urls')),
+    url(r'', include('obra_social.urls')),
     url(r'', include('security.urls')),
     url(r'^admin/', include(admin.site.urls)),
 ]
