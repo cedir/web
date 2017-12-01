@@ -16,7 +16,7 @@ admin.site.register(Anestesista, AnestesistaAdmin)
 
 class ComplejidadEstudioAdmin(admin.ModelAdmin):
     fields = (u'estudios', 'formula')
-    list_display = (u'estudios', 'formula')
+    list_display = (u'practicas', u'estudios', 'formula')
 
 admin.site.register(ComplejidadEstudio, ComplejidadEstudioAdmin)
 

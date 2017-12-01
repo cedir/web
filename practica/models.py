@@ -15,3 +15,4 @@ class Practica(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.abreviatura or self.descripcion)
+
