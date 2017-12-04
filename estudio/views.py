@@ -91,6 +91,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
     serializer_class = EstudioSerializer
     filter_backends = (EstudioObraSocialFilterBackend, EstudioMedicoFilterBackend,
         EstudioMedicoSolicitanteFilterBackend, EstudioPacienteFilterBackend,
-        EstudioFechaFilterBackend, )
+        EstudioFechaFilterBackend, filters.OrderingFilter, )
     pagination_class = StandardResultsSetPagination
+    ordering_fields = ('fecha', )
     page_size = 20
