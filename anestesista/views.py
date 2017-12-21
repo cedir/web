@@ -108,11 +108,11 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
     for k in pago.totales_ara:
         pago.totales_ara[k] = pago.totales_ara[k].quantize(Decimal('.01'), ROUND_UP)
     for k in pago.subtotales_no_ara:
-        pago.totales_ara[k] = pago.subtotales_no_ara[k].quantize(Decimal('.01'), ROUND_UP)
+        pago.subtotales_no_ara[k] = pago.subtotales_no_ara[k].quantize(Decimal('.01'), ROUND_UP)
     for k in pago.totales_iva_no_ara:
-        pago.totales_ara[k] = pago.totales_iva_no_ara[k].quantize(Decimal('.01'), ROUND_UP)
+        pago.totales_iva_no_ara[k] = pago.totales_iva_no_ara[k].quantize(Decimal('.01'), ROUND_UP)
     for k in pago.totales_no_ara:
-        pago.totales_ara[k] = pago.totales_no_ara[k].quantize(Decimal('.01'), ROUND_UP)
+        pago.totales_no_ara[k] = pago.totales_no_ara[k].quantize(Decimal('.01'), ROUND_UP)
 
     serializer = PagoAnestesistaVMSerializer(pago, context={'request': request})
     return JSONResponse(serializer.data)
