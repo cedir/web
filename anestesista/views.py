@@ -30,10 +30,10 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
     pago.porcentaje_anestesista = pago.anestesista.porcentaje_anestesista
     pago.lineas_ARA = []
     pago.lineas_no_ARA = []
-    pago.totales_ara = {}
-    pago.totales_no_ara = {}
-    pago.subtotales_no_ara = {}
-    pago.totales_iva_no_ara = {}
+    pago.totales_ara = {}  # {"iva": XX, "subtotal": "XX", "total": XX}
+    pago.totales_no_ara = {}  # {"iva00": XX, "iva105": XX, "iva21": XX}
+    pago.subtotales_no_ara = {}  # {"iva00": XX, "iva105": XX, "iva21": XX}
+    pago.totales_iva_no_ara = {}  # {"iva00": XX, "iva105": XX, "iva21": XX}
 
     estudios = Estudio.objects.filter(anestesista_id=id_anestesista, fecha__year=anio, fecha__month=mes).order_by('fecha','paciente','obra_social')
     grupos_de_estudios = groupby(estudios, lambda e: (e.fecha, e.paciente, e.obra_social))
@@ -104,6 +104,16 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
 
             pago.lineas_no_ARA.append(linea_no_ara)
             
+    # round totals
+    for k in pago.totales_ara:
+        pago.totales_ara[k] = pago.totales_ara[k].quantize(Decimal('.01'), ROUND_UP)
+    for k in pago.subtotales_no_ara:
+        pago.totales_ara[k] = pago.subtotales_no_ara[k].quantize(Decimal('.01'), ROUND_UP)
+    for k in pago.totales_iva_no_ara:
+        pago.totales_ara[k] = pago.totales_iva_no_ara[k].quantize(Decimal('.01'), ROUND_UP)
+    for k in pago.totales_no_ara:
+        pago.totales_ara[k] = pago.totales_no_ara[k].quantize(Decimal('.01'), ROUND_UP)
+
     serializer = PagoAnestesistaVMSerializer(pago, context={'request': request})
     return JSONResponse(serializer.data)
 
