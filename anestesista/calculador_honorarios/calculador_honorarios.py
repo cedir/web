@@ -28,7 +28,7 @@ TIPO_MOV_CAJA_HONORARIO_ANESTESISTA = 3
 TIPO_MOV_CAJA_COSEGURO = 10
 PORCENTAJE_DESCUENTO_CEDIR = Decimal('0.35')
 SIMARA_ID = 6
-SIMARA_IMPORTE_C2 = u'1742.0'
+SIMARA_IMPORTE_C2 = u'c1'  # c2 = c1 para Simara
 
 
 class CalculadorHonorariosAnestesista(object):
@@ -75,7 +75,7 @@ class CalculadorHonorariosAnestesista(object):
         Reemplazar variables en la formula (c1 + c2 - 20) por valores sacados de las complejidades.
         """
         formula_valorizada = formula
-        if self.obra_social.id == SIMARA_ID:  # esta es una excepcion que pronto se va a sacar. Simara tiene valor distinto para c2
+        if self.obra_social.id == SIMARA_ID:  # esta es una excepcion que pronto se va a sacar. Simara hace c2 = c1
             formula_valorizada = formula_valorizada.replace('c2', SIMARA_IMPORTE_C2)
         for c in self.complejidades:
             formula_valorizada = formula_valorizada.replace('c{0}'.format(c.id), c.importe)
