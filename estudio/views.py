@@ -3,8 +3,9 @@ from rest_framework import filters
 from rest_framework import viewsets, generics
 from common.drf.views import StandardResultsSetPagination
 from estudio.models import Estudio
-from estudio.serializers import EstudioSerializer
+from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
 from imprimir import generar_informe
+
 
 def imprimir(request, id_estudio):
 
@@ -16,6 +17,7 @@ def imprimir(request, id_estudio):
 
     return generar_informe(response, estudio)
 
+
 class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
     """
     Filtro de estudios por obra social
@@ -25,6 +27,7 @@ class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
         if obra_social:
             queryset = queryset.filter(obra_social__nombre__icontains=obra_social)
         return queryset
+
 
 class EstudioMedicoFilterBackend(filters.BaseFilterBackend):
     """
@@ -39,6 +42,7 @@ class EstudioMedicoFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(medico__nombre__icontains=nombre)
         return queryset
 
+
 class EstudioMedicoSolicitanteFilterBackend(filters.BaseFilterBackend):
     """
     Filtro de estudios por medico solicitante
@@ -51,6 +55,7 @@ class EstudioMedicoSolicitanteFilterBackend(filters.BaseFilterBackend):
         if nombre:
             queryset = queryset.filter(medico_solicitante__nombre__icontains=nombre)
         return queryset
+
 
 class EstudioPacienteFilterBackend(filters.BaseFilterBackend):
     """
@@ -85,13 +90,22 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(fecha__lte=fecha_hasta)
         return queryset
 
+
 class EstudioViewSet(viewsets.ModelViewSet):
     model = Estudio
     queryset = Estudio.objects.all()
     serializer_class = EstudioSerializer
     filter_backends = (EstudioObraSocialFilterBackend, EstudioMedicoFilterBackend,
-        EstudioMedicoSolicitanteFilterBackend, EstudioPacienteFilterBackend,
-        EstudioFechaFilterBackend, filters.OrderingFilter, )
+                       EstudioMedicoSolicitanteFilterBackend, EstudioPacienteFilterBackend,
+                       EstudioFechaFilterBackend, filters.OrderingFilter, )
     pagination_class = StandardResultsSetPagination
     ordering_fields = ('fecha', )
     page_size = 20
+
+    serializers = {
+        'create': EstudioCreateUpdateSerializer,
+        'update': EstudioCreateUpdateSerializer,
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializer_class)

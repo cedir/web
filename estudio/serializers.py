@@ -6,7 +6,7 @@ from medico.serializers import MedicoSerializer
 from practica.serializers import PracticaSerializer
 
 
-class EstudioSerializer(serializers.HyperlinkedModelSerializer):
+class EstudioSerializer(serializers.ModelSerializer):
 
     obra_social = ObraSocialSerializer()
     paciente = PacienteSerializer()
@@ -18,3 +18,8 @@ class EstudioSerializer(serializers.HyperlinkedModelSerializer):
         model = Estudio
         fields = (u'id', u'fecha', u'paciente', u'practica', u'obra_social', u'medico', u'medico_solicitante',)
 
+
+class EstudioCreateUpdateSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Estudio
+            fields = (u'fecha', u'paciente', u'practica', u'obra_social', u'medico', u'medico_solicitante',)
