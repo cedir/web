@@ -63,6 +63,35 @@ class Estudio(models.Model):
 
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
+    
+    def save(self, *args, **kwargs):
+        if not self.id:  # creation
+            self.set_create_defaults()
+        super(Estudio, self).save(*args, **kwargs)
+
+    def set_create_defaults(self):
+        # TODO: move this to database default values on each field
+        self.motivo = u''
+        self.informe = u''
+        self.nro_de_orden = u''
+        self.anestesista_id = 1
+        self.es_pago_contra_factura = 0
+        self.fecha_cobro = None
+        self.importe_estudio = 0
+        self.importe_medicacion = 0
+        self.pago_contra_factura = 0
+        self.diferencia_paciente = 0
+        self.pension = 0
+        self.importe_pago_medico = 0
+        self.importe_pago_medico_solicitante = 0
+        self.pago_medico_actuante = None
+        self.pago_medico_solicitante = None
+        self.importe_cobrado_pension = 0
+        self.importe_cobrado_arancel_anestesia = 0
+        self.importe_estudio_cobrado = 0
+        self.importe_medicacion_cobrado = 0
+        self.arancel_anestesia = 0
+
 
 
 def asignar_presentacion_nula(sender, instance, **kwargs):

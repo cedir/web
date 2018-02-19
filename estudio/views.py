@@ -1,9 +1,12 @@
 from django.http import HttpResponse
 from rest_framework import filters
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
+from rest_framework.response import Response
 from common.drf.views import StandardResultsSetPagination
 from estudio.models import Estudio
-from estudio.serializers import EstudioSerializer
+from estudio.models import Medicacion
+from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
+from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from imprimir import generar_informe
 
 def imprimir(request, id_estudio):
@@ -95,3 +98,48 @@ class EstudioViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
     ordering_fields = ('fecha', )
     page_size = 20
+
+    serializers = {
+        'create': EstudioCreateUpdateSerializer,
+        'update': EstudioCreateUpdateSerializer,
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializer_class)
+
+class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
+    """
+    Filtro de medicaciones por estudio
+    """
+    def filter_queryset(self, request, queryset, view):
+        estudio = request.query_params.get(u'estudio')
+        if estudio:
+            queryset = queryset.filter(estudio__id=estudio)
+        return queryset
+
+
+class MedicacionViewSet(viewsets.ModelViewSet):
+    model = Medicacion
+    queryset = Medicacion.objects.all()
+    serializer_class = MedicacionSerializer
+    filter_backends = (MedicacionEstudioFilterBackend, )
+    pagination_class = StandardResultsSetPagination
+    page_size = 20
+
+    serializers = {
+        'create': MedicacionCreateUpdateSerializer,
+        'update': MedicacionCreateUpdateSerializer,
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializer_class)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        # serializedMedicacion = MedicacionCreateUpdateSerializer(instance).data
+        print instance.estudio.id
+        return Response({ "estudio": instance.estudio.id })
+    
+    def perform_destroy(self, instance):
+        instance.delete()

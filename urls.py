@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'', include('contenidos.urls')),
     url(r'', include('turno.urls')),
+    url(r'', include('medicamento.urls')),
     url(r'', include('paciente.urls')),
     url(r'', include('comprobante.urls')),
     url(r'', include('medico.urls')),
