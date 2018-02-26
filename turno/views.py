@@ -330,29 +330,10 @@ def anunciar(request, id_turno):
             estudio.paciente_id = turno.paciente.id
             estudio.practica_id = practica.id
             estudio.fecha = turno.fechaTurno
-            estudio.motivo = ""
-            estudio.informe = ""
             estudio.medico_id = turno.medico.id
             estudio.obra_social_id = turno.obraSocial.id
             estudio.medico_solicitante_id = turno.medico.id
-            estudio.nro_de_orden = ""
-            estudio.anestesista_id = 1
-            estudio.es_pago_contra_factura = 0
-            estudio.fecha_cobro = None
-            estudio.importe_estudio = 0
-            estudio.importe_medicacion = 0
-            estudio.pago_contra_factura = 0
-            estudio.diferencia_paciente = 0
-            estudio.pension = 0
-            estudio.importe_pago_medico = 0
-            estudio.importe_pago_medico_solicitante = 0
-            estudio.pago_medico_actuante = None
-            estudio.pago_medico_solicitante = None
-            estudio.importe_cobrado_pension = 0
-            estudio.importe_cobrado_arancel_anestesia = 0
-            estudio.importe_estudio_cobrado = 0
-            estudio.importe_medicacion_cobrado = 0
-            estudio.arancel_anestesia = 0
+            estudio.set_create_defaults()
             estudio.save()
             estudio.public_id = encode(estudio.id)
             estudio.save()

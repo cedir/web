@@ -123,8 +123,6 @@ class MedicacionViewSet(viewsets.ModelViewSet):
     queryset = Medicacion.objects.all()
     serializer_class = MedicacionSerializer
     filter_backends = (MedicacionEstudioFilterBackend, )
-    pagination_class = StandardResultsSetPagination
-    page_size = 20
 
     serializers = {
         'create': MedicacionCreateUpdateSerializer,

@@ -20,12 +20,6 @@ class EstudioSerializer(serializers.ModelSerializer):
         model = Estudio
         fields = (u'id', u'fecha', u'paciente', u'practica', u'obra_social', u'medico', u'medico_solicitante',)
 
-class EstudioLiteSerializer(serializers.HyperlinkedModelSerializer):
-    
-    class Meta:
-        model = Estudio
-        fields = (u'id',)
-
 class EstudioCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudio
@@ -34,11 +28,10 @@ class EstudioCreateUpdateSerializer(serializers.ModelSerializer):
 class MedicacionSerializer(serializers.HyperlinkedModelSerializer):
 
     medicamento = MedicamentoSerializer()
-    estudio = EstudioLiteSerializer()
 
     class Meta:
         model = Medicacion
-        fields = (u'id', u'medicamento', u'estudio', u'importe')
+        fields = (u'id', u'medicamento', u'estudio_id', u'importe')
 
 
 class MedicacionCreateUpdateSerializer(serializers.ModelSerializer):

@@ -20,4 +20,3 @@ class MedicamentoViewSet(viewsets.ModelViewSet):
     filter_backends = (MedicamentoNombreFilterBackend, )
     serializer_class = MedicamentoSerializer
     pagination_class = StandardResultsSetPagination
-    page_size = 20
