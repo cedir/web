@@ -18,8 +18,8 @@ class Estudio(models.Model):
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
     fecha = models.DateField(u'Fecha', db_column="fechaEstudio")
     practica = models.ForeignKey(Practica, db_column="idEstudio")
-    motivo = models.CharField(u'Motivo', db_column="motivoEstudio", max_length=300, blank=True)
-    informe = models.TextField(blank=True)
+    motivo = models.CharField(u'Motivo', db_column="motivoEstudio", max_length=300, blank=True, default=u'')
+    informe = models.TextField(blank=True, default=u'')
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo", blank=True)
     public_id = models.CharField(max_length=100, db_column="publicID")
 
@@ -71,10 +71,10 @@ class Estudio(models.Model):
 
     def set_create_defaults(self):
         # TODO: move this to database default values on each field
-        self.motivo = u''
-        self.informe = u''
+        # self.motivo = u''
+        # self.informe = u''
         self.nro_de_orden = u''
-        self.anestesista_id = 1
+        # self.anestesista_id = 1
         self.es_pago_contra_factura = 0
         self.fecha_cobro = None
         self.importe_estudio = 0
