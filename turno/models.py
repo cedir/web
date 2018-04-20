@@ -6,7 +6,6 @@ from practica.models import Practica
 from sala.models import Sala
 from obra_social.models import ObraSocial
 
-
 class Estado(models.Model):
     PENDIENTE = 1
     CONFIRMADO = 2
