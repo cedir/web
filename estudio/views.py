@@ -135,8 +135,6 @@ class MedicacionViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
-        # serializedMedicacion = MedicacionCreateUpdateSerializer(instance).data
-        print instance.estudio.id
         return Response({ "estudio": instance.estudio.id })
     
     def perform_destroy(self, instance):
