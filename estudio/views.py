@@ -5,9 +5,11 @@ from rest_framework.response import Response
 from common.drf.views import StandardResultsSetPagination
 from estudio.models import Estudio
 from estudio.models import Medicacion
+from medicamento.models import Medicamento
 from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from imprimir import generar_informe
+import simplejson
 
 def imprimir(request, id_estudio):
 
@@ -18,6 +20,28 @@ def imprimir(request, id_estudio):
     response['Content-Disposition'] = u'filename="Estudio de {0}.pdf"'.format(estudio.paciente.apellido)
 
     return generar_informe(response, estudio)
+
+def add_default_medicacion(request):
+
+    id_estudio = request.POST['id_estudio']
+    default_medicamentos_ids = (2, 3, 4, 5, 6, 7, 8, 22, 23, 35, 36, 37, 42, 48, 109, 128, 144, 167, 169)
+
+    estudio = Estudio.objects.get(pk=id_estudio)
+
+    for medicamento_id in default_medicamentos_ids:
+        medicacion = Medicacion()
+        medicacion.estudio = estudio
+        medicacion.medicamento = Medicamento.objects.get(pk=medicamento_id)
+        medicacion.importe = medicacion.medicamento.importe
+        medicacion.save()
+    
+    response_dict = {
+        'status': 200,
+        'estudio': estudio.id,
+        'message': "default medicacion added"
+    }
+    
+    return HttpResponse(simplejson.dumps(response_dict))
 
 class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
     """
