@@ -11,7 +11,7 @@ class PracticaDescripcionOrCodigoMedicoFilterBackend(filters.BaseFilterBackend):
         search_text = request.query_params.get(u'descripcion')
         if search_text:
             if unicode.isdigit(search_text):
-                queryset = queryset.filter(Q(codigoMedico__icontains=search_text))
+                queryset = queryset.filter(codigoMedico__icontains=search_text)
             else:
                 queryset = queryset.filter(descripcion__icontains=search_text)
         return queryset
