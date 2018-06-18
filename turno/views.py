@@ -333,6 +333,8 @@ def anunciar(request, id_turno):
             estudio.medico_id = turno.medico.id
             estudio.obra_social_id = turno.obraSocial.id
             estudio.medico_solicitante_id = turno.medico.id
+            estudio.nro_de_orden = ""
+            estudio.anestesista_id = 1
             estudio.set_create_defaults()
             estudio.save()
             estudio.public_id = encode(estudio.id)
