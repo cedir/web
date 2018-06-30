@@ -1,10 +1,14 @@
 from django.conf import settings
 from django.shortcuts import redirect, get_object_or_404
+from django.db.models import Q
 from django.http import HttpResponse
+from rest_framework import viewsets, filters
 from django.template import Context, loader
 from paciente.models import Paciente
 from datetime import datetime
 import simplejson
+from models import Paciente
+from serializers import PacienteSerializer
 
 
 def create_form(request):
@@ -181,3 +185,30 @@ def update(request, id_paciente):
             'message': "Ocurrio un error. Revise los datos y vuelva a intentarlo." + "Error:" + str(err)
         }
         return HttpResponse(simplejson.dumps(response_dict))
+
+class PacienteNombreApellidoODniFilterBackend(filters.BaseFilterBackend):
+    
+    """
+    Filtro de pacientes por nombre o apellido
+    """
+    def filter_queryset(self, request, queryset, view):
+        search_text = request.query_params.get(u'search_text')
+
+
+        if search_text:
+            if unicode.isdigit(search_text):
+                queryset = queryset.filter(Q(dni__icontains=search_text))
+            else:
+                search_params = [x.strip() for x in search_text.split(',')]
+                nomOApe1 = search_params[0]
+                nomOApe2 = search_params[1] if len(search_params) >= 2 else ''
+                queryset = queryset.filter((Q(nombre__icontains=nomOApe1) & Q(apellido__icontains=nomOApe2)) |
+                    (Q(nombre__icontains=nomOApe2) & Q(apellido__icontains=nomOApe1)))
+        return queryset
+
+class PacienteViewSet(viewsets.ModelViewSet):
+    model = Paciente
+    queryset = Paciente.objects.all()
+    serializer_class = PacienteSerializer
+    filter_backends = (PacienteNombreApellidoODniFilterBackend, )
+    pagination_class = None

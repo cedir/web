@@ -9,7 +9,7 @@ class Medico(models.Model):
     #domicilio = models.CharField("Domicilio",max_length=200, db_column="direccionMedico")
     #localidad = models.CharField("Localidad", db_column="localidadMedico",max_length=200)
     #telefono = models.CharField("Telefono",max_length=200, db_column="telMedico")
-    #matricula = models.CharField("Matricula",max_length=200, db_column="nroMatricula")
+    matricula = models.CharField("Matricula",max_length=200, db_column="nroMatricula")
     #mail = models.CharField("Mail",max_length=200, db_column="mail")
 
     def __unicode__ (self):

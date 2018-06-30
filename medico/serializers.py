@@ -6,6 +6,6 @@ class MedicoSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Medico
-        fields = (u'id', u'nombre', u'apellido', )
+        fields = (u'id', u'nombre', u'apellido', u'matricula')
 
 

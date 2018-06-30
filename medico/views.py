@@ -174,20 +174,24 @@ def delete_disponibilidad(request, id_disponibilidad):
     }
     return HttpResponse(simplejson.dumps(response_dict))
 
-class MedicoNombreApellidoFilterBackend(filters.BaseFilterBackend):
-
-    """
-    Filtro de medicos por nombre o apellido
-    """
+class MedicoNombreApellidoOMatriculaFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         search_text = request.query_params.get(u'search_text')
+
         if search_text:
-            queryset = queryset.filter(Q(nombre__icontains=search_text) | Q(apellido__icontains=search_text))
-            return queryset
+            if unicode.isdigit(search_text):
+                queryset = queryset.filter(Q(matricula__icontains=search_text))
+            else:
+                search_params = [x.strip() for x in search_text.split(',')]
+                nomOApe1 = search_params[0]
+                nomOApe2 = search_params[1] if len(search_params) >= 2 else ''
+                queryset = queryset.filter((Q(nombre__icontains=nomOApe1) & Q(apellido__icontains=nomOApe2)) |
+                    (Q(nombre__icontains=nomOApe2) & Q(apellido__icontains=nomOApe1)))
+        return queryset
 
 class MedicoViewSet(viewsets.ModelViewSet):
     model = Medico
     queryset = Medico.objects.all()
     serializer_class = MedicoSerializer
-    filter_backends = (MedicoNombreApellidoFilterBackend, )
+    filter_backends = (MedicoNombreApellidoOMatriculaFilterBackend, )
     pagination_class = None
