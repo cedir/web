@@ -5,6 +5,7 @@ import operator as op
 from datetime import timedelta
 from anestesista.models import Complejidad, ComplejidadEstudio
 from comprobante.models import LineaDeComprobante
+from presentacion.models import Presentacion
 
 
 def eval_expr(expr):
@@ -115,7 +116,7 @@ class CalculadorHonorariosAnestesista(object):
         Si no va por ara y es de obra social (no particular) se saca el iva del comprobante asociado a la presentacion.
         """
         estudio = self.estudios[0]
-        if estudio.presentacion_id:  # esto puede ser = 0 si no esta facturado
+        if estudio.presentacion_id in (Presentacion.COBRADO, Presentacion.PENDIENTE):
             return estudio.presentacion.comprobante
 
     def _es_paciente_diferenciado(self):

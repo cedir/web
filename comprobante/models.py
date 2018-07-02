@@ -23,9 +23,9 @@ class Comprobante(models.Model):
     COBRADO = u'COBRADO'
 
     ESTADOS = (
-        (ANULADO, ANULADO),  # 'estado = 0 significa que esta facturado, y no se pueden agregar mas estudios ni modificar nada porque esta cerrado
-        (NO_COBRADO, NO_COBRADO),    # 'estado = 1 significa que se facturo y se cobro
-        (COBRADO, COBRADO),    # 'estado = 2 la facturacion esta abierta a agregar o modificar estudios
+        (ANULADO, ANULADO),
+        (NO_COBRADO, NO_COBRADO),
+        (COBRADO, COBRADO),
     )
 
     nombre_cliente = models.CharField(max_length=128, db_column=u'nombreCliente')
@@ -35,7 +35,7 @@ class Comprobante(models.Model):
     condicion_fiscal = models.CharField(max_length=128, db_column=u'condicionFiscal')
     responsable = models.CharField(max_length=128, )
     sub_tipo = models.CharField(max_length=50, db_column=u'subTipo')
-    estado = models.CharField(max_length=50, choices=ESTADOS )
+    estado = models.CharField(max_length=50, choices=ESTADOS)
     numero = models.IntegerField(db_column=u'nroComprobante', )
     nro_terminal = models.SmallIntegerField(db_column=u'nroTerminal', default=1)
     total_facturado = models.DecimalField(db_column=u'totalFacturado', max_digits=16, decimal_places=2, default=0)

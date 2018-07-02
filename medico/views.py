@@ -174,6 +174,7 @@ def delete_disponibilidad(request, id_disponibilidad):
     }
     return HttpResponse(simplejson.dumps(response_dict))
 
+
 class MedicoNombreApellidoFilterBackend(filters.BaseFilterBackend):
 
     """
@@ -185,9 +186,32 @@ class MedicoNombreApellidoFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(Q(nombre__icontains=search_text) | Q(apellido__icontains=search_text))
             return queryset
 
+
 class MedicoViewSet(viewsets.ModelViewSet):
     model = Medico
     queryset = Medico.objects.all()
     serializer_class = MedicoSerializer
     filter_backends = (MedicoNombreApellidoFilterBackend, )
     pagination_class = None
+
+
+
+
+
+from rest_framework import generics
+from comprobante.models import Comprobante
+from rest_framework.response import Response
+class PagoMedicoViewList(generics.ListAPIView):
+    serializer_class = ComprobanteListadoSerializer
+
+    def get_queryset(self):
+
+        return Estudio.objects.all()[:11]
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        data = []
+        for q in queryset:
+            serializer = ComprobanteListadoSerializer(q, context={'calculador': 1})
+            data.append(serializer.data)
+        return Response(data)

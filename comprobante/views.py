@@ -8,6 +8,7 @@ import StringIO
 
 from imprimir import generar_factura, obtener_comprobante, obtener_filename
 from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
+from comprobante.serializers import ComprobanteListadoSerializer
 
 
 def imprimir(request, cae):
@@ -54,6 +55,23 @@ def ventas(request, responsable, anio, mes):
     return resp
 
 
+from rest_framework import generics
+from comprobante.models import Comprobante
+from rest_framework.response import Response
+class ComprobantesList(generics.ListAPIView):
+    serializer_class = ComprobanteListadoSerializer
+
+    def get_queryset(self):
+
+        return Comprobante.objects.all()[:11]
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        data = []
+        for q in queryset:
+            serializer = ComprobanteListadoSerializer(q, context={'calculador': 1})
+            data.append(serializer.data)
+        return Response(data)
 
 """
 - traer comprobantes filtrando por fecha desde - fecha hasta
@@ -66,10 +84,14 @@ def ventas(request, responsable, anio, mes):
   (https://github.com/cedir/intranet/blob/81f708d089f02efd8d98c886782572428752913f/CedirNegocios/Interfaces/CalculadorHonorariosComprobantes.vb#L79)
 - Finalmente se muestran los datos de comprobante (*) mas honorario, anestesia y total medicacion
 
-NOTA: tanto el calculo de honorario medico como el calculo de honorario anestesista, deben calcularse del mismo modo
-      que se hace en sus respectivas pantallas (pago a medico, pago anestesista)
+NOTA: el calculo de honorario medico se aplican las mismas reglas que pago a medico. Si el estudio esta pagado al medico, no importa, volver a aplicar las reglas porque hay qye mostrar lo que se deberia pagar, y no lo que se pago.
+      calculo de honorario anestesia sale del campo "anestesia" del estudio. Sino esta cargado se muestra 0 (cero)
+
+NOTA 2: del calculo de pago a medico, se desprenden otros valores como "Retencion Impositiva" y "Gastos Administriativos".
+        Estos valores deben ser sumados por separado y mostrado en diferentes columnas.
 
 *
+Columnas Actuales
 dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()
 dr("Nro") = c.NroComprobante.ToString()
 dr("Estado") = c.Estado
@@ -84,9 +106,20 @@ dr("Honorarios") = Format(0.0, "#################0.00")
 dr("Anestesia") = Format(0.0, "#################0.00")
 dr("TotalMedicacion") = Format(0.0, "#################0.00")
 
+
+Columnas extras que hay que mostrar:
+Retencion Imposotva
+Retencion Cedir (GA)
+Sala de recuperacion
+Retencion Anestesia --> ya se esta mostrando. Aplicar 10% a la suma de todo es una opcion, o bien recorrer cada estudio y aplicar el porcentaje de cada anestesista. Sumarlos y mostrar eso es la otra opcion.
+Medicamentos         |
+Material especifico  |  --> Estos 2 hoy aparecen juntos como TotalMedicacion, pero deben ir separados
+
+
 # TODO next:
  - Terminar de entender calclulo de honorario para un estudio, y como se relaciona eso con Pago A Medico, ya que se
  puede usar lo mismo para ambos.
+ - Se puede empezar a hacer el listado sin calcular los honorarios medicos. Y dejar eso para el final.
 """
 
 
@@ -94,7 +127,7 @@ dr("TotalMedicacion") = Format(0.0, "#################0.00")
 """
 PAGO A MEDICO:
 
-
+--
 
 
 """
