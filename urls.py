@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'', include('medicamento.urls')),
     url(r'', include('paciente.urls')),
     url(r'', include('comprobante.urls')),
+    url(r'', include('presentacion.urls')),
     url(r'', include('medico.urls')),
     url(r'', include('anestesista.urls')),
     url(r'', include('usuario.urls')),

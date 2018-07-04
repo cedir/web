@@ -7,7 +7,7 @@ from medico.serializers import MedicoSerializer
 from anestesista.serializers import AnestesistaSerializer
 from practica.serializers import PracticaSerializer
 from medicamento.serializers import MedicamentoSerializer
-from presentacion.serializers import PresentacionSerializer
+from presentacion.serializers import PresentacionSmallSerializer
 
 
 class EstudioSerializer(serializers.ModelSerializer):
@@ -18,7 +18,7 @@ class EstudioSerializer(serializers.ModelSerializer):
     medico = MedicoSerializer()
     medico_solicitante = MedicoSerializer()
     anestesista = AnestesistaSerializer()
-    presentacion = PresentacionSerializer()
+    presentacion = PresentacionSmallSerializer()
     
     class Meta:
         model = Estudio
