@@ -51,8 +51,8 @@ def _get_row_osde(estudio):
     Prestador Prescriptor	145	150
     """
     nro_prestador_cedir = '051861'
-    nro_afiliado = '{0:<11}'.format(estudio.paciente.nroAfiliado)
-    codigo_medico_osde = '{0:<6}'.format(estudio.practica.codigo_medico_osde)
+    nro_afiliado = '{0:<11}'.format(estudio.paciente.nroAfiliado[:11])
+    codigo_medico_osde = '{0:<6}'.format(estudio.practica.codigo_medico_osde[:6])
     tipo_prestacion = '1'  # ambulatorio
     cantidad = '001'
     fecha = estudio.fecha.strftime('%d%m%y')  # DDMMAA
@@ -61,16 +61,17 @@ def _get_row_osde(estudio):
     tipo_orden = '0'
     importe = '{0:015}'.format(estudio.get_importe_total())
     letra_espec_efector = letra_espec_prescriptor = 'M'  #  El la letra que identifica la especialidad del profesional (M= medico, B= bioquimico, etc)
-    nro_matricula_prescriptor = '{0:<10}'.format(estudio.medico_solicitante.matricula)
+    nro_matricula_prescriptor = '{0:<10}'.format(estudio.medico_solicitante.matricula[:10])
     provincia_matricula = 'S'  # santa Fe
-    nro_matricula_efector = '{0:<10}'.format(estudio.medico.matricula)
-    transacion = '{0:<6}'.format(estudio.nro_de_orden)
+    nro_matricula_efector = '{0:<10}'.format(estudio.medico.matricula[:10])
+    transacion = '{0:<6}'.format(estudio.nro_de_orden[:6])
     prestador_prescriptor = '000000'
 
-    filas_1 = '  {0}{1}{2}{3}{4}{5}'.format(nro_prestador_cedir, nro_afiliado, codigo_medico_osde, tipo_prestacion, cantidad, fecha)
-    filas_2 = '{0}{1}{2}{3}'.format(dlegacion_emisora, nro_de_orden, tipo_orden, importe)
-    filas_medico_solicitante = '{0}{1}{2}'.format(letra_espec_prescriptor, nro_matricula_prescriptor, provincia_matricula)
-    filas_medico_actuante = '{0}{1}{2}'.format(letra_espec_efector, nro_matricula_efector, provincia_matricula)
-    filas_final = '{0}{1}'.format(transacion, prestador_prescriptor)
+    filas_1 = '{:<1}{}{:<3}{}{:<3}{}{}{:<11}{}{:<3}{}'.format('', nro_prestador_cedir, '', nro_afiliado, '',
+                                                              codigo_medico_osde, tipo_prestacion, '', cantidad, '', fecha)
+    filas_2 = '{:<3}{}{:<3}{}{:<3}{}{:<3}{}'.format('', dlegacion_emisora, '', nro_de_orden, '', tipo_orden, '', importe)
+    filas_medico_solicitante = '{:<3}{}{:<3}{}{:<3}{}'.format('', letra_espec_prescriptor, '', nro_matricula_prescriptor, '', provincia_matricula)
+    filas_medico_actuante = '{:<3}{}{:<3}{}{:<3}{}'.format('', letra_espec_efector, '', nro_matricula_efector, '', provincia_matricula)
+    filas_final = '{:<3}{}{:<3}{}'.format('', transacion, '', prestador_prescriptor)
 
     return filas_1 + filas_2 + filas_medico_solicitante + filas_medico_actuante + filas_final
