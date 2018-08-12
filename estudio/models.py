@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 import datetime
 from decimal import Decimal, ROUND_UP
 from django.db import models
@@ -95,6 +96,7 @@ class Estudio(models.Model):
     def get_importe_total(self):
         if self.fecha_cobro:
             # TODO: ver bien como se calcula el total en caso de estar cobrado.
+            # hago raise por el momento, no tengo tiempo de verlo ahora
             raise NotImplementedError
         return Decimal(self.importe_estudio).quantize(Decimal('.01'), ROUND_UP) - \
                Decimal(self.diferencia_paciente).quantize(Decimal('.01'), ROUND_UP) + \
@@ -102,10 +104,16 @@ class Estudio(models.Model):
                self.get_total_medicacion()
 
     def get_total_medicacion(self):
+        """
+        Return: total medicacion sin material especifico
+        """
+        if self.fecha_cobro:
+            return Decimal(self.importe_medicacion_cobrado).quantize(Decimal('.01'), ROUND_UP)
         if self.importe_medicacion > 0:
             return Decimal(self.importe_medicacion).quantize(Decimal('.01'), ROUND_UP)
+
         total_medicacion = 0
-        for medicacion in self.estudioXmedicamento.all():
+        for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Medicación'):
             total_medicacion += medicacion.importe
         return Decimal(total_medicacion).quantize(Decimal('.01'), ROUND_UP)
 
