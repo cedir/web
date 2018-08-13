@@ -1,4 +1,6 @@
+# -*- coding: utf-8
 import datetime
+from decimal import Decimal, ROUND_UP
 from django.db import models
 from django.db.models.signals import pre_save
 from medico.models import Medico, PagoMedico
@@ -29,27 +31,26 @@ class Estudio(models.Model):
     presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion', null=True, blank=True, related_name=u'estudios')
     nro_de_orden = models.CharField(db_column=u'nroDeOrden', max_length=200)
     anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
-    #anestesista = models.IntegerField(db_column="idAnestesista")    
 
     es_pago_contra_factura = models.IntegerField(db_column="esPagoContraFactura", default=0)
     medicacion = models.ManyToManyField(Medicamento, through='Medicacion')
 
     fecha_cobro = models.CharField(db_column="fechaCobro", null=True, max_length=100)
-    importe_estudio = models.FloatField(db_column="importeEstudio")
-    importe_medicacion = models.FloatField(db_column="importeMedicacion")
-    pago_contra_factura = models.FloatField(db_column="pagoContraFactura")
-    diferencia_paciente = models.FloatField(db_column="diferenciaPaciente")
-    pension = models.FloatField()
-    importe_pago_medico = models.FloatField(db_column=u'importePagoMedico')
-    importe_pago_medico_solicitante = models.FloatField(db_column=u'importePagoMedicoSol')
-    #diferencia_paciente_medicacion = models.FloatField(db_column=u'diferenciaPacienteMedicacion')
+    importe_estudio = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeEstudio")
+    importe_medicacion = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeMedicacion")
+    pago_contra_factura = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="pagoContraFactura")
+    diferencia_paciente = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="diferenciaPaciente")
+    pension = models.DecimalField(max_digits=16, decimal_places=2, default='0.00')
+    importe_pago_medico = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column=u'importePagoMedico')
+    importe_pago_medico_solicitante = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column=u'importePagoMedicoSol')
+    #diferencia_paciente_medicacion = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column=u'diferenciaPacienteMedicacion')
     pago_medico_actuante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoAct', null=True, blank=True, related_name=u'estudios_actuantes')
     pago_medico_solicitante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoSol', null=True, blank=True, related_name=u'estudios_solicitantes')
-    importe_cobrado_pension = models.FloatField(db_column="importeCobradoPension")
-    importe_cobrado_arancel_anestesia = models.FloatField(db_column="importeCobradoArancelAnestesia")
-    importe_estudio_cobrado = models.FloatField(db_column="importeEstudioCobrado")
-    importe_medicacion_cobrado = models.FloatField(db_column="importeMedicacionCobrado")
-    arancel_anestesia = models.FloatField(db_column="arancelAnestesia")
+    importe_cobrado_pension = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeCobradoPension")
+    importe_cobrado_arancel_anestesia = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeCobradoArancelAnestesia")
+    importe_estudio_cobrado = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeEstudioCobrado")
+    importe_medicacion_cobrado = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeMedicacionCobrado")
+    arancel_anestesia = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="arancelAnestesia")
 
     class Meta:
         db_table = 'tblEstudios'
@@ -92,6 +93,29 @@ class Estudio(models.Model):
         self.importe_medicacion_cobrado = 0
         self.arancel_anestesia = 0
 
+    def get_importe_total(self):
+        if self.fecha_cobro:
+            # TODO: ver bien como se calcula el total en caso de estar cobrado.
+            # hago raise por el momento, no tengo tiempo de verlo ahora
+            raise NotImplementedError
+        return Decimal(self.importe_estudio).quantize(Decimal('.01'), ROUND_UP) - \
+               Decimal(self.diferencia_paciente).quantize(Decimal('.01'), ROUND_UP) + \
+               self.arancel_anestesia + Decimal(self.pension).quantize(Decimal('.01'), ROUND_UP) + \
+               self.get_total_medicacion()
+
+    def get_total_medicacion(self):
+        """
+        Return: total medicacion sin material especifico
+        """
+        if self.fecha_cobro:
+            return Decimal(self.importe_medicacion_cobrado).quantize(Decimal('.01'), ROUND_UP)
+        if self.importe_medicacion > 0:
+            return Decimal(self.importe_medicacion).quantize(Decimal('.01'), ROUND_UP)
+
+        total_medicacion = 0
+        for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Medicación'):
+            total_medicacion += medicacion.importe
+        return Decimal(total_medicacion).quantize(Decimal('.01'), ROUND_UP)
 
 
 def asignar_presentacion_nula(sender, instance, **kwargs):
