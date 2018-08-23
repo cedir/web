@@ -116,7 +116,7 @@ class CalculadorHonorariosAnestesista(object):
         Si no va por ara y es de obra social (no particular) se saca el iva del comprobante asociado a la presentacion.
         """
         estudio = self.estudios[0]
-        if estudio.presentacion_id:
+        if estudio.presentacion_id:  # esto puede ser = 0 si no esta facturado
             return estudio.presentacion.comprobante
 
     def _es_paciente_diferenciado(self):
