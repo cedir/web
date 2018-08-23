@@ -4,11 +4,13 @@ from decimal import Decimal, ROUND_UP
 from itertools import groupby
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework import viewsets, filters
+from django.db.models import Q
 from rest_framework.renderers import JSONRenderer
 
 from estudio.models import Estudio
 from anestesista.models import Anestesista, PagoAnestesistaVM, LineaPagoAnestesistaVM, Complejidad
-from anestesista.serializers import PagoAnestesistaVMSerializer
+from anestesista.serializers import AnestesistaSerializer, PagoAnestesistaVMSerializer
 from anestesista.calculador_honorarios.calculador_honorarios import CalculadorHonorariosAnestesista
 
 
@@ -117,3 +119,29 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
     serializer = PagoAnestesistaVMSerializer(pago, context={'request': request})
     return JSONResponse(serializer.data)
 
+class AnestesistaNombreApellidoFilterBackend(filters.BaseFilterBackend):
+    
+    """
+    Filtro de anestesista por nombre o apellido
+    """
+    def filter_queryset(self, request, queryset, view):
+        search_text = request.query_params.get(u'search_text')
+
+
+        if search_text:
+            if unicode.isdigit(search_text):
+                queryset = queryset.filter(Q(matricula__icontains=search_text))
+            else:
+                search_params = [x.strip() for x in search_text.split(',')]
+                nomOApe1 = search_params[0]
+                nomOApe2 = search_params[1] if len(search_params) >= 2 else ''
+                queryset = queryset.filter((Q(nombre__icontains=nomOApe1) & Q(apellido__icontains=nomOApe2)) |
+                    (Q(nombre__icontains=nomOApe2) & Q(apellido__icontains=nomOApe1)))
+        return queryset
+
+class AnastesistaViewSet(viewsets.ModelViewSet):
+    model = Anestesista
+    queryset = Anestesista.objects.all()
+    serializer_class = AnestesistaSerializer
+    filter_backends = (AnestesistaNombreApellidoFilterBackend, )
+    pagination_class = None

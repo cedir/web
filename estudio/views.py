@@ -1,10 +1,15 @@
 from django.http import HttpResponse
 from rest_framework import filters
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
+from rest_framework.response import Response
 from common.drf.views import StandardResultsSetPagination
 from estudio.models import Estudio
-from estudio.serializers import EstudioSerializer
+from estudio.models import Medicacion
+from medicamento.models import Medicamento
+from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
+from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from imprimir import generar_informe
+import simplejson
 
 def imprimir(request, id_estudio):
 
@@ -15,6 +20,28 @@ def imprimir(request, id_estudio):
     response['Content-Disposition'] = u'filename="Estudio de {0}.pdf"'.format(estudio.paciente.apellido)
 
     return generar_informe(response, estudio)
+
+def add_default_medicacion(request):
+
+    id_estudio = request.POST['id_estudio']
+    default_medicamentos_ids = (2, 3, 4, 5, 6, 7, 8, 22, 23, 35, 36, 37, 42, 48, 109, 128, 144, 167, 169)
+
+    estudio = Estudio.objects.get(pk=id_estudio)
+
+    for medicamento_id in default_medicamentos_ids:
+        medicacion = Medicacion()
+        medicacion.estudio = estudio
+        medicacion.medicamento = Medicamento.objects.get(pk=medicamento_id)
+        medicacion.importe = medicacion.medicamento.importe
+        medicacion.save()
+    
+    response_dict = {
+        'status': 200,
+        'estudio': estudio.id,
+        'message': "default medicacion added"
+    }
+    
+    return HttpResponse(simplejson.dumps(response_dict))
 
 class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
     """
@@ -93,5 +120,46 @@ class EstudioViewSet(viewsets.ModelViewSet):
         EstudioMedicoSolicitanteFilterBackend, EstudioPacienteFilterBackend,
         EstudioFechaFilterBackend, filters.OrderingFilter, )
     pagination_class = StandardResultsSetPagination
-    ordering_fields = ('fecha', )
+    ordering_fields = ('fecha', 'id')
     page_size = 20
+
+    serializers = {
+        'create': EstudioCreateUpdateSerializer,
+        'update': EstudioCreateUpdateSerializer,
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializer_class)
+
+class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
+    """
+    Filtro de medicaciones por estudio
+    """
+    def filter_queryset(self, request, queryset, view):
+        estudio = request.query_params.get(u'estudio')
+        if estudio:
+            queryset = queryset.filter(estudio__id=estudio)
+        return queryset
+
+
+class MedicacionViewSet(viewsets.ModelViewSet):
+    model = Medicacion
+    queryset = Medicacion.objects.all()
+    serializer_class = MedicacionSerializer
+    filter_backends = (MedicacionEstudioFilterBackend, )
+
+    serializers = {
+        'create': MedicacionCreateUpdateSerializer,
+        'update': MedicacionCreateUpdateSerializer,
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializer_class)
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({ "estudio": instance.estudio.id })
+    
+    def perform_destroy(self, instance):
+        instance.delete()
