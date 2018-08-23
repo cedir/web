@@ -5,7 +5,6 @@ import operator as op
 from datetime import timedelta
 from anestesista.models import Complejidad, ComplejidadEstudio
 from comprobante.models import LineaDeComprobante
-from presentacion.models import Presentacion
 
 
 def eval_expr(expr):
