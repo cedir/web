@@ -1,4 +1,4 @@
-{% extends "turnos/base.html" %} {% load staticfiles %} {% block content %}
+{% extends "turnos/base.html" %} {% load staticfiles %} {% load to_aaaa_mm_dd %} {% block content %}
 <link href="/media/css/turnos/buscar_turnos.css" rel="stylesheet" type="text/css"/>
 <link href="/media/css/turnos/buscar_turnos_print.css" rel="stylesheet" type="text/css" media="print" />
 
@@ -168,6 +168,7 @@
 				</td>
 				<td class="action_column">
 					<a href="#" data-toggle="modal" data-target="#dialog" data-turno-id="{{ hshTurnos.id }}">Editar</a>
+                    | <a href="{{ uli_url }}/estudios?fecha={{ hshTurnos.fecha | to_aaaa_mm_dd }}&dniPaciente={{ hshTurnos.dni_paciente }}" target="_blank">Estudios</a>
 				</td>
 			</tr>
 			{% endfor %}

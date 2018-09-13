@@ -33,5 +33,5 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             for material_esp in estudio.estudioXmedicamento.filter(medicamento__tipo=u'Mat Esp'):
                 csv_string = '{}\n{}'.format(csv_string, OsdeRowMaterialEspecifico(estudio, material_esp).get_row_osde())
 
-        response = HttpResponse(csv_string, content_type='text/csv')
+        response = HttpResponse(csv_string, content_type='text/plain')
         return response

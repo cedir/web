@@ -13,7 +13,7 @@ class OsdeRowBase(object):
         self.nro_de_orden = '000000'
         self.tipo_orden = '0'
         self.importe = None
-        self.letra_espec_efector = self.letra_espec_prescriptor = 'M'  #  El la letra que identifica la especialidad del profesional (M= medico, B= bioquimico, etc)
+        self.letra_espec_efector = self.letra_espec_prescriptor = 'M'  #  Es la letra que identifica la especialidad del profesional (M= medico, B= bioquimico, etc)
         self.nro_matricula_prescriptor = '{0:<10}'.format(estudio.medico_solicitante.matricula[:10])
         self.provincia_matricula = 'S'  # santa Fe
         self.nro_matricula_efector = '{0:<10}'.format(estudio.medico.matricula[:10])
