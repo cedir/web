@@ -4,7 +4,7 @@ from decimal import Decimal, ROUND_UP
 class OsdeRowBase(object):
     def __init__(self, estudio, *args, **kwargs):
         self.nro_prestador_cedir = '051861'
-        self.nro_afiliado = '{0:<11}'.format(estudio.paciente.nroAfiliado[:11])
+        self.nro_afiliado = self.format_nro_afiliado(estudio.paciente)
         self.codigo_medico_osde = None
         self.tipo_prestacion = '1'  # ambulatorio
         self.cantidad = '001'
@@ -14,9 +14,9 @@ class OsdeRowBase(object):
         self.tipo_orden = '0'
         self.importe = None
         self.letra_espec_efector = self.letra_espec_prescriptor = 'M'  #  Es la letra que identifica la especialidad del profesional (M= medico, B= bioquimico, etc)
-        self.nro_matricula_prescriptor = '{0:<10}'.format(estudio.medico_solicitante.matricula[:10])
+        self.nro_matricula_prescriptor = self.format_nro_matricula(estudio.medico_solicitante)
         self.provincia_matricula = 'S'  # santa Fe
-        self.nro_matricula_efector = '{0:<10}'.format(estudio.medico.matricula[:10])
+        self.nro_matricula_efector = self.format_nro_matricula(estudio.medico)
         self.transacion = '{0:<6}'.format(estudio.nro_de_orden[:6])
         self.prestador_prescriptor = '000000'
 
@@ -54,6 +54,25 @@ class OsdeRowBase(object):
         filas_final = '{:<3}{}{:<3}{}'.format('', self.transacion, '', self.prestador_prescriptor)
 
         return filas_1 + filas_2 + filas_medico_solicitante + filas_medico_actuante + filas_final
+
+    def format_nro_afiliado(self, paciente):
+        nro_afiliado = paciente.nroAfiliado.replace(' ', '')
+        nro_afiliado = nro_afiliado.replace('-', '')
+        nro_afiliado = nro_afiliado[:11]
+        try:
+            assert len(nro_afiliado) == 11
+            return nro_afiliado
+        except AssertionError:
+            raise Exception('Nro de Afiliado debe ser 11 caracteres numericos para {}({}) - Nro Afiliado: {}'.format(paciente, paciente.id, nro_afiliado))
+
+    def format_nro_matricula(self, medico):
+        nro_matricula = medico.matricula
+        try:
+            nro_matricula = nro_matricula.split(u' ')[0]
+            nro_matricula = int(nro_matricula)
+            return '{0:010}'.format(nro_matricula)
+        except ValueError:
+            raise ValueError("Error con la matricula del medico {}({}) - Matricula {}".format(medico.apellido, medico.id, nro_matricula))
 
 
 class OsdeRowEstudio(OsdeRowBase):
