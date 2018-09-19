@@ -1,3 +1,4 @@
+import simplejson
 from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
@@ -23,15 +24,19 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         csv_string = ''
         estudios = presentacion.estudios.all()
 
-        for estudio in estudios:
-            csv_string = '{}\n{}'.format(csv_string, OsdeRowEstudio(estudio).get_row_osde())
+        try:
+            for estudio in estudios:
+                csv_string = '{}\n{}'.format(csv_string, OsdeRowEstudio(estudio).get_row_osde())
 
-            if estudio.get_total_medicacion():
-                csv_string = '{}\n{}'.format(csv_string, OsdeRowMedicacion(estudio).get_row_osde())
-            if estudio.pension:
-                csv_string = '{}\n{}'.format(csv_string, OsdeRowPension(estudio).get_row_osde())
-            for material_esp in estudio.estudioXmedicamento.filter(medicamento__tipo=u'Mat Esp'):
-                csv_string = '{}\n{}'.format(csv_string, OsdeRowMaterialEspecifico(estudio, material_esp).get_row_osde())
+                if estudio.get_total_medicacion():
+                    csv_string = '{}\n{}'.format(csv_string, OsdeRowMedicacion(estudio).get_row_osde())
+                if estudio.pension:
+                    csv_string = '{}\n{}'.format(csv_string, OsdeRowPension(estudio).get_row_osde())
+                for material_esp in estudio.estudioXmedicamento.filter(medicamento__tipo=u'Mat Esp'):
+                    csv_string = '{}\n{}'.format(csv_string, OsdeRowMaterialEspecifico(estudio, material_esp).get_row_osde())
 
-        response = HttpResponse(csv_string, content_type='text/csv')
+            response = HttpResponse(csv_string, content_type='text/plain')
+        except Exception as ex:
+            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+
         return response

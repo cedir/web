@@ -92,6 +92,7 @@ def get_buscar_turnos(request):
         "nombre": turno.paciente.nombre,
         "apellido": turno.paciente.apellido,
         "id_paciente": turno.paciente.id,
+        "dni_paciente": turno.paciente.dni,
         "fecha": _sql_date_to_normal_date(turno.fechaTurno),
         "hora_inicio": turno.horaInicio,
         "medico": turno.medico.apellido + ", " + turno.medico.nombre,
@@ -128,6 +129,7 @@ def get_buscar_turnos(request):
         'paciente': paciente,
         'ocultarAnuladosState': 'checked' if ocultar_anulados == 'true' else '',
         'logged_user_name': request.user.username,
+        'uli_url': settings.ULI_URL
     })
 
     t = loader.get_template('turnos/buscarTurnos.html')
