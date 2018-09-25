@@ -1,16 +1,20 @@
+#-*- coding: utf-8 -*-
 from django.contrib import admin
 from models import Practica
 
 
 class PracticaAdmin(admin.ModelAdmin):
-    actions = None
-    fields = (u'descripcion', u'codigoMedico', u'abreviatura')
-    search_fields = [u'descripcion', u'abreviatura']
-    list_display = (u'id', u'descripcion', u'codigoMedico', u'abreviatura')
-    ordering = (u'descripcion', )
+    '''
+    Las prácticas se pueden buscar por nombre o abreviatura, pero la abreviatura no aparece en el listado para mantenerlo limpio.
+    Se pueden buscar y agregar y modificar pero no borrar.
 
-    def has_add_permission(self, request):
-        return False
+    Fede@Septiembre 2018
+    '''
+    actions = None
+    fields = (u'descripcion', u'abreviatura', u'codigoMedico', u'codigo_medico_osde')
+    search_fields = [u'descripcion', u'abreviatura']
+    list_display = (u'descripcion', u'codigoMedico', u'codigo_medico_osde')
+    ordering = (u'descripcion', )
 
     def has_delete_permission(self, request, obj=None):
         return False
