@@ -7,9 +7,12 @@ CONDICIONES_FISCALES = (('CONSUMIDOR FINAL', 'CONSUMIDOR FINAL'),
                         ('EXENTO', 'EXENTO'))
 BOOLEANOS = (('1', 'Si'),
              ('0', 'No'))
+
 class ObraSocial(models.Model):
     id = models.AutoField(primary_key=True, db_column="idObraSocial")
     nombre = models.CharField(db_column="obraSocial", max_length=200)
+
+    # Estos fields estan representados como chars con choice porque en la DB son SmallInt
     se_presenta_por_ARA = models.CharField(u'Se presenta por ARA', db_column='sePresentaPorARA',  max_length=200,
                                         choices=BOOLEANOS, default=0)
     se_presenta_por_AMR = models.CharField(u'Se presenta por AMR', db_column='sePresentaPorAMR',  max_length=200,
