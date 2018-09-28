@@ -205,6 +205,17 @@ class MedicoViewSet(viewsets.ModelViewSet):
     filter_backends = (MedicoNombreApellidoOMatriculaFilterBackend, )
     pagination_class = None
 
+    @detail_route(methods=['get'])
+    def get_estudios_pendientes_de_pago(self, request, pk=None):
+        import pdb; pdb.set_trace()
+        estudios = Estudio.objects.filter(medico_id=pk, fecha_cobro__isnull=False,  )  # get estudios pendiente pago
+
+        data = []
+        for q in estudios:
+            serializer = ListNuevoPagoMedicoSerializer(q, context={'calculador': 1})
+            data.append(serializer.data)
+        return Response(data)
+
 
 class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y POST
     queryset = PagoMedico.objects.all().order_by('-fecha')
@@ -214,10 +225,10 @@ class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y
 
     def create(self, request, *args, **kwargs):
         import pdb; pdb.set_trace()
-        serializer = CreateNuevoPagoMedicoSerializer(data=request.DATA)
+        serializer = CreateNuevoPagoMedicoSerializer(data=request.data)
 
         if serializer.is_valid():
-            pass
+            serializer.save()
 
     @detail_route(methods=['get'])
     def get_detalle_pago(self, request, pk=None):
@@ -236,12 +247,4 @@ class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y
 
         return Response(data)
 
-    @list_route(methods=['get'])
-    def get_estudios_pendientes_de_pago(self, request, pk=None):
-        estudios = Estudio.objects.all()[:11]  # get estudios pendiente pago
 
-        data = []
-        for q in estudios:
-            serializer = ListNuevoPagoMedicoSerializer(q, context={'calculador': 1})
-            data.append(serializer.data)
-        return Response(data)
