@@ -9,6 +9,7 @@ logs
 node_modules/
 static/templates/media_files
 static/templates/bower_components/
+static/templates/npm_deps/
 .idea
 .vscode
 ENV/
