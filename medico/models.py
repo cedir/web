@@ -43,7 +43,7 @@ class Medico(models.Model):
         '''
         La tabla de medicos esta duplicada, en tblMedicoAct y tblMedicoSol.
         Por eso, cuando guardamos algo, tenemos que duplicar el cambio en la segunda.
-        El SQL crudo se llama después de la superclase, para evitar escrir si
+        El SQL crudo se llama después de la superclase, para evitar escribir si
         falló algo.
 
         Esto es vulnerable a SQL Injection y no tienen arreglo mas que arreglar lo de arriba.
@@ -53,9 +53,7 @@ class Medico(models.Model):
 
         Fede@Septiembre 2018.
         '''
-        super(Medico, self).save(*args, **kwargs)
-        valores = (self.id, \
-                   self.nombre, \
+        valores = (self.nombre, \
                    self.apellido, \
                    self.matricula, \
                    self.domicilio, \
@@ -65,36 +63,49 @@ class Medico(models.Model):
                    self.clave_fiscal, \
                    self.responsabilidad_fiscal, \
                    self.matricula_osde)
-        columnas_insert = ("%d, " \
-                          + "'%s', " \
-                          + "'%s', " \
-                          + "'%s', " \
-                          + "'%s', " \
-                          + "'%s', " \
-                          + "'%s', " \
-                          + "'%s', " \
-                          + "'%s', " \
-                          + "'%s', " \
-                          + "'%s'")
-        fila_insert = columnas_insert % valores
-        columnas_update = ('"idMedicoSol"=\'%d\', ' \
-                           + '"nombreMedicoSol"=\'%s\', ' \
-                            + '"apellidoMedicoSol"=\'%s\', ' \
-                            + '"nroMatricula"=\'%s\', ' \
-                            + '"direccionMedico"=\'%s\', ' \
-                            + '"localidadMedico"=\'%s\', ' \
-                            + '"telMedico"=\'%s\', ' \
-                            + '"mail"=\'%s\', ' \
-                            + '"claveFiscal"=\'%s\', ' \
-                            + '"responsabilidadFiscal"=\'%s\', ' \
-                            + '"matriculaOSDE"=\'%s\'')
-        fila_update = columnas_update % valores
-        query = ('INSERT INTO public."tblMedicosSol" VALUES (%s) ' \
-                 + 'ON CONFLICT ("idMedicoSol") DO UPDATE SET %s ' \
-                 + 'WHERE "tblMedicosSol"."idMedicoSol"=%i;') \
-                 % (fila_insert, fila_update, self.id)
+        # Si la instancia tiene id, es un update. Sino, es un insert.
+        if self.id is None:
+            columnas = ("nextval('tblmedicossol_idmedicosol_seq'), " \
+                        + "'%s', " \
+                        + "'%s', " \
+                        + "'%s', " \
+                        + "'%s', " \
+                        + "'%s', " \
+                        + "'%s', " \
+                        + "'%s', " \
+                        + "'%s', " \
+                        + "'%s', " \
+                        + "'%s'")
+            fila = columnas % valores
+            query = 'INSERT INTO public."tblMedicosSol" VALUES (%s);' % fila
+        else:
+            valores = (self.nombre, \
+                       self.apellido, \
+                       self.matricula, \
+                       self.domicilio, \
+                       self.localidad, \
+                       self.telefono, \
+                       self.mail, \
+                       self.clave_fiscal, \
+                       self.responsabilidad_fiscal, \
+                       self.matricula_osde)
+            columnas = ('"nombreMedicoSol"=\'%s\', ' \
+                        + '"apellidoMedicoSol"=\'%s\', ' \
+                        + '"nroMatricula"=\'%s\', ' \
+                        + '"direccionMedico"=\'%s\', ' \
+                        + '"localidadMedico"=\'%s\', ' \
+                        + '"telMedico"=\'%s\', ' \
+                        + '"mail"=\'%s\', ' \
+                        + '"claveFiscal"=\'%s\', ' \
+                        + '"responsabilidadFiscal"=\'%s\', ' \
+                        + '"matriculaOSDE"=\'%s\'')
+            fila = columnas % valores
+            query = ('UPDATE public."tblMedicosSol" SET %s ' \
+                     + 'WHERE "tblMedicosSol"."idMedicoSol"=%i;') \
+                     % (fila, self.id)
         with connection.cursor() as cursor:
             cursor.execute(query)
+        super(Medico, self).save(*args, **kwargs)
 
 
 class Disponibilidad(models.Model):
