@@ -43,8 +43,8 @@ class Medico(models.Model):
         '''
         La tabla de medicos esta duplicada, en tblMedicoAct y tblMedicoSol.
         Por eso, cuando guardamos algo, tenemos que duplicar el cambio en la segunda.
-        El SQL crudo se llama después de la superclase, para evitar escribir si
-        falló algo.
+        El SQL crudo se llama antes de la superclase para poder diferenciar según si
+        hay o no self.id .
 
         Esto es vulnerable a SQL Injection y no tienen arreglo mas que arreglar lo de arriba.
 
