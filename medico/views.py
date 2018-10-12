@@ -207,13 +207,11 @@ class MedicoViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['get'])
     def get_estudios_pendientes_de_pago(self, request, pk=None):
+        estudios_cobrados = Estudio.objects.filter(fecha_cobro__isnull=False)
+        pendientes_de_pago = estudios_cobrados.filter(medico__id=pk, pago_medico_actuante__isnull=True) \
+                             | estudios_cobrados.filter(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
+        data = [ListNuevoPagoMedicoSerializer(q, context={'calculador': 1}) for q in pendientes_de_pago]
         import pdb; pdb.set_trace()
-        estudios = Estudio.objects.filter(medico_id=pk, fecha_cobro__isnull=False,  )  # get estudios pendiente pago
-
-        data = []
-        for q in estudios:
-            serializer = ListNuevoPagoMedicoSerializer(q, context={'calculador': 1})
-            data.append(serializer.data)
         return Response(data)
 
 
@@ -246,5 +244,3 @@ class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y
         data.append(serializer.data)
 
         return Response(data)
-
-
