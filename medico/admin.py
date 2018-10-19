@@ -5,7 +5,7 @@ class MedicoAdmin(admin.ModelAdmin):
     actions = None
 
     search_fields = [u'apellido', u'nombre', u'matricula']
-    list_display = (u'apellido', u'nombre', u'telefono', u'domicilio', u'localidad', u'mail', u'matricula', u'matricula_osde', u'responsabilidad_fiscal', u'clave_fiscal')
+    list_display = (u'apellido', u'nombre', u'telefono', u'domicilio', u'localidad', u'mail', u'matricula', u'responsabilidad_fiscal', u'clave_fiscal')
 
     def has_delete_permission(self, request, obj=None):
         return False

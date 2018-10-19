@@ -21,8 +21,6 @@ class Medico(models.Model):
                                 db_column="telMedico", blank=True)
     matricula = models.CharField("Matrícula", max_length=200, \
                                  db_column="nroMatricula", blank=True)
-    matricula_osde = models.CharField('Matrícula OSDE', max_length=200, \
-                                      db_column='matriculaOSDE', blank=True)
     mail = models.CharField("Mail", max_length=200, \
                             db_column="mail", blank=True)
     clave_fiscal = models.CharField("Clave Fiscal", max_length=200, \
@@ -61,12 +59,10 @@ class Medico(models.Model):
                    self.telefono, \
                    self.mail, \
                    self.clave_fiscal, \
-                   self.responsabilidad_fiscal, \
-                   self.matricula_osde)
+                   self.responsabilidad_fiscal)
         # Si la instancia tiene id, es un update. Sino, es un insert.
         if self.id is None:
             columnas = ("nextval('tblmedicossol_idmedicosol_seq'), " \
-                        + "'%s', " \
                         + "'%s', " \
                         + "'%s', " \
                         + "'%s', " \
@@ -79,16 +75,6 @@ class Medico(models.Model):
             fila = columnas % valores
             query = 'INSERT INTO public."tblMedicosSol" VALUES (%s);' % fila
         else:
-            valores = (self.nombre, \
-                       self.apellido, \
-                       self.matricula, \
-                       self.domicilio, \
-                       self.localidad, \
-                       self.telefono, \
-                       self.mail, \
-                       self.clave_fiscal, \
-                       self.responsabilidad_fiscal, \
-                       self.matricula_osde)
             columnas = ('"nombreMedicoSol"=\'%s\', ' \
                         + '"apellidoMedicoSol"=\'%s\', ' \
                         + '"nroMatricula"=\'%s\', ' \
@@ -97,8 +83,7 @@ class Medico(models.Model):
                         + '"telMedico"=\'%s\', ' \
                         + '"mail"=\'%s\', ' \
                         + '"claveFiscal"=\'%s\', ' \
-                        + '"responsabilidadFiscal"=\'%s\', ' \
-                        + '"matriculaOSDE"=\'%s\'')
+                        + '"responsabilidadFiscal"=\'%s\'')
             fila = columnas % valores
             query = ('UPDATE public."tblMedicosSol" SET %s ' \
                      + 'WHERE "tblMedicosSol"."idMedicoSol"=%i;') \
