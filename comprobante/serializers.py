@@ -36,7 +36,25 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comprobante
-        fields = ('nombre_cliente', 'sub_tipo', 'numero', 'nro_terminal', 'total_facturado', 'total_cobrado', 'fecha_emision', 'tipo_comprobante', 'days_since_joined')
+        fields = ('nombre_cliente',
+                  'sub_tipo',
+                  'numero',
+                  'nro_terminal',
+                  'total_facturado',
+                  'total_cobrado',
+                  'fecha_emision',
+                  'tipo_comprobante',
+                  'days_since_joined',
+                  'estado',
+                  'neto',
+                  'IVA',
+                  'honorarios',
+                  'anestesia',
+                  'retencion_impositiva',
+                  'retencion_cedir',
+                  'sala_recuperacion',
+                  'medicamentos',
+                  'material_especifico')
 
     def get_days_since_joined(self, obj):
         return self.context.get('calculador')
@@ -65,5 +83,3 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
 # Retencion Anestesia --> ya se esta mostrando. Aplicar 10% a la suma de todo es una opcion, o bien recorrer cada estudio y aplicar el porcentaje de cada anestesista. Sumarlos y mostrar eso es la otra opcion.
 # Medicamentos         |
 # Material especifico  |  --> Estos 2 hoy aparecen juntos como TotalMedicacion, pero deben ir separados
-
-

@@ -4,6 +4,6 @@ from comprobante.views import imprimir, ventas, ComprobantesList
 urlpatterns = [
     url(r'^comprobante/imprimir/(?P<cae>\d+)/$', imprimir, name='comprobante_imprimir'),
     url(r'^comprobante/informe/ventas/(?P<responsable>\w+)/(?P<anio>\d{4})/(?P<mes>\d{2})/$', ventas, name='comprobante_informe_ventas'),
-    url(r'^api/comprobante/listado/$', ComprobantesList.as_view()),  # todo: cambiar url porque entra en conflicto con /api/comprobante/<id>/
+    url(r'^api/comprobantes', ComprobantesList.as_view()),  # todo: cambiar url porque entra en conflicto con /api/comprobante/<id>/
 ]
 

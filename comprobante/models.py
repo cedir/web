@@ -90,6 +90,42 @@ class Comprobante(models.Model):
     def fecha_vencimiento(self):
         return self.fecha_emision + timedelta(days=30)
 
+    @property
+    def neto(self):
+        return 0
+
+    @property
+    def IVA(self):
+        return 0
+
+    @property
+    def honorarios(self):
+        return 0
+
+    @property
+    def anestesia(self):
+        return 0
+
+    @property
+    def retencion_impositiva(self):
+        return 0
+
+    @property
+    def retencion_cedir(self):
+        return 0
+
+    @property
+    def sala_recuperacion(self):
+        return 0
+
+    @property
+    def medicamentos(self):
+        return 0
+
+    @property
+    def material_especifico(self):
+        return 0
+
     class Meta:
         permissions = (
             ("informe_ventas", u"Permite generar el informe de ventas."),

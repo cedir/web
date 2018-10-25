@@ -61,16 +61,12 @@ from rest_framework.response import Response
 class ComprobantesList(generics.ListAPIView):
     serializer_class = ComprobanteListadoSerializer
 
-    def get_queryset(self):
-
-        return Comprobante.objects.all()[:11]
-
     def list(self, request):
-        queryset = self.get_queryset()
-        data = []
-        for q in queryset:
-            serializer = ComprobanteListadoSerializer(q, context={'calculador': 1})
-            data.append(serializer.data)
+        #import pdb; pdb.set_trace()
+        queryset = Comprobante.objects.filter(fecha_emision__month=request.query_params["mes"],
+                                              fecha_emision__year=request.query_params["anio"])
+        data = [ComprobanteListadoSerializer(q, context={'calculador': 1}).data
+                for q in queryset]
         return Response(data)
 
 """
