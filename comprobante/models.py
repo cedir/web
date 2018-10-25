@@ -92,8 +92,8 @@ class Comprobante(models.Model):
 
     @property
     def neto(self):
+        return self.total / 1.105 
         return 0
-
     @property
     def IVA(self):
         return 0

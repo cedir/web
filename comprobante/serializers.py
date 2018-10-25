@@ -37,6 +37,7 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comprobante
         fields = ('nombre_cliente',
+                  'nro_cuit',
                   'sub_tipo',
                   'numero',
                   'nro_terminal',
