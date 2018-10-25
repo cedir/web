@@ -92,15 +92,11 @@ class Comprobante(models.Model):
 
     @property
     def neto(self):
-        return self.total / 1.105 
-        return 0
-    @property
-    def IVA(self):
-        return 0
+        return self.total / 1.105  # TODO: sacar el gravado desde self.gravado.porcentaje
 
     @property
-    def honorarios(self):
-        return 0
+    def total_iva(self):
+        return self.neto * self.gravado.porcentaje / 100  # TODO: ver si se puede mejorar este calculo
 
     @property
     def anestesia(self):

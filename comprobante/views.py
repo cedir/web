@@ -58,7 +58,7 @@ def ventas(request, responsable, anio, mes):
 from rest_framework import generics
 from comprobante.models import Comprobante
 from rest_framework.response import Response
-class ComprobantesList(generics.ListAPIView):
+class InformeMensualView(generics.ListAPIView):
     serializer_class = ComprobanteListadoSerializer
 
     def list(self, request):
@@ -86,44 +86,8 @@ NOTA: el calculo de honorario medico se aplican las mismas reglas que pago a med
 NOTA 2: del calculo de pago a medico, se desprenden otros valores como "Retencion Impositiva" y "Gastos Administriativos".
         Estos valores deben ser sumados por separado y mostrado en diferentes columnas.
 
-*
-Columnas Actuales
-dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()
-dr("Nro") = c.NroComprobante.ToString()
-dr("Estado") = c.Estado
-dr("Fecha") = c.FechaEmision.ToString().Remove(10)
-dr("Cliente") = c.NombreCliente.ToUpper()
-dr("TotalFacturado") = Format(c.TotalFacturado, "#################0.00")
-dr("TotalCobrado") = Format(0.0, "#################0.00")
-dr("TotalFacturado") = Format(0.0, "#################0.00")
-dr("Neto") = Format(0.0, "#################0.00")
-dr("IVA") = Format(0.0, "#################0.00")
-dr("Honorarios") = Format(0.0, "#################0.00")
-dr("Anestesia") = Format(0.0, "#################0.00")
-dr("TotalMedicacion") = Format(0.0, "#################0.00")
 
 
-Columnas extras que hay que mostrar:
-Retencion Imposotva
-Retencion Cedir (GA)
-Sala de recuperacion
-Retencion Anestesia --> ya se esta mostrando. Aplicar 10% a la suma de todo es una opcion, o bien recorrer cada estudio y aplicar el porcentaje de cada anestesista. Sumarlos y mostrar eso es la otra opcion.
-Medicamentos         |
-Material especifico  |  --> Estos 2 hoy aparecen juntos como TotalMedicacion, pero deben ir separados
-
-
-# TODO next:
- - Terminar de entender calclulo de honorario para un estudio, y como se relaciona eso con Pago A Medico, ya que se
- puede usar lo mismo para ambos.
- - Se puede empezar a hacer el listado sin calcular los honorarios medicos. Y dejar eso para el final.
-"""
-
-
-
-"""
-PAGO A MEDICO:
-
---
 
 
 """

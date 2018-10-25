@@ -32,6 +32,7 @@ class ComprobanteSerializer(serializers.ModelSerializer):
 
 class ComprobanteListadoSerializer(serializers.ModelSerializer):
     tipo_comprobante = TipoComprobanteSerializer()
+    gravado = GravadoSerializer()
     days_since_joined = serializers.SerializerMethodField()
 
     class Meta:
@@ -45,10 +46,9 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'total_cobrado',
                   'fecha_emision',
                   'tipo_comprobante',
-                  'days_since_joined',
                   'estado',
                   'neto',
-                  'IVA',
+                  'total_iva',
                   'honorarios',
                   'anestesia',
                   'retencion_impositiva',
@@ -57,9 +57,39 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'medicamentos',
                   'material_especifico')
 
-    def get_days_since_joined(self, obj):
-        return self.context.get('calculador')
+    def honorarios_medico(self, comprobante):
+        # self.context.get('calculador')
+        presentacion = comprobante.presentacion
 
+        return presentacion.get_total_honorarios()
+
+        # TODO: decir si mover esto a presentacion
+        estudios = presentacion.estudios.all()
+
+        total = 0
+        for estudio in estudios:
+            honorario = calculate_honorario(estudio)
+            total +=honorario
+
+        return total
+
+    def horarios_anestesista(self):
+        # TODO: terminar logica y moverla a presentacion si corresponde
+        estudios = presentacion.estudios.all().order_by('fecha','paciente','obra_social')
+        grupos_de_estudios = groupby(estudios, lambda e: (e.fecha, e.paciente, e.obra_social))
+
+
+        for (fecha, paciente, obra_social), grupo in grupos_de_estudios:
+            estudios = list(grupo)
+
+            calculador_honorarios = CalculadorHonorariosAnestesista(estudios[0].anestesista, estudios, estudios[0].obra_social)
+            result = calculador_honorarios.calculate()
+            ara = result.get('ara')
+            if ara:
+                retencion = ara.get('retencion')   # TODO: validar que valor se toma con Mariana
+            no_ara = result.get('no_ara')
+            if no_ara:
+                retencion = no_ara.get('a_pagar')
 
 # Columnas Actuales
 # dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()
@@ -68,8 +98,6 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
 # dr("Fecha") = c.FechaEmision.ToString().Remove(10)
 # dr("Cliente") = c.NombreCliente.ToUpper()
 # dr("TotalFacturado") = Format(c.TotalFacturado, "#################0.00")
-# dr("TotalCobrado") = Format(0.0, "#################0.00")
-# dr("TotalFacturado") = Format(0.0, "#################0.00")
 # dr("Neto") = Format(0.0, "#################0.00")
 # dr("IVA") = Format(0.0, "#################0.00")
 # dr("Honorarios") = Format(0.0, "#################0.00")
