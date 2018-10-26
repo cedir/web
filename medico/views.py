@@ -207,10 +207,15 @@ class MedicoViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['get'])
     def get_estudios_pendientes_de_pago(self, request, pk=None):
-        estudios_cobrados = Estudio.objects.filter(fecha_cobro__isnull=False)
-        pendientes_de_pago = estudios_cobrados.filter(medico__id=pk, pago_medico_actuante__isnull=True) \
-                             | estudios_cobrados.filter(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
-        data = [ListNuevoPagoMedicoSerializer(q, context={'calculador': 1}).data for q in pendientes_de_pago]
+        # Si la fecha de cobro es null, no se lo cobramos a la OS
+        # Si es pago_contra_factura entonces hay que cobrarle al medico los servicios administrativos
+        estudios_cobrados = Estudio.objects.filter(fecha_cobro__isnull=False) \
+                            | Estudio.objects.filter(pago_contra_factura=True)
+        # Si el medico participo en el estudio (como actuante o solicitante)
+        # y no se lo pagamos/cobramos, esta pendiente.
+        pendientes_del_medico = estudios_cobrados.filter(medico__id=pk, pago_medico_actuante__isnull=True) \
+                                | estudios_cobrados.filter(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
+        data = [ListNuevoPagoMedicoSerializer(q, context={'calculador': 1}).data for q in pendientes_del_medico]
         return Response(data)
 
 
