@@ -10,5 +10,8 @@
   },
   "scripts": {
     "postinstall": "bower install"
+  },
+  "dependencies": {
+    "owl-carousel": "^1.0.0"
   }
 }

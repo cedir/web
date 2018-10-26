@@ -1,3 +1,4 @@
 {
-  "directory": "static/templates/bower_components"
+  "directory": "static/templates/bower_components",
+  "registry": "https://registry.bower.io"
 }
