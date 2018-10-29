@@ -1,5 +1,8 @@
+from itertools import groupby
 from rest_framework import serializers
 from comprobante.models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado
+from anestesista.calculador_honorarios.calculador_honorarios import CalculadorHonorariosAnestesista
+
 
 class TipoComprobanteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,9 +34,10 @@ class ComprobanteSerializer(serializers.ModelSerializer):
 
 
 class ComprobanteListadoSerializer(serializers.ModelSerializer):
-    tipo_comprobante = TipoComprobanteSerializer()
-    gravado = GravadoSerializer()
-    days_since_joined = serializers.SerializerMethodField()
+    # tipo_comprobante = TipoComprobanteSerializer()
+    # gravado = GravadoSerializer()
+    honorarios_medicos = serializers.SerializerMethodField()
+    honorarios_anestesistas = serializers.SerializerMethodField()
 
     class Meta:
         model = Comprobante
@@ -47,38 +51,38 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'fecha_emision',
                   'tipo_comprobante',
                   'estado',
-                  'neto',
-                  'total_iva',
-                  'honorarios',
-                  'anestesia',
+                  'importe_gravado_afip',  # neto
+                  'importe_alicuota_afip',  # iva
+                  'honorarios_medicos',
+                  'honorarios_anestesistas',
                   'retencion_impositiva',
                   'retencion_cedir',
                   'sala_recuperacion',
                   'medicamentos',
                   'material_especifico')
 
-    def honorarios_medico(self, comprobante):
+    def get_honorarios_medicos(self, comprobante):
         # self.context.get('calculador')
-        presentacion = comprobante.presentacion
+        # presentacion = comprobante.presentacion
+        #
+        # return presentacion.get_total_honorarios()
+        #
+        # # TODO: decir si mover esto a presentacion
+        # estudios = presentacion.estudios.all()
+        #
+        # total = 0
+        # for estudio in estudios:
+        #     honorario = calculate_honorario(estudio)
+        #     total +=honorario
+        #
+        # return total
+        return 0
 
-        return presentacion.get_total_honorarios()
-
-        # TODO: decir si mover esto a presentacion
-        estudios = presentacion.estudios.all()
+    def get_honorarios_anestesistas(self, comprobante):
+        estudios_todos = comprobante.presentacion.get().estudios.all().order_by('fecha','paciente','obra_social')
+        grupos_de_estudios = groupby(estudios_todos, lambda e: (e.fecha, e.paciente, e.obra_social))
 
         total = 0
-        for estudio in estudios:
-            honorario = calculate_honorario(estudio)
-            total +=honorario
-
-        return total
-
-    def horarios_anestesista(self):
-        # TODO: terminar logica y moverla a presentacion si corresponde
-        estudios = presentacion.estudios.all().order_by('fecha','paciente','obra_social')
-        grupos_de_estudios = groupby(estudios, lambda e: (e.fecha, e.paciente, e.obra_social))
-
-
         for (fecha, paciente, obra_social), grupo in grupos_de_estudios:
             estudios = list(grupo)
 
@@ -86,10 +90,10 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
             result = calculador_honorarios.calculate()
             ara = result.get('ara')
             if ara:
-                retencion = ara.get('retencion')   # TODO: validar que valor se toma con Mariana
+                total += ara.get('retencion')   # TODO: validar que valor se toma con Mariana
             no_ara = result.get('no_ara')
             if no_ara:
-                retencion = no_ara.get('a_pagar')
+                total += no_ara.get('a_pagar')
 
 # Columnas Actuales
 # dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()

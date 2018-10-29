@@ -1,3 +1,5 @@
+from functools import reduce
+
 from django.db import models
 from datetime import timedelta
 
@@ -91,18 +93,6 @@ class Comprobante(models.Model):
         return self.fecha_emision + timedelta(days=30)
 
     @property
-    def neto(self):
-        return self.total / 1.105  # TODO: sacar el gravado desde self.gravado.porcentaje
-
-    @property
-    def total_iva(self):
-        return self.neto * self.gravado.porcentaje / 100  # TODO: ver si se puede mejorar este calculo
-
-    @property
-    def anestesia(self):
-        return 0
-
-    @property
     def retencion_impositiva(self):
         return 0
 
@@ -112,14 +102,20 @@ class Comprobante(models.Model):
 
     @property
     def sala_recuperacion(self):
+        reduce(sum, [est.importe_cobrado_pension
+                     for est in self.presentacion.estudios])
         return 0
 
     @property
     def medicamentos(self):
+        reduce(sum, [est.get_total_medicacion
+                     for est in self.presentacion.estudios])
         return 0
 
     @property
     def material_especifico(self):
+        reduce(sum, [est.medicamentos - est.get_total_medicacionfor
+                     for est in self.presentacion.estudios])
         return 0
 
     class Meta:
