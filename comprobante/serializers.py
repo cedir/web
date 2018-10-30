@@ -79,21 +79,22 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
         return 0
 
     def get_honorarios_anestesistas(self, comprobante):
-        estudios_todos = comprobante.presentacion.get().estudios.all().order_by('fecha','paciente','obra_social')
-        grupos_de_estudios = groupby(estudios_todos, lambda e: (e.fecha, e.paciente, e.obra_social))
-
+        # estudios_todos = comprobante.presentacion.get().estudios.all().order_by('fecha','paciente','obra_social')
+        # grupos_de_estudios = groupby(estudios_todos, lambda e: (e.fecha, e.paciente, e.obra_social))
+        #
         total = 0
-        for (fecha, paciente, obra_social), grupo in grupos_de_estudios:
-            estudios = list(grupo)
-
-            calculador_honorarios = CalculadorHonorariosAnestesista(estudios[0].anestesista, estudios, estudios[0].obra_social)
-            result = calculador_honorarios.calculate()
-            ara = result.get('ara')
-            if ara:
-                total += ara.get('retencion')   # TODO: validar que valor se toma con Mariana
-            no_ara = result.get('no_ara')
-            if no_ara:
-                total += no_ara.get('a_pagar')
+        # for (fecha, paciente, obra_social), grupo in grupos_de_estudios:
+        #     estudios = list(grupo)
+        #
+        #     calculador_honorarios = CalculadorHonorariosAnestesista(estudios[0].anestesista, estudios, estudios[0].obra_social)
+        #     result = calculador_honorarios.calculate()
+        #     ara = result.get('ara')
+        #     if ara:
+        #         total += ara.get('retencion')   # TODO: validar que valor se toma con Mariana
+        #     no_ara = result.get('no_ara')
+        #     if no_ara:
+        #         total += no_ara.get('a_pagar')
+        return total
 
 # Columnas Actuales
 # dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()

@@ -102,21 +102,31 @@ class Comprobante(models.Model):
 
     @property
     def sala_recuperacion(self):
-        reduce(sum, [est.importe_cobrado_pension
-                     for est in self.presentacion.estudios])
-        return 0
+
+        presentacion = self.presentacion.get()
+        estudios = presentacion.estudios.all()
+        total = 0
+        for est in estudios:
+            total += est.importe_cobrado_pension
+        return total
 
     @property
     def medicamentos(self):
-        reduce(sum, [est.get_total_medicacion
-                     for est in self.presentacion.estudios])
-        return 0
+        presentacion = self.presentacion.get()
+        estudios = presentacion.estudios.all()
+        total = 0
+        for est in estudios:
+            total += est.get_total_medicacion()
+        return total
 
     @property
     def material_especifico(self):
-        reduce(sum, [est.medicamentos - est.get_total_medicacionfor
-                     for est in self.presentacion.estudios])
-        return 0
+        presentacion = self.presentacion.get()
+        estudios = presentacion.estudios.all()
+        total = 0
+        for est in estudios:
+            total += est.medicamentos - est.get_total_medicacion()
+        return total
 
     class Meta:
         permissions = (
