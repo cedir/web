@@ -226,7 +226,6 @@ class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y
     page_size = 20
 
     def create(self, request, *args, **kwargs):
-        import pdb; pdb.set_trace()
         serializer = CreateNuevoPagoMedicoSerializer(data=request.data)
 
         if serializer.is_valid():

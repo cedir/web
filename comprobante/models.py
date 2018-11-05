@@ -1,5 +1,3 @@
-from functools import reduce
-
 from django.db import models
 from datetime import timedelta
 
