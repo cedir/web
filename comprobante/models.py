@@ -3,6 +3,7 @@ from functools import reduce
 from django.db import models
 from datetime import timedelta
 
+
 class TipoComprobante(models.Model):
     nombre = models.CharField(max_length=128, db_column=u'tipoComprobante')
 
@@ -92,47 +93,12 @@ class Comprobante(models.Model):
     def fecha_vencimiento(self):
         return self.fecha_emision + timedelta(days=30)
 
-    @property
-    def retencion_impositiva(self):
-        return 0
-
-    @property
-    def retencion_cedir(self):
-        return 0
-
-    @property
-    def sala_recuperacion(self):
-
-        presentacion = self.presentacion.get()
-        estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.importe_cobrado_pension
-        return total
-
-    @property
-    def medicamentos(self):
-        presentacion = self.presentacion.get()
-        estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.get_total_medicacion()
-        return total
-
-    @property
-    def material_especifico(self):
-        presentacion = self.presentacion.get()
-        estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.medicamentos - est.get_total_medicacion()
-        return total
-
     class Meta:
         permissions = (
             ("informe_ventas", u"Permite generar el informe de ventas."),
         )
         db_table = 'tblComprobantes'
+
 
 class LineaDeComprobante(models.Model):
     comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'lineas')

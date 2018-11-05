@@ -38,6 +38,11 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     # gravado = GravadoSerializer()
     honorarios_medicos = serializers.SerializerMethodField()
     honorarios_anestesistas = serializers.SerializerMethodField()
+    retencion_impositiva = serializers.SerializerMethodField()
+    retencion_cedir = serializers.SerializerMethodField()
+    sala_recuperacion = serializers.SerializerMethodField()
+    total_medicamentos = serializers.SerializerMethodField()
+    total_material_especifico = serializers.SerializerMethodField()
 
     class Meta:
         model = Comprobante
@@ -58,8 +63,8 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'retencion_impositiva',
                   'retencion_cedir',
                   'sala_recuperacion',
-                  'medicamentos',
-                  'material_especifico')
+                  'total_medicamentos',
+                  'total_material_especifico')
 
     def get_honorarios_medicos(self, comprobante):
         # self.context.get('calculador')
@@ -67,7 +72,7 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
         #
         # return presentacion.get_total_honorarios()
         #
-        # # TODO: decir si mover esto a presentacion
+        # # TODO: decir si mover esto a presentacion. Me parece que no debido a que solo se utiliza aca y no es atributo de Presentacion.
         # estudios = presentacion.estudios.all()
         #
         # total = 0
@@ -96,6 +101,36 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
         #         total += no_ara.get('a_pagar')
         return total
 
+    def get_retencion_impositiva(self, comprobante):
+        return 0
+
+    def get_retencion_cedir(self, comprobante):
+        return 0
+
+    def get_sala_recuperacion(self, comprobante):
+
+        presentacion = self.presentacion.get()
+        estudios = presentacion.estudios.all()
+        total = 0
+        for est in estudios:
+            total += est.importe_cobrado_pension
+        return total
+
+    def get_total_medicamentos(self, comprobante):
+        presentacion = self.presentacion.get()
+        estudios = presentacion.estudios.all()
+        total = 0
+        for est in estudios:
+            total += est.get_total_medicacion()
+        return total
+
+    def get_total_material_especifico(self, comprobante):
+        presentacion = self.presentacion.get()
+        estudios = presentacion.estudios.all()
+        # TODO: ver que hacer en el caso de que la presentacion este cobrada y ya no tengamos el listado sino un total
+        total = 0
+        return total
+
 # Columnas Actuales
 # dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()
 # dr("Nro") = c.NroComprobante.ToString()
@@ -117,3 +152,13 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
 # Retencion Anestesia --> ya se esta mostrando. Aplicar 10% a la suma de todo es una opcion, o bien recorrer cada estudio y aplicar el porcentaje de cada anestesista. Sumarlos y mostrar eso es la otra opcion.
 # Medicamentos         |
 # Material especifico  |  --> Estos 2 hoy aparecen juntos como TotalMedicacion, pero deben ir separados
+
+"""
+NOTA: el calculo de honorario medico se aplican las mismas reglas que pago a medico. Si el estudio esta pagado al medico, no importa, volver a aplicar las reglas porque hay qye mostrar lo que se deberia pagar, y no lo que se pago.
+      calculo de honorario anestesia sale del campo "anestesia" del estudio. Sino esta cargado se muestra 0 (cero)
+
+NOTA 2: del calculo de pago a medico, se desprenden otros valores como "Retencion Impositiva" y "Gastos Administriativos".
+        Estos valores deben ser sumados por separado y mostrado en diferentes columnas.
+
+
+"""
