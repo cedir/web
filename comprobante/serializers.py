@@ -34,8 +34,8 @@ class ComprobanteSerializer(serializers.ModelSerializer):
 
 
 class ComprobanteListadoSerializer(serializers.ModelSerializer):
-    # tipo_comprobante = TipoComprobanteSerializer()
-    # gravado = GravadoSerializer()
+    tipo_comprobante = TipoComprobanteSerializer()
+    gravado = GravadoSerializer()
     honorarios_medicos = serializers.SerializerMethodField()
     honorarios_anestesistas = serializers.SerializerMethodField()
     retencion_impositiva = serializers.SerializerMethodField()
@@ -55,6 +55,7 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'total_cobrado',
                   'fecha_emision',
                   'tipo_comprobante',
+                  'gravado',
                   'estado',
                   'importe_gravado_afip',  # neto
                   'importe_alicuota_afip',  # iva
@@ -108,8 +109,9 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
         return 0
 
     def get_sala_recuperacion(self, comprobante):
-
-        presentacion = self.presentacion.get()
+        presentacion = comprobante.presentacion.all().first()
+        if not presentacion:
+            return 0
         estudios = presentacion.estudios.all()
         total = 0
         for est in estudios:
@@ -117,7 +119,9 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
         return total
 
     def get_total_medicamentos(self, comprobante):
-        presentacion = self.presentacion.get()
+        presentacion = comprobante.presentacion.all().first()
+        if not presentacion:
+            return 0
         estudios = presentacion.estudios.all()
         total = 0
         for est in estudios:
@@ -125,7 +129,9 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
         return total
 
     def get_total_material_especifico(self, comprobante):
-        presentacion = self.presentacion.get()
+        presentacion = comprobante.presentacion.all().first()
+        if not presentacion:
+            return 0
         estudios = presentacion.estudios.all()
         # TODO: ver que hacer en el caso de que la presentacion este cobrada y ya no tengamos el listado sino un total
         total = 0
@@ -146,12 +152,12 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
 #
 #
 # Columnas extras que hay que mostrar:
-# Retencion Imposotva
+# Retencion Impositiva
 # Retencion Cedir (GA)
 # Sala de recuperacion
 # Retencion Anestesia --> ya se esta mostrando. Aplicar 10% a la suma de todo es una opcion, o bien recorrer cada estudio y aplicar el porcentaje de cada anestesista. Sumarlos y mostrar eso es la otra opcion.
-# Medicamentos         |
-# Material especifico  |  --> Estos 2 hoy aparecen juntos como TotalMedicacion, pero deben ir separados
+# total Medicamentos         |
+# total Material especifico  |  --> Estos 2 hoy aparecen juntos como TotalMedicacion, pero deben ir separados
 
 """
 NOTA: el calculo de honorario medico se aplican las mismas reglas que pago a medico. Si el estudio esta pagado al medico, no importa, volver a aplicar las reglas porque hay qye mostrar lo que se deberia pagar, y no lo que se pago.

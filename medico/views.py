@@ -229,7 +229,7 @@ class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y
         serializer = CreateNuevoPagoMedicoSerializer(data=request.data)
 
         if not serializer.is_valid():
-            return Response(self._serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         #serializer.save()
         return Response({'success': True}, status=status.HTTP_200_OK)

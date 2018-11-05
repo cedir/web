@@ -97,17 +97,17 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
         return Decimal(0)
 
 
-class LineaPagoMedicoSerializer(serializers.ModelSerializer):
-    estudio_id = serializers.IntegerField(source='estudio_id')
+class LineaPagoMedicoSerializer(serializers.Serializer):
+    estudio_id = serializers.IntegerField()
     importe = serializers.DecimalField(max_digits=16, decimal_places=2)
 
 
-class CreateNuevoPagoMedicoSerializer(serializers.ModelSerializer):
+class CreateNuevoPagoMedicoSerializer(serializers.Serializer):
     """
-    {"medico_id": 11, "estudios": [{"id": 22, "importe": 22.22}, ...]}
+    {"medico": 11, "lineas": [{"estudio_id": 22, "importe": 22.22}, ...]}
 
     """
-    medico = MedicoSerializer()
+    medico = serializers.IntegerField()
     lineas = LineaPagoMedicoSerializer(many=True)
 
 
