@@ -6,10 +6,10 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.template import Template, Context, loader
 from django.http import HttpResponse
-from rest_framework.response import Response
 from django.db.models import Q
+from rest_framework.response import Response
+from rest_framework import generics, status
 from rest_framework import viewsets, filters
-from rest_framework import generics
 from rest_framework.decorators import list_route, detail_route
 
 from common.drf.views import StandardResultsSetPagination
@@ -228,8 +228,11 @@ class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y
     def create(self, request, *args, **kwargs):
         serializer = CreateNuevoPagoMedicoSerializer(data=request.data)
 
-        if serializer.is_valid():
-            serializer.save()
+        if not serializer.is_valid():
+            return Response(self._serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        #serializer.save()
+        return Response({'success': True}, status=status.HTTP_200_OK)
 
     @detail_route(methods=['get'])
     def get_detalle_pago(self, request, pk=None):
