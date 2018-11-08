@@ -1,15 +1,22 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse
-from rest_framework import viewsets, filters
-from django.db.models import Q
-from medico.models import Medico, Disponibilidad
-from medico.serializers import MedicoSerializer
-from sala.models import Sala
+from datetime import datetime
+import simplejson
+
 from django.conf import settings
 from django.shortcuts import redirect
 from django.template import Template, Context, loader
-from datetime import datetime
-import simplejson
+from django.http import HttpResponse
+from django.db.models import Q
+from rest_framework.response import Response
+from rest_framework import generics, status
+from rest_framework import viewsets, filters
+from rest_framework.decorators import list_route, detail_route
+
+from common.drf.views import StandardResultsSetPagination
+from medico.models import Medico, Disponibilidad, PagoMedico
+from medico.serializers import MedicoSerializer, PagoMedicoSerializer, ListNuevoPagoMedicoSerializer, CreateNuevoPagoMedicoSerializer, GETLineaPagoMedicoSerializer
+from sala.models import Sala
+from estudio.models import Estudio
 
 
 def get_disponibilidad_medicos(request):
@@ -174,6 +181,7 @@ def delete_disponibilidad(request, id_disponibilidad):
     }
     return HttpResponse(simplejson.dumps(response_dict))
 
+
 class MedicoNombreApellidoOMatriculaFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         search_text = request.query_params.get(u'search_text')
@@ -186,8 +194,9 @@ class MedicoNombreApellidoOMatriculaFilterBackend(filters.BaseFilterBackend):
                 nomOApe1 = search_params[0]
                 nomOApe2 = search_params[1] if len(search_params) >= 2 else ''
                 queryset = queryset.filter((Q(nombre__icontains=nomOApe1) & Q(apellido__icontains=nomOApe2)) |
-                    (Q(nombre__icontains=nomOApe2) & Q(apellido__icontains=nomOApe1)))
+                                           (Q(nombre__icontains=nomOApe2) & Q(apellido__icontains=nomOApe1)))
         return queryset
+
 
 class MedicoViewSet(viewsets.ModelViewSet):
     model = Medico
@@ -195,3 +204,49 @@ class MedicoViewSet(viewsets.ModelViewSet):
     serializer_class = MedicoSerializer
     filter_backends = (MedicoNombreApellidoOMatriculaFilterBackend, )
     pagination_class = None
+
+    @detail_route(methods=['get'])
+    def get_estudios_pendientes_de_pago(self, request, pk=None):
+        # Si la fecha de cobro es null, no se lo cobramos a la OS
+        # Si es pago_contra_factura entonces hay que cobrarle al medico los servicios administrativos
+        estudios_cobrados = Estudio.objects.filter(fecha_cobro__isnull=False) \
+                            | Estudio.objects.filter(pago_contra_factura=True)
+        # Si el medico participo en el estudio (como actuante o solicitante)
+        # y no se lo pagamos/cobramos, esta pendiente.
+        pendientes_del_medico = estudios_cobrados.filter(medico__id=pk, pago_medico_actuante__isnull=True) \
+                                | estudios_cobrados.filter(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
+        data = [ListNuevoPagoMedicoSerializer(q, context={'calculador': 1}).data for q in pendientes_del_medico]
+        return Response(data)
+
+
+class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y POST
+    queryset = PagoMedico.objects.all().order_by('-fecha')
+    serializer_class = PagoMedicoSerializer
+    pagination_class = StandardResultsSetPagination
+    page_size = 20
+
+    def create(self, request, *args, **kwargs):
+        serializer = CreateNuevoPagoMedicoSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        #serializer.save()
+        return Response({'success': True}, status=status.HTTP_200_OK)
+
+    @detail_route(methods=['get'])
+    def get_detalle_pago(self, request, pk=None):
+
+        pago_medico = PagoMedico.objects.get(pk=pk)
+
+        # TODO: merge these
+        # TODO: mostrar solo el total para medico actuante o solicitante de acuerdo al rol en el estudio
+        # en vez de mostrar los importes actuante y solicitante todo el tiempo
+        # TODO: ver donde devolver el total
+        estudios_actuante = pago_medico.estudios_actuantes.all()
+        estudios_solicitantes = pago_medico.estudios_solicitantes.all()
+        data = []
+        serializer = GETLineaPagoMedicoSerializer(estudios_actuante, many=True)
+        data.append(serializer.data)
+
+        return Response(data)

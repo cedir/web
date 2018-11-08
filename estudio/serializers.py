@@ -11,7 +11,6 @@ from presentacion.serializers import PresentacionSmallSerializer
 
 
 class EstudioSerializer(serializers.ModelSerializer):
-
     obra_social = ObraSocialSerializer()
     paciente = PacienteSerializer()
     practica = PracticaSerializer()
@@ -25,11 +24,13 @@ class EstudioSerializer(serializers.ModelSerializer):
         fields = (u'id', u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
             u'medico_solicitante', u'anestesista', u'motivo', u'informe', u'presentacion')
 
+
 class EstudioCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudio
         fields = (u'id',u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
             u'medico_solicitante', u'anestesista', u'motivo', u'informe',)
+
 
 class MedicacionSerializer(serializers.HyperlinkedModelSerializer):
 

@@ -2,12 +2,16 @@
 from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import redirect
+from rest_framework import generics
+from rest_framework.response import Response
 
 import zipfile
 import StringIO
 
 from imprimir import generar_factura, obtener_comprobante, obtener_filename
 from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
+from comprobante.serializers import ComprobanteListadoSerializer
+from comprobante.models import Comprobante
 
 
 def imprimir(request, cae):
@@ -24,7 +28,6 @@ def imprimir(request, cae):
     return generar_factura(response, comp, leyenda)
 
 
-# Create your views here.
 def ventas(request, responsable, anio, mes):
     if not request.user.is_authenticated() or not request.user.has_perm('comprobante.informe_ventas'):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
@@ -53,3 +56,15 @@ def ventas(request, responsable, anio, mes):
     resp['Content-Disposition'] = 'attachment; filename={0}_{1}_{2}.zip'.format(responsable, anio, mes)
 
     return resp
+
+
+class InformeMensualView(generics.ListAPIView):
+    serializer_class = ComprobanteListadoSerializer
+
+    def list(self, request):
+        queryset = Comprobante.objects.filter(fecha_emision__month=request.query_params["mes"],
+                                              fecha_emision__year=request.query_params["anio"])
+        # TODO: ver si hace falta pasar el calculador (de honorarios) o se instancua dentro del serializer
+        data = [ComprobanteListadoSerializer(q, context={'calculador': 1}).data
+                for q in queryset]
+        return Response(data)
