@@ -2,6 +2,7 @@ from itertools import groupby
 from rest_framework import serializers
 from comprobante.models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado
 from anestesista.calculador_honorarios.calculador_honorarios import CalculadorHonorariosAnestesista
+from medico.calculo_honorarios import CalculadorHonorarios
 
 
 class TipoComprobanteSerializer(serializers.ModelSerializer):
@@ -68,21 +69,19 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'total_material_especifico')
 
     def get_honorarios_medicos(self, comprobante):
-        # self.context.get('calculador')
-        # presentacion = comprobante.presentacion
-        #
-        # return presentacion.get_total_honorarios()
-        #
-        # # TODO: decir si mover esto a presentacion. Me parece que no debido a que solo se utiliza aca y no es atributo de Presentacion.
-        # estudios = presentacion.estudios.all()
-        #
-        # total = 0
-        # for estudio in estudios:
-        #     honorario = calculate_honorario(estudio)
-        #     total +=honorario
-        #
-        # return total
-        return 0
+
+        presentacion = comprobante.presentacion.all().first()
+        if not presentacion:
+            return 34  # TODO: validar con mariana
+
+        estudios = presentacion.estudios.all()
+
+        total = 0
+        for estudio in estudios:
+            honorario = CalculadorHonorarios(estudio).total()
+            total +=honorario
+
+        return total
 
     def get_honorarios_anestesistas(self, comprobante):
         # estudios_todos = comprobante.presentacion.get().estudios.all().order_by('fecha','paciente','obra_social')
