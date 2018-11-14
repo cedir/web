@@ -29,6 +29,7 @@ class Comprobante(models.Model):
         (COBRADO, COBRADO),
     )
 
+    id = models.AutoField(primary_key=True)
     nombre_cliente = models.CharField(max_length=128, db_column=u'nombreCliente')
     domicilio_cliente = models.CharField(max_length=128, db_column=u'domicilioCliente')
     nro_cuit = models.CharField(max_length=128, db_column=u'nroCuit')
