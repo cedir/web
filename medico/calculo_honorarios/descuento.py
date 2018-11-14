@@ -1,9 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 PARTICULAR = 2
 PARTICULAR_ESPECIAL = 134
 OSDE = 3
-OSDE_CEDIR 79
+OSDE_CEDIR = 79
 OS_UNR = 25
 ACA_SALUD = 5
 GALENO = 46
@@ -17,7 +17,7 @@ ELECTROCARDEOGRAMA = 46
 
 DRENJUTO = 558
 
-class Descuento(ABC):
+class Descuento(object):
     """
     Clase abstracta que representa un descuento al importe de un estudio.
     """
@@ -93,10 +93,11 @@ class DescuentoPorPolipectomia(Descuento):
         return 300
 
 
-class DescuentoEcografia:
-    def aplicar(estudio, importe):
-        if _es_ecografia(estudio) and 
+class DescuentoEcografia(object):
+    def aplicar(self, estudio, importe):
+        if _es_ecografia(estudio):
+            pass
         
-    def _es_ecografia(estudio):
+    def _es_ecografia(self, estudio):
         # TODO
         pass

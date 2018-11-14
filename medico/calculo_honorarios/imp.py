@@ -1,11 +1,13 @@
-from .descuento import DescuentosVarios, DescuentoColangios, DescuentoStent, DescuentoRadiofrecuencia \
-                       DescuentoPorPolipectomia, 
+from abc import abstractmethod, abstractproperty
+
+from .descuento import DescuentosVarios, DescuentoColangios, DescuentoStent, DescuentoRadiofrecuencia, \
+                       DescuentoPorPolipectomia
 from .porcentajes import Porcentajes
 
 
-class ImpCalcHonorarios(ABC):
+class CalculadorHonorariosAbstracto(object):
     """
-    Reglas de negocio de calculo de honorarios para un tipo de facturación.
+    Reglas de negocio de calculo de honorarios para un tipo de facturacion.
     CalcHonorarios usa un heredero concreto para implementar cada paso de su algoritmo.
     Strategy: cada heredero debe definir una propiedad instancia de Descuento.
     """
@@ -17,9 +19,8 @@ class ImpCalcHonorarios(ABC):
     @abstractmethod
     def importe(self, estudio, gastos_administrativos):
         pass
-    
-    @abstractcmethod
-    @property
+
+    @abstractproperty
     def descuentos(self):
         pass
             
@@ -28,17 +29,27 @@ class ImpCalcHonorarios(ABC):
         pass
     
         
-class ImpComun(ImpCalcHonorarios):
+class CalculadorPorPresentacion(CalculadorHonorariosAbstracto):
     """
     Reglas de negocio cuando el estudio NO es pago contra factura.
     """
 
     def gastos_administrativos(self, estudio):
-        # TODO
-        pass
+
+        presentacion = estudio.presentacion
+
+        if presentacion.estado != presentacion.COBRADO:
+            return 0
+
+        pago = presentacion.pago.get()
+
+        return estudio.importe_estudio_cobrado * pago.gasto_administrativo / 100
     
     def importe(self, estudio, gastos_administrativos):
         # Esta bien usar importe_estudio_cobrado???
+        importe = estudio.importe
+        if presentacion.estado == presentacion.COBRADO:
+            importe = estudio.importe_estudio_cobrado
         return estudio.importe_estudio_cobrado - gastos_administrativos
     
     @property
@@ -56,7 +67,7 @@ class ImpComun(ImpCalcHonorarios):
             pago[idsolicitante] = importe * porcentajes.solicitante / 100
 
 
-class ImpPCF(ImpCalcHonorarios):
+class CalculadorPorPagoContraFactura(CalculadorHonorariosAbstracto):
     """
     Reglas de negocio cuando el estudio ES pago contra factura.
     """
@@ -83,5 +94,3 @@ class ImpPCF(ImpCalcHonorarios):
         pago[idactuante] = -(importe * porcentajes.actuante / 100 + self.descuentos.aplicar(estudio, importe))        
         if idsolicitante != idactuante:
             pago[idsolicitante] = importe * porcentajes.solicitante / 100
-
-

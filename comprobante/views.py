@@ -64,7 +64,5 @@ class InformeMensualView(generics.ListAPIView):
     def list(self, request):
         queryset = Comprobante.objects.filter(fecha_emision__month=request.query_params["mes"],
                                               fecha_emision__year=request.query_params["anio"])
-        # TODO: ver si hace falta pasar el calculador (de honorarios) o se instancua dentro del serializer
-        data = [ComprobanteListadoSerializer(q, context={'calculador': 1}).data
-                for q in queryset]
-        return Response(data)
+
+        return Response(ComprobanteListadoSerializer(queryset, many=True).data)
