@@ -58,7 +58,7 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Estudio
-        fields = ('fecha', 'importe_estudio', 'importe_neto', 'fecha_cobro', 'paciente', 'obra_social', 'medico_actuante',
+        fields = ('id', 'fecha', 'importe_estudio', 'importe_neto', 'fecha_cobro', 'paciente', 'obra_social', 'medico_actuante',
                   'medico_solicitante', 'practica', 'retencion_cedir', 'porcentaje_medico', 'gastos_administrativos',
                   'pago_contra_factura', 'pago', 'importe_iva_21', 'importe_iva_105', 'total')
 
