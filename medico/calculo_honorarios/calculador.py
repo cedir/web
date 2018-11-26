@@ -1,28 +1,44 @@
 
-from .imp import CalculadorPorPagoContraFactura, CalculadorPorPresentacion
+from .reglas import ReglasPorPagoContraFactura, ReglasPorPresentacion, \
+                    ReglasPorFacturado
 
 
 class CalculadorHonorarios():
     """
-    Dado un estudio, aplica todas las reglas de negocio para calcular los honorarios de los medicos.
-    Template (una variante con composicion en vez de herencia): Los detalles de cada regla quedan
-    a cargo de un ImpCalcHonorarios concreto, dependiendo de como se facturo el estudio.
+    Dado un estudio, aplica todas las reglas de negocios para calcular los
+    honorarios de los medicos implicados en el mismo.
+    Template (una variante con composicion en vez de herencia):
+    Los detalles de cada regla quedan a cargo de un heredero de
+    CalculadorHonorariosAbstracto, dependiendo de como se facturo
+    el estudio.
     """
-    def __init__(self, estudio):
-        if estudio.es_pago_contra_factura:
-            imp = CalculadorPorPagoContraFactura()
-        else:
-            imp = CalculadorPorPresentacion()
+    def _calcular(self):
+        gastos_administrativos = self.reglas.get_gastos_administrativos(self.estudio)
+        importe = self.reglas.get_importe(self.estudio, gastos_administrativos)
+        importe_actualizado = max(0, importe - self.reglas.descuentos.aplicar(self.estudio, importe))
+        self.honorarios_medicos = self.reglas.get_honorarios_medicos(self.estudio, importe_actualizado)
 
-        # gastos_administrativos = imp.gastos_administrativos(estudio)
-        # importe = imp.importe(estudio, gastos_administrativos)
-        # importe_actualizado = max(0, importe - imp.descuentos.aplicar(estudio, importe))
-        # self._pagos_correspondientes = imp.correspondientes(estudio, importe_actualizado)
+
+class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
+    def __init__(self, estudio):
+        self.reglas = ReglasPorFacturado()
+        self._calcular()
 
     def total(self):
-        # return sum(self._pagos_correspondientes.values())
+        return sum(self.honorarios_medicos.values())
 
-        return 35
 
-    def correspondiente(self, medico):
-        return self._pagos_correspondientes[medico.id]
+class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
+    def __init__(self, estudio):
+        self.estudio = estudio
+        if estudio.es_pago_contra_factura:
+            self.reglas = ReglasPorPagoContraFactura()
+        else:
+            self.reglas = ReglasPorPresentacion()
+        self._calcular()
+
+    def actuante(self):
+        pass
+
+    def solicitante(self):
+        pass

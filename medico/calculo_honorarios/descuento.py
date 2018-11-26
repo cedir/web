@@ -17,6 +17,7 @@ ELECTROCARDEOGRAMA = 46
 
 DRENJUTO = 558
 
+
 class Descuento(object):
     """
     Clase abstracta que representa un descuento al importe de un estudio.
@@ -27,7 +28,8 @@ class Descuento(object):
         Calcula el nuevo importe luego de aplicar de un estudio luego de aplicar este descuento
         """
         pass
-        
+
+
 class DescuentoNulo(Descuento):
     """
     No se aplica ningun descuento al monto. Necesario para poder anular los descuentos con la menor modificacion posible
@@ -35,29 +37,31 @@ class DescuentoNulo(Descuento):
     """
     def aplicar(self, estudio, importe):
         return 0
-        
+
+
 class DescuentosVarios(Descuento):
     """
     Aplicar una lista de descuentos.
     """
     def __init__(self, *descuentos):
         self._descuentos = descuentos
-        
+
     def aplicar(self, estudio, importe):
         return sum([des.aplicar(estudio, importe) for des in self._descuentos])
-            
+
+
 class DescuentosNoAcumulables(Descuento):
     """
     Se aplica solo el mayor descuento de una lista de posibles.
     """
-    
+
     def __init__(self, *descuentos):
         self._descuentos = descuentos
-        
+
     def aplicar(self, estudio, importe):
         return max([des.aplicar(estudio, importe) for des in self._descuentos])
-        
-        
+
+
 class DescuentoColangios(Descuento):
     def aplicar(estudio, importe):
         if estudio.practica.id in (13, 14, 34):
@@ -77,27 +81,27 @@ class DescuentoRadiofrecuencia(Descuento):
         if estudio.practica.id in (11, 17, 43):
             return 450
         return 0
-        
-        
+
+
 class DescuentoPorPolipectomia(Descuento):
     def aplicar(estudio, importe):
-        if estudio.practica.id not in []: # TODO: no se las ids estas o que criterio usar
+        if estudio.practica.id not in []:  # TODO: no se las ids estas o que criterio usar
             return 0
-        
+
         if estudio.obra_social.id in (OSDE, OSDE_CEDIR):
             return 0
-                    
+
         if estudio.obra_social.id in (OS_UNR, ACA_SALUD, GALENO, OSPAC):
             return 0
-            
+
         return 300
 
 
 class DescuentoEcografia(object):
     def aplicar(self, estudio, importe):
-        if _es_ecografia(estudio):
+        if self._es_ecografia(estudio):
             pass
-        
+
     def _es_ecografia(self, estudio):
         # TODO
         pass
