@@ -1,8 +1,9 @@
 from itertools import groupby
 from rest_framework import serializers
-from comprobante.models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado
+
 from anestesista.calculador_honorarios.calculador_honorarios import CalculadorHonorariosAnestesista
 
+from .models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado
 
 class TipoComprobanteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -68,75 +69,33 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'total_medicamentos',
                   'total_material_especifico')
 
-    def get_honorarios_medicos(self, comprobante):
-        # self.context.get('calculador')
-        # presentacion = comprobante.presentacion
-        #
-        # return presentacion.get_total_honorarios()
-        #
-        # # TODO: decir si mover esto a presentacion. Me parece que no debido a que solo se utiliza aca y no es atributo de Presentacion.
-        # estudios = presentacion.estudios.all()
-        #
-        # total = 0
-        # for estudio in estudios:
-        #     honorario = calculate_honorario(estudio)
-        #     total +=honorario
-        #
-        # return total
-        return 0
+    def get_honorarios_medicos(self, comprobante, context={}):
+        calculador = context["calculador"]
+        return calculador.honorarios_medicos
 
-    def get_honorarios_anestesistas(self, comprobante):
-        # estudios_todos = comprobante.presentacion.get().estudios.all().order_by('fecha','paciente','obra_social')
-        # grupos_de_estudios = groupby(estudios_todos, lambda e: (e.fecha, e.paciente, e.obra_social))
-        #
-        total = 0
-        # for (fecha, paciente, obra_social), grupo in grupos_de_estudios:
-        #     estudios = list(grupo)
-        #
-        #     calculador_honorarios = CalculadorHonorariosAnestesista(estudios[0].anestesista, estudios, estudios[0].obra_social)
-        #     result = calculador_honorarios.calculate()
-        #     ara = result.get('ara')
-        #     if ara:
-        #         total += ara.get('retencion')   # TODO: validar que valor se toma con Mariana
-        #     no_ara = result.get('no_ara')
-        #     if no_ara:
-        #         total += no_ara.get('a_pagar')
-        return total
+    def get_honorarios_anestesistas(self, comprobante, context={}):
+        calculador = context["calculador"]
+        return calculador.anestecia
 
-    def get_retencion_impositiva(self, comprobante):
-        return 0
+    def get_retencion_impositiva(self, comprobante, context={}):
+        calculador = context["calculador"]
+        return calculador.retencion_impositiva
 
-    def get_retencion_cedir(self, comprobante):
-        return 0
+    def get_retencion_cedir(self, comprobante, context={}):
+        calculador = context["calculador"]
+        return calculador.retencion_cedir
 
-    def get_sala_recuperacion(self, comprobante):
-        presentacion = comprobante.presentacion.all().first()
-        if not presentacion:
-            return 0
-        estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.importe_cobrado_pension
-        return total
+    def get_sala_recuperacion(self, comprobante, context={}):
+        calculador = context["calculador"]
+        return calculador.sala_recuperacion
 
-    def get_total_medicamentos(self, comprobante):
-        presentacion = comprobante.presentacion.all().first()
-        if not presentacion:
-            return 0
-        estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.get_total_medicacion()
-        return total
+    def get_total_medicamentos(self, comprobante, context={}):
+        calculador = context["calculador"]
+        return calculador.total_medicamentos
 
-    def get_total_material_especifico(self, comprobante):
-        presentacion = comprobante.presentacion.all().first()
-        if not presentacion:
-            return 0
-        estudios = presentacion.estudios.all()
-        # TODO: ver que hacer en el caso de que la presentacion este cobrada y ya no tengamos el listado sino un total
-        total = 0
-        return total
+    def get_total_material_especifico(self, comprobante, context={}):
+        calculador = context["calculador"]
+        return calculador.sala_recuperacion
 
 # Columnas Actuales
 # dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()
