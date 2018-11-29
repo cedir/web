@@ -2,10 +2,12 @@ from abc import abstractmethod, abstractproperty
 
 
 def create_calculador_informe(comprobante):
-    if comprobante.tipo_comprobante.get().nombre == "presentacion":  # REVISAR
-        return CalculadorInformePresentacion(comprobante)
-    elif comprobante.tipo_comprobante.get().nombre == "nota_de_credito":
-        return CalculadorInformeNotaCredito
+    if comprobante.tipo_comprobante.nombre in ["Factura", "Liquidacion", "Nota De Debito"]:  # REVISAR
+        return CalculadorInformeFactura(comprobante)
+    elif comprobante.tipo_comprobante.nombre == "Nota De Credito":
+        return CalculadorInformeNotaCredito(comprobante)
+    else:
+        raise Exception(comprobante.tipo_comprobante.nombre)
 
         
 class CalculardorInforme(object):
@@ -26,7 +28,7 @@ class CalculardorInforme(object):
         pass
     
     @abstractproperty
-    def sala_recupercion(self):
+    def sala_recuperacion(self):
         pass
     
     @abstractproperty
@@ -38,9 +40,9 @@ class CalculardorInforme(object):
         pass
 
         
-class CalculardorInformePresentacion(object):
+class CalculadorInformeFactura(object):
     def __init__(self, comprobante):
-        self.comprobante = compronbante
+        self.comprobante = comprobante
         
     @property
     def honorarios_medicos(self):
@@ -66,15 +68,15 @@ class CalculardorInformePresentacion(object):
         
     @property
     def retencion_impositiva(self):
-        pass
+        return 0
         
     @property
     def retencion_cedir(self):
-        pass
+        return 0
         
     @property
-    def sala_recupercion(self):
-        presentacion = comprobante.presentacion.all().first()
+    def sala_recuperacion(self):
+        presentacion = self.comprobante.presentacion.all().first()
         if not presentacion:
             return 0
         estudios = presentacion.estudios.all()
@@ -85,7 +87,7 @@ class CalculardorInformePresentacion(object):
         
     @property
     def total_medicamentos(self):
-        presentacion = comprobante.presentacion.all().first()
+        presentacion = self.comprobante.presentacion.all().first()
         if not presentacion:
             return 0
         estudios = presentacion.estudios.all()
@@ -96,7 +98,7 @@ class CalculardorInformePresentacion(object):
     
     @property
     def total_material_especifico(self):
-        presentacion = comprobante.presentacion.all().first()
+        presentacion = self.comprobante.presentacion.all().first()
         if not presentacion:
             return 0
         estudios = presentacion.estudios.all()
@@ -105,7 +107,7 @@ class CalculardorInformePresentacion(object):
         return total
 
         
-class CalculardorInforme(object):
+class CalculadorInformeNotaCredito(object):
     def __init__(self, comprobante):
         self.comprobante = comprobante
     
@@ -126,7 +128,7 @@ class CalculardorInforme(object):
         return 0
     
     @property
-    def sala_recupercion(self):
+    def sala_recuperacion(self):
         return 0
     
     @property

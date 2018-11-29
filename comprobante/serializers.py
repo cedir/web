@@ -69,33 +69,26 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'total_medicamentos',
                   'total_material_especifico')
 
-    def get_honorarios_medicos(self, comprobante, context={}):
-        calculador = context["calculador"]
-        return calculador.honorarios_medicos
+    def get_honorarios_medicos(self, comprobante):
+        return self.context["calculador"].honorarios_medicos
 
-    def get_honorarios_anestesistas(self, comprobante, context={}):
-        calculador = context["calculador"]
-        return calculador.anestecia
+    def get_honorarios_anestesistas(self, comprobante):
+        return self.context["calculador"].anestecia
 
-    def get_retencion_impositiva(self, comprobante, context={}):
-        calculador = context["calculador"]
-        return calculador.retencion_impositiva
+    def get_retencion_impositiva(self, comprobante):
+        return self.context["calculador"].retencion_impositiva
 
-    def get_retencion_cedir(self, comprobante, context={}):
-        calculador = context["calculador"]
-        return calculador.retencion_cedir
+    def get_retencion_cedir(self, comprobante):
+        return self.context["calculador"].retencion_cedir
 
-    def get_sala_recuperacion(self, comprobante, context={}):
-        calculador = context["calculador"]
-        return calculador.sala_recuperacion
+    def get_sala_recuperacion(self, comprobante):
+        return self.context["calculador"].sala_recuperacion
 
-    def get_total_medicamentos(self, comprobante, context={}):
-        calculador = context["calculador"]
-        return calculador.total_medicamentos
+    def get_total_medicamentos(self, comprobante):
+        return self.context["calculador"].total_medicamentos
 
-    def get_total_material_especifico(self, comprobante, context={}):
-        calculador = context["calculador"]
-        return calculador.sala_recuperacion
+    def get_total_material_especifico(self, comprobante):
+        return self.context["calculador"].sala_recuperacion
 
 # Columnas Actuales
 # dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()
