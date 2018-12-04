@@ -1,49 +1,49 @@
-from abc import abstractmethod, abstractproperty
+from abc import abstractproperty
 
 
-def create_calculador_informe(comprobante):
-    if comprobante.tipo_comprobante.nombre in ["Factura", "Liquidacion", "Nota De Debito"]:  # REVISAR
+def Calculador_informe_factory(comprobante):
+    if comprobante.tipo_comprobante.nombre in ["Factura", "Liquidacion", "Nota De Debito"]:
         return CalculadorInformeFactura(comprobante)
     elif comprobante.tipo_comprobante.nombre == "Nota De Credito":
         return CalculadorInformeNotaCredito(comprobante)
     else:
         raise Exception(comprobante.tipo_comprobante.nombre)
 
-        
-class CalculardorInforme(object):
+
+class CalculadorInforme(object):
     @abstractproperty
     def honorarios_medicos(self):
-        pass
-    
+        raise NotImplementedError
+
     @abstractproperty
-    def anestecia(self):
-        pass
-    
+    def anestesia(self):
+        raise NotImplementedError
+
     @abstractproperty
     def retencion_impositiva(self):
-        pass
-    
+        raise NotImplementedError
+
     @abstractproperty
     def retencion_cedir(self):
-        pass
-    
+        raise NotImplementedError
+
     @abstractproperty
     def sala_recuperacion(self):
-        pass
-    
+        raise NotImplementedError
+
     @abstractproperty
     def total_medicamentos(self):
-        pass
-    
+        raise NotImplementedError
+
     @abstractproperty
     def total_material_especifico(self):
-        pass
+        raise NotImplementedError
 
-        
-class CalculadorInformeFactura(object):
+
+class CalculadorInformeFactura(CalculadorInforme):
     def __init__(self, comprobante):
         self.comprobante = comprobante
-        
+
     @property
     def honorarios_medicos(self):
         # self.context.get('calculador')
@@ -61,19 +61,19 @@ class CalculadorInformeFactura(object):
         #
         # return total
         return 0
-        
+
     @property
-    def anestecia(self):
+    def anestesia(self):
         return 0
-        
+
     @property
     def retencion_impositiva(self):
         return 0
-        
+
     @property
     def retencion_cedir(self):
         return 0
-        
+
     @property
     def sala_recuperacion(self):
         presentacion = self.comprobante.presentacion.all().first()
@@ -84,7 +84,7 @@ class CalculadorInformeFactura(object):
         for est in estudios:
             total += est.importe_cobrado_pension
         return total
-        
+
     @property
     def total_medicamentos(self):
         presentacion = self.comprobante.presentacion.all().first()
@@ -95,7 +95,7 @@ class CalculadorInformeFactura(object):
         for est in estudios:
             total += est.get_total_medicacion()
         return total
-    
+
     @property
     def total_material_especifico(self):
         presentacion = self.comprobante.presentacion.all().first()
@@ -106,36 +106,35 @@ class CalculadorInformeFactura(object):
         total = 0
         return total
 
-        
-class CalculadorInformeNotaCredito(object):
+
+class CalculadorInformeNotaCredito(CalculadorInforme):
     def __init__(self, comprobante):
         self.comprobante = comprobante
-    
+
     @property
     def honorarios_medicos(self):
         return 0
-    
+
     @property
-    def anestecia(self):
+    def anestesia(self):
         return 0
-    
+
     @property
     def retencion_impositiva(self):
         return 0
-    
+
     @property
     def retencion_cedir(self):
         return 0
-    
+
     @property
     def sala_recuperacion(self):
         return 0
-    
+
     @property
     def total_medicamentos(self):
         return 0
-    
+
     @property
     def total_material_especifico(self):
         return 0
-
