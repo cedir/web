@@ -1,7 +1,7 @@
 from abc import abstractproperty
 
 
-def Calculador_informe_factory(comprobante):
+def calculador_informe_factory(comprobante):
     if comprobante.tipo_comprobante.nombre in ["Factura", "Liquidacion", "Nota De Debito"]:
         return CalculadorInformeFactura(comprobante)
     elif comprobante.tipo_comprobante.nombre == "Nota De Credito":
