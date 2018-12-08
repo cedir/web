@@ -64,47 +64,33 @@ class CalculadorInformeFactura(CalculadorInforme):
 
     @property
     def anestesia(self):
-        return 0
+        estudios  = self.comprobante.presentacion.estudios.all()
+        return sum([estudio.arancel_anestesia for estudio in estudios])
 
     @property
     def retencion_impositiva(self):
-        return 0
+        presentacion = self.comprobante.presentacion
+        return presentacion.iva * presentacion.total_facturado
 
     @property
     def retencion_cedir(self):
-        return 0
+        presentacion = self.comprobante.presentacion
+        return presentacion.pago.gasto_administrativo
 
     @property
     def sala_recuperacion(self):
-        presentacion = self.comprobante.presentacion.all().first()
-        if not presentacion:
-            return 0
-        estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.importe_cobrado_pension
-        return total
+        estudios  = self.comprobante.presentacion.estudios.all()
+        return sum([estudio.pension for estudio in estudios])
 
     @property
     def total_medicamentos(self):
-        presentacion = self.comprobante.presentacion.all().first()
-        if not presentacion:
-            return 0
-        estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.get_total_medicacion()
-        return total
+        estudios  = self.comprobante.presentacion.estudios.all()
+        return sum([estudio.get_total_medicacion() for estudio in estudios])
 
     @property
     def total_material_especifico(self):
-        presentacion = self.comprobante.presentacion.all().first()
-        if not presentacion:
-            return 0
-        estudios = presentacion.estudios.all()
-        # TODO: ver que hacer en el caso de que la presentacion este cobrada y ya no tengamos el listado sino un total
-        total = 0
-        return total
+        estudios  = self.comprobante.presentacion.estudios.all()
+        return sum([estudio.importe_medicacion - estudio.get_total_medicacion() for estudio in estudios])
 
 
 class CalculadorInformeNotaCredito(CalculadorInforme):
