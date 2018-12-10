@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'', include('anestesista.urls')),
     url(r'', include('usuario.urls')),
     url(r'', include('estudio.urls')),
+    url(r'', include('caja.urls')),
     url(r'', include('obra_social.urls')),
     url(r'', include('practica.urls')),
     url(r'', include('security.urls')),
