@@ -2,8 +2,10 @@ from abc import abstractproperty
 
 
 def calculador_informe_factory(comprobante):
-    if comprobante.tipo_comprobante.nombre in ["Factura", "Liquidacion", "Nota De Debito"]:
+    if comprobante.tipo_comprobante.nombre in "Factura":
         return CalculadorInformeFactura(comprobante)
+    elif comprobante.tipo_comprobante.nombre == "Nota De Debito":
+        return CalculadorInformeNotaDebito(comprobante)
     elif comprobante.tipo_comprobante.nombre == "Nota De Credito":
         return CalculadorInformeNotaCredito(comprobante)
     else:
@@ -106,6 +108,9 @@ class CalculadorInformeFactura(CalculadorInforme):
         total = 0
         return total
 
+
+class CalculadorInformeNotaDebito(CalculadorInformeFactura):
+    pass
 
 class CalculadorInformeNotaCredito(CalculadorInforme):
     def __init__(self, comprobante):
