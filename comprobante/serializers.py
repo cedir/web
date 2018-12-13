@@ -73,7 +73,7 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
         return self.context["calculador"].honorarios_medicos
 
     def get_honorarios_anestesistas(self, comprobante):
-        return self.context["calculador"].anestecia
+        return self.context["calculador"].anestesia
 
     def get_retencion_impositiva(self, comprobante):
         return self.context["calculador"].retencion_impositiva
