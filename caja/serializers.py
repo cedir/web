@@ -22,6 +22,12 @@ class EstudioCajaSerializer(serializers.ModelSerializer):
 
 class MovimientoCajaSerializer(serializers.ModelSerializer):
     tipo = TipoMovimientoCajaSerializer()
+    class Meta:
+        model = MovimientoCaja
+        fields = (u'id', u'concepto', u'monto', u'fecha', u'hora', u'tipo', u'estado')
+
+class MovimientoCajaForListadoSerializer(serializers.ModelSerializer):
+    tipo = TipoMovimientoCajaSerializer()
     estudio = EstudioCajaSerializer()
     class Meta:
         model = MovimientoCaja
