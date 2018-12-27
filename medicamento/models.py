@@ -1,6 +1,9 @@
 # -*- coding: utf-8
+from decimal import Decimal
+
 from django.db import models
 from django.db.models.signals import post_save
+
 from medico.models import Medico
 
 TIPOS_MEDICAMENTOS = (
@@ -12,7 +15,7 @@ TIPOS_MEDICAMENTOS = (
 class Medicamento(models.Model):
     id = models.AutoField(primary_key=True, db_column=u'idMedicamento')
     descripcion = models.CharField(db_column=u'descripcionMedicamento', max_length=300, blank=True)
-    importe = models.DecimalField(db_column=u'importeMedicamento', max_digits=16, decimal_places=2, default='0.00')
+    importe = models.DecimalField(db_column=u'importeMedicamento', max_digits=16, decimal_places=2, default=Decimal('0.00'))
     stock = models.PositiveSmallIntegerField(default=0)
     tipo = models.CharField(max_length=100, default=u'Medicación', choices=TIPOS_MEDICAMENTOS)
     codigo_osde = models.CharField(max_length=100, db_column=u'codigoMedicoOSDE', blank=True, default=u'')
