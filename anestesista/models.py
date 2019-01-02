@@ -19,7 +19,7 @@ class Anestesista(models.Model):
     localidad = models.CharField("Localidad",max_length=200, db_column="localidadMedico", null=True, blank=True)
     telefono  = models.CharField("Telefono",max_length=200, db_column="telMedico", null=True, blank=True)
     email     = models.EmailField("E-mail",max_length=200, db_column="mail", null=True, blank=True)
-    porcentaje_anestesista = models.DecimalField(max_digits=4, decimal_places=2, default='0.00')
+    porcentaje_anestesista = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.00'))
 
     def __unicode__ (self):
         return u'%s, %s' % (self.apellido, self.nombre, )
