@@ -198,7 +198,7 @@ function getConfirmarTurno(event) {
   var fecha = button.data('fecha');
   var horaInicio = button.data('hora');
 
-  var modal = $(this)
+  var modal = $(this);
 
   modal.find("#selected-paciente").text($("#selectedPaciente").text().trim() || 'Seleccione..');
   modal.find("#selected-medico").text($("#id-medico option:selected").text());
@@ -209,6 +209,21 @@ function getConfirmarTurno(event) {
   modal.find("#hora_inicio").val(horaInicio);
   modal.find("#selected-sala").text($("#id-sala option:selected").text());
 
+}
+
+function getInfoMedicoNoAtiendeEnFecha() {
+  var medico = $("#id_medico_chosen a span").text();
+  var periodoNoAtencion = $("#periodo-no-atencion").text();
+  var modal = $(this);
+  var msgNoAtencion;
+  if (periodoNoAtencion !== 'atiende') {
+    if (periodoNoAtencion === 'feriado') {
+      msgNoAtencion = 'La fecha solicitada coincide con un feriado.'
+    } else {
+      msgNoAtencion = 'El medico/ca ' + medico + ' informo que no atiende en la fecha solicitada.'
+    }
+    modal.find('#msg-no-atencion').text(msgNoAtencion);
+  }
 }
 
 

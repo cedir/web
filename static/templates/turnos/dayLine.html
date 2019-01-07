@@ -1,5 +1,14 @@
 <div style="float:left; margin-right:14px;border:1px solid #EEEEEE;">
+	<!-- Para obtener el periodo de no atencion y poder informarlo -->
+	<div id="periodo-no-atencion" style="display:none">{{periodoNoAtencion}}</div>
     <input type="hidden" name="fecha" value="{{fechaTurno}}" >
+	{% if periodoNoAtencion != 'atiende' %}
+		{% if periodoNoAtencion == 'feriado' %}
+			<div>Feriado!!!</div>
+		{% else %}
+			<div>El medico no atiende del {{periodoNoAtencion}}</div>
+		{% endif %}
+	{% endif %}
     <div>{{lineDay}}</div>
     <div class="line medicoLine" style="position:relative;">
 	    {% for disp in disponibilidades %}
@@ -9,74 +18,74 @@
 	    {% endfor %}
     </div>
     <div class="line timeLine">
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="07:00"><strong>07:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="07:15">07:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="07:30">07:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="07:45">07:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="08:00"><strong>08:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="08:15">08:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="08:30">08:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="08:45">08:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="09:00"><strong>09:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="09:15">09:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="09:30">09:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="09:45">09:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="10:00"><strong>10:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="10:15">10:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="10:30">10:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="10:45">10:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="11:00"><strong>11:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="11:15">11:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="11:30">11:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="11:45">11:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="12:00"><strong>12:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="12:15">12:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="12:30">12:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="12:45">12:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="13:00"><strong>13:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="13:15">13:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="13:30">13:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="13:45">13:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="14:00"><strong>14:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="14:15">14:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="14:30">14:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="14:45">14:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="15:00"><strong>15:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="15:15">15:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="15:30">15:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="15:45">15:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="16:00"><strong>16:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="16:15">16:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="16:30">16:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="16:45">16:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="17:00"><strong>17:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="17:15">17:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="17:30">17:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="17:45">17:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="18:00"><strong>18:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="18:15">18:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="18:30">18:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="18:45">18:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="19:00"><strong>19:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="19:15">19:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="19:30">19:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="19:45">19:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="20:00"><strong>20:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="20:15">20:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="20:30">20:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="20:45">20:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="21:00"><strong>21:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="21:15">21:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="21:30">21:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="21:45">21:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="22:00"><strong>22:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="22:15">22:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="22:30">22:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="22:45">22:45-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="23:00"><strong>23:00-</strong></div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="23:15">23:15-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="23:30">23:30-</div>
-	    <div class="time" data-toggle="modal" data-target="#dialog" data-fecha = "{{fechaTurno}}" data-hora="23:45">23:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="07:00"><strong>07:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="07:15">07:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="07:30">07:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="07:45">07:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="08:00"><strong>08:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="08:15">08:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="08:30">08:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="08:45">08:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="09:00"><strong>09:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="09:15">09:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="09:30">09:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="09:45">09:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="10:00"><strong>10:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="10:15">10:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="10:30">10:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="10:45">10:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="11:00"><strong>11:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="11:15">11:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="11:30">11:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="11:45">11:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="12:00"><strong>12:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="12:15">12:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="12:30">12:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="12:45">12:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="13:00"><strong>13:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="13:15">13:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="13:30">13:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="13:45">13:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="14:00"><strong>14:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="14:15">14:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="14:30">14:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="14:45">14:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="15:00"><strong>15:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="15:15">15:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="15:30">15:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="15:45">15:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="16:00"><strong>16:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="16:15">16:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="16:30">16:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="16:45">16:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="17:00"><strong>17:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="17:15">17:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="17:30">17:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="17:45">17:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="18:00"><strong>18:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="18:15">18:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="18:30">18:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="18:45">18:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="19:00"><strong>19:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="19:15">19:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="19:30">19:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="19:45">19:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="20:00"><strong>20:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="20:15">20:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="20:30">20:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="20:45">20:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="21:00"><strong>21:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="21:15">21:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="21:30">21:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="21:45">21:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="22:00"><strong>22:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="22:15">22:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="22:30">22:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="22:45">22:45-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="23:00"><strong>23:00-</strong></div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="23:15">23:15-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="23:30">23:30-</div>
+	    <div class="time" data-toggle="modal" data-target="{{dialog}}" data-fecha = "{{fechaTurno}}" data-hora="23:45">23:45-</div>
     </div>
     <div class="line dayLine" style="position:relative;">
 	    {% for turno in turnos %}
