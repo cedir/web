@@ -10,7 +10,7 @@
   $(document).ready(function() {
 
     $("#dialog").on('show.bs.modal', getConfirmarTurno);
-    $("#info-no-atiende").on('show.bs.modal', getInfoMedicoNoAtiendeEnFecha);
+    $("#disponibilidad-deshabilitada").on('show.bs.modal', getInfoDisponibilidadAnulada);
 
     $(".multiselect").chosen({
         search_contains : true,
@@ -59,7 +59,7 @@
   });
 </script>
 
-<div id="info-no-atiende" class="modal fade" tabindex="-1" role="dialog">
+<div id="disponibilidad-deshabilitada" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">

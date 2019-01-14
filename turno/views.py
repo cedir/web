@@ -187,16 +187,28 @@ def get_turnos_disponibles(request):
 
     return _get_turnos_disponibles(request.user, request.GET)
 
-def _atiendeElMedicoEnFecha(fecha, id_medico):
-    feriado = list(FechaNoAtencion.objects.filter(medico__isnull=True, fecha_fin__gte=fecha, fecha_inicio__lte=fecha))
-    if len(feriado) > 0:
-        return feriado[0];
-    fechas_no_disponibles_medico = list(FechaNoAtencion.objects.filter(medico__id=id_medico, fecha_fin__gte=fecha, fecha_inicio__lte=fecha))
-    # medico_no_disponible_en_fecha = True if len(fechas_no_disponibles) > 0 else False
-    if len(fechas_no_disponibles_medico) > 0:
-        return fechas_no_disponibles_medico[0]
-    return False
-
+def estado_disponibilidad_medico(fecha, id_medico):
+    anulacion = None
+    anulaciones_generales = list(FechaNoAtencion.objects.filter(medico__isnull=True, fecha_fin__gte=fecha, fecha_inicio__lte=fecha))
+    if len(anulaciones_generales) > 0:
+        anulacion = anulaciones_generales[0]
+    else:
+        licencias = list(FechaNoAtencion.objects.filter(medico__id=id_medico, fecha_fin__gte=fecha, fecha_inicio__lte=fecha))
+        if len(licencias) > 0:
+            anulacion = licencias[0]
+    
+    if anulacion is None:
+        return {
+            'deshabilitada': False,
+            'motivo_deshabilitacion': 'habilitada'
+        }
+    motivo_anulacion = "general" if anulacion.medico is None else "licencia"
+    return {
+        'deshabilitada': True,
+        'motivo_deshabilitacion': motivo_anulacion,
+        'fecha_inicio': anulacion.fecha_inicio,
+        'fecha_fin': anulacion.fecha_fin
+    }
 
 def get_next_day_line(request):
     fecha = request.GET['fecha']
@@ -205,9 +217,7 @@ def get_next_day_line(request):
     sp = fecha.split('-')
     c = date(int(sp[0]), int(sp[1]), int(sp[2]))
     next_date = _get_next_day(c, id_sala, id_medico)
-    # determinar si el medico atiende en la fecha indicada
-    medico_no_disponible_en_fecha = _atiendeElMedicoEnFecha(next_date, id_medico)
-    day_lines = _get_day_line(next_date, id_sala, medico_no_disponible_en_fecha)
+    day_lines = _get_day_line(next_date, id_sala, id_medico)
     return HttpResponse(day_lines)
 
 
@@ -218,9 +228,7 @@ def get_back_day_line(request):
     sp = fecha.split('-')
     c = date(int(sp[0]), int(sp[1]), int(sp[2]))
     back_date = _get_previous_day(c, id_sala, id_medico)
-    # determinar si el medico atiende en la fecha indicada
-    medico_no_disponible_en_fecha = _atiendeElMedicoEnFecha(back_date, id_medico)
-    day_lines = _get_day_line(back_date, id_sala, medico_no_disponible_en_fecha)
+    day_lines = _get_day_line(back_date, id_sala, id_medico)
     return HttpResponse(day_lines)
 
 
@@ -484,8 +492,14 @@ def confirmar(request, id_turno):
     except Exception as err:
         return str(err)
 
+def _get_periodo_no_atencion(disponibilidad_anulada):
+    if disponibilidad_anulada.get('deshabilitada'):
+        fechaInicio = disponibilidad_anulada.get('fecha_inicio')
+        fechaFin = disponibilidad_anulada.get('fecha_fin')
+        return "{}/{}/{} al {}/{}/{}".format(fechaInicio.day, fechaInicio.month, fechaInicio.year, fechaFin.day, fechaFin.month, fechaFin.year)
+    return ''
 
-def _get_day_line(fecha, id_sala, medico_no_disponible = False):
+def _get_day_line(fecha, id_sala, id_medico):
     """
     Arma la linea de tiempo con los turnos existentes y la disponibilidad de los medicos (hora en los que atienden)
     para el dia y la sala dada.
@@ -493,16 +507,8 @@ def _get_day_line(fecha, id_sala, medico_no_disponible = False):
     :param id_sala: Int id de sala.
     :return: HTML object con la linea de tiempo
     """
-    periodoNoAtencion = 'atiende'
-    if medico_no_disponible:
-        if medico_no_disponible.medico is None:
-            periodoNoAtencion = 'feriado'
-        else:
-            fechaInicio = medico_no_disponible.fecha_inicio
-            fechaFin = medico_no_disponible.fecha_fin
-            periodoNoAtencion = "{}/{}/{} al {}/{}/{}".format(fechaInicio.day, fechaInicio.month, fechaInicio.year, fechaFin.day, fechaFin.month, fechaFin.year)
-            # periodoNoAtencion = str(fechaInicio.day) + '/' + str(fechaInicio.month) + '/' + str(fechaInicio.year)
-            # + 'al ' + str(fechaFin.day) + '/' + str(fechaFin.month) + '/' + str(fechaFin.year)
+    estado_disponibilidad = estado_disponibilidad_medico(fecha, id_medico)
+
     dia = spaDays[fecha.weekday()]
     mes = spaMonths[fecha.month]
 
@@ -534,7 +540,7 @@ def _get_day_line(fecha, id_sala, medico_no_disponible = False):
           "hora": disp.horaInicio,
           "duracionEnPixeles": disp.getDuracionEnMinutos() * PIXELS_PER_MINUTE,
           "medico": " ".join(list(disp.medico.apellido)),
-          "color": 'red' if medico_no_disponible else colors[index % 3],
+          "color": 'red' if estado_disponibilidad.get('deshabilitada') else colors[index % 3],
           "sala": disp.sala.nombre
       } for (index, disp) in enumerate(disponibilidad)]
 
@@ -543,8 +549,9 @@ def _get_day_line(fecha, id_sala, medico_no_disponible = False):
         'fechaTurno': fecha_format,
         'turnos': arr_hsh_turnos,
         'disponibilidades': arr_hsh_disponibilidad,
-        'dialog': '#info-no-atiende' if medico_no_disponible else '#dialog',
-        'periodoNoAtencion': periodoNoAtencion
+        'dialog': '#disponibilidad-deshabilitada' if estado_disponibilidad.get('deshabilitada') else '#dialog',
+        'periodoNoAtencion': _get_periodo_no_atencion(estado_disponibilidad),
+        'motivo_deshabilitacion': estado_disponibilidad.get('motivo_deshabilitacion')
     })
 
     return day_line_template.render(day_line_context)
@@ -619,9 +626,7 @@ def _get_turnos_disponibles(user, data):
         # lo mismo que este codigo
         for i in range(0, 4):
             next_date = _get_next_day(selected_date, id_sala, id_medico)
-            # determinar si el medico atiende en la fecha indicada
-            medico_no_disponible_en_fecha = _atiendeElMedicoEnFecha(next_date, id_medico)
-            line = _get_day_line(next_date, id_sala, medico_no_disponible_en_fecha)
+            line = _get_day_line(next_date, id_sala, id_medico)
             selected_date = next_date
             day_lines.append(line)
 

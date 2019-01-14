@@ -211,13 +211,14 @@ function getConfirmarTurno(event) {
 
 }
 
-function getInfoMedicoNoAtiendeEnFecha() {
+function getInfoDisponibilidadAnulada(event) {
+  var button = $(event.relatedTarget);
   var medico = $("#id_medico_chosen a span").text();
-  var periodoNoAtencion = $("#periodo-no-atencion").text();
+  var motivo_deshabilitacion =  button.data('motivo');
   var modal = $(this);
   var msgNoAtencion;
-  if (periodoNoAtencion !== 'atiende') {
-    if (periodoNoAtencion === 'feriado') {
+  if (motivo_deshabilitacion !== 'atiende') {
+    if (motivo_deshabilitacion === 'general') {
       msgNoAtencion = 'La fecha solicitada coincide con un feriado.'
     } else {
       msgNoAtencion = 'El medico/ca ' + medico + ' informo que no atiende en la fecha solicitada.'
