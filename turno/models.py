@@ -18,7 +18,7 @@ class Estado(models.Model):
     class Meta:
         db_table = 'turnos_estados'
 
-class FechaNoAtencion(models.Model):
+class PeriodosNoAtencion(models.Model):
     fecha_inicio = models.DateTimeField("Fecha Inicio", null=False, blank=False)
     fecha_fin = models.DateTimeField("Fecha Fin", null=False, blank=False)
     medico = models.ForeignKey(Medico, null=True, blank=True)

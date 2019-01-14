@@ -20,7 +20,7 @@ from paciente.models import Paciente
 from practica.models import Practica
 from sala.models import Sala
 from turno.models import InfoTurno
-from turno.models import Turno, Estado, FechaNoAtencion
+from turno.models import Turno, Estado, PeriodosNoAtencion
 from turno.serializers import InfoTurnoSerializer
 from security.encryption import encode
 from common.drf.views import StandardResultsSetPagination
@@ -189,11 +189,11 @@ def get_turnos_disponibles(request):
 
 def estado_disponibilidad_medico(fecha, id_medico):
     anulacion = None
-    anulaciones_generales = list(FechaNoAtencion.objects.filter(medico__isnull=True, fecha_fin__gte=fecha, fecha_inicio__lte=fecha))
+    anulaciones_generales = list(PeriodosNoAtencion.objects.filter(medico__isnull=True, fecha_fin__gte=fecha, fecha_inicio__lte=fecha))
     if len(anulaciones_generales) > 0:
         anulacion = anulaciones_generales[0]
     else:
-        licencias = list(FechaNoAtencion.objects.filter(medico__id=id_medico, fecha_fin__gte=fecha, fecha_inicio__lte=fecha))
+        licencias = list(PeriodosNoAtencion.objects.filter(medico__id=id_medico, fecha_fin__gte=fecha, fecha_inicio__lte=fecha))
         if len(licencias) > 0:
             anulacion = licencias[0]
     
