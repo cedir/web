@@ -492,7 +492,7 @@ def confirmar(request, id_turno):
     except Exception as err:
         return str(err)
 
-def _get_periodo_no_atencion(disponibilidad_anulada):
+def get_periodo_no_atencion(disponibilidad_anulada):
     if disponibilidad_anulada.get('deshabilitada'):
         fechaInicio = disponibilidad_anulada.get('fecha_inicio')
         fechaFin = disponibilidad_anulada.get('fecha_fin')
@@ -550,7 +550,7 @@ def _get_day_line(fecha, id_sala, id_medico):
         'turnos': arr_hsh_turnos,
         'disponibilidades': arr_hsh_disponibilidad,
         'dialog': '#disponibilidad-deshabilitada' if estado_disponibilidad.get('deshabilitada') else '#dialog',
-        'periodoNoAtencion': _get_periodo_no_atencion(estado_disponibilidad),
+        'periodoNoAtencion': get_periodo_no_atencion(estado_disponibilidad),
         'motivo_deshabilitacion': estado_disponibilidad.get('motivo_deshabilitacion')
     })
 
