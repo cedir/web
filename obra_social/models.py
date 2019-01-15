@@ -22,8 +22,7 @@ class ObraSocial(models.Model):
                                 blank=True, default='')
     localidad = models.CharField(u'Localidad', db_column='localidad', max_length=200,
                                  blank=True, default='')
-    codigo_postal = models.IntegerField(u'Código Postal', db_column='codigoPostal',
-                                        blank=True, default='')
+    codigo_postal = models.IntegerField(u'Código Postal', db_column='codigoPostal', blank=True, default=0)
     condicion_fiscal = models.CharField(u'Condición Fiscal', db_column='condicionFiscal', max_length=200,
                                         choices=CONDICIONES_FISCALES, default='CONSUMIDOR FINAL')
     observaciones = models.TextField(u'Observaciones', db_column="observaciones", blank=True)
