@@ -24,7 +24,7 @@ class PeriodosNoAtencion(models.Model):
     medico = models.ForeignKey(Medico, null=True, blank=True)
 
     class Meta:
-        db_table = 'turnos_fecha_no_atencion'
+        db_table = 'turnos_periodo_no_atencion'
 
 class Turno(models.Model):
     fecha_otorgamiento = models.DateTimeField("Fecha Otorgamiento", null=False, blank=False)

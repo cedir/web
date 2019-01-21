@@ -10,7 +10,6 @@
   $(document).ready(function() {
 
     $("#dialog").on('show.bs.modal', getConfirmarTurno);
-    $("#disponibilidad-deshabilitada").on('show.bs.modal', getInfoDisponibilidadAnulada);
 
     $(".multiselect").chosen({
         search_contains : true,
@@ -58,23 +57,6 @@
     getInfoTurno();
   });
 </script>
-
-<div id="disponibilidad-deshabilitada" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4>Atencion!!!</h4>
-      </div>
-      <div class="modal-body">
-        <div id="msg-no-atencion"></div>
-        <div>No es posible otorgar el turno.</div>
-      </div>
-      <div class="modal-footer">
-        <input type="button" class="btn btn-default" value="Cerrar" name="btnCerrar" data-dismiss="modal" />
-      </div>
-    </div> <!-- .modal-content -->
-  </div> <!-- .modal-dialog -->
-</div>
 
 <div id="dialog" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog">
