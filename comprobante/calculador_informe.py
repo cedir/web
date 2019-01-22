@@ -66,14 +66,22 @@ class CalculadorInformeFactura(CalculadorInforme):
 
     @property
     def anestesia(self):
-        return 0
+        estudios = self.comprobante.presentacion.all().first().estudios.all()
+        return sum([estudio.arancel_anestesia for estudio in estudios])
 
     @property
     def retencion_impositiva(self):
-        return 0
+        presentacion = self.comprobante.presentacion.all().first()
+        if not presentacion.iva:
+            return 0
+        return presentacion.iva * presentacion.total_facturado
 
     @property
     def retencion_cedir(self):
+        presentacion = self.comprobante.presentacion.all().first()
+        if not presentacion.pago:
+            return 0
+        # return presentacion.pago.all().first().gasto_administrativo
         return 0
 
     @property
@@ -95,7 +103,10 @@ class CalculadorInformeFactura(CalculadorInforme):
         estudios = presentacion.estudios.all()
         total = 0
         for est in estudios:
-            total += est.get_total_medicacion()
+            try:
+                total += est.get_total_medicacion()
+            except NotImplementedError:
+                pass
         return total
 
     @property
