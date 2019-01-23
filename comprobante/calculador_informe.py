@@ -44,25 +44,15 @@ class CalculadorInforme(object):
 
 
 class CalculadorInformeFactura(CalculadorInforme):
+    '''
+    En todos los casos, se toman los importes FACTURADOS.
+    '''
     def __init__(self, comprobante):
         self.comprobante = comprobante
 
     @property
     def honorarios_medicos(self):
-        # self.context.get('calculador')
-        # presentacion = comprobante.presentacion
-        #
-        # return presentacion.get_total_honorarios()
-        #
-        # # TODO: decir si mover esto a presentacion. Me parece que no debido a que solo se utiliza aca y no es atributo de Presentacion.
-        # estudios = presentacion.estudios.all()
-        #
-        # total = 0
-        # for estudio in estudios:
-        #     honorario = calculate_honorario(estudio)
-        #     total +=honorario
-        #
-        # return total
+        # No implementado aun.
         return 0
 
     @property
@@ -74,52 +64,61 @@ class CalculadorInformeFactura(CalculadorInforme):
     def retencion_impositiva(self):
         presentacion = self.comprobante.presentacion.all().first()
         if not presentacion.iva:
+            # Algunas presentacionines tienen IVA = Null. Para estos casos, consideramos que debía ser 0.
             return 0
         return presentacion.iva * presentacion.total_facturado / Decimal(100)
 
     @property
     def retencion_cedir(self):
+        '''
+        La retencion del cedir depende se guarda en el pago de la presentacion y esos casos conviene sacarla de ahí.
+        Pero si no hay pago, es segun Mariana, "un valor fijo que no cambia seguido" y se puede decidir aca.
+        Hay que mover esta logica cuando hagamos facturacion, para no duplicar.
+        '''
         presentacion = self.comprobante.presentacion.all().first()
         if presentacion.pago:
-            retencion = ...
+            return presentacion.pago.retencion_impositiva * presentacion.total_facturado / Decimal(100)
         if presentacion.obra_social.se_presenta_por_AMR:
-            retencion = Decimal(32)
-        else:
-            retencion = Decimal()
-        return presentacion.total_facturado * retencion / Decimal(100)
+            return Decimal(32) * presentacion.total_facturado / Decimal(100)
+        return Decimal(25) * presentacion.total_facturado / Decimal(100)
 
     @property
     def sala_recuperacion(self):
         presentacion = self.comprobante.presentacion.all().first()
         estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.pension
-        return total
+        return sum([estudio.pension for estudio in estudios])
 
     @property
     def total_medicamentos(self):
+        '''
+        Para las presentacion ya cobradas, se borran los registros que dividen los medicamentos por tipo y queda solo el
+        total. En esos casos, se suma todo en esta columna y se deja en 0 el material especifico.
+        Cuando implementemos facturacion acá, no vamos a eleminar ese registro y podemos corregir esto.
+        '''
+        def aux(est):
+            try:
+                return est.get_total_medicacion()
+            except NotImplementedError:
+                return est.importe_medicacion
         presentacion = self.comprobante.presentacion.all().first()
         estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            try:
-                total += est.get_total_medicacion()
-            except NotImplementedError:
-                pass
-        return total
+        return sum([aux(estudio) for estudio in estudios])
 
     @property
     def total_material_especifico(self):
+        def aux(est):
+            try:
+                return est.get_total_material_especifico()
+            except NotImplementedError:
+                return 0
         presentacion = self.comprobante.presentacion.all().first()
         estudios = presentacion.estudios.all()
-        # TODO: ver que hacer en el caso de que la presentacion este cobrada y ya no tengamos el listado sino un total
-        total = 0
-        return total
+        return sum([aux(estudio) for estudio in estudios])
 
 
 class CalculadorInformeNotaDebito(CalculadorInformeFactura):
     pass
+
 
 class CalculadorInformeNotaCredito(CalculadorInforme):
     def __init__(self, comprobante):
