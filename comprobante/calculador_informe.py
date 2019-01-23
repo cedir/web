@@ -1,4 +1,5 @@
 from abc import abstractproperty
+from decimal import Decimal
 
 
 def calculador_informe_factory(comprobante):
@@ -74,32 +75,31 @@ class CalculadorInformeFactura(CalculadorInforme):
         presentacion = self.comprobante.presentacion.all().first()
         if not presentacion.iva:
             return 0
-        return presentacion.iva * presentacion.total_facturado
+        return presentacion.iva * presentacion.total_facturado / Decimal(100)
 
     @property
     def retencion_cedir(self):
         presentacion = self.comprobante.presentacion.all().first()
-        if not presentacion.pago:
-            return 0
-        # return presentacion.pago.all().first().gasto_administrativo
-        return 0
+        if presentacion.pago:
+            retencion = ...
+        if presentacion.obra_social.se_presenta_por_AMR:
+            retencion = Decimal(32)
+        else:
+            retencion = Decimal()
+        return presentacion.total_facturado * retencion / Decimal(100)
 
     @property
     def sala_recuperacion(self):
         presentacion = self.comprobante.presentacion.all().first()
-        if not presentacion:
-            return 0
         estudios = presentacion.estudios.all()
         total = 0
         for est in estudios:
-            total += est.importe_cobrado_pension
+            total += est.pension
         return total
 
     @property
     def total_medicamentos(self):
         presentacion = self.comprobante.presentacion.all().first()
-        if not presentacion:
-            return 0
         estudios = presentacion.estudios.all()
         total = 0
         for est in estudios:
@@ -112,8 +112,6 @@ class CalculadorInformeFactura(CalculadorInforme):
     @property
     def total_material_especifico(self):
         presentacion = self.comprobante.presentacion.all().first()
-        if not presentacion:
-            return 0
         estudios = presentacion.estudios.all()
         # TODO: ver que hacer en el caso de que la presentacion este cobrada y ya no tengamos el listado sino un total
         total = 0
