@@ -57,27 +57,34 @@ class CalculadorInformeFactura(CalculadorInforme):
 
     @property
     def anestesia(self):
-        estudios = self.comprobante.presentacion.all().first().estudios.all()
+        presentacion = self.comprobante.presentacion.all().first()
+        if not presentacion:
+            return 0
+        estudios = presentacion.estudios.all()
         return sum([estudio.arancel_anestesia for estudio in estudios])
 
     @property
     def retencion_impositiva(self):
         presentacion = self.comprobante.presentacion.all().first()
+        if not presentacion:
+            return 0
         if not presentacion.iva:
-            # Algunas presentacionines tienen IVA = Null. Para estos casos, consideramos que debía ser 0.
+            # Algunas presentacionines tienen IVA = Null. Para estos casos, consideramos que debia ser 0.
             return 0
         return presentacion.iva * presentacion.total_facturado / Decimal(100)
 
     @property
     def retencion_cedir(self):
         '''
-        La retencion del cedir depende se guarda en el pago de la presentacion y esos casos conviene sacarla de ahí.
+        La retencion del cedir depende se guarda en el pago de la presentacion y esos casos conviene sacarla de ahi.
         Pero si no hay pago, es segun Mariana, "un valor fijo que no cambia seguido" y se puede decidir aca.
         Hay que mover esta logica cuando hagamos facturacion, para no duplicar.
         '''
         presentacion = self.comprobante.presentacion.all().first()
+        if not presentacion:
+            return 0
         if presentacion.pago:
-            return presentacion.pago.retencion_impositiva * presentacion.total_facturado / Decimal(100)
+            return presentacion.pago.get().gasto_administrativo * presentacion.total_facturado / Decimal(100)
         if presentacion.obra_social.se_presenta_por_AMR:
             return Decimal(32) * presentacion.total_facturado / Decimal(100)
         return Decimal(25) * presentacion.total_facturado / Decimal(100)
@@ -85,6 +92,8 @@ class CalculadorInformeFactura(CalculadorInforme):
     @property
     def sala_recuperacion(self):
         presentacion = self.comprobante.presentacion.all().first()
+        if not presentacion:
+            return 0
         estudios = presentacion.estudios.all()
         return sum([estudio.pension for estudio in estudios])
 
@@ -93,7 +102,7 @@ class CalculadorInformeFactura(CalculadorInforme):
         '''
         Para las presentacion ya cobradas, se borran los registros que dividen los medicamentos por tipo y queda solo el
         total. En esos casos, se suma todo en esta columna y se deja en 0 el material especifico.
-        Cuando implementemos facturacion acá, no vamos a eleminar ese registro y podemos corregir esto.
+        Cuando implementemos facturacion aca, no vamos a eleminar ese registro y podemos corregir esto.
         '''
         def aux(est):
             try:
@@ -101,6 +110,8 @@ class CalculadorInformeFactura(CalculadorInforme):
             except NotImplementedError:
                 return est.importe_medicacion
         presentacion = self.comprobante.presentacion.all().first()
+        if not presentacion:
+            return 0
         estudios = presentacion.estudios.all()
         return sum([aux(estudio) for estudio in estudios])
 
@@ -112,6 +123,8 @@ class CalculadorInformeFactura(CalculadorInforme):
             except NotImplementedError:
                 return 0
         presentacion = self.comprobante.presentacion.all().first()
+        if not presentacion:
+            return 0
         estudios = presentacion.estudios.all()
         return sum([aux(estudio) for estudio in estudios])
 
