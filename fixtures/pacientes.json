@@ -1,0 +1,66 @@
+[
+{
+    "model": "paciente.paciente",
+    "pk": 1,
+    "fields": {
+        "dni": 11111111,
+        "nombre": "Homero Jay",
+        "apellido": "Simpson",
+        "edad": 66,
+        "fechaNacimiento": "1947-05-21",
+        "domicilio": "Av. Siempre Viva 742",
+        "telefono": "",
+        "sexo": "Masculino",
+        "nroAfiliado": "11111112",
+        "email": null
+    }
+},
+{
+    "model": "paciente.paciente",
+    "pk": 2,
+    "fields": {
+        "dni": 22222222,
+        "nombre": "Nedward",
+        "apellido": "Flanders",
+        "edad": 56,
+        "fechaNacimiento": "1957-05-21",
+        "domicilio": "Avenida Siempre Viva 748",
+        "telefono": "",
+        "sexo": "Masculino",
+        "nroAfiliado": "234245",
+        "email": null
+    }
+},
+{
+    "model": "paciente.paciente",
+    "pk": 3,
+    "fields": {
+        "dni": 33333333,
+        "nombre": "Apu",
+        "apellido": "Nahasapeemapetilon",
+        "edad": 0,
+        "fechaNacimiento": null,
+        "domicilio": "",
+        "telefono": "",
+        "sexo": "Masculino",
+        "nroAfiliado": "73253",
+        "email": null
+    }
+},
+{
+    "model": "paciente.paciente",
+    "pk": 4,
+    "fields": {
+        "dni": 44444444,
+        "nombre": "Seymour",
+        "apellido": "Skinner",
+        "edad": 60,
+        "fechaNacimiento": "1953-05-21",
+        "domicilio": "",
+        "telefono": "",
+        "sexo": "Masculino",
+        "nroAfiliado": "1023512",
+        "email": null
+    }
+}
+]

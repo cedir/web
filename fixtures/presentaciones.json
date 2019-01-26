@@ -1,0 +1,30 @@
+[
+{
+    "model": "presentacion.presentacion",
+    "pk": 1,
+    "fields": {
+        "obra_social": 1,
+        "comprobante": 1,
+        "fecha": "2011-07-20",
+        "estado": 0,
+        "periodo": "g",
+        "iva": 0,
+        "total": "2800.00",
+        "total_facturado": "2800.00"
+    }
+},
+{
+    "model": "presentacion.presentacion",
+    "pk": 2,
+    "fields": {
+        "obra_social": 2,
+        "comprobante": 2,
+        "fecha": "2012-07-06",
+        "estado": 1,
+        "periodo": "JUNIO 2012",
+        "iva": 0,
+        "total": "1368.36",
+        "total_facturado": "1368.36"
+    }
+}
+]
