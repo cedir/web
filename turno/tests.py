@@ -7,8 +7,7 @@ from turno.models import Turno
 
 
 class TurnosTest(TestCase):
-    fixtures = ['turnos.json']
-
+    fixtures = ['turnos.json','pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json']
     def setUp(self):
         self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
         self.client = Client(HTTP_POST='localhost')
