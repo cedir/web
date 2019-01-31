@@ -1,6 +1,7 @@
 from abc import abstractproperty
 from decimal import Decimal
 
+from django.core.exceptions import ObjectDoesNotExist
 
 def calculador_informe_factory(comprobante):
     if comprobante.tipo_comprobante.nombre in "Factura":
@@ -53,13 +54,13 @@ class CalculadorInformeFactura(CalculadorInforme):
     @property
     def honorarios_medicos(self):
         # No implementado aun.
-        return 0
+        return Decimal("0.00")
 
     @property
     def anestesia(self):
         presentacion = self.comprobante.presentacion.all().first()
         if not presentacion:
-            return 0
+            return Decimal("0.00")
         estudios = presentacion.estudios.all()
         return sum([estudio.arancel_anestesia for estudio in estudios])
 
@@ -67,11 +68,11 @@ class CalculadorInformeFactura(CalculadorInforme):
     def retencion_impositiva(self):
         presentacion = self.comprobante.presentacion.all().first()
         if not presentacion:
-            return 0
+            return Decimal("0.00")
         if not presentacion.iva:
             # Algunas presentacionines tienen IVA = Null. Para estos casos, consideramos que debia ser 0.
-            return 0
-        return presentacion.iva * presentacion.total_facturado / Decimal(100)
+                return Decimal("0.00")
+        return presentacion.iva * presentacion.total_facturado / Decimal("100.00")
 
     @property
     def retencion_cedir(self):
@@ -82,18 +83,20 @@ class CalculadorInformeFactura(CalculadorInforme):
         '''
         presentacion = self.comprobante.presentacion.all().first()
         if not presentacion:
-            return 0
-        if presentacion.pago:
-            return presentacion.pago.get().gasto_administrativo * presentacion.total_facturado / Decimal(100)
-        if presentacion.obra_social.se_presenta_por_AMR:
-            return Decimal(32) * presentacion.total_facturado / Decimal(100)
-        return Decimal(25) * presentacion.total_facturado / Decimal(100)
+            return Decimal("0.00")
+        try:
+            return presentacion.pago.get().gasto_administrativo * presentacion.total_facturado / Decimal("100.00")
+        except ObjectDoesNotExist:
+            if presentacion.obra_social.se_presenta_por_AMR == "1":
+                # Resulta que bool("0") es True. TODO: arreglar esto, en el model o en algun lado.
+                return Decimal("32.00") * presentacion.total_facturado / Decimal("100.00")
+            return Decimal("25.00") * presentacion.total_facturado / Decimal("100.00")
 
     @property
     def sala_recuperacion(self):
         presentacion = self.comprobante.presentacion.all().first()
         if not presentacion:
-            return 0
+            return Decimal("0.00")
         estudios = presentacion.estudios.all()
         return sum([estudio.pension for estudio in estudios])
 
@@ -111,7 +114,7 @@ class CalculadorInformeFactura(CalculadorInforme):
                 return est.importe_medicacion
         presentacion = self.comprobante.presentacion.all().first()
         if not presentacion:
-            return 0
+            return Decimal("0.00")
         estudios = presentacion.estudios.all()
         return sum([aux(estudio) for estudio in estudios])
 
@@ -121,10 +124,10 @@ class CalculadorInformeFactura(CalculadorInforme):
             try:
                 return est.get_total_material_especifico()
             except NotImplementedError:
-                return 0
+                return Decimal("0.00")
         presentacion = self.comprobante.presentacion.all().first()
         if not presentacion:
-            return 0
+            return Decimal("0.00")
         estudios = presentacion.estudios.all()
         return sum([aux(estudio) for estudio in estudios])
 
@@ -139,28 +142,28 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
 
     @property
     def honorarios_medicos(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def anestesia(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def retencion_impositiva(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def retencion_cedir(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def sala_recuperacion(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def total_medicamentos(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def total_material_especifico(self):
-        return 0
+        return Decimal("0.00")
