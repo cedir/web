@@ -58,7 +58,7 @@ class CalculadorInformeFactura(CalculadorInforme):
 
     @property
     def anestesia(self):
-        presentacion = self.comprobante.presentacion.all().first()
+        presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
         estudios = presentacion.estudios.all()
@@ -66,7 +66,7 @@ class CalculadorInformeFactura(CalculadorInforme):
 
     @property
     def retencion_impositiva(self):
-        presentacion = self.comprobante.presentacion.all().first()
+        presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
         if not presentacion.iva:
@@ -81,20 +81,20 @@ class CalculadorInformeFactura(CalculadorInforme):
         Pero si no hay pago, es segun Mariana, "un valor fijo que no cambia seguido" y se puede decidir aca.
         Hay que mover esta logica cuando hagamos facturacion, para no duplicar.
         '''
-        presentacion = self.comprobante.presentacion.all().first()
+        presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
-        try:
-            return presentacion.pago.get().gasto_administrativo * presentacion.total_facturado / Decimal("100.00")
-        except ObjectDoesNotExist:
-            if presentacion.obra_social.se_presenta_por_AMR == "1":
-                # Resulta que bool("0") es True. TODO: arreglar esto, en el model o en algun lado.
-                return Decimal("32.00") * presentacion.total_facturado / Decimal("100.00")
-            return Decimal("25.00") * presentacion.total_facturado / Decimal("100.00")
+        pago = presentacion.pago.first()
+        if pago:
+            return pago.gasto_administrativo * presentacion.total_facturado / Decimal("100.00")
+        if presentacion.obra_social.se_presenta_por_AMR == "1":
+            # Resulta que bool("0") es True. TODO: arreglar esto, en el model o en algun lado.
+            return Decimal("32.00") * presentacion.total_facturado / Decimal("100.00")
+        return Decimal("25.00") * presentacion.total_facturado / Decimal("100.00")
 
     @property
     def sala_recuperacion(self):
-        presentacion = self.comprobante.presentacion.all().first()
+        presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
         estudios = presentacion.estudios.all()
@@ -112,7 +112,7 @@ class CalculadorInformeFactura(CalculadorInforme):
                 return est.get_total_medicacion()
             except NotImplementedError:
                 return est.importe_medicacion
-        presentacion = self.comprobante.presentacion.all().first()
+        presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
         estudios = presentacion.estudios.all()
@@ -125,7 +125,7 @@ class CalculadorInformeFactura(CalculadorInforme):
                 return est.get_total_material_especifico()
             except NotImplementedError:
                 return Decimal("0.00")
-        presentacion = self.comprobante.presentacion.all().first()
+        presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
         estudios = presentacion.estudios.all()
