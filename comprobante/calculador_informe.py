@@ -1,7 +1,6 @@
 from abc import abstractproperty
 from decimal import Decimal
 
-from django.core.exceptions import ObjectDoesNotExist
 
 def calculador_informe_factory(comprobante):
     if comprobante.tipo_comprobante.nombre in "Factura":
