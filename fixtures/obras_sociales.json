@@ -1,0 +1,32 @@
+[
+{
+    "model": "obra_social.obrasocial",
+    "pk": 2,
+    "fields": {
+        "nombre": "PARTICULAR",
+        "se_presenta_por_ARA": 0,
+        "se_presenta_por_AMR": 0,
+        "direccion": "",
+        "telefono": "",
+        "localidad": "Rosario",
+        "codigo_postal": 2000,
+        "condicion_fiscal": "",
+        "observaciones": ""
+    }
+},
+{
+    "model": "obra_social.obrasocial",
+    "pk": 1,
+    "fields": {
+        "nombre": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+        "se_presenta_por_ARA": 0,
+        "se_presenta_por_AMR": 1,
+        "direccion": "asdasdas",
+        "telefono": "132124",
+        "localidad": "Springfield",
+        "codigo_postal": 1234,
+        "condicion_fiscal": "CONSUMIDOR FINAL",
+        "observaciones": "Adios, plan dental!"
+    }
+}
+]

@@ -1,0 +1,32 @@
+[
+{
+    "model": "medico.medico",
+    "pk": 1,
+    "fields": {
+        "nombre": "Julius",
+        "apellido": "Hibbert",
+        "domicilio": "gdasfgsfd",
+        "localidad": "Rosario",
+        "telefono": "22",
+        "matricula": "222",
+        "mail": "julius@hibbert.com",
+        "clave_fiscal": "2222",
+        "responsabilidad_fiscal": "INSCRIPTO"
+    }
+},
+{
+    "model": "medico.medico",
+    "pk": 2,
+    "fields": {
+        "nombre": "Nicholas",
+        "apellido": "Riviera",
+        "domicilio": "asdasda",
+        "localidad": "rosario",
+        "telefono": "33",
+        "matricula": "333",
+        "mail": "nick@riviera.com",
+        "clave_fiscal": "3333",
+        "responsabilidad_fiscal": "INSCRIPTO"
+    }
+}
+]

@@ -10,8 +10,10 @@ import StringIO
 
 from imprimir import generar_factura, obtener_comprobante, obtener_filename
 from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
+
 from comprobante.serializers import ComprobanteListadoSerializer
 from comprobante.models import Comprobante
+from comprobante.calculador_informe import calculador_informe_factory
 
 
 def imprimir(request, cae):
@@ -62,9 +64,9 @@ class InformeMensualView(generics.ListAPIView):
     serializer_class = ComprobanteListadoSerializer
 
     def list(self, request):
-        queryset = Comprobante.objects.filter(fecha_emision__month=request.query_params["mes"],
-                                              fecha_emision__year=request.query_params["anio"])
-        # TODO: ver si hace falta pasar el calculador (de honorarios) o se instancua dentro del serializer
-        data = [ComprobanteListadoSerializer(q, context={'calculador': 1}).data
+        comprobantes_fiscales = Comprobante.objects.filter(tipo_comprobante__nombre__in=["Factura", "Nota De Credito", "Nota De Debito"])
+        queryset = comprobantes_fiscales.filter(fecha_emision__month=request.query_params["mes"],
+                                                fecha_emision__year=request.query_params["anio"])
+        data = [ComprobanteListadoSerializer(q, context={'calculador': calculador_informe_factory(q)}).data
                 for q in queryset]
         return Response(data)

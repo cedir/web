@@ -1,0 +1,24 @@
+[
+{
+    "model": "practica.practica",
+    "pk": 1,
+    "fields": {
+        "descripcion": "ESOFAGO GASTRO DUODENO VIDEO ENDOSCOPIA",
+        "codigoMedico": "205013",
+        "codigo_medico_osde": "200180",
+        "abreviatura": "VEGD",
+        "usedLevel": 1
+    }
+},
+{
+    "model": "practica.practica",
+    "pk": 2,
+    "fields": {
+        "descripcion": "COLONO VIDEO ENDOSCOPIA",
+        "codigoMedico": "205014",
+        "codigo_medico_osde": "200185",
+        "abreviatura": "VCC",
+        "usedLevel": 1
+    }
+}
+]
