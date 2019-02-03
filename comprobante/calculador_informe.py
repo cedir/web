@@ -1,4 +1,5 @@
 from abc import abstractproperty
+from decimal import Decimal
 
 
 def calculador_informe_factory(comprobante):
@@ -43,74 +44,96 @@ class CalculadorInforme(object):
 
 
 class CalculadorInformeFactura(CalculadorInforme):
+    '''
+    En todos los casos, se toman los importes FACTURADOS.
+    '''
     def __init__(self, comprobante):
         self.comprobante = comprobante
 
     @property
     def honorarios_medicos(self):
-        # self.context.get('calculador')
-        # presentacion = comprobante.presentacion
-        #
-        # return presentacion.get_total_honorarios()
-        #
-        # # TODO: decir si mover esto a presentacion. Me parece que no debido a que solo se utiliza aca y no es atributo de Presentacion.
-        # estudios = presentacion.estudios.all()
-        #
-        # total = 0
-        # for estudio in estudios:
-        #     honorario = calculate_honorario(estudio)
-        #     total +=honorario
-        #
-        # return total
-        return 0
+        # No implementado aun.
+        return Decimal("0.00")
 
     @property
     def anestesia(self):
-        return 0
+        presentacion = self.comprobante.presentacion.first()
+        if not presentacion:
+            return Decimal("0.00")
+        estudios = presentacion.estudios.all()
+        return sum([estudio.arancel_anestesia for estudio in estudios])
 
     @property
     def retencion_impositiva(self):
-        return 0
+        presentacion = self.comprobante.presentacion.first()
+        if not presentacion:
+            return Decimal("0.00")
+        if not presentacion.iva:
+            # Algunas presentacionines tienen IVA = Null. Para estos casos, consideramos que debia ser 0.
+                return Decimal("0.00")
+        return presentacion.iva * presentacion.total_facturado / Decimal("100.00")
 
     @property
     def retencion_cedir(self):
-        return 0
+        '''
+        La retencion del cedir depende se guarda en el pago de la presentacion y esos casos conviene sacarla de ahi.
+        Pero si no hay pago, es segun Mariana, "un valor fijo que no cambia seguido" y se puede decidir aca.
+        Hay que mover esta logica cuando hagamos facturacion, para no duplicar.
+        '''
+        presentacion = self.comprobante.presentacion.first()
+        if not presentacion:
+            return Decimal("0.00")
+        pago = presentacion.pago.first()
+        if pago:
+            return pago.gasto_administrativo * presentacion.total_facturado / Decimal("100.00")
+        if presentacion.obra_social.se_presenta_por_AMR == "1":
+            # Resulta que bool("0") es True. TODO: arreglar esto, en el model o en algun lado.
+            return Decimal("32.00") * presentacion.total_facturado / Decimal("100.00")
+        return Decimal("25.00") * presentacion.total_facturado / Decimal("100.00")
 
     @property
     def sala_recuperacion(self):
-        presentacion = self.comprobante.presentacion.all().first()
+        presentacion = self.comprobante.presentacion.first()
         if not presentacion:
-            return 0
+            return Decimal("0.00")
         estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.importe_cobrado_pension
-        return total
+        return sum([estudio.pension for estudio in estudios])
 
     @property
     def total_medicamentos(self):
-        presentacion = self.comprobante.presentacion.all().first()
+        '''
+        Para las presentacion ya cobradas, se borran los registros que dividen los medicamentos por tipo y queda solo el
+        total. En esos casos, se suma todo en esta columna y se deja en 0 el material especifico.
+        Cuando implementemos facturacion aca, no vamos a eleminar ese registro y podemos corregir esto.
+        '''
+        def aux(est):
+            try:
+                return est.get_total_medicacion()
+            except NotImplementedError:
+                return est.importe_medicacion
+        presentacion = self.comprobante.presentacion.first()
         if not presentacion:
-            return 0
+            return Decimal("0.00")
         estudios = presentacion.estudios.all()
-        total = 0
-        for est in estudios:
-            total += est.get_total_medicacion()
-        return total
+        return sum([aux(estudio) for estudio in estudios])
 
     @property
     def total_material_especifico(self):
-        presentacion = self.comprobante.presentacion.all().first()
+        def aux(est):
+            try:
+                return est.get_total_material_especifico()
+            except NotImplementedError:
+                return Decimal("0.00")
+        presentacion = self.comprobante.presentacion.first()
         if not presentacion:
-            return 0
+            return Decimal("0.00")
         estudios = presentacion.estudios.all()
-        # TODO: ver que hacer en el caso de que la presentacion este cobrada y ya no tengamos el listado sino un total
-        total = 0
-        return total
+        return sum([aux(estudio) for estudio in estudios])
 
 
 class CalculadorInformeNotaDebito(CalculadorInformeFactura):
     pass
+
 
 class CalculadorInformeNotaCredito(CalculadorInforme):
     def __init__(self, comprobante):
@@ -118,28 +141,28 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
 
     @property
     def honorarios_medicos(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def anestesia(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def retencion_impositiva(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def retencion_cedir(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def sala_recuperacion(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def total_medicamentos(self):
-        return 0
+        return Decimal("0.00")
 
     @property
     def total_material_especifico(self):
-        return 0
+        return Decimal("0.00")

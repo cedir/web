@@ -42,8 +42,8 @@ class PagoPresentacion(models.Model):
     presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion', related_name=u'pago')
     fecha = models.DateField(u'Fecha', db_column=u'fechaPagoFact')
     nro_recivo = models.CharField(max_length=128, db_column=u'nroRecivo')
-    importe = models.FloatField(db_column=u'importePago')
-    gasto_administrativo = models.FloatField(db_column=u'gastoAdministrativo', default='0')
+    importe = models.DecimalField(db_column=u'importePago', max_digits=16, decimal_places=2)
+    gasto_administrativo = models.DecimalField(db_column=u'gastoAdministrativo', default=Decimal('0.00'), max_digits=16, decimal_places=2)
     
     class Meta:
         db_table = 'tblPagoFacturacion'

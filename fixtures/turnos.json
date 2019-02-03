@@ -1,0 +1,36 @@
+[
+{
+    "model": "turno.turno",
+    "pk": 1,
+    "fields": {
+        "fecha_otorgamiento": "2016-09-05T20:05:28.960",
+        "fechaTurno": "2016-09-10",
+        "horaInicio": "12:00:00",
+        "horaFinEstimada": "13:00:00",
+        "horaFinReal": "13:00:00",
+        "observacion": "",
+        "obraSocial": 1,
+        "paciente": 1,
+        "medico": 1,
+        "sala": 1,
+        "estado": 1,
+        "practicas": [2]
+    }
+},
+{
+    "model": "turno.estado",
+    "pk": 1,
+    "fields": {
+        "descripcion": "Pendiente",
+        "img": "icon_warning_16x16.png"
+    }
+},
+{
+    "model": "sala.sala",
+    "pk": 1,
+    "fields": {
+        "nombre": "Sala de Videoendoscopias",
+        "observaciones": ""
+    }
+}
+]

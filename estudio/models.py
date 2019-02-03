@@ -124,6 +124,13 @@ class Estudio(models.Model):
 
         return Decimal(total_medicacion).quantize(Decimal('.01'), ROUND_UP)
 
+    def get_total_material_especifico(self):
+        if self.fecha_cobro:
+            raise NotImplementedError('Imposible saber el total de material especifico ya que los registros'
+                                      'estudioXmedicamento se han borrado')
+        total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Material Especifico')])
+        return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
+
 
 def asignar_presentacion_nula(sender, instance, **kwargs):
     """
