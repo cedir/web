@@ -1,5 +1,5 @@
 from django.contrib import admin
-from turno.models import InfoTurno, PeriodosNoAtencion
+from turno.models import InfoTurno, PeriodoSinAtencion
 
 
 class InfoTurnoAdmin(admin.ModelAdmin):
@@ -8,10 +8,10 @@ class InfoTurnoAdmin(admin.ModelAdmin):
     ordering = (u'medico__apellido', u'medico__nombre', )
     filter_horizontal = ('practicas', u'obra_sociales')
 
-class PeriodosNoAtencionAdmin(admin.ModelAdmin):
+
+class PeriodoSinAtencionAdmin(admin.ModelAdmin):
     search_fields = [u'medico__apellido', u'medico__nombre']
     list_display = [u'medico', u'fecha_inicio', u'fecha_fin']
 
 admin.site.register(InfoTurno, InfoTurnoAdmin)
-admin.site.register(PeriodosNoAtencion, PeriodosNoAtencionAdmin)
-
+admin.site.register(PeriodoSinAtencion, PeriodoSinAtencionAdmin)

@@ -18,13 +18,6 @@ class Estado(models.Model):
     class Meta:
         db_table = 'turnos_estados'
 
-class PeriodosNoAtencion(models.Model):
-    fecha_inicio = models.DateTimeField("Fecha Inicio", null=False, blank=False)
-    fecha_fin = models.DateTimeField("Fecha Fin", null=False, blank=False)
-    medico = models.ForeignKey(Medico, null=True, blank=True)
-
-    class Meta:
-        db_table = 'turnos_periodo_no_atencion'
 
 class Turno(models.Model):
     fecha_otorgamiento = models.DateTimeField("Fecha Otorgamiento", null=False, blank=False)
@@ -66,3 +59,8 @@ class InfoTurno(models.Model):
 
     get_practicas_as_string.short_description = 'Practicas'
 
+
+class PeriodoSinAtencion(models.Model):
+    fecha_inicio = models.DateTimeField(null=False, blank=False)
+    fecha_fin = models.DateTimeField(null=False, blank=False)
+    medico = models.ForeignKey(Medico, null=True, blank=True)
