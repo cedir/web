@@ -240,8 +240,6 @@ def guardar(request):
     id_obra_social = request.GET['id-obra-social']
     observacion_turno = request.GET['observacion_turno']
 
-    #import pdb; pdb.set_trace()
-
     if (_is_feriado(fecha_turno) or _is_medico_con_licencia(fecha_turno, id_medico)):
         err_no_atiende = 'El medico no atiende en la fecha seleccionada'
         resp_dict = {'status': 0, 'message': err_no_atiende}
@@ -478,13 +476,12 @@ def confirmar(request, id_turno):
         return str(err)
 
 
-
 def _is_feriado(fecha):
-    return PeriodoSinAtencion.objects.filter(medico__isnull=True, fecha_fin__gte=fecha, fecha_inicio__lte=fecha).exists()
+    return PeriodoSinAtencion.objects.filter(medico__isnull=True, fecha_inicio__lte=fecha, fecha_fin__gte=fecha).exists()
+
 
 def _is_medico_con_licencia(fecha, id_medico):
     return PeriodoSinAtencion.objects.filter(medico_id=id_medico, fecha_fin__gte=fecha, fecha_inicio__lte=fecha).exists()
-
 
 
 def _get_day_line(fecha, id_sala):

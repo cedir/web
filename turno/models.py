@@ -61,6 +61,7 @@ class InfoTurno(models.Model):
 
 
 class PeriodoSinAtencion(models.Model):
-    fecha_inicio = models.DateTimeField(null=False, blank=False)
-    fecha_fin = models.DateTimeField(null=False, blank=False)
+    fecha_inicio = models.DateField(null=False, blank=False)
+    fecha_fin = models.DateField(null=False, blank=False)
     medico = models.ForeignKey(Medico, null=True, blank=True)
+    descripcion = models.CharField(max_length=200, null=True, blank=True)
