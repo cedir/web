@@ -20,7 +20,7 @@ from paciente.models import Paciente
 from practica.models import Practica
 from sala.models import Sala
 from turno.models import InfoTurno
-from turno.models import Turno, Estado
+from turno.models import Turno, Estado, PeriodoSinAtencion
 from turno.serializers import InfoTurnoSerializer
 from security.encryption import encode
 from common.drf.views import StandardResultsSetPagination
@@ -187,7 +187,6 @@ def get_turnos_disponibles(request):
 
     return _get_turnos_disponibles(request.user, request.GET)
 
-
 def get_next_day_line(request):
     fecha = request.GET['fecha']
     id_sala = request.GET['id-sala'] or 0
@@ -240,6 +239,12 @@ def guardar(request):
     id_medico = request.GET['id-medico']
     id_obra_social = request.GET['id-obra-social']
     observacion_turno = request.GET['observacion_turno']
+
+    if (_is_feriado(fecha_turno) or _is_medico_con_licencia(fecha_turno, id_medico)):
+        err_no_atiende = 'El medico no atiende en la fecha seleccionada'
+        resp_dict = {'status': 0, 'message': err_no_atiende}
+        json = simplejson.dumps(resp_dict)
+        return HttpResponse(json)
 
     try:
         paciente = Paciente.objects.get(id=id_paciente)
@@ -307,7 +312,7 @@ def update(request, id_turno):
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
-    except ValidationError, e:
+    except ValidationError as e:
         response_dict = {'status': 0, 'message': e.message}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
@@ -354,7 +359,7 @@ def anunciar(request, id_turno):
         response_dict = {'status': False, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
-    except ValidationError, e:
+    except ValidationError as e:
         response_dict = {'status': 0, 'message': e.message}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
@@ -394,7 +399,7 @@ def anular(request, id_turno):
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
-    except ValidationError, e:
+    except ValidationError as e:
         response_dict = {'status': 0, 'message': e.message}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
@@ -463,12 +468,20 @@ def confirmar(request, id_turno):
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
-    except ValidationError, e:
+    except ValidationError as e:
         response_dict = {'status': 0, 'message': e.message}
         json = simplejson.dumps(response_dict)
         return HttpResponse(json)
     except Exception as err:
         return str(err)
+
+
+def _is_feriado(fecha):
+    return PeriodoSinAtencion.objects.filter(medico__isnull=True, fecha_inicio__lte=fecha, fecha_fin__gte=fecha).exists()
+
+
+def _is_medico_con_licencia(fecha, id_medico):
+    return PeriodoSinAtencion.objects.filter(medico_id=id_medico, fecha_fin__gte=fecha, fecha_inicio__lte=fecha).exists()
 
 
 def _get_day_line(fecha, id_sala):
@@ -479,15 +492,15 @@ def _get_day_line(fecha, id_sala):
     :param id_sala: Int id de sala.
     :return: HTML object con la linea de tiempo
     """
+
     dia = spaDays[fecha.weekday()]
     mes = spaMonths[fecha.month]
 
     fecha_format = str(fecha)
     dia_format = dia + ' ' + str(fecha.day) + ' de ' + mes + ' del ' + str(fecha.year)
     turnos = Turno.objects.filter(fechaTurno=fecha, sala__id=int(id_sala), estado__id__lt=3)
-    disponibilidad = Disponibilidad.objects.filter(dia=dia, sala__id=id_sala, fecha__lte=date.today())\
+    disponibilidades = Disponibilidad.objects.filter(dia=dia, sala__id=id_sala, fecha__lte=date.today())\
         .order_by('horaInicio')
-
     colors = ('#71FF86', '#fffccc', '#A6C4FF')
     day_line_template = loader.get_template('turnos/dayLine.html')
 
@@ -505,21 +518,22 @@ def _get_day_line(fecha, id_sala):
       } for turno in turnos]
 
     arr_hsh_disponibilidad = [{
-          "id": disp.id,
+          "id": disp.id, 
           "top": (((disp.horaInicio.hour - 7) * 60) + disp.horaInicio.minute) * PIXELS_PER_MINUTE + 9,
           "fecha": disp.fecha,
           "hora": disp.horaInicio,
           "duracionEnPixeles": disp.getDuracionEnMinutos() * PIXELS_PER_MINUTE,
           "medico": " ".join(list(disp.medico.apellido)),
-          "color": colors[index % 3],
+          "color": 'red' if _is_medico_con_licencia(fecha, disp.medico_id) else colors[index % 3],
           "sala": disp.sala.nombre
-      } for (index, disp) in enumerate(disponibilidad)]
+      } for (index, disp) in enumerate(disponibilidades)]
 
     day_line_context = Context({
         'lineDay': dia_format,
         'fechaTurno': fecha_format,
         'turnos': arr_hsh_turnos,
-        'disponibilidades': arr_hsh_disponibilidad
+        'disponibilidades': arr_hsh_disponibilidad,
+        'feriado': _is_feriado(fecha),
     })
 
     return day_line_template.render(day_line_context)
