@@ -138,7 +138,7 @@ class CalculadorHonorariosAnestesista(object):
         importe = importe - total_mov_caja  # total_mov_caja = 0 si no hubiese
         sub_total = importe - (importe * PORCENTAJE_DESCUENTO_CEDIR)
         sub_total = sub_total.quantize(Decimal('.01'), ROUND_UP)
-        retencion = sub_total * self.anestesista.porcentaje_anestesista / 100
+        retencion = sub_total * self.anestesista.porcentaje_anestesista / Decimal(100)
 
         return {'importe': importe, 'sub_total': sub_total, 'retencion': retencion, 'alicuota_iva': alicuota_iva}
 
@@ -162,7 +162,7 @@ class CalculadorHonorariosAnestesista(object):
 
         sub_total = importe - (importe * PORCENTAJE_DESCUENTO_CEDIR)
         sub_total = sub_total.quantize(Decimal('.01'), ROUND_UP)
-        a_pagar = sub_total * (100 - self.anestesista.porcentaje_anestesista) / 100
+        a_pagar = sub_total * (Decimal(100) - self.anestesista.porcentaje_anestesista) / Decimal(100)
         
         return {'importe': importe, 'sub_total': sub_total, 'a_pagar': a_pagar, 'alicuota_iva': alicuota_iva, 
                 'comprobante': comprobante}

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from comprobante.models import Comprobante
 from obra_social.models import ObraSocial
@@ -21,9 +23,9 @@ class Presentacion(models.Model):
     fecha = models.DateField(u'Fecha', db_column=u'fechaFacturacion')
     estado = models.SmallIntegerField(db_column=u'pagado', choices=ESTADOS)
     periodo = models.CharField(max_length=128)
-    iva = models.FloatField()
-    total = models.FloatField(default='0')
-    total_facturado = models.FloatField(db_column=u'totalFacturado', default='0')
+    iva = models.DecimalField(max_digits=16, decimal_places=2)
+    total = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'))
+    total_facturado = models.DecimalField(db_column=u'totalFacturado', max_digits=16, decimal_places=2, default=Decimal('0.00'))
 
     #"tipoFactura" smallint, no me acuerdo para que se usa esto
     #"responsableDeFactura" character varying, no me acuerdo para que se usa esto
@@ -40,8 +42,8 @@ class PagoPresentacion(models.Model):
     presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion', related_name=u'pago')
     fecha = models.DateField(u'Fecha', db_column=u'fechaPagoFact')
     nro_recivo = models.CharField(max_length=128, db_column=u'nroRecivo')
-    importe = models.FloatField(db_column=u'importePago')
-    gasto_administrativo = models.FloatField(db_column=u'gastoAdministrativo', default='0')
+    importe = models.DecimalField(db_column=u'importePago', max_digits=16, decimal_places=2)
+    gasto_administrativo = models.DecimalField(db_column=u'gastoAdministrativo', default=Decimal('0.00'), max_digits=16, decimal_places=2)
     
     class Meta:
         db_table = 'tblPagoFacturacion'

@@ -59,3 +59,9 @@ class InfoTurno(models.Model):
 
     get_practicas_as_string.short_description = 'Practicas'
 
+
+class PeriodoSinAtencion(models.Model):
+    fecha_inicio = models.DateField(null=False, blank=False)
+    fecha_fin = models.DateField(null=False, blank=False)
+    medico = models.ForeignKey(Medico, null=True, blank=True)
+    descripcion = models.CharField(max_length=200, null=True, blank=True)

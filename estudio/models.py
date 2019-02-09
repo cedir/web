@@ -1,8 +1,10 @@
 # -*- coding: utf-8
 import datetime
 from decimal import Decimal, ROUND_UP
+
 from django.db import models
 from django.db.models.signals import pre_save
+
 from medico.models import Medico, PagoMedico
 from anestesista.models import Anestesista
 from practica.models import Practica
@@ -36,21 +38,21 @@ class Estudio(models.Model):
     medicacion = models.ManyToManyField(Medicamento, through='Medicacion')
 
     fecha_cobro = models.CharField(db_column="fechaCobro", null=True, max_length=100)
-    importe_estudio = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeEstudio")
-    importe_medicacion = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeMedicacion")
-    pago_contra_factura = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="pagoContraFactura")
-    diferencia_paciente = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="diferenciaPaciente")
-    pension = models.DecimalField(max_digits=16, decimal_places=2, default='0.00')
-    importe_pago_medico = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column=u'importePagoMedico')
-    importe_pago_medico_solicitante = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column=u'importePagoMedicoSol')
-    #diferencia_paciente_medicacion = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column=u'diferenciaPacienteMedicacion')
+    importe_estudio = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeEstudio")
+    importe_medicacion = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeMedicacion")
+    pago_contra_factura = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="pagoContraFactura")
+    diferencia_paciente = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="diferenciaPaciente")
+    pension = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'))
+    importe_pago_medico = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column=u'importePagoMedico')
+    importe_pago_medico_solicitante = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column=u'importePagoMedicoSol')
+    #diferencia_paciente_medicacion = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column=u'diferenciaPacienteMedicacion')
     pago_medico_actuante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoAct', null=True, blank=True, related_name=u'estudios_actuantes')
     pago_medico_solicitante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoSol', null=True, blank=True, related_name=u'estudios_solicitantes')
-    importe_cobrado_pension = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeCobradoPension")
-    importe_cobrado_arancel_anestesia = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeCobradoArancelAnestesia")
-    importe_estudio_cobrado = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeEstudioCobrado")
-    importe_medicacion_cobrado = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="importeMedicacionCobrado")
-    arancel_anestesia = models.DecimalField(max_digits=16, decimal_places=2, default='0.00', db_column="arancelAnestesia")
+    importe_cobrado_pension = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeCobradoPension")
+    importe_cobrado_arancel_anestesia = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeCobradoArancelAnestesia")
+    importe_estudio_cobrado = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeEstudioCobrado")
+    importe_medicacion_cobrado = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeMedicacionCobrado")
+    arancel_anestesia = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="arancelAnestesia")
 
     class Meta:
         db_table = 'tblEstudios'
@@ -94,6 +96,7 @@ class Estudio(models.Model):
         self.arancel_anestesia = 0
 
     def get_importe_total(self):
+        # TODO: escribir unit tests para este metodo, no se esta usando por ahora.
         if self.fecha_cobro:
             # TODO: ver bien como se calcula el total en caso de estar cobrado.
             # hago raise por el momento, no tengo tiempo de verlo ahora
@@ -101,21 +104,32 @@ class Estudio(models.Model):
         return Decimal(self.importe_estudio).quantize(Decimal('.01'), ROUND_UP) - \
                Decimal(self.diferencia_paciente).quantize(Decimal('.01'), ROUND_UP) + \
                self.arancel_anestesia + Decimal(self.pension).quantize(Decimal('.01'), ROUND_UP) + \
-               self.get_total_medicacion()
+               self.importe_medicacion
 
     def get_total_medicacion(self):
         """
         Return: total medicacion sin material especifico
+        NOTA: si la presentacion esta cobrada, los registros estudioXmedicamento se borran,
+        por lo que perdemos el detalle de que era Medicamento y que era Material Especifico.
+        En dicho caso esta funcion FALLA, ya que devuelve la suma de los dos (total) y no
+        solamente Material especifico.
         """
         if self.fecha_cobro:
-            return Decimal(self.importe_medicacion_cobrado).quantize(Decimal('.01'), ROUND_UP)
-        if self.importe_medicacion > 0:
-            return Decimal(self.importe_medicacion).quantize(Decimal('.01'), ROUND_UP)
+            raise NotImplementedError('Imposible saber el total de medicacion ya que los registros estudioXmedicamento'
+                                      'se han borrado')
 
         total_medicacion = 0
         for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Medicación'):
             total_medicacion += medicacion.importe
+
         return Decimal(total_medicacion).quantize(Decimal('.01'), ROUND_UP)
+
+    def get_total_material_especifico(self):
+        if self.fecha_cobro:
+            raise NotImplementedError('Imposible saber el total de material especifico ya que los registros'
+                                      'estudioXmedicamento se han borrado')
+        total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Material Especifico')])
+        return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
 
 
 def asignar_presentacion_nula(sender, instance, **kwargs):
@@ -138,7 +152,7 @@ class Medicacion(models.Model):
     id = models.AutoField(primary_key=True, db_column="idMedicacion")
     medicamento = models.ForeignKey(Medicamento, db_column="idMedicamento")
     estudio = models.ForeignKey(Estudio, db_column="nroEstudio", related_name='estudioXmedicamento')
-    importe = models.DecimalField(max_digits=16, decimal_places=2, default='0.00')
+    importe = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'))
 
     class Meta:
         db_table = 'tblMedicacion'
