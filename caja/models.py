@@ -7,7 +7,6 @@ class TipoMovimientoCaja(models.Model):
     descripcion = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'tblCajaTipoDeMovimientos'
 
 
@@ -23,6 +22,4 @@ class MovimientoCaja(models.Model):
     estado = models.NullBooleanField()
 
     class Meta:
-        managed = False
         db_table = 'tblCajaMovimientos'
-

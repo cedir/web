@@ -33,7 +33,6 @@ class EstudioCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class MedicacionSerializer(serializers.HyperlinkedModelSerializer):
-
     medicamento = MedicamentoSerializer()
 
     class Meta:
