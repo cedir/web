@@ -28,15 +28,15 @@ class Porcentajes:
         pass
 
     @property
-    def actuante():
+    def actuante(self):
         return Decimal('70.00')
 
     @property
-    def solicitante():
+    def solicitante(self):
         return Decimal('20.00')
 
     @property
-    def cedir():
+    def cedir(self):
         return Decimal('10.00')
 
 

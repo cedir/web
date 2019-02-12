@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from medico.calculo_honorarios import CalculadorHonorariosInformeContadora
 
+
 def calculador_informe_factory(comprobante):
     if comprobante.tipo_comprobante.nombre in "Factura":
         return CalculadorInformeFactura(comprobante)

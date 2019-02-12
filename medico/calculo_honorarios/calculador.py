@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 from abc import abstractmethod, abstractproperty
 from decimal import Decimal
 from .porcentajes import Porcentajes
-from .descuento import DescuentosVarios, DescuentoColangios, DescuentoStent, DescuentoRadiofrecuencia, \
+from .descuentos import DescuentosVarios, DescuentoColangios, DescuentoStent, DescuentoRadiofrecuencia, \
                        DescuentoPorPolipectomia, DescuentosPorPolicolangio
 
 

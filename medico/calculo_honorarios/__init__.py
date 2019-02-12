@@ -1,3 +1,3 @@
-from calculador import CalculadorHonorarios
+from .calculador import CalculadorHonorariosInformeContadora, CalculadorHonorariosPagoMedico
 
-__all__ = ['CalculadorHonorarios']
+__all__ = ['CalculadorHonorariosInformeContadora', 'CalculadorHonorariosPagoMedico']
