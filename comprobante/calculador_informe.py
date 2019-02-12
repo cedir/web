@@ -1,6 +1,7 @@
 from abc import abstractproperty
 from decimal import Decimal
 
+from medico.calculo_honorarios import CalculadorHonorariosInformeContadora
 
 def calculador_informe_factory(comprobante):
     if comprobante.tipo_comprobante.nombre in "Factura":
@@ -52,8 +53,11 @@ class CalculadorInformeFactura(CalculadorInforme):
 
     @property
     def honorarios_medicos(self):
-        # No implementado aun.
-        return Decimal("0.00")
+        presentacion = self.comprobante.presentacion.first()
+        if not presentacion:
+            return Decimal("0.00")
+        estudios = presentacion.estudios.all()
+        return sum([CalculadorHonorariosInformeContadora(estudio).total for estudio in estudios])
 
     @property
     def anestesia(self):
