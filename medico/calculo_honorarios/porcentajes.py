@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 CONSULTA = 100
 
 ACT_ECOGRAFIA = 70
@@ -17,15 +19,43 @@ SOLICITANTE = 0
 
 COMB_MED_ACT_BRUNETTI = 2
 
+
 class Porcentajes:
-    # TODO
+    '''
+    #TODO: marco para implementar mas adelante las reglas posta.
+    '''
     def __init__(self, estudio):
         pass
-    
+
     @property
     def actuante():
-        pass
-        
+        return Decimal('70.00')
+
     @property
     def solicitante():
-        pass
+        return Decimal('20.00')
+
+    @property
+    def cedir():
+        return Decimal('10.00')
+
+
+# Estos se usan tambien en descuentos. Convendra hacerlas @property en los models de estudio?
+def es_ecografia(estudio):
+    pass
+
+
+def es_laboratorio(estudio):
+    pass
+
+
+def es_ligadura_de_hemorroides(estudio):
+    pass
+
+
+def es_practica_especial(estudio):
+    pass
+
+
+def brunetti_es_actuante(estudio):
+    pass

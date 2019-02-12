@@ -105,3 +105,9 @@ class DescuentoEcografia(object):
     def _es_ecografia(self, estudio):
         # TODO
         pass
+
+
+class DescuentosPorPolicolangio(object):
+    # TODO
+    def aplicar(self, estudio, importe):
+        return 0
