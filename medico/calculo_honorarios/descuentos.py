@@ -17,22 +17,32 @@ ELECTROCARDEOGRAMA = 46
 
 DRENJUTO = 558
 
+COLANGIOS = (13, 14, 34)
+STENT = (48, 49, 97)
+RADIOFRECUENCIA = (11, 17, 43)
+POLIPECTOMIA = (18, 19, 23, 24, 146, 147, 58)
+
 
 class Descuento(object):
     """
     Clase abstracta que representa un descuento al importe de un estudio.
+    La idea es que todos los descuentos implementen esta interfaz comun, de manera que si los descuentos cambiaran, estos cambios se puedan
+    implementar de cambiando tan poco como se posible el codigo del calculador. Esto permite separar logica y no introducir (muchos) bugs.
+
+    Los descuentos devuelven el monto a descontar. Toman el importe solo por si fuera necesario para el calculo del descuento.
     """
     @abstractmethod
     def aplicar(self, estudio, importe):
         """
-        Calcula el nuevo importe luego de aplicar de un estudio luego de aplicar este descuento
+        Calcula el monto que debe descontarse de un estudio.
+        Esta funcion debe devolver 0 en los casos en los que el descuento no se aplica al estudio en cuestion.
         """
         pass
 
 
 class DescuentoNulo(Descuento):
     """
-    No se aplica ningun descuento al monto. Necesario para poder anular los descuentos con la menor modificacion posible
+    No se aplica ningun descuento al importe. Necesario para poder anular los descuentos con la menor modificacion posible
     al codigo de calculo de honorarios.
     """
     def aplicar(self, estudio, importe):
@@ -41,7 +51,7 @@ class DescuentoNulo(Descuento):
 
 class DescuentosVarios(Descuento):
     """
-    Aplicar una lista de descuentos.
+    Calcular un descuento compuesto por la suma de una lista de descuentos.
     """
     def __init__(self, *descuentos):
         self._descuentos = descuentos
@@ -63,29 +73,29 @@ class DescuentosNoAcumulables(Descuento):
 
 
 class DescuentoColangios(Descuento):
-    def aplicar(estudio, importe):
-        if estudio.practica.id in (13, 14, 34):
+    def aplicar(self, estudio, importe):
+        if estudio.practica.id in COLANGIOS:
             return 2000
         return 0
 
 
 class DescuentoStent(Descuento):
-    def aplicar(estudio, importe):
-        if estudio.practica.id in (48, 49, 97):
+    def aplicar(self, estudio, importe):
+        if estudio.practica.id in STENT:
             return 900
         return 0
 
 
 class DescuentoRadiofrecuencia(Descuento):
-    def aplicar(estudio, importe):
-        if estudio.practica.id in (11, 17, 43):
+    def aplicar(self, estudio, importe):
+        if estudio.practica.id in RADIOFRECUENCIA:
             return 450
         return 0
 
 
 class DescuentoPorPolipectomia(Descuento):
-    def aplicar(estudio, importe):
-        if estudio.practica.id not in []:  # TODO: no se las ids estas o que criterio usar
+    def aplicar(self, estudio, importe):
+        if estudio.practica.id not in POLIPECTOMIA:
             return 0
 
         if estudio.obra_social.id in (OSDE, OSDE_CEDIR):
@@ -105,9 +115,3 @@ class DescuentoEcografia(object):
     def _es_ecografia(self, estudio):
         # TODO
         pass
-
-
-class DescuentosPorPolicolangio(object):
-    # TODO
-    def aplicar(self, estudio, importe):
-        return 0

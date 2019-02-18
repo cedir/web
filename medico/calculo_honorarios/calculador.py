@@ -3,7 +3,7 @@ from abc import abstractmethod, abstractproperty
 from decimal import Decimal
 from .porcentajes import Porcentajes
 from .descuentos import DescuentosVarios, DescuentoColangios, DescuentoStent, DescuentoRadiofrecuencia, \
-                       DescuentoPorPolipectomia, DescuentosPorPolicolangio
+                       DescuentoPorPolipectomia
 
 
 class CalculadorHonorarios(object):
@@ -43,8 +43,8 @@ class CalculadorHonorarios(object):
         porcentaje_GA = self.porcentaje_GA(estudio)
 
         importe_estudio = self.get_importe()
-        importe_descuentos = self.descuentos.aplicar(estudio, importe_estudio)
-        self.total_honorarios = importe_estudio * (Decimal('100.00') - porcentaje_GA) / Decimal('100.00') - importe_descuentos
+        monto_descuentos = self.descuentos.aplicar(estudio, importe_estudio)
+        self.total_honorarios = importe_estudio * (Decimal('100.00') - porcentaje_GA) / Decimal('100.00') - monto_descuentos
 
 
 class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
@@ -58,8 +58,11 @@ class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
 
     @property
     def descuentos(self):
-        # Aca posta no hay mas descuentos? mmmmm...   (CalculadorHonorariosComprobantes.vb L79)
-        return DescuentosPorPolicolangio()
+        return DescuentosVarios(
+            DescuentoPorPolipectomia(),
+            DescuentoColangios(),
+            DescuentoStent(),
+            DescuentoRadiofrecuencia())
 
     @property
     def total(self):
@@ -85,6 +88,7 @@ class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
 
     @property
     def descuentos(self):
+        # Volver a revisar esto cuando hagamos pago a medico.
         return DescuentosVarios(
             DescuentoPorPolipectomia(),
             DescuentoColangios(),
