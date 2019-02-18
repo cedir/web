@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from decimal import Decimal
 
 PARTICULAR = 2
 PARTICULAR_ESPECIAL = 134
@@ -14,8 +15,6 @@ VIDEO_BAJA = 25
 VIDEO_ALTA = 27
 CONSULTA = 20
 ELECTROCARDEOGRAMA = 46
-
-DRENJUTO = 558
 
 COLANGIOS = (13, 14, 34)
 STENT = (48, 49, 97)
@@ -46,7 +45,7 @@ class DescuentoNulo(Descuento):
     al codigo de calculo de honorarios.
     """
     def aplicar(self, estudio, importe):
-        return 0
+        return Decimal("0.00")
 
 
 class DescuentosVarios(Descuento):
@@ -75,43 +74,33 @@ class DescuentosNoAcumulables(Descuento):
 class DescuentoColangios(Descuento):
     def aplicar(self, estudio, importe):
         if estudio.practica.id in COLANGIOS:
-            return 2000
-        return 0
+            return Decimal("2000.00")
+        return Decimal("0.00")
 
 
 class DescuentoStent(Descuento):
     def aplicar(self, estudio, importe):
         if estudio.practica.id in STENT:
-            return 900
-        return 0
+            return Decimal("900.00")
+        return Decimal("0.00")
 
 
 class DescuentoRadiofrecuencia(Descuento):
     def aplicar(self, estudio, importe):
         if estudio.practica.id in RADIOFRECUENCIA:
-            return 450
-        return 0
+            return Decimal("450.00")
+        return Decimal("0.00")
 
 
 class DescuentoPorPolipectomia(Descuento):
     def aplicar(self, estudio, importe):
         if estudio.practica.id not in POLIPECTOMIA:
-            return 0
+            return Decimal("0.00")
 
         if estudio.obra_social.id in (OSDE, OSDE_CEDIR):
-            return 0
+            return Decimal("0.00")
 
         if estudio.obra_social.id in (OS_UNR, ACA_SALUD, GALENO, OSPAC):
-            return 0
+            return Decimal("0.00")
 
-        return 300
-
-
-class DescuentoEcografia(object):
-    def aplicar(self, estudio, importe):
-        if self._es_ecografia(estudio):
-            pass
-
-    def _es_ecografia(self, estudio):
-        # TODO
-        pass
+        return Decimal("300.00")

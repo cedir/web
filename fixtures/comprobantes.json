@@ -101,6 +101,81 @@
     }
 },
 {
+    "model": "comprobante.comprobante",
+    "pk": 5,
+    "fields": {
+        "nombre_cliente": "PARTICULAR",
+        "domicilio_cliente": " - Springfield - (CP:2000)",
+        "nro_cuit": "",
+        "gravado_paciente": "",
+        "condicion_fiscal": "",
+        "responsable": "Cedir",
+        "sub_tipo": "B",
+        "estado": "PENDIENTE",
+        "numero": 4,
+        "nro_terminal": 1,
+        "total_facturado": "4444.44",
+        "total_cobrado": "0.00",
+        "fecha_emision": "2011-07-20",
+        "fecha_recepcion": "2011-07-20",
+        "tipo_comprobante": 1,
+        "factura": null,
+        "gravado": 3,
+        "cae": null,
+        "vencimiento_cae": null
+    }
+},
+{
+    "model": "comprobante.comprobante",
+    "pk": 6,
+    "fields": {
+        "nombre_cliente": "PARTICULAR",
+        "domicilio_cliente": " - Springfield - (CP:2000)",
+        "nro_cuit": "",
+        "gravado_paciente": "",
+        "condicion_fiscal": "",
+        "responsable": "Cedir",
+        "sub_tipo": "B",
+        "estado": "PENDIENTE",
+        "numero": 4,
+        "nro_terminal": 1,
+        "total_facturado": "4444.44",
+        "total_cobrado": "0.00",
+        "fecha_emision": "2011-07-20",
+        "fecha_recepcion": "2011-07-20",
+        "tipo_comprobante": 1,
+        "factura": null,
+        "gravado": 3,
+        "cae": null,
+        "vencimiento_cae": null
+    }
+},
+{
+    "model": "comprobante.comprobante",
+    "pk": 7,
+    "fields": {
+        "nombre_cliente": "PARTICULAR",
+        "domicilio_cliente": " - Springfield - (CP:2000)",
+        "nro_cuit": "",
+        "gravado_paciente": "",
+        "condicion_fiscal": "",
+        "responsable": "Cedir",
+        "sub_tipo": "B",
+        "estado": "PENDIENTE",
+        "numero": 4,
+        "nro_terminal": 1,
+        "total_facturado": "4444.44",
+        "total_cobrado": "0.00",
+        "fecha_emision": "2011-07-20",
+        "fecha_recepcion": "2011-07-20",
+        "tipo_comprobante": 1,
+        "factura": null,
+        "gravado": 3,
+        "cae": null,
+        "vencimiento_cae": null
+    }
+},
+{
     "model": "comprobante.gravado",
     "pk": 1,
     "fields": {

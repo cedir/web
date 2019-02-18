@@ -1,6 +1,21 @@
 [
 {
     "model": "obra_social.obrasocial",
+    "pk": 1,
+    "fields": {
+        "nombre": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+        "se_presenta_por_ARA": 0,
+        "se_presenta_por_AMR": 1,
+        "direccion": "asdasdas",
+        "telefono": "132124",
+        "localidad": "Springfield",
+        "codigo_postal": 1234,
+        "condicion_fiscal": "CONSUMIDOR FINAL",
+        "observaciones": "Adios, plan dental!"
+    }
+},
+{
+    "model": "obra_social.obrasocial",
     "pk": 2,
     "fields": {
         "nombre": "PARTICULAR",
@@ -15,18 +30,66 @@
     }
 },
 {
+    "pk": 5,
     "model": "obra_social.obrasocial",
-    "pk": 1,
     "fields": {
-        "nombre": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+        "se_presenta_por_AMR": 0,
+        "se_presenta_por_ARA": 1,
+        "nombre": "ACA SALUD"
+    }
+},
+{
+    "pk": 46,
+    "model": "obra_social.obrasocial",
+    "fields": {
+        "se_presenta_por_AMR": 0,
+        "se_presenta_por_ARA": 1,
+        "nombre": "GALENO ARGENTINA S.A"
+    }
+},
+{
+    "pk": 3,
+    "model": "obra_social.obrasocial",
+    "fields": {
+        "se_presenta_por_AMR": 0,
+        "se_presenta_por_ARA": 1,
+        "nombre": " no usar mas OSDE dr brunetti"
+    }
+},
+{
+    "pk": 79,
+    "model": "obra_social.obrasocial",
+    "fields": {
+        "se_presenta_por_AMR": 0,
+        "se_presenta_por_ARA": 1,
+        "nombre": "OSDE BINARIO"
+    }
+},
+{
+    "pk": 19,
+    "model": "obra_social.obrasocial",
+    "fields": {
+        "se_presenta_por_AMR": 0,
+        "se_presenta_por_ARA": 1,
+        "nombre": "OSPAC"
+    }
+},
+{
+    "pk": 134,
+    "model": "obra_social.obrasocial",
+    "fields": {
+        "se_presenta_por_AMR": 0,
         "se_presenta_por_ARA": 0,
-        "se_presenta_por_AMR": 1,
-        "direccion": "asdasdas",
-        "telefono": "132124",
-        "localidad": "Springfield",
-        "codigo_postal": 1234,
-        "condicion_fiscal": "CONSUMIDOR FINAL",
-        "observaciones": "Adios, plan dental!"
+        "nombre": "PARTICULAR ESPECIAL"
+    }
+},
+{
+    "pk": 25,
+    "model": "obra_social.obrasocial",
+    "fields": {
+        "se_presenta_por_AMR": 0,
+        "se_presenta_por_ARA": 1,
+        "nombre": "U N R"
     }
 }
 ]
