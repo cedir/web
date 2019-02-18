@@ -8,7 +8,6 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
-
 #class CedirViewSet(viewsets.ModelViewSet):
 #    permission_classes = (permissions.IsAdminUser,)
 #    authentication_classes = (authentication.TokenAuthentication, authentication.SessionAuthentication,)

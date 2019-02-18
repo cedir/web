@@ -1,0 +1,68 @@
+[
+{
+    "model": "caja.movimientocaja",
+    "pk": 1,
+    "fields": {
+        "concepto": "ingreso X",
+        "fecha": "2019-02-07",
+        "hora": "11:00",
+        "tipo": 1,
+        "estudio": null,
+        "medico": null,
+        "monto": 100,
+        "monto_acumulado": 100,
+        "estado": false
+    }
+},
+{
+    "model": "caja.movimientocaja",
+    "pk": 2,
+    "fields": {
+        "concepto": "ingreso X 1",
+        "fecha": "2019-02-07",
+        "hora": "12:00",
+        "tipo": 2,
+        "estudio": null,
+        "medico": null,
+        "monto": 88.99,
+        "monto_acumulado": 100,
+        "estado": false
+    }
+},
+{
+    "model": "caja.movimientocaja",
+    "pk": 3,
+    "fields": {
+        "concepto": "ingreso X 2",
+        "fecha": "2019-02-07",
+        "hora": "13:00",
+        "tipo": 3,
+        "estudio": null,
+        "medico": null,
+        "monto": 999,
+        "monto_acumulado": 999,
+        "estado": false
+    }
+},
+{
+    "model": "caja.tipomovimientocaja",
+    "pk": 1,
+    "fields": {
+        "descripcion": "General"
+    }
+},
+  {
+    "model": "caja.tipomovimientocaja",
+    "pk": 2,
+    "fields": {
+        "descripcion": "Anestesia"
+    }
+},
+{
+    "model": "caja.tipomovimientocaja",
+    "pk": 3,
+    "fields": {
+        "descripcion": "Honorario Médico"
+    }
+}
+]

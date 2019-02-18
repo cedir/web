@@ -15,23 +15,23 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='Anestesista',
-            fields=[
-                ('id', models.AutoField(db_column=b'idMedicoAn', primary_key=True, serialize=False)),
-                ('nombre', models.CharField(db_column=b'nombreMedicoAn', max_length=200, verbose_name=b'Nombre')),
-                ('apellido', models.CharField(db_column=b'apellidoMedicoAn', max_length=200, verbose_name=b'Apellido')),
-                ('matricula', models.CharField(blank=True, db_column=b'nroMatricula', max_length=200, null=True, verbose_name=b'Matricula')),
-                ('direccion', models.CharField(blank=True, db_column=b'direccionMedico', max_length=200, null=True, verbose_name=b'Direccion')),
-                ('localidad', models.CharField(blank=True, db_column=b'localidadMedico', max_length=200, null=True, verbose_name=b'Localidad')),
-                ('telefono', models.CharField(blank=True, db_column=b'telMedico', max_length=200, null=True, verbose_name=b'Telefono')),
-                ('email', models.EmailField(blank=True, db_column=b'mail', max_length=200, null=True, verbose_name=b'E-mail')),
-            ],
-            options={
-                'ordering': ['apellido'],
-                'db_table': 'tblMedicosAnestesistas',
-            },
-        ),
+        # migrations.CreateModel(
+        #     name='Anestesista',
+        #     fields=[
+        #         ('id', models.AutoField(db_column=b'idMedicoAn', primary_key=True, serialize=False)),
+        #         ('nombre', models.CharField(db_column=b'nombreMedicoAn', max_length=200, verbose_name=b'Nombre')),
+        #         ('apellido', models.CharField(db_column=b'apellidoMedicoAn', max_length=200, verbose_name=b'Apellido')),
+        #         ('matricula', models.CharField(blank=True, db_column=b'nroMatricula', max_length=200, null=True, verbose_name=b'Matricula')),
+        #         ('direccion', models.CharField(blank=True, db_column=b'direccionMedico', max_length=200, null=True, verbose_name=b'Direccion')),
+        #         ('localidad', models.CharField(blank=True, db_column=b'localidadMedico', max_length=200, null=True, verbose_name=b'Localidad')),
+        #         ('telefono', models.CharField(blank=True, db_column=b'telMedico', max_length=200, null=True, verbose_name=b'Telefono')),
+        #         ('email', models.EmailField(blank=True, db_column=b'mail', max_length=200, null=True, verbose_name=b'E-mail')),
+        #     ],
+        #     options={
+        #         'ordering': ['apellido'],
+        #         'db_table': 'tblMedicosAnestesistas',
+        #     },
+        # ),
         migrations.CreateModel(
             name='Disponibilidad',
             fields=[

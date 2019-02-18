@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ['apellido'],
-                'managed': False,
+                #'managed': False,
             },
         ),
         migrations.CreateModel(
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'tblComplejidades',
-                'managed': False,
+                #'managed': False,
             },
         ),
         migrations.CreateModel(
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'tblComplejidadEstudios',
-                'managed': False,
+                #'managed': False,
             },
         ),
     ]
