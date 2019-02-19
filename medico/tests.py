@@ -18,7 +18,7 @@ class TestDescuentosCalculadorHonorarios(TestCase):
         estudio_aplica = Estudio.objects.get(pk=4)
         estudio_no_aplica = Estudio.objects.get(pk=3)
         self.assertNotEquals(DescuentoStent().aplicar(estudio_aplica, Decimal("10000.00")), Decimal("0.00"))
-        self.assertEquals(DescuentoColangios().aplicar(estudio_no_aplica, Decimal("10000.00")), Decimal("0.00"))
+        self.assertEquals(DescuentoStent().aplicar(estudio_no_aplica, Decimal("10000.00")), Decimal("0.00"))
 
     def test_descuentos_por_radiofrecuencia(self):
         estudio_aplica = Estudio.objects.get(pk=5)
