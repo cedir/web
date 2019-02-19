@@ -67,6 +67,7 @@ class CreateInformeFactoryTest(TestCase):
 
 class TestCaluloRetencionCedir(TestCase):
     fixtures = ["comprobantes.json", "presentaciones.json", "obras_sociales.json"]
+
     def test_retencion_cedir_es_cero_si_no_hay_presentacion(self):
         comprobante = Comprobante.objects.get(pk=3)
         self.assertIsNone(comprobante.presentacion.first())

@@ -12,3 +12,7 @@
 #info-turno table, th, td {
     border: 1px solid #a9a9a9;
 }
+
+#info-no-atiende .modal-body {
+    font-size: 13px;
+}

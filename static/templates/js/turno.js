@@ -198,7 +198,7 @@ function getConfirmarTurno(event) {
   var fecha = button.data('fecha');
   var horaInicio = button.data('hora');
 
-  var modal = $(this)
+  var modal = $(this);
 
   modal.find("#selected-paciente").text($("#selectedPaciente").text().trim() || 'Seleccione..');
   modal.find("#selected-medico").text($("#id-medico option:selected").text());
@@ -210,7 +210,6 @@ function getConfirmarTurno(event) {
   modal.find("#selected-sala").text($("#id-sala option:selected").text());
 
 }
-
 
 function setPaciente(id, nombre, apellido) {
   $('#selectedPaciente').html(apellido + ", " + nombre);
