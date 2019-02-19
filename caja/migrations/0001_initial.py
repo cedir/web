@@ -20,12 +20,12 @@ class Migration(migrations.Migration):
                 ('concepto', models.TextField(blank=True)),
                 ('fecha', models.DateField(blank=True, null=True)),
                 ('hora', models.TimeField()),
-                ('monto', models.DecimalField(blank=True, db_column=b'montoAcumulado', decimal_places=2, max_digits=10, null=True)),
+                ('monto', models.DecimalField(blank=True, db_column=b'monto', decimal_places=2, max_digits=10, null=True)),
                 ('estado', models.NullBooleanField()),
             ],
             options={
                 'db_table': 'tblCajaMovimientos',
-                'managed': False,
+                # 'managed': False,
             },
         ),
         migrations.CreateModel(
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'tblCajaTipoDeMovimientos',
-                'managed': False,
+                # 'managed': False,
             },
         ),
     ]
