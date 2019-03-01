@@ -96,7 +96,7 @@ class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
             DescuentoRadiofrecuencia())
 
     @property
-    def actuante(self):
+    def honorario_actuante(self):
         estudio = self.estudio
         importe = self.importe
         porcentajes = Porcentajes(estudio)
@@ -106,7 +106,7 @@ class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
             return importe * porcentajes.actuante / Decimal('100.00')
 
     @property
-    def solicitante(self):
+    def honorario_solicitante(self):
         estudio = self.estudio
         importe = self.importe
         porcentajes = Porcentajes(estudio)
