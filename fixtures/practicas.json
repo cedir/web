@@ -20,5 +20,133 @@
         "abreviatura": "VCC",
         "usedLevel": 1
     }
+},
+{
+    "pk": 34,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "COLANGIOGRAFIA RETROGRADA ENDOSCOPICA CON PAPILOTOMIA",
+        "usedLevel": 1
+    }
+},
+{
+    "pk": 13,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "COLANGIO PANCREATOGRAFIA RETROGRADA ENDOSCOPICA",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 17,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "COLOCACION DE PROTESIS AUTOEXPANDIBLE COLONICA",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 11,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "COLOCACION DE PROTESIS AUTOEXPANDIBLE ESOFAGICA",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 43,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "COLOCACION DE STENT ESOFAGICO",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 19,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "COLONO VIDEOENDOSCOPIA CON POLIPECTOMIA COLONICA",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 49,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "CPRE CON COLOCACION DE STENT BILIAR O PANCREATICO",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 48,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "CPRE CON LITOTRIPSIA MECANICA PARA LITIASIS DE GRAN TAMA\u00d1O",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 58,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "ECOGRAFIA VESICAL",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 18,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "ESOFAGO GASTRO DUODENO VIDEOENDOSCOPIA  CON POLIPECTOMIA GASTRICA",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 14,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "PAPILOTOMIA ENDOSCOPICA, EXTRACCION DE CALCULOS COLEDOCIANOS",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 23,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "POLIPECTOMIA COLONICA",
+        "usedLevel": 1
+    }
+},
+{
+    "pk": 24,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "POLIPECTOMIA GASTRICA ENDOSCOPICA",
+        "usedLevel": 1
+    }
+},
+{
+    "pk": 146,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "polipectomia - NO USAR",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 97,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "PROTESIS DE VIA BILIAR O PANCREATICA",
+        "usedLevel": 0
+    }
+},
+{
+    "pk": 147,
+    "model": "practica.practica",
+    "fields": {
+        "descripcion": "TTO DE ESOFAGO DE BARRET POR RADIOFRECUENCIA",
+        "usedLevel": 0
+    }
 }
 ]

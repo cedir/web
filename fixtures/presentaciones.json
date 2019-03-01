@@ -51,5 +51,38 @@
         "total": "4444.44",
         "total_facturado": "4444.44"
     }
+},
+{
+    "model": "presentacion.presentacion",
+    "pk": 5,
+    "fields": {
+        "obra_social": 2,
+        "fecha": "2012-07-06",
+        "estado": 0,
+        "iva": "21.00",
+        "comprobante": 5
+    }
+},
+{
+    "model": "presentacion.presentacion",
+    "pk": 6,
+    "fields": {
+        "obra_social": 2,
+        "fecha": "2012-07-06",
+        "estado": 0,
+        "iva": "21.00",
+        "comprobante": 6
+    }
+},
+{
+    "model": "presentacion.presentacion",
+    "pk": 7,
+    "fields": {
+        "obra_social": 2,
+        "fecha": "2012-07-06",
+        "estado": 0,
+        "iva": "21.00",
+        "comprobante": 7
+    }
 }
 ]

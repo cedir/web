@@ -1,0 +1,16 @@
+[
+{
+    "pk": 1,
+    "model": "anestesista.anestesista",
+    "fields": {
+        "apellido": "Sin anestesia",
+        "direccion": "",
+        "porcentaje_anestesista": "0.00",
+        "matricula": "",
+        "localidad": "",
+        "nombre": "",
+        "telefono": "",
+        "email": ""
+    }
+}
+]

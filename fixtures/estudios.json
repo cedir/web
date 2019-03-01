@@ -68,5 +68,95 @@
         "importe_medicacion_cobrado": "267.06",
         "arancel_anestesia": "535.00"
     }
+},
+{
+    "model": "estudio.estudio",
+    "pk": 3,
+    "fields": {
+        "paciente": 2,
+        "practica": 13,
+        "medico": 2,
+        "obra_social": 2,
+        "medico_solicitante": 1,
+        "presentacion": 5,
+        "importe_estudio": "10000.00",
+        "fecha": "2013-11-19",
+        "anestesista": 1
+    }
+},
+{
+    "model": "estudio.estudio",
+    "pk": 4,
+    "fields": {
+        "paciente": 1,
+        "practica": 48,
+        "medico": 2,
+        "obra_social": 2,
+        "medico_solicitante": 1,
+        "presentacion": 5,
+        "importe_estudio": "10000.00",
+        "fecha": "2013-11-19",
+        "anestesista": 1
+    }
+},
+{
+    "model": "estudio.estudio",
+    "pk": 5,
+    "fields": {
+        "paciente": 1,
+        "practica": 11,
+        "medico": 2,
+        "obra_social": 2,
+        "medico_solicitante": 1,
+        "presentacion": 5,
+        "importe_estudio": "10000.00",
+        "fecha": "2013-11-19",
+        "anestesista": 1
+    }
+},
+{
+    "model": "estudio.estudio",
+    "pk": 6,
+    "fields": {
+        "paciente": 1,
+        "practica": 18,
+        "medico": 2,
+        "obra_social": 2,
+        "medico_solicitante": 1,
+        "presentacion": 5,
+        "importe_estudio": "10000.00",
+        "fecha": "2013-11-19",
+        "anestesista": 1
+    }
+},
+{
+    "model": "estudio.estudio",
+    "pk": 7,
+    "fields": {
+        "paciente": 1,
+        "practica": 18,
+        "medico": 2,
+        "obra_social": 3,
+        "medico_solicitante": 1,
+        "presentacion": 6,
+        "importe_estudio": "10000.00",
+        "fecha": "2013-11-19",
+        "anestesista": 1
+    }
+},
+{
+    "model": "estudio.estudio",
+    "pk": 8,
+    "fields": {
+        "paciente": 1,
+        "practica": 18,
+        "medico": 2,
+        "obra_social": 5,
+        "medico_solicitante": 1,
+        "presentacion": 7,
+        "importe_estudio": "10000.00",
+        "fecha": "2013-11-19",
+        "anestesista": 1
+    }
 }
 ]
