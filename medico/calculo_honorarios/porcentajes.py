@@ -1,46 +1,56 @@
 from decimal import Decimal
 
-CONSULTA = 100
-
-ACT_ECOGRAFIA = 70
-SOL_ECOGRAFIA = 15
-
-ACT_LABORATORIO = 70
-SOL_LABORATORIO = 10
-
-ACT_LIGADURA_HEMORROIDES = 50
-SOL_LIGADURA_HEMORROIDES = 0
-
-ACT_PRACTICA_ESPECIAL = 75
-SOL_PRACTICA_ESPECIAL = 75
-
-ACTUANTE = 80
-SOLICITANTE = 0
-
-COMB_MED_ACT_BRUNETTI = 2
-
 
 class Porcentajes:
     '''
     #TODO: marco para implementar mas adelante las reglas posta.
     '''
     def __init__(self, estudio):
-        pass
+        if es_consulta(estudio):
+            self._actuante = Decimal('100.00')
+            self._solicitante = Decimal('0.00')
+            self._cedir = Decimal('0.00')
+        elif es_ecografia(estudio):
+            self._actuante = Decimal('70.00')
+            self._solicitante = Decimal('15.00')
+            self._cedir = Decimal('15.00')
+        elif es_laboratorio(estudio):
+            self._actuante = Decimal('70.00')
+            self._solicitante = Decimal('10.00')
+            self._cedir = Decimal('20.00')
+        elif es_ligadura_hemorroides(estudio):
+            self._actuante = Decimal('50.00')
+            self._solicitante = Decimal('0.00')
+            self._cedir = Decimal('50.00')
+        elif es_practica_especial(estudio):
+            self._actuante = Decimal('75.00')
+            self._solicitante = Decimal('25.00')
+            self._cedir = Decimal('0.00')
+        elif brunetti_es_actuante(estudio):
+            pass #TODO
+        else:
+            self._actuante = Decimal('80.00')
+            self._solicitante = Decimal('0.00')
+            self._cedir = Decimal('20.00')
 
     @property
     def actuante(self):
-        return Decimal('70.00')
+        return self._actuante
 
     @property
     def solicitante(self):
-        return Decimal('20.00')
+        return self._solicitante
 
     @property
     def cedir(self):
-        return Decimal('10.00')
+        return self._cedir
 
 
 # Estos se usan tambien en descuentos. Convendra hacerlas @property en los models de estudio?
+def es_consulta(estudio):
+    pass
+
+
 def es_ecografia(estudio):
     pass
 
