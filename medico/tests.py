@@ -1,4 +1,7 @@
 from decimal import Decimal
+from mock import patch
+
+
 from django.test import TestCase
 from estudio.models import Estudio
 from medico.calculo_honorarios.descuentos import DescuentoColangios, DescuentoStent, DescuentoPorPolipectomia, DescuentoRadiofrecuencia
@@ -15,6 +18,7 @@ OS_UNR = 25
 ACA_SALUD = 5
 GALENO = 46
 OSPAC = 19
+
 
 class TestDescuentosCalculadorHonorarios(TestCase):
     fixtures = ["medicos.json", "estudios.json", "obras_sociales.json", "practicas.json", "pacientes.json", "presentaciones.json", "comprobantes",
@@ -55,6 +59,7 @@ class TestDescuentosCalculadorHonorarios(TestCase):
         for estudio in estudios_obras_sociales_no_aplican:
             self.assertEquals(DescuentoPorPolipectomia().aplicar(estudio, Decimal("10000.00")), Decimal("0.00"))
 
+
 class TestPorcentajesCalculadorHonorarios(TestCase):
     fixtures = ["medicos.json", "estudios.json", "obras_sociales.json", "practicas.json", "pacientes.json", "presentaciones.json", "comprobantes",
                 "anestesistas.json"]
@@ -64,8 +69,15 @@ class TestPorcentajesCalculadorHonorarios(TestCase):
             p = Porcentajes(e)
             self.assertEquals(p.actuante + p.solicitante + p.cedir, Decimal("100.00"))
 
-    def test_porcentajes_consulta(self):
-        pass
+
+    @patch('medico.calculo_honorarios.porcentajes.Porcentajes.es_consulta')
+    def test_porcentajes_consulta(self, mock_es_consulta):
+        #mock_es_consulta.return_value = True
+
+        p = Porcentajes(e)
+        self.assertEquals(p.actuante + p.solicitante + p.cedir, Decimal("100.00"))
+
+        self.assertTrue(mock_es_consulta.called)
 
     def test_porcentajes_ecografia(self):
         pass

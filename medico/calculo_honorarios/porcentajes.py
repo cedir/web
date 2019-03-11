@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 
-class Porcentajes:
+class Porcentajes(object):
     def __init__(self, estudio):
         if es_consulta(estudio):
             self._actuante = Decimal('100.00')
