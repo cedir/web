@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.test import TestCase
 from estudio.models import Estudio
 from medico.calculo_honorarios.descuentos import DescuentoColangios, DescuentoStent, DescuentoPorPolipectomia, DescuentoRadiofrecuencia
+from medico.calculo_honorarios.porcentajes import Porcentajes
 
 COLANGIO_ID = 13
 STENT_ID = 48
@@ -53,3 +54,32 @@ class TestDescuentosCalculadorHonorarios(TestCase):
             self.assertEquals(DescuentoPorPolipectomia().aplicar(estudio, Decimal("10000.00")), Decimal("0.00"))
         for estudio in estudios_obras_sociales_no_aplican:
             self.assertEquals(DescuentoPorPolipectomia().aplicar(estudio, Decimal("10000.00")), Decimal("0.00"))
+
+class TestPorcentajesCalculadorHonorarios(TestCase):
+    fixtures = ["medicos.json", "estudios.json", "obras_sociales.json", "practicas.json", "pacientes.json", "presentaciones.json", "comprobantes",
+                "anestesistas.json"]
+    def test_porcentajes_consistentes(self):
+        estudios = Estudio.objects.all()
+        for e in estudios:
+            p = Porcentajes(e)
+            self.assertEquals(p.actuante + p.solicitante + p.cedir, Decimal("100.00"))
+
+    def test_porcentajes_consulta(self):
+        pass
+
+    def test_porcentajes_ecografia(self):
+        pass
+
+    def test_porcentajes_laboratorio(self):
+        pass
+
+    def test_porcentajes_ligadura(self):
+        pass
+
+    def test_porcentajes_especial(self):
+        pass
+
+    def test_porcentajes_actuante_brunetti(self):
+        pass
+
+    
