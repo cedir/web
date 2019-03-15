@@ -46,7 +46,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
     def get_detalle_amr(self, request, pk=None):
         presentacion = Presentacion.objects.get(pk=pk)
         csv_string = ''
-        estudios = presentacion.estudios.all()
+        estudios = presentacion.estudios.all().order_by('fecha', 'id')
         comprobante = presentacion.comprobante
         try:
             for estudio in estudios:

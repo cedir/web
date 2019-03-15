@@ -1,8 +1,6 @@
 from decimal import Decimal, ROUND_UP
 
 # TODO:
-# - Ver en que orden aparecen los estudios en el azul, y ordenarlos igual aca
-# - Escribir test?
 # - arancel_anestesia y diferencia paciente se suman al total del estudio o no? y en OSDE?
 
 class AmrRowBase(object):
@@ -47,7 +45,7 @@ class AmrRowBase(object):
         self.nombre_de_afiliado = u'{:<30}'.format(unicode(estudio.paciente)[:30])
         self.tipo_documento = u'0'
         self.numero_de_documento = u'{:<8}'.format(unicode(estudio.paciente.dni)[:8])
-        self.numero_de_bono = u'{:<8}'.format(estudio.nro_de_orden[:8])  # nro de orden
+        self.numero_de_bono = u'{:<7}'.format(estudio.nro_de_orden[:7])  # nro de orden
         self.fecha = u'{}'.format(estudio.fecha.strftime('%Y%m%d'))  # AAAAMMDD
         self.codigo_de_nomenclador_prestacional = '{0:<7}'.format(estudio.practica.codigoMedico[:7])
         self.tipo_de_nomenclador_prestacional = u'M'
