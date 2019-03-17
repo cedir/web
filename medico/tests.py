@@ -4,8 +4,11 @@ from mock import patch
 
 from django.test import TestCase
 from estudio.models import Estudio
+from practica.models import Practica
+from medico.models import Medico
 from medico.calculo_honorarios.descuentos import DescuentoColangios, DescuentoStent, DescuentoPorPolipectomia, DescuentoRadiofrecuencia
 from medico.calculo_honorarios.porcentajes import Porcentajes
+from medico.calculo_honorarios.constantes import *
 
 COLANGIO_ID = 13
 STENT_ID = 48
@@ -63,35 +66,96 @@ class TestDescuentosCalculadorHonorarios(TestCase):
 class TestPorcentajesCalculadorHonorarios(TestCase):
     fixtures = ["medicos.json", "estudios.json", "obras_sociales.json", "practicas.json", "pacientes.json", "presentaciones.json", "comprobantes",
                 "anestesistas.json"]
-    def test_porcentajes_consistentes(self):
+    def test_porcentajes_honorarios_medicos_suman_siempre_100(self):
         estudios = Estudio.objects.all()
         for e in estudios:
             p = Porcentajes(e)
             self.assertEquals(p.actuante + p.solicitante + p.cedir, Decimal("100.00"))
 
 
-    @patch('medico.calculo_honorarios.porcentajes.Porcentajes.es_consulta')
-    def test_porcentajes_consulta(self, mock_es_consulta):
-        #mock_es_consulta.return_value = True
+    def test_porcentajes_correctos_por_defecto(self):
+        estudio = Estudio.objects.first()
+        estudio.practica = Practica(99999)
+        estudio.medico = Medico(ID_BRUNETTI[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_POR_DEFECTO_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_POR_DEFECTO_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_POR_DEFECTO_CEDIR)
 
-        p = Porcentajes(e)
-        self.assertEquals(p.actuante + p.solicitante + p.cedir, Decimal("100.00"))
+    def test_porcentajes_correctos_consulta(self):
+        estudio = Estudio.objects.first()
+        estudio.practica = Practica(ID_CONSULTA[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_CONSULTA_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_CONSULTA_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_CONSULTA_CEDIR)
 
-        self.assertTrue(mock_es_consulta.called)
+    def test_porcentajes_correctos_ecografia(self):
+        estudio = Estudio.objects.first()
+        estudio.practica = Practica(ID_ECOGRAFIA[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_ECOGRAFIA_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_ECOGRAFIA_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_ECOGRAFIA_CEDIR)
 
-    def test_porcentajes_ecografia(self):
-        pass
+    def test_porcentajes_correctos_laboratorio(self):
+        estudio = Estudio.objects.first()
+        estudio.practica = Practica(ID_LABORATORIO[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_LABORATORIO_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_LABORATORIO_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_LABORATORIO_CEDIR)
 
-    def test_porcentajes_laboratorio(self):
-        pass
+    def test_porcentajes_correctos_ligadura(self):
+        estudio = Estudio.objects.first()
+        estudio.practica = Practica(ID_LIGADURA[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_LIGADURA_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_LIGADURA_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_LIGADURA_CEDIR)
 
-    def test_porcentajes_ligadura(self):
-        pass
+    def test_porcentajes_correctos_especial(self):
+        estudio = Estudio.objects.first()
+        estudio.practica = Practica(ID_ESPECIAL[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_ESPECIAL_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_ESPECIAL_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_ESPECIAL_CEDIR)
 
-    def test_porcentajes_especial(self):
-        pass
+    def test_porcentajes_correctos_actuante_brunetti_acuerdo_10(self):
+        estudio = Estudio.objects.first()
+        estudio.medico = Medico(ID_BRUNETTI[0])
+        estudio.medico_solicitante = Medico(ID_ACUERDO_10[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_ACUERDO_10_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_ACUERDO_10_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_ACUERDO_10_CEDIR)
 
-    def test_porcentajes_actuante_brunetti(self):
-        pass
+    def test_porcentajes_correctos_actuante_brunetti_acuerdo_40(self):
+        estudio = Estudio.objects.first()
+        estudio.medico = Medico(ID_BRUNETTI[0])
+        estudio.medico_solicitante = Medico(ID_ACUERDO_40[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_ACUERDO_40_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_ACUERDO_40_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_ACUERDO_40_CEDIR)
+
+    def test_porcentajes_correctos_actuante_brunetti_acuerdo_50(self):
+        estudio = Estudio.objects.first()
+        estudio.medico = Medico(ID_BRUNETTI[0])
+        estudio.medico_solicitante = Medico(ID_ACUERDO_50[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_ACUERDO_50_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_ACUERDO_50_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_ACUERDO_50_CEDIR)
+
+    def test_porcentajes_correctos_actuante_brunetti_acuerdo_80(self):
+        estudio = Estudio.objects.first()
+        estudio.medico = Medico(ID_BRUNETTI[0])
+        estudio.medico_solicitante = Medico(ID_ACUERDO_80[0])
+        p = Porcentajes(estudio)
+        self.assertEquals(p.actuante, PORCENTAJE_ACUERDO_80_ACTUANTE)
+        self.assertEquals(p.solicitante, PORCENTAJE_ACUERDO_80_SOLICITANTE)
+        self.assertEquals(p.cedir, PORCENTAJE_ACUERDO_80_CEDIR)
 
     
