@@ -1,61 +1,108 @@
-from decimal import Decimal
-
-CONSULTA = 100
-
-ACT_ECOGRAFIA = 70
-SOL_ECOGRAFIA = 15
-
-ACT_LABORATORIO = 70
-SOL_LABORATORIO = 10
-
-ACT_LIGADURA_HEMORROIDES = 50
-SOL_LIGADURA_HEMORROIDES = 0
-
-ACT_PRACTICA_ESPECIAL = 75
-SOL_PRACTICA_ESPECIAL = 75
-
-ACTUANTE = 80
-SOLICITANTE = 0
-
-COMB_MED_ACT_BRUNETTI = 2
+from constantes import *
 
 
-class Porcentajes:
-    '''
-    #TODO: marco para implementar mas adelante las reglas posta.
-    '''
+class Porcentajes(object):
     def __init__(self, estudio):
-        pass
+        if es_consulta(estudio):
+            self._actuante = PORCENTAJE_CONSULTA_ACTUANTE
+            self._solicitante = PORCENTAJE_CONSULTA_SOLICITANTE
+            self._cedir = PORCENTAJE_CONSULTA_CEDIR
+            return
+
+        if es_ecografia(estudio):
+            self._actuante = PORCENTAJE_ECOGRAFIA_ACTUANTE
+            self._solicitante = PORCENTAJE_ECOGRAFIA_SOLICITANTE
+            self._cedir = PORCENTAJE_ECOGRAFIA_CEDIR
+            return
+
+        if es_laboratorio(estudio):
+            self._actuante = PORCENTAJE_LABORATORIO_ACTUANTE
+            self._solicitante = PORCENTAJE_LABORATORIO_SOLICITANTE
+            self._cedir = PORCENTAJE_LABORATORIO_CEDIR
+            return
+
+        if es_ligadura_de_hemorroides(estudio):
+            self._actuante = PORCENTAJE_LIGADURA_ACTUANTE
+            self._solicitante = PORCENTAJE_LIGADURA_SOLICITANTE
+            self._cedir = PORCENTAJE_LIGADURA_CEDIR
+            return
+
+        if es_practica_especial(estudio):
+            self._actuante = PORCENTAJE_ESPECIAL_ACTUANTE
+            self._solicitante = PORCENTAJE_ESPECIAL_SOLICITANTE
+            self._cedir = PORCENTAJE_ESPECIAL_CEDIR
+            return
+
+        if brunetti_es_actuante(estudio):
+            if tiene_acuerdo_al_10(estudio):
+                self._actuante = PORCENTAJE_ACUERDO_10_ACTUANTE
+                self._solicitante = PORCENTAJE_ACUERDO_10_SOLICITANTE
+                self._cedir = PORCENTAJE_ACUERDO_10_CEDIR
+                return
+
+            if tiene_acuerdo_al_40(estudio):
+                self._actuante = PORCENTAJE_ACUERDO_40_ACTUANTE
+                self._solicitante = PORCENTAJE_ACUERDO_40_SOLICITANTE
+                self._cedir = PORCENTAJE_ACUERDO_40_CEDIR
+                return
+
+            if tiene_acuerdo_al_50(estudio):
+                self._actuante = PORCENTAJE_ACUERDO_50_ACTUANTE
+                self._solicitante = PORCENTAJE_ACUERDO_50_SOLICITANTE
+                self._cedir = PORCENTAJE_ACUERDO_50_CEDIR
+                return
+
+            if tiene_acuerdo_al_80(estudio):
+                self._actuante = PORCENTAJE_ACUERDO_80_ACTUANTE
+                self._solicitante = PORCENTAJE_ACUERDO_80_SOLICITANTE
+                self._cedir = PORCENTAJE_ACUERDO_80_CEDIR
+                return
+
+        self._actuante = PORCENTAJE_POR_DEFECTO_ACTUANTE
+        self._solicitante = PORCENTAJE_POR_DEFECTO_SOLICITANTE
+        self._cedir = PORCENTAJE_POR_DEFECTO_CEDIR
+        return
 
     @property
     def actuante(self):
-        return Decimal('70.00')
+        return self._actuante
 
     @property
     def solicitante(self):
-        return Decimal('20.00')
+        return self._solicitante
 
     @property
     def cedir(self):
-        return Decimal('10.00')
+        return self._cedir
 
 
 # Estos se usan tambien en descuentos. Convendra hacerlas @property en los models de estudio?
-def es_ecografia(estudio):
-    pass
+def es_consulta(estudio):
+    return estudio.practica.id in ID_CONSULTA
 
+def es_ecografia(estudio):
+    return estudio.practica.id in ID_ECOGRAFIA
 
 def es_laboratorio(estudio):
-    pass
-
+    return estudio.practica.id in ID_LABORATORIO
 
 def es_ligadura_de_hemorroides(estudio):
-    pass
-
+    return estudio.practica.id in ID_LIGADURA
 
 def es_practica_especial(estudio):
-    pass
-
+    return estudio.practica.id in ID_ESPECIAL
 
 def brunetti_es_actuante(estudio):
-    pass
+    return estudio.medico.id in ID_BRUNETTI
+
+def tiene_acuerdo_al_10(estudio):
+    return estudio.medico_solicitante.id in ID_ACUERDO_10
+
+def tiene_acuerdo_al_40(estudio):
+    return estudio.medico_solicitante.id in ID_ACUERDO_40
+
+def tiene_acuerdo_al_50(estudio):
+    return estudio.medico_solicitante.id in ID_ACUERDO_50
+
+def tiene_acuerdo_al_80(estudio):
+    return estudio.medico_solicitante.id in ID_ACUERDO_80
