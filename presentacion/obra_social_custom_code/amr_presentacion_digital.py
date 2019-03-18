@@ -42,7 +42,7 @@ class AmrRowBase(object):
         self.numero_de_factura = u'{0:08}'.format(comprobante.numero)
         self.numero_de_rendicion = u'{:<7}'.format('')
         self.codigo_de_afiliado = u'{:<15}'.format(self.format_nro_afiliado(estudio.paciente))
-        self.nombre_de_afiliado = u'{:<30}'.format(unicode(estudio.paciente)[:30])
+        self.nombre_de_afiliado = u'{:<30}'.format(remove_non_ascii_character(unicode(estudio.paciente))[:30])
         self.tipo_documento = u'0'
         self.numero_de_documento = u'{:<8}'.format(unicode(estudio.paciente.dni)[:8])
         self.numero_de_bono = u'{:<7}'.format(estudio.nro_de_orden[:7])  # nro de orden
@@ -52,7 +52,7 @@ class AmrRowBase(object):
         self.nombre_de_nomenclador_prestacional = u'{:<30}'.format(unicode(estudio.practica)[:30])
         self.cantidad = u'00001'
         self.matricula_del_efector = '{0:06}'.format(self.format_nro_matricula(estudio.medico))
-        self.nombre_del_efector = u'{:<30}'.format(unicode(estudio.medico)[:30])
+        self.nombre_del_efector = u'{:<30}'.format(remove_non_ascii_character(unicode(estudio.medico))[:30])
         self.honorarios = '0{0:013}'.format(importe).replace('.', '')
         self.derechos = '0{0:013}'.format(importe_pension).replace('.', '')
         self.tipo_de_honorario = u'0'
@@ -60,7 +60,7 @@ class AmrRowBase(object):
         self.porcentaje_derechos = u'100'
         self.urgencia = u'N'  # S=Si, N=No
         self.matricula_del_prescriptor = '{0:06}'.format(self.format_nro_matricula(estudio.medico_solicitante))
-        self.nombre_del_prescriptor = u'{:<30}'.format(unicode(estudio.medico_solicitante)[:30])
+        self.nombre_del_prescriptor = u'{:<30}'.format(remove_non_ascii_character(unicode(estudio.medico_solicitante))[:30])
         self.codigo_de_autorizacion = u'{:<11}'.format('')  # no lo tenemos
         self.medicamentos_y_descartables = '0{0:013}'.format(importe_medicacion).replace('.', '')
 
@@ -94,3 +94,16 @@ class AmrRowBase(object):
 class AmrRowEstudio(AmrRowBase):
     def __init__(self, estudio, *args, **kwargs):
         super(AmrRowEstudio, self).__init__(estudio, *args, **kwargs)
+
+
+def remove_non_ascii_character(text):
+    """
+    encode to ascii removing non-ascii characters and convert back to unicode
+    :param text:
+    :return:
+    """
+    try:
+        text.encode(u'ascii')
+    except UnicodeEncodeError:
+        text = text.encode(u'ascii', u'ignore').decode(u'ascii')
+    return text
