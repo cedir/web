@@ -1,7 +1,5 @@
 from decimal import Decimal, ROUND_UP
 
-# TODO:
-# - arancel_anestesia y diferencia paciente se suman al total del estudio o no? y en OSDE?
 
 class AmrRowBase(object):
     def __init__(self, estudio, comprobante, *args, **kwargs):
@@ -33,7 +31,8 @@ class AmrRowBase(object):
         Codigo de Autorizacion	245	255
         Medicamentos y Descartables	256	268
         """
-        importe = Decimal(estudio.importe_estudio).quantize(Decimal('.01'), ROUND_UP)
+        importe = estudio.importe_estudio + estudio.arancel_anestesia - estudio.diferencia_paciente
+        importe = Decimal(importe).quantize(Decimal('.01'), ROUND_UP)
         importe_pension = Decimal(estudio.pension).quantize(Decimal('.01'), ROUND_UP)
         importe_medicacion = Decimal(estudio.importe_medicacion).quantize(Decimal('.01'), ROUND_UP)
 
