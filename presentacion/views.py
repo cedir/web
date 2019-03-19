@@ -47,8 +47,9 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         presentacion = Presentacion.objects.get(pk=pk)
         csv_string = ''
         estudios = presentacion.estudios.all().order_by('fecha', 'id')
-        comprobante = presentacion.comprobante
         try:
+            comprobante = presentacion.comprobante
+
             for estudio in estudios:
                 csv_string = '{}\n{}'.format(csv_string, AmrRowEstudio(estudio, comprobante).get_row())
 
