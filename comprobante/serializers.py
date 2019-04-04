@@ -88,7 +88,7 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
         return self.context["calculador"].total_medicamentos
 
     def get_total_material_especifico(self, comprobante):
-        return self.context["calculador"].sala_recuperacion
+        return self.context["calculador"].total_material_especifico
 
 # Columnas Actuales
 # dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()
