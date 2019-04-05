@@ -44,7 +44,6 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     sala_recuperacion = serializers.SerializerMethodField()
     total_medicamentos = serializers.SerializerMethodField()
     total_material_especifico = serializers.SerializerMethodField()
-    responsable = serializers.SerializerMethodField()
     
     class Meta:
         model = Comprobante
@@ -53,6 +52,7 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'nro_cuit',
                   'sub_tipo',
                   'numero',
+                  'responsable',
                   'nro_terminal',
                   'total_facturado',
                   'total_cobrado',
