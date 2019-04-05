@@ -44,7 +44,8 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     sala_recuperacion = serializers.SerializerMethodField()
     total_medicamentos = serializers.SerializerMethodField()
     total_material_especifico = serializers.SerializerMethodField()
-
+    responsable = serializers.SerializerMethodField()
+    
     class Meta:
         model = Comprobante
         fields = ('id',
@@ -58,7 +59,6 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'fecha_emision',
                   'tipo_comprobante',
                   'gravado',
-                  'estado',
                   'importe_gravado_afip',  # neto
                   'importe_alicuota_afip',  # iva
                   'honorarios_medicos',
