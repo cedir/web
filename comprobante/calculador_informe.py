@@ -69,17 +69,16 @@ class CalculadorInformeFactura(CalculadorInforme):
         return sum([estudio.arancel_anestesia for estudio in estudios])
 
     @property
-    def retencion_impositiva(self):
+    def retencion_cedir(self):
         presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
-        if not presentacion.iva:
-            # Algunas presentacionines tienen IVA = Null. Para estos casos, consideramos que debia ser 0.
-                return Decimal("0.00")
-        return presentacion.iva * presentacion.total_facturado / Decimal("100.00")
+        estudios = presentacion.estudios.all()
+        return sum([CalculadorHonorariosInformeContadora(estudio).cedir for estudio in estudios])
 
     @property
-    def retencion_cedir(self):
+    # gasto administrativo
+    def retencion_impositiva(self):
         '''
         La retencion del cedir depende se guarda en el pago de la presentacion y esos casos conviene sacarla de ahi.
         Pero si no hay pago, es segun Mariana, "un valor fijo que no cambia seguido" y se puede decidir aca.

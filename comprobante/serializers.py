@@ -1,4 +1,5 @@
 from itertools import groupby
+from decimal import Decimal, ROUND_UP
 from rest_framework import serializers
 
 from anestesista.calculador_honorarios.calculador_honorarios import CalculadorHonorariosAnestesista
@@ -70,25 +71,25 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'total_material_especifico')
 
     def get_honorarios_medicos(self, comprobante):
-        return self.context["calculador"].honorarios_medicos
+        return Decimal(self.context["calculador"].honorarios_medicos).quantize(Decimal('.01'), ROUND_UP)
 
     def get_honorarios_anestesistas(self, comprobante):
-        return self.context["calculador"].anestesia
+        return Decimal(self.context["calculador"].anestesia).quantize(Decimal('.01'), ROUND_UP)
 
     def get_retencion_impositiva(self, comprobante):
-        return self.context["calculador"].retencion_impositiva
+        return Decimal(self.context["calculador"].retencion_impositiva).quantize(Decimal('.01'), ROUND_UP)
 
     def get_retencion_cedir(self, comprobante):
-        return self.context["calculador"].retencion_cedir
+        return Decimal(self.context["calculador"].retencion_cedir).quantize(Decimal('.01'), ROUND_UP)
 
     def get_sala_recuperacion(self, comprobante):
-        return self.context["calculador"].sala_recuperacion
+        return Decimal(self.context["calculador"].sala_recuperacion).quantize(Decimal('.01'), ROUND_UP)
 
     def get_total_medicamentos(self, comprobante):
-        return self.context["calculador"].total_medicamentos
+        return Decimal(self.context["calculador"].total_medicamentos).quantize(Decimal('.01'), ROUND_UP)
 
     def get_total_material_especifico(self, comprobante):
-        return self.context["calculador"].total_material_especifico
+        return Decimal(self.context["calculador"].total_material_especifico).quantize(Decimal('.01'), ROUND_UP)
 
 # Columnas Actuales
 # dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()
