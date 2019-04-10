@@ -37,6 +37,7 @@ class ComprobanteSerializer(serializers.ModelSerializer):
 
 class ComprobanteListadoSerializer(serializers.ModelSerializer):
     tipo_comprobante = TipoComprobanteSerializer()
+    # Nro
     gravado = GravadoSerializer()
     honorarios_medicos = serializers.SerializerMethodField()
     honorarios_anestesistas = serializers.SerializerMethodField()
@@ -45,30 +46,38 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     sala_recuperacion = serializers.SerializerMethodField()
     total_medicamentos = serializers.SerializerMethodField()
     total_material_especifico = serializers.SerializerMethodField()
+    neto = serializers.SerializerMethodField()
+    iva = serializers.SerializerMethodField()
     
     class Meta:
         model = Comprobante
         fields = ('id',
-                  'nombre_cliente',
-                  'nro_cuit',
-                  'sub_tipo',
                   'numero',
                   'responsable',
+                  'fecha_emision',
+                  'nombre_cliente',
+                  'nro_cuit',
+                  'tipo_comprobante',
+                  'sub_tipo',
                   'nro_terminal',
+                  'neto',
+                  'iva',
+                  'gravado',
                   'total_facturado',
                   'total_cobrado',
-                  'fecha_emision',
-                  'tipo_comprobante',
-                  'gravado',
-                  'importe_gravado_afip',  # neto
-                  'importe_alicuota_afip',  # iva
                   'honorarios_medicos',
-                  'honorarios_anestesistas',
                   'retencion_impositiva',
                   'retencion_cedir',
                   'sala_recuperacion',
+                  'honorarios_anestesistas',
                   'total_medicamentos',
                   'total_material_especifico')
+
+    def get_neto(self, comprobante):
+        return Decimal(comprobante.importe_gravado_afip).quantize(Decimal('.01'), ROUND_UP)
+
+    def get_iva(self, comprobante):
+        return Decimal(comprobante.importe_alicuota_afip).quantize(Decimal('.01'), ROUND_UP)
 
     def get_honorarios_medicos(self, comprobante):
         return Decimal(self.context["calculador"].honorarios_medicos).quantize(Decimal('.01'), ROUND_UP)
