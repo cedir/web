@@ -21,7 +21,11 @@ class CalculadorInforme(object):
         raise NotImplementedError
 
     @abstractproperty
-    def anestesia(self):
+    def honorarios_anestesia(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def retencion_anestesia(self):
         raise NotImplementedError
 
     @abstractproperty
@@ -61,13 +65,21 @@ class CalculadorInformeFactura(CalculadorInforme):
         return sum([CalculadorHonorariosInformeContadora(estudio).total for estudio in estudios])
 
     @property
-    def anestesia(self):
+    def honorarios_anestesia(self):
         presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
         estudios = presentacion.estudios.all()
-        return sum([estudio.arancel_anestesia for estudio in estudios])
+        return sum([estudio.arancel_anestesia for estudio in estudios]) * Decimal('0.9')
 
+    @property
+    def retencion_anestesia(self):
+        presentacion = self.comprobante.presentacion.first()
+        if not presentacion:
+            return Decimal("0.00")
+        estudios = presentacion.estudios.all()
+        return sum([estudio.arancel_anestesia for estudio in estudios]) * Decimal('0.1')
+    
     @property
     def retencion_cedir(self):
         presentacion = self.comprobante.presentacion.first()
@@ -148,7 +160,11 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
         return Decimal("0.00")
 
     @property
-    def anestesia(self):
+    def honorarios_anestesia(self):
+        return Decimal("0.00")
+
+    @property
+    def retencion_anestesia(self):
         return Decimal("0.00")
 
     @property

@@ -41,6 +41,7 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     gravado = GravadoSerializer()
     honorarios_medicos = serializers.SerializerMethodField()
     honorarios_anestesistas = serializers.SerializerMethodField()
+    retencion_anestesia = serializers.SerializerMethodField()
     retencion_impositiva = serializers.SerializerMethodField()
     retencion_cedir = serializers.SerializerMethodField()
     sala_recuperacion = serializers.SerializerMethodField()
@@ -70,6 +71,7 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'retencion_cedir',
                   'sala_recuperacion',
                   'honorarios_anestesistas',
+                  'retencion_anestesia',
                   'total_medicamentos',
                   'total_material_especifico')
 
@@ -83,7 +85,10 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
         return Decimal(self.context["calculador"].honorarios_medicos).quantize(Decimal('.01'), ROUND_UP)
 
     def get_honorarios_anestesistas(self, comprobante):
-        return Decimal(self.context["calculador"].anestesia).quantize(Decimal('.01'), ROUND_UP)
+        return Decimal(self.context["calculador"].honorarios_anestesia).quantize(Decimal('.01'), ROUND_UP)
+
+    def get_retencion_anestesia(self, comprobante):
+        return Decimal(self.context["calculador"].retencion_anestesia).quantize(Decimal('.01'), ROUND_UP)
 
     def get_retencion_impositiva(self, comprobante):
         return Decimal(self.context["calculador"].retencion_impositiva).quantize(Decimal('.01'), ROUND_UP)
