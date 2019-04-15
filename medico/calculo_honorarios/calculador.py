@@ -67,8 +67,12 @@ class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
     @property
     def total(self):
         porcentajes = Porcentajes(self.estudio)
-        return self.total_honorarios * (porcentajes.actuante + porcentajes.solicitante) / Decimal('100.00')
+        return Decimal(self.total_honorarios * (porcentajes.actuante + porcentajes.solicitante)) / Decimal('100.00')
 
+    @property
+    def cedir(self):
+        porcentajes = Porcentajes(self.estudio)
+        return Decimal(self.total_honorarios * porcentajes.cedir) / Decimal('100.00')
 
 class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
     '''

@@ -1,4 +1,5 @@
 from itertools import groupby
+from decimal import Decimal, ROUND_UP
 from rest_framework import serializers
 
 from anestesista.calculador_honorarios.calculador_honorarios import CalculadorHonorariosAnestesista
@@ -36,59 +37,73 @@ class ComprobanteSerializer(serializers.ModelSerializer):
 
 class ComprobanteListadoSerializer(serializers.ModelSerializer):
     tipo_comprobante = TipoComprobanteSerializer()
+    # Nro
     gravado = GravadoSerializer()
     honorarios_medicos = serializers.SerializerMethodField()
     honorarios_anestesistas = serializers.SerializerMethodField()
+    retencion_anestesia = serializers.SerializerMethodField()
     retencion_impositiva = serializers.SerializerMethodField()
     retencion_cedir = serializers.SerializerMethodField()
     sala_recuperacion = serializers.SerializerMethodField()
     total_medicamentos = serializers.SerializerMethodField()
     total_material_especifico = serializers.SerializerMethodField()
-
+    neto = serializers.SerializerMethodField()
+    iva = serializers.SerializerMethodField()
+    
     class Meta:
         model = Comprobante
         fields = ('id',
+                  'numero',
+                  'responsable',
+                  'fecha_emision',
                   'nombre_cliente',
                   'nro_cuit',
+                  'tipo_comprobante',
                   'sub_tipo',
-                  'numero',
                   'nro_terminal',
+                  'neto',
+                  'iva',
+                  'gravado',
                   'total_facturado',
                   'total_cobrado',
-                  'fecha_emision',
-                  'tipo_comprobante',
-                  'gravado',
-                  'estado',
-                  'importe_gravado_afip',  # neto
-                  'importe_alicuota_afip',  # iva
                   'honorarios_medicos',
-                  'honorarios_anestesistas',
                   'retencion_impositiva',
                   'retencion_cedir',
                   'sala_recuperacion',
+                  'honorarios_anestesistas',
+                  'retencion_anestesia',
                   'total_medicamentos',
                   'total_material_especifico')
 
+    def get_neto(self, comprobante):
+        return Decimal(comprobante.importe_gravado_afip).quantize(Decimal('.01'), ROUND_UP)
+
+    def get_iva(self, comprobante):
+        return Decimal(comprobante.importe_alicuota_afip).quantize(Decimal('.01'), ROUND_UP)
+
     def get_honorarios_medicos(self, comprobante):
-        return self.context["calculador"].honorarios_medicos
+        return Decimal(self.context["calculador"].honorarios_medicos).quantize(Decimal('.01'), ROUND_UP)
 
     def get_honorarios_anestesistas(self, comprobante):
-        return self.context["calculador"].anestesia
+        return Decimal(self.context["calculador"].honorarios_anestesia).quantize(Decimal('.01'), ROUND_UP)
+
+    def get_retencion_anestesia(self, comprobante):
+        return Decimal(self.context["calculador"].retencion_anestesia).quantize(Decimal('.01'), ROUND_UP)
 
     def get_retencion_impositiva(self, comprobante):
-        return self.context["calculador"].retencion_impositiva
+        return Decimal(self.context["calculador"].retencion_impositiva).quantize(Decimal('.01'), ROUND_UP)
 
     def get_retencion_cedir(self, comprobante):
-        return self.context["calculador"].retencion_cedir
+        return Decimal(self.context["calculador"].retencion_cedir).quantize(Decimal('.01'), ROUND_UP)
 
     def get_sala_recuperacion(self, comprobante):
-        return self.context["calculador"].sala_recuperacion
+        return Decimal(self.context["calculador"].sala_recuperacion).quantize(Decimal('.01'), ROUND_UP)
 
     def get_total_medicamentos(self, comprobante):
-        return self.context["calculador"].total_medicamentos
+        return Decimal(self.context["calculador"].total_medicamentos).quantize(Decimal('.01'), ROUND_UP)
 
     def get_total_material_especifico(self, comprobante):
-        return self.context["calculador"].sala_recuperacion
+        return Decimal(self.context["calculador"].total_material_especifico).quantize(Decimal('.01'), ROUND_UP)
 
 # Columnas Actuales
 # dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()

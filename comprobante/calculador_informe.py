@@ -21,7 +21,11 @@ class CalculadorInforme(object):
         raise NotImplementedError
 
     @abstractproperty
-    def anestesia(self):
+    def honorarios_anestesia(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def retencion_anestesia(self):
         raise NotImplementedError
 
     @abstractproperty
@@ -61,25 +65,32 @@ class CalculadorInformeFactura(CalculadorInforme):
         return sum([CalculadorHonorariosInformeContadora(estudio).total for estudio in estudios])
 
     @property
-    def anestesia(self):
+    def honorarios_anestesia(self):
         presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
         estudios = presentacion.estudios.all()
-        return sum([estudio.arancel_anestesia for estudio in estudios])
+        return sum([estudio.arancel_anestesia for estudio in estudios]) * Decimal('0.9')
 
     @property
-    def retencion_impositiva(self):
+    def retencion_anestesia(self):
         presentacion = self.comprobante.presentacion.first()
         if not presentacion:
             return Decimal("0.00")
-        if not presentacion.iva:
-            # Algunas presentacionines tienen IVA = Null. Para estos casos, consideramos que debia ser 0.
-                return Decimal("0.00")
-        return presentacion.iva * presentacion.total_facturado / Decimal("100.00")
-
+        estudios = presentacion.estudios.all()
+        return sum([estudio.arancel_anestesia for estudio in estudios]) * Decimal('0.1')
+    
     @property
     def retencion_cedir(self):
+        presentacion = self.comprobante.presentacion.first()
+        if not presentacion:
+            return Decimal("0.00")
+        estudios = presentacion.estudios.all()
+        return sum([CalculadorHonorariosInformeContadora(estudio).cedir for estudio in estudios])
+
+    @property
+    # gasto administrativo
+    def retencion_impositiva(self):
         '''
         La retencion del cedir depende se guarda en el pago de la presentacion y esos casos conviene sacarla de ahi.
         Pero si no hay pago, es segun Mariana, "un valor fijo que no cambia seguido" y se puede decidir aca.
@@ -149,7 +160,11 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
         return Decimal("0.00")
 
     @property
-    def anestesia(self):
+    def honorarios_anestesia(self):
+        return Decimal("0.00")
+
+    @property
+    def retencion_anestesia(self):
         return Decimal("0.00")
 
     @property
