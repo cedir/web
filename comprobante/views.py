@@ -64,9 +64,9 @@ class InformeMensualView(generics.ListAPIView):
     serializer_class = ComprobanteListadoSerializer
 
     def list(self, request):
-        comprobantes_fiscales = Comprobante.objects.filter(tipo_comprobante__nombre__in=["Factura", "Nota De Credito", "Nota De Debito"])
-        queryset = comprobantes_fiscales.filter(fecha_emision__month=request.query_params["mes"],
-                                                fecha_emision__year=request.query_params["anio"])
+        comprobantes = Comprobante.objects.exclude(estado=Comprobante.ANULADO)
+        queryset = comprobantes.filter(fecha_emision__month=request.query_params["mes"],
+                                       fecha_emision__year=request.query_params["anio"])
         data = [ComprobanteListadoSerializer(q, context={'calculador': calculador_informe_factory(q)}).data
                 for q in queryset]
         return Response(data)

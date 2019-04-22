@@ -76,10 +76,10 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'total_material_especifico')
 
     def get_neto(self, comprobante):
-        return Decimal(comprobante.importe_gravado_afip).quantize(Decimal('.01'), ROUND_UP)
+        return Decimal(self.context["calculador"].neto).quantize(Decimal('.01'), ROUND_UP)
 
     def get_iva(self, comprobante):
-        return Decimal(comprobante.importe_alicuota_afip).quantize(Decimal('.01'), ROUND_UP)
+        return Decimal(self.context["calculador"].iva).quantize(Decimal('.01'), ROUND_UP)
 
     def get_honorarios_medicos(self, comprobante):
         return Decimal(self.context["calculador"].honorarios_medicos).quantize(Decimal('.01'), ROUND_UP)
