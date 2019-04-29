@@ -2,6 +2,7 @@ from abc import abstractproperty
 from decimal import Decimal
 
 from medico.calculo_honorarios import CalculadorHonorariosInformeContadora
+from comprobante.models import LineaDeComprobante
 
 
 def calculador_informe_factory(comprobante):
@@ -11,11 +12,21 @@ def calculador_informe_factory(comprobante):
         return CalculadorInformeNotaDebito(comprobante)
     elif comprobante.tipo_comprobante.nombre == "Nota De Credito":
         return CalculadorInformeNotaCredito(comprobante)
+    elif comprobante.tipo_comprobante.nombre == "Liquidacion":
+        return CalculadorInformeLiquidacion(comprobante)
     else:
         raise Exception(comprobante.tipo_comprobante.nombre)
 
 
 class CalculadorInforme(object):
+    @abstractproperty
+    def neto(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def iva(self):
+        raise NotImplementedError
+
     @abstractproperty
     def honorarios_medicos(self):
         raise NotImplementedError
@@ -55,6 +66,16 @@ class CalculadorInformeFactura(CalculadorInforme):
     '''
     def __init__(self, comprobante):
         self.comprobante = comprobante
+
+    @property
+    def neto(self):
+        lineas = LineaDeComprobante.objects.filter(comprobante=self.comprobante)
+        return sum([l.importe_neto for l in lineas]) 
+
+    @property
+    def iva(self):
+        lineas = LineaDeComprobante.objects.filter(comprobante=self.comprobante)
+        return sum([l.iva for l in lineas])
 
     @property
     def honorarios_medicos(self):
@@ -154,35 +175,48 @@ class CalculadorInformeNotaDebito(CalculadorInformeFactura):
 class CalculadorInformeNotaCredito(CalculadorInforme):
     def __init__(self, comprobante):
         self.comprobante = comprobante
+        self.calculador_aux = CalculadorInformeNotaDebito(comprobante)
 
     @property
+    def neto(self):
+        return Decimal("-1") * self.calculador_aux.neto
+
+    @property
+    def iva(self):
+        return Decimal("-1") * self.calculador_aux.iva
+        
+    @property
     def honorarios_medicos(self):
-        return Decimal("0.00")
+        return Decimal("-1") * self.calculador_aux.honorarios_medicos
 
     @property
     def honorarios_anestesia(self):
-        return Decimal("0.00")
+        return Decimal("-1") * self.calculador_aux.honorarios_anestesia
 
     @property
     def retencion_anestesia(self):
-        return Decimal("0.00")
+        return Decimal("-1") * self.calculador_aux.retencion_anestesia
 
     @property
     def retencion_impositiva(self):
-        return Decimal("0.00")
+        return Decimal("-1") * self.calculador_aux.retencion_impositiva
 
     @property
     def retencion_cedir(self):
-        return Decimal("0.00")
+        return Decimal("-1") * self.calculador_aux.retencion_cedir
 
     @property
     def sala_recuperacion(self):
-        return Decimal("0.00")
+        return Decimal("-1") * self.calculador_aux.sala_recuperacion
 
     @property
     def total_medicamentos(self):
-        return Decimal("0.00")
+        return Decimal("-1") * self.calculador_aux.total_medicamentos
 
     @property
     def total_material_especifico(self):
-        return Decimal("0.00")
+        return Decimal("-1") * self.calculador_aux.total_material_especifico
+
+
+class CalculadorInformeLiquidacion(CalculadorInformeFactura):
+    pass
