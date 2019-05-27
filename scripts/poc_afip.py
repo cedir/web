@@ -3,13 +3,19 @@
 
 # importar modulos python
 import datetime
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir)
+
+import wsgi
+from comprobante.models import Comprobante, LineaDeComprobante
 
 # importar componentes del módulo PyAfipWs
 from pyafipws.wsaa import WSAA
 from pyafipws.wsfev1 import WSFEv1
 
-import wsgi
-from comprobante.models import Comprobante, LineaDeComprobante
+
 
 class Facturador(object):
     def __init__(self, privada, certificado, cuit):
@@ -45,27 +51,39 @@ class Facturador(object):
 
     def emitir_en_afip(self, comprobante_cedir):
         lineas = LineaDeComprobante.objects.filter(comprobante = comprobante_cedir.id)
-        tipo_cbte = comprobante_cedir.codigo_afip
-        punto_vta = comprobante_cedir.nro_terminal
-        cbte_nro = long(self.wsfev1.CompUltimoAutorizado(tipo_cbte, punto_vta) or 0)
+
+        
+        # Habria que usar la fecha del comprobante, pero la API me limita a facturar cerca de la fecha actual.
         # fecha = comprobante_cedir.fecha_emision.strftime("%Y%m%d")
         fecha = datetime.datetime.now().strftime("%Y%m%d")
-        concepto = 2
-        tipo_doc = comprobante_cedir.tipo_id_afip
-        nro_doc = comprobante_cedir.nro_id_afip
-        cbt_desde = cbte_nro + 1
-        cbt_hasta = cbte_nro + 1
-        imp_total = comprobante_cedir.total_facturado      # sumatoria total
-        imp_tot_conc = "0.00"     # importe total conceptos no gravado
-        imp_neto = sum([l.importe_neto for l in lineas])       # importe neto gravado (todas las alicuotas)
-        imp_iva = sum([l.iva for l in lineas])        # importe total iva liquidado (idem)
-        imp_trib = "0.00"         # importe total otros conceptos
-        imp_op_ex = "0.00"        # importe total operaciones exentas
         fecha_cbte = fecha
         fecha_venc_pago = fecha
         # Fechas del período del servicio facturado (solo si concepto != 1)
         fecha_serv_desde = fecha
         fecha_serv_hasta = fecha
+
+        # Todo esto ya lo tenemos en el comprobante.
+        tipo_cbte = comprobante_cedir.codigo_afip
+        punto_vta = comprobante_cedir.nro_terminal
+        imp_total = comprobante_cedir.total_facturado      # sumatoria total
+        tipo_doc = comprobante_cedir.tipo_id_afip
+        nro_doc = comprobante_cedir.nro_id_afip
+        imp_neto = sum([l.importe_neto for l in lineas])       # importe neto gravado (todas las alicuotas)
+        imp_iva = sum([l.iva for l in lineas])        # importe total iva liquidado (idem)
+        concepto = 2 # Servicios, lo unico que hace el CEDIR.
+
+
+        #Si es nota, hay que agregar el comprobante asociado.
+
+        # En realidad habria que usar el numero del comprobante, pero con este certificado no puedo.
+        cbte_nro = long(self.wsfev1.CompUltimoAutorizado(tipo_cbte, punto_vta) or 0)
+        cbt_desde = cbte_nro + 1 # Esto varia si son facturas B por lotes, que creo que no hacemos.
+        cbt_hasta = cbte_nro + 1
+        
+        # Creo que el unico impuesto que tenemos que tener en cuenta es IVA.
+        imp_trib = "0.00"         # importe total otros conceptos
+        imp_tot_conc = "0.00"     # importe total conceptos no gravado
+        imp_op_ex = "0.00"        # importe total operaciones exentas
         moneda_id = 'PES'         # actualmente no se permite otra monedaWSFEv1
         moneda_ctz = '1.000'
 
@@ -104,12 +122,11 @@ class Facturador(object):
         print "Mensaje Error AFIP", self.wsfev1.ErrMsg
         print "Mensaje Obs AFIP", self.wsfev1.Obs
     
-    def consultar_afip(self, cae):
-        return comprobante_afip
+    def consultar_cae(self, comprobante_cedir):
+        return WSFEv1.CompConsultar(comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal, cbte_nro)
 
 
 if __name__ == "__main__":
-
     f = Facturador("privada.csr", "test.crt", 20389047938)
 
 
