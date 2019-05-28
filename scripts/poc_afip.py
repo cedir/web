@@ -1,14 +1,26 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 
+#################################################################################
+#
+# Prueba de concepto de emision de comprobantes con al API de la AFIP
+# Llamar con:
+# python poc_afip.py path_archivo_clave_privada path_archivo_certificado numero_cuit
+# Claramente los archivos tienen que ser del entorno de homologacion.
+#
+#####################################################################################
+
+
+
 # importar modulos python
 import datetime
 import os,sys,inspect
+
+# Correccion del path para importar desde el directorio padre
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir)
-
-import wsgi
+import wsgi # Importar esto hace lo del setting e iniciar django
 from comprobante.models import Comprobante, LineaDeComprobante
 
 # importar componentes del módulo PyAfipWs
@@ -58,14 +70,14 @@ class Facturador(object):
         fecha = datetime.datetime.now().strftime("%Y%m%d")
         fecha_cbte = fecha
         fecha_venc_pago = fecha
-        # Fechas del período del servicio facturado (solo si concepto != 1)
+        # Fechas del período del servicio facturado
         fecha_serv_desde = fecha
         fecha_serv_hasta = fecha
 
         # Todo esto ya lo tenemos en el comprobante.
         tipo_cbte = comprobante_cedir.codigo_afip
         punto_vta = comprobante_cedir.nro_terminal
-        imp_total = comprobante_cedir.total_facturado      # sumatoria total
+        imp_total = comprobante_cedir.total_facturado
         tipo_doc = comprobante_cedir.tipo_id_afip
         nro_doc = comprobante_cedir.nro_id_afip
         imp_neto = sum([l.importe_neto for l in lineas])       # importe neto gravado (todas las alicuotas)
@@ -77,6 +89,7 @@ class Facturador(object):
 
         # En realidad habria que usar el numero del comprobante, pero con este certificado no puedo.
         cbte_nro = long(self.wsfev1.CompUltimoAutorizado(tipo_cbte, punto_vta) or 0)
+
         cbt_desde = cbte_nro + 1 # Esto varia si son facturas B por lotes, que creo que no hacemos.
         cbt_hasta = cbte_nro + 1
         
@@ -94,7 +107,6 @@ class Facturador(object):
             fecha_serv_desde, fecha_serv_hasta,
             moneda_id, moneda_ctz)
 
-        # dudas aca
         # 4: 10.5%, 5: 21%, 6: 27% (no enviar si es otra alicuota)
         if comprobante_cedir.gravado.id == 2:
             id = 5
@@ -115,21 +127,27 @@ class Facturador(object):
 
 
         # datos devueltos por AFIP:
-        print "Resultado", self.wsfev1.Resultado
-        print "Reproceso", self.wsfev1.Reproceso
-        print "CAE", self.wsfev1.CAE
-        print "Vencimiento", self.wsfev1.Vencimiento
-        print "Mensaje Error AFIP", self.wsfev1.ErrMsg
-        print "Mensaje Obs AFIP", self.wsfev1.Obs
+        return {
+            "resultado": self.wsfev1.Resultado,
+            "reproceso": self.wsfev1.Reproceso,
+            "cae": self.wsfev1.CAE,
+            "vencimiento": self.wsfev1.Vencimiento,
+            "mensaje_error_afip": self.wsfev1.ErrMsg,
+            "mensaje_obs_afip": self.wsfev1.Obs,
+            "numero": cbte_nro
+        }
     
-    def consultar_cae(self, comprobante_cedir):
+    def consultar_cae(self, comprobante_cedir, cbte_nro):
+        # De nuevo, el numero tendria que ser el del comprobante, pero limitaciones.
         return WSFEv1.CompConsultar(comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal, cbte_nro)
 
 
 if __name__ == "__main__":
-    f = Facturador("privada.csr", "test.crt", 20389047938)
-
-
-    # Buscar ids copadas
+    privada = sys.argv[1]
+    certificado = sys.argv[2]
+    cuit = sys.argv[3]
+    f = Facturador(privada, certificado, cuit)
     comprobante_cedir = Comprobante.objects.get(id=18658)
-    f.emitir_en_afip(comprobante_cedir)
+    comprobante_afip = f.emitir_en_afip(comprobante_cedir)
+    print(comprobante_afip)
+    print(f.consultar_cae(comprobante_cedir, comprobante_afip["numero"]))
