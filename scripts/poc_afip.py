@@ -25,28 +25,32 @@ from comprobante.models import Comprobante, LineaDeComprobante
 
 # importar componentes del módulo PyAfipWs
 from pyafipws.wsaa import WSAA
-from pyafipws.wsfev1 import WSFEv1
+from pyafipws.wsmtx import WSMTXCA
+from xml.parsers.expat import ExpatError
 
 
 
 class Facturador(object):
     def __init__(self, privada, certificado, cuit):
         # instanciar el componente para factura electrónica mercado interno
-        self.wsfev1 = WSFEv1()
-        self.wsfev1.LanzarExcepciones = True
+        self.afip = WSMTXCA()
+        self.afip.LanzarExcepciones = True
         
         # datos de conexión (cambiar URL para producción)
         cache = None
-        wsdl = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL"
+        wsdl = "https://wswhomo.afip.gov.ar/afip/service.asmx?WSDL"
         proxy = ""
         wrapper = ""    # "pycurl" para usar proxy avanzado / propietarios
         # datos de la factura de prueba (encabezado):
         cacert = None   # "afip_ca_info.crt" para verificar canal seguro
 
         # conectar
-        ok = self.wsfev1.Conectar(cache, wsdl, proxy, wrapper, cacert)
+        try:
+            ok = self.afip.Conectar(cache, wsdl, proxy, wrapper, cacert)
+        except ExpatError:
+            RuntimeError("Error: parece que el servicio de la AFIP esta caido.")
         if not ok:
-            raise RuntimeError("Error WSFEv1: %s" % WSAA.Excepcion)
+            raise RuntimeError("Error afip: %s" % WSAA.Excepcion)
 
 
         # autenticarse frente a AFIP (obtención de ticket de acceso):
@@ -58,8 +62,8 @@ class Facturador(object):
             raise RuntimeError("Error WSAA: %s" % WSAA.Excepcion)
 
         # establecer credenciales (token y sign) y cuit emisor:
-        self.wsfev1.SetTicketAcceso(self.ta)
-        self.wsfev1.Cuit = cuit
+        self.afip.SetTicketAcceso(self.ta)
+        self.afip.Cuit = cuit
 
     def emitir_en_afip(self, comprobante_cedir):
         lineas = LineaDeComprobante.objects.filter(comprobante = comprobante_cedir.id)
@@ -88,7 +92,7 @@ class Facturador(object):
         #Si es nota, hay que agregar el comprobante asociado.
 
         # En realidad habria que usar el numero del comprobante, pero con este certificado no puedo.
-        cbte_nro = long(self.wsfev1.CompUltimoAutorizado(tipo_cbte, punto_vta) or 0)
+        cbte_nro = long(self.afip.CompUltimoAutorizado(tipo_cbte, punto_vta) or 0)
 
         cbt_desde = cbte_nro + 1 # Esto varia si son facturas B por lotes, que creo que no hacemos.
         cbt_hasta = cbte_nro + 1
@@ -97,55 +101,72 @@ class Facturador(object):
         imp_trib = "0.00"         # importe total otros conceptos
         imp_tot_conc = "0.00"     # importe total conceptos no gravado
         imp_op_ex = "0.00"        # importe total operaciones exentas
-        moneda_id = 'PES'         # actualmente no se permite otra monedaWSFEv1
+        moneda_id = 'PES'         # actualmente no se permite otra monedaafip
         moneda_ctz = '1.000'
 
         # inicializar la estructura de factura (interna)
-        self.wsfev1.CrearFactura(concepto, tipo_doc, nro_doc, tipo_cbte, punto_vta,
+        self.afip.CrearFactura(concepto, tipo_doc, nro_doc, tipo_cbte, punto_vta,
             cbt_desde, cbt_hasta, imp_total, imp_tot_conc, imp_neto,
             imp_iva, imp_trib, imp_op_ex, fecha_cbte, fecha_venc_pago, 
             fecha_serv_desde, fecha_serv_hasta,
             moneda_id, moneda_ctz)
 
+        # No se si ya tenemos algun metodo que haga esta traduccion
         # 4: 10.5%, 5: 21%, 6: 27% (no enviar si es otra alicuota)
         if comprobante_cedir.gravado.id == 2:
             id = 5
             base_imp = imp_neto      # neto gravado por esta alicuota
             importe = imp_iva       # importe de iva liquidado por esta alicuota
-            self.wsfev1.AgregarIva(id, base_imp, importe)
+            self.afip.AgregarIva(id, base_imp, importe)
         elif comprobante_cedir.gravado.id == 3:
             id = 4
             base_imp = imp_neto      # neto gravado por esta alicuota
             importe = imp_iva       # importe de iva liquidado por esta alicuota
-            self.wsfev1.AgregarIva(id, base_imp, importe)
+            self.afip.AgregarIva(id, base_imp, importe)
+
+        for linea in lineas:
+            u_mtx = 123456
+            cod_mtx = "1234567890"
+            codigo = "P0001"
+            ds = linea.concepto
+            qty = "1.0000"
+            umed = 7
+            precio = linea.importe_neto
+            bonif = "0.00"
+            cod_iva = 5 # aca en realidad va la misma logica arriba de traducir el codigo de gravado, que hay que abstraer en un metodo
+            imp_iva = linea.iva
+            imp_subtotal = linea.sub_total
+            ok = self.afip.AgregarItem(u_mtx, cod_mtx, codigo, ds, qty,
+                        umed, precio, bonif, cod_iva, imp_iva, imp_subtotal)
 
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
-        self.wsfev1.CAESolicitar()
+        self.afip.CAESolicitar()
 
         # Si es nota de credito o debito necesito
-        # wsfev1.AgregarCmpAsoc
+        # afip.AgregarCmpAsoc
 
 
         # datos devueltos por AFIP:
         return {
-            "resultado": self.wsfev1.Resultado,
-            "reproceso": self.wsfev1.Reproceso,
-            "cae": self.wsfev1.CAE,
-            "vencimiento": self.wsfev1.Vencimiento,
-            "mensaje_error_afip": self.wsfev1.ErrMsg,
-            "mensaje_obs_afip": self.wsfev1.Obs,
+            "resultado": self.afip.Resultado,
+            "reproceso": self.afip.Reproceso,
+            "cae": self.afip.CAE,
+            "vencimiento": self.afip.Vencimiento,
+            "mensaje_error_afip": self.afip.ErrMsg,
+            "mensaje_obs_afip": self.afip.Obs,
             "numero": cbte_nro
         }
     
     def consultar_cae(self, comprobante_cedir, cbte_nro):
         # De nuevo, el numero tendria que ser el del comprobante, pero limitaciones.
-        return WSFEv1.CompConsultar(comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal, cbte_nro)
+        return afip.CompConsultar(comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal, cbte_nro)
 
 
 if __name__ == "__main__":
     privada = sys.argv[1]
     certificado = sys.argv[2]
     cuit = sys.argv[3]
+    
     f = Facturador(privada, certificado, cuit)
     comprobante_cedir = Comprobante.objects.get(id=18658)
     comprobante_afip = f.emitir_en_afip(comprobante_cedir)
