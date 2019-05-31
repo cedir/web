@@ -72,7 +72,6 @@ class Facturador(object):
         # Habria que usar la fecha del comprobante, pero la API me limita a facturar cerca de la fecha actual.
         # fecha = comprobante_cedir.fecha_emision.strftime("%Y%m%d")
         fecha = datetime.datetime.now().strftime("%Y-%m-%d")
-        print(fecha)
         fecha_cbte = fecha
         fecha_venc_pago = fecha
         # Fechas del período del servicio facturado
@@ -85,8 +84,15 @@ class Facturador(object):
         imp_total = comprobante_cedir.total_facturado
         tipo_doc = comprobante_cedir.tipo_id_afip
         nro_doc = comprobante_cedir.nro_id_afip
-        imp_neto = sum([l.importe_neto for l in lineas])       # importe neto gravado (todas las alicuotas)
-        imp_subtotal = sum([l.sub_total for l in lineas])
+        if comprobante_cedir.gravado.id == 1:
+            imp_neto = "0.00"
+            imp_op_ex = sum([l.importe_neto for l in lineas])
+            imp_subtotal = sum([l.sub_total for l in lineas])
+        else:
+            imp_neto = sum([l.importe_neto for l in lineas])       # importe neto gravado (todas las alicuotas)
+            imp_op_ex = "0.00"        # importe total operaciones exentas
+            imp_subtotal = imp_neto
+
         imp_iva = sum([l.iva for l in lineas])        # importe total iva liquidado (idem)
         concepto = 2 # Servicios, lo unico que hace el CEDIR.
 
@@ -98,7 +104,6 @@ class Facturador(object):
         # Creo que el unico impuesto que tenemos que tener en cuenta es IVA.
         imp_trib = "0.00"         # importe total otros conceptos
         imp_tot_conc = "0.00"     # importe total conceptos no gravado
-        imp_op_ex = "0.00"        # importe total operaciones exentas
         moneda_id = 'PES'         # actualmente no se permite otra monedaafip
         moneda_ctz = '1.000'
 
@@ -106,7 +111,7 @@ class Facturador(object):
         # Por algun motivo que no entiendo, nuestro subtotal no le gusta y quiere que el mande el neto como subtotal. Sino, no lo emite.
         self.afip.CrearFactura(concepto=concepto, tipo_doc=tipo_doc, nro_doc=nro_doc, tipo_cbte=tipo_cbte, punto_vta=punto_vta,
             cbt_desde=cbt_desde, cbt_hasta=cbt_hasta, imp_total=imp_total, imp_tot_conc=imp_tot_conc, imp_neto=imp_neto,
-            imp_subtotal=imp_neto, imp_trib=imp_trib, imp_op_ex=imp_op_ex, fecha_cbte=fecha_cbte, fecha_venc_pago=fecha_venc_pago, 
+            imp_subtotal=imp_subtotal, imp_trib=imp_trib, imp_op_ex=imp_op_ex, fecha_cbte=fecha_cbte, fecha_venc_pago=fecha_venc_pago, 
             fecha_serv_desde=fecha_serv_desde, fecha_serv_hasta=fecha_serv_hasta, #--
             moneda_id=moneda_id, moneda_ctz=moneda_ctz, observaciones=None, caea=None, fch_venc_cae=None)
 
@@ -164,8 +169,16 @@ class Facturador(object):
         }
     
     def consultar_cae(self, comprobante_cedir, cbte_nro):
-        # De nuevo, el numero tendria que ser el del comprobante, pero limitaciones.
-        return self.afip.ConsultarComprobante(comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal, cbte_nro)
+        self.afip.ConsultarComprobante(comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal, cbte_nro)
+        return {
+            "fecha": self.afip.FechaCbte,
+            "numero": self.afip.CbteNro,
+            "punto_venta": self.afip.PuntoVenta,
+            "vencimiento": self.afip.Vencimiento,
+            "importe_total": self.afip.ImpTotal,
+            "CAE": self.afip.CAE,
+            "emision_tipo": self.afip.EmisionTipo
+        }
 
 
 if __name__ == "__main__":
@@ -174,7 +187,12 @@ if __name__ == "__main__":
     cuit = sys.argv[3]
     
     f = Facturador(privada, certificado, cuit)
-    comprobante_cedir = Comprobante.objects.get(id=18658)
-    comprobante_afip = f.emitir_en_afip(comprobante_cedir)
-    print(comprobante_afip)
-    print(f.consultar_cae(comprobante_cedir, comprobante_afip["numero"]))
+    for id_comprobante in range(18500, 18650):
+        print(id_comprobante)
+        comprobante_cedir = Comprobante.objects.get(id=id_comprobante)
+        # Nos salteamos las liquidaciones
+        if comprobante_cedir.tipo_comprobante.id == 2:
+            continue
+        comprobante_afip = f.emitir_en_afip(comprobante_cedir)
+        print(comprobante_afip)
+        print(f.consultar_cae(comprobante_cedir, comprobante_afip["numero"]))
