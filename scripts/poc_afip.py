@@ -90,12 +90,8 @@ class Facturador(object):
         imp_iva = sum([l.iva for l in lineas])        # importe total iva liquidado (idem)
         concepto = 2 # Servicios, lo unico que hace el CEDIR.
 
-
-        #Si es nota, hay que agregar el comprobante asociado.
-
         # En realidad habria que usar el numero del comprobante, pero con este certificado no puedo.
         cbte_nro = long(self.afip.CompUltimoAutorizado(tipo_cbte, punto_vta) or 0)
-
         cbt_desde = cbte_nro + 1 # Esto varia si son facturas B por lotes, que creo que no hacemos.
         cbt_hasta = cbte_nro + 1
         
@@ -113,6 +109,15 @@ class Facturador(object):
             imp_subtotal=imp_neto, imp_trib=imp_trib, imp_op_ex=imp_op_ex, fecha_cbte=fecha_cbte, fecha_venc_pago=fecha_venc_pago, 
             fecha_serv_desde=fecha_serv_desde, fecha_serv_hasta=fecha_serv_hasta, #--
             moneda_id=moneda_id, moneda_ctz=moneda_ctz, observaciones=None, caea=None, fch_venc_cae=None)
+
+        # Si es una nota de debito (3) o credito (4), agregamos el comprobante asociado
+        if comprobante_cedir.tipo_comprobante in [3, 4]:
+            comprobante_asociado = Comprobantes.objects.get(id=factura)
+            tipo = comrpobante_asociado.codigo_afip
+            punto_vta = comprobante_asociado.nro_terminal
+            nro = comprobante_asociado.numero # Curiosamente, la afip no se queja si este numero es invalido.
+            self.afip.AgregarCmpAsoc(tipo, pto_vta, nro)
+
 
         # No se si ya tenemos algun metodo que haga esta traduccion
         # 4: 10.5%, 5: 21%, 6: 27% (no enviar si es otra alicuota)
@@ -146,10 +151,6 @@ class Facturador(object):
 
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
         self.afip.CAESolicitar()
-
-        # Si es nota de credito o debito necesito
-        # afip.AgregarCmpAsoc
-
 
         # datos devueltos por AFIP:
         return {
