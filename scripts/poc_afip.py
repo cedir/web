@@ -38,7 +38,7 @@ class Facturador(object):
         
         # datos de conexión (cambiar URL para producción)
         cache = None
-        wsdl = "https://wswhomo.afip.gov.ar/afip/service.asmx?WSDL"
+        wsdl = "https://fwshomo.afip.gov.ar/wsmtxca/services/MTXCAService?wsdl"
         proxy = ""
         wrapper = ""    # "pycurl" para usar proxy avanzado / propietarios
         # datos de la factura de prueba (encabezado):
@@ -57,7 +57,7 @@ class Facturador(object):
         cert = certificado       # archivos a tramitar previamente ante AFIP 
         clave = privada     # (ver manual)
         wsaa_url = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl"
-        self.ta = WSAA().Autenticar("wsfe", cert, clave, wsaa_url, debug=True)
+        self.ta = WSAA().Autenticar("wsmtxca", cert, clave, wsaa_url, debug=True)
         if not self.ta:
             raise RuntimeError("Error WSAA: %s" % WSAA.Excepcion)
 
@@ -71,7 +71,8 @@ class Facturador(object):
         
         # Habria que usar la fecha del comprobante, pero la API me limita a facturar cerca de la fecha actual.
         # fecha = comprobante_cedir.fecha_emision.strftime("%Y%m%d")
-        fecha = datetime.datetime.now().strftime("%Y%m%d")
+        fecha = datetime.datetime.now().strftime("%Y-%m-%d")
+        print(fecha)
         fecha_cbte = fecha
         fecha_venc_pago = fecha
         # Fechas del período del servicio facturado
@@ -85,6 +86,7 @@ class Facturador(object):
         tipo_doc = comprobante_cedir.tipo_id_afip
         nro_doc = comprobante_cedir.nro_id_afip
         imp_neto = sum([l.importe_neto for l in lineas])       # importe neto gravado (todas las alicuotas)
+        imp_subtotal = sum([l.sub_total for l in lineas])
         imp_iva = sum([l.iva for l in lineas])        # importe total iva liquidado (idem)
         concepto = 2 # Servicios, lo unico que hace el CEDIR.
 
@@ -105,24 +107,27 @@ class Facturador(object):
         moneda_ctz = '1.000'
 
         # inicializar la estructura de factura (interna)
-        self.afip.CrearFactura(concepto, tipo_doc, nro_doc, tipo_cbte, punto_vta,
-            cbt_desde, cbt_hasta, imp_total, imp_tot_conc, imp_neto,
-            imp_iva, imp_trib, imp_op_ex, fecha_cbte, fecha_venc_pago, 
-            fecha_serv_desde, fecha_serv_hasta,
-            moneda_id, moneda_ctz)
+        # Por algun motivo que no entiendo, nuestro subtotal no le gusta y quiere que el mande el neto como subtotal. Sino, no lo emite.
+        self.afip.CrearFactura(concepto=concepto, tipo_doc=tipo_doc, nro_doc=nro_doc, tipo_cbte=tipo_cbte, punto_vta=punto_vta,
+            cbt_desde=cbt_desde, cbt_hasta=cbt_hasta, imp_total=imp_total, imp_tot_conc=imp_tot_conc, imp_neto=imp_neto,
+            imp_subtotal=imp_neto, imp_trib=imp_trib, imp_op_ex=imp_op_ex, fecha_cbte=fecha_cbte, fecha_venc_pago=fecha_venc_pago, 
+            fecha_serv_desde=fecha_serv_desde, fecha_serv_hasta=fecha_serv_hasta, #--
+            moneda_id=moneda_id, moneda_ctz=moneda_ctz, observaciones=None, caea=None, fch_venc_cae=None)
 
         # No se si ya tenemos algun metodo que haga esta traduccion
         # 4: 10.5%, 5: 21%, 6: 27% (no enviar si es otra alicuota)
         if comprobante_cedir.gravado.id == 2:
-            id = 5
+            id_iva = 4
             base_imp = imp_neto      # neto gravado por esta alicuota
             importe = imp_iva       # importe de iva liquidado por esta alicuota
-            self.afip.AgregarIva(id, base_imp, importe)
+            self.afip.AgregarIva(id_iva, base_imp, importe)
         elif comprobante_cedir.gravado.id == 3:
-            id = 4
+            id_iva = 5
             base_imp = imp_neto      # neto gravado por esta alicuota
             importe = imp_iva       # importe de iva liquidado por esta alicuota
-            self.afip.AgregarIva(id, base_imp, importe)
+            self.afip.AgregarIva(id_iva, base_imp, importe)
+        else:
+            id_iva = 2
 
         for linea in lineas:
             u_mtx = 123456
@@ -131,10 +136,10 @@ class Facturador(object):
             ds = linea.concepto
             qty = "1.0000"
             umed = 7
-            precio = linea.importe_neto
+            precio = str(linea.importe_neto)
             bonif = "0.00"
-            cod_iva = 5 # aca en realidad va la misma logica arriba de traducir el codigo de gravado, que hay que abstraer en un metodo
-            imp_iva = linea.iva
+            cod_iva = id_iva
+            imp_iva = str(linea.iva)
             imp_subtotal = linea.sub_total
             ok = self.afip.AgregarItem(u_mtx, cod_mtx, codigo, ds, qty,
                         umed, precio, bonif, cod_iva, imp_iva, imp_subtotal)
@@ -154,12 +159,12 @@ class Facturador(object):
             "vencimiento": self.afip.Vencimiento,
             "mensaje_error_afip": self.afip.ErrMsg,
             "mensaje_obs_afip": self.afip.Obs,
-            "numero": cbte_nro
+            "numero": cbte_nro + 1
         }
     
     def consultar_cae(self, comprobante_cedir, cbte_nro):
         # De nuevo, el numero tendria que ser el del comprobante, pero limitaciones.
-        return afip.CompConsultar(comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal, cbte_nro)
+        return self.afip.ConsultarComprobante(comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal, cbte_nro)
 
 
 if __name__ == "__main__":
