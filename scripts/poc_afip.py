@@ -146,10 +146,13 @@ class Facturador(object):
             ds = linea.concepto
             qty = "1.0000"
             umed = 7
-            precio = str(linea.importe_neto)
+            if comprobante_cedir.condicion_fiscal == "EXENTO":
+                precio = linea.sub_total
+            else:
+                precio = linea.importe_neto
             bonif = "0.00"
             cod_iva = id_iva
-            imp_iva = str(linea.iva)
+            imp_iva = linea.iva
             imp_subtotal = linea.sub_total
             ok = self.afip.AgregarItem(u_mtx, cod_mtx, codigo, ds, qty,
                         umed, precio, bonif, cod_iva, imp_iva, imp_subtotal)
