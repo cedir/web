@@ -8,6 +8,12 @@
 # python poc_afip.py path_archivo_clave_privada path_archivo_certificado numero_cuit
 # Claramente los archivos tienen que ser del entorno de homologacion.
 #
+# Notas:
+# 1) En este script se usa WSMTXCA y no WSFEv1 porque el ultimo no permite comprobantes con detalles por item.
+# 2) Con este script la afip rechaza facturas A a consumidores finales (facturado directo a paciente) por cuestiones
+# conceptuales de que considera la afip subtotal, importe, precio unitario, etc; y como se traduce eso a las terminos
+# que nosotros manejamos. No pasan los chequeos de restricciones del servidor de la API.
+# 3) Aca no se esta considerando, pero el ticket expira y de ser asi hay que renovarlo.
 #####################################################################################
 
 
@@ -20,10 +26,10 @@ import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir)
-import wsgi # Importar esto hace lo del setting e iniciar django
+import wsgi # Importar esto hace lo de las settings e inicia django
 from comprobante.models import Comprobante, LineaDeComprobante
 
-# importar componentes del módulo PyAfipWs
+# importar componentes del la libreria PyAfipWs
 from pyafipws.wsaa import WSAA
 from pyafipws.wsmtx import WSMTXCA
 from xml.parsers.expat import ExpatError
@@ -37,11 +43,11 @@ class Facturador(object):
         self.afip.LanzarExcepciones = True
         
         # datos de conexión (cambiar URL para producción)
+        # Esa URL tambien cambia si cambias de WSMTXCA a WSFEv1
         cache = None
         wsdl = "https://fwshomo.afip.gov.ar/wsmtxca/services/MTXCAService?wsdl"
         proxy = ""
         wrapper = ""    # "pycurl" para usar proxy avanzado / propietarios
-        # datos de la factura de prueba (encabezado):
         cacert = None   # "afip_ca_info.crt" para verificar canal seguro
 
         # conectar
@@ -70,7 +76,6 @@ class Facturador(object):
 
         
         # Habria que usar la fecha del comprobante, pero la API me limita a facturar cerca de la fecha actual.
-        # fecha = comprobante_cedir.fecha_emision.strftime("%Y%m%d")
         fecha = datetime.datetime.now().strftime("%Y-%m-%d")
         fecha_cbte = fecha
         fecha_venc_pago = fecha
@@ -173,6 +178,8 @@ class Facturador(object):
     
     def consultar_cae(self, comprobante_cedir, cbte_nro):
         self.afip.ConsultarComprobante(comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal, cbte_nro)
+        # Todos estos datos se setean en el objeto afip cuando la llamada a ConsultarComprobante es exitosa.
+        # Notar que si falla (comprobante invalido, conexion...) queda con valores viejos!
         return {
             "fecha": self.afip.FechaCbte,
             "numero": self.afip.CbteNro,
