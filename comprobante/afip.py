@@ -37,7 +37,7 @@ class Afip(object):
         self.clave = privada
         self.wsaa_url = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl"
         self.wsaa = WSAA()
-        self.autorizar()
+        self.autenticar()
         
         self.ws.Cuit = cuit
 
