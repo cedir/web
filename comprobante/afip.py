@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 
 from pyafipws.wsaa import WSAA
@@ -13,6 +14,17 @@ class AfipErrorValidacion(AfipError):
 
 class AfipErrorRed(AfipError):
     pass
+
+def requiere_ticket(func):
+    '''
+    Decorador para que los metodos primero chequeen que el ticket no este vencido
+    Y en caso de estarlo, lo renueven antes de hacer sus tareas.
+    '''
+    def wrapper(self, *args, **kwargs):
+        if self.wsaa.Expirado():
+            self.autenticar()
+        return func(self, *args, **kwargs)
+    return wrapper
 
 class Afip(object):
     '''
@@ -33,11 +45,9 @@ class Afip(object):
 
         # conectar
         try:
-            ok = self.ws.Conectar(cache, wsdl, proxy, wrapper, cacert)
+            self.ws.Conectar(cache, wsdl, proxy, wrapper, cacert)
         except (ExpatError, ServerNotFoundError):
-            raise AfipErrorRed
-        if not ok:
-            raise AfipErrorValidacion("Error afip: %s" % WSAA.Excepcion)
+            raise AfipErrorRed("Error en la conexion inicial con la AFIP.")
 
         self.cert = certificado       # archivos a tramitar previamente ante AFIP 
         self.clave = privada
@@ -51,9 +61,9 @@ class Afip(object):
         # Pide un ticket de acceso a la AFIP que sera usado en todas las requests.
         self.ta = self.wsaa.Autenticar("wsmtxca", self.cert, self.clave, self.wsaa_url, debug=True)
         if not self.ta:
-            raise RuntimeError("Error WSAA: %s" % WSAA.Excepcion)
+            raise AfipError("Error WSAA: %s" % WSAA.Excepcion)
 
-        # establecer credenciales (token y sign) y cuit emisor:
+        # establecer credenciales (token y sign):
         self.ws.SetTicketAcceso(self.ta)
     
     @requiere_ticket
@@ -73,43 +83,42 @@ class Afip(object):
             Fecha de hoy
             Concepto servicios
         '''
-        def comprobante_vacio():
-            # Usamos por defecto la fecha actual
-            fecha = datetime.datetime.now().strftime("%Y-%m-%d")
-            return {
-                "concepto": 2, # Servicios
-                "fecha_cbte": fecha,
-                "fecha_venc_pago":  fecha,
-                "fecha_serv_desde": fecha,
-                "fecha_serv_hasta": fecha,
-                "imp_trib": "0.00",         # Importe total otros tributos
-                "imp_tot_conc": "0.00",     # Importe total conceptos no gravados
-                "moneda_id": 'PES',         # La moneda es pesos argentinos.
-                "moneda_ctz": '1.000'
-            }
+        fecha = datetime.datetime.now().strftime("%Y-%m-%d")
+        comprobante = {
+            "concepto": 2, # Servicios
+            "fecha_cbte": fecha,
+            "fecha_venc_pago":  fecha,
+            "fecha_serv_desde": fecha,
+            "fecha_serv_hasta": fecha,
+            "imp_trib": "0.00",         # Importe total otros tributos
+            "imp_tot_conc": "0.00",     # Importe total conceptos no gravados
+            "moneda_id": 'PES',         # La moneda es pesos argentinos.
+            "moneda_ctz": '1.000'
+        }
         # Creamos una factura desde una template y le actualizamos los valores especificados. 
-        comprobante = comprobante_vacio().update(kwargs)
+        comprobante.update(kwargs)
         nro = long(self.ws.CompUltimoAutorizado(comprobante["tipo_cbte"], comprobante["punto_vta"]) or 0) + 1
         comprobante["cbte_desde"] = nro
         comprobante["cbt_hasta"] = nro
         self.ws.CrearFactura(**comprobante)
 
         # Agregar el IVA
-        self.ws.AgregarIva(**iva)
+        if iva:
+            self.ws.AgregarIva(**iva)
 
         # Agregar las lineas
         for linea in lineas:
             self.ws.AgregarItem(**linea)
 
         # Si hay comprobantes asociados, los agregamos.
-        if comprobantes_asociados:
-            for c in comprobantes_asociados:
-                self.ws.AgregarCmpAsoc(c)
+        for c in comprobantes_asociados:
+            self.ws.AgregarCmpAsoc(c)
+
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
         try:
             self.ws.CAESolicitar()
-        except (ExpatError, ServerNotFoundError):
-            raise AfipErrorRed
+        except (ExpatError, ServerNotFoundError) as e:
+            raise AfipErrorRed("Error de red emitiendo el comprobante.")
         if self.ws.Resultado == "R":
             # Si la AFIP nos rechaza el comprobante, lanzamos excepcion.
             raise AfipErrorValidacion(self.ws.ErrMsg)
@@ -138,12 +147,3 @@ class Afip(object):
             "emision_tipo": self.ws.EmisionTipo
         }
 
-
-def requiere_ticket(func):
-    # Decorador para que los metodos primero chequeen que el ticket no este vencido
-    # Y en caso de estarlo, lo renueven antes de hacer sus tareas.
-    def wrapper(self, **kwargs):
-        if self.wsaa.Expirado():
-            self.autenticar()
-        return func(self, **kwargs)
-    return wrapper(func)
