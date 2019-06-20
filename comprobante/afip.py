@@ -1,23 +1,35 @@
 # -*- coding: utf-8 -*-
+'''
+Modulo encargado de la comunicacion con el Webservice de la AFIP.
+'''
 import datetime
+from xml.parsers.expat import ExpatError
+from httplib2 import ServerNotFoundError
 
 from pyafipws.wsaa import WSAA
 from pyafipws.wsfev1 import WSFEv1
-from xml.parsers.expat import ExpatError
-from httplib2 import ServerNotFoundError
 
 from comprobante.models import Comprobante, LineaDeComprobante
 
 
 class AfipError(RuntimeError):
+    '''
+    Excepcion base para todos los errores relacionados a la AFIP.
+    '''
     pass
 
 
 class AfipErrorValidacion(AfipError):
+    '''
+    La afip rechazo un comprobante por fallar las validaciones.
+    '''
     pass
 
 
 class AfipErrorRed(AfipError):
+    '''
+    Ocurrio un error en la conexion con la AFIP.
+    '''
     pass
 
 
@@ -66,7 +78,9 @@ class Afip(object):
         self.ws.Cuit = cuit
 
     def autenticar(self):
-        # Pide un ticket de acceso a la AFIP que sera usado en todas las requests.
+        '''
+        Pide un ticket de acceso a la AFIP que sera usado en todas las requests.
+        '''
         self.ta = self.wsaa.Autenticar(
             "wsfev1", self.cert, self.clave, self.wsaa_url, debug=True)
         if not self.ta and self.wsaa.Excepcion:
@@ -79,8 +93,10 @@ class Afip(object):
     # type: (Afip, Comprobante) -> Dict
     def emitir_comprobante(self, comprobante_cedir):
         '''
-        Toma un comprobante nuestro, lo traduce al formato que usa la AFIP en su webservice y trata de emitirlo.
-        En caso de exito, setea las propiedades faltantes del comprobante que son dependientes de la AFIP.
+        Toma un comprobante nuestro, lo traduce al formato que usa la AFIP en su webservice
+        y trata de emitirlo.
+        En caso de exito, setea las propiedades faltantes del comprobante que son dependientes
+        de la AFIP.
         En caso de error, levanta una excepcion.
         '''
         lineas = LineaDeComprobante.objects.filter(
@@ -91,11 +107,10 @@ class Afip(object):
         if comprobante_cedir.gravado.id == 1:
             imp_neto = "0.00"
             imp_op_ex = sum([l.importe_neto for l in lineas])
-            imp_subtotal = sum([l.sub_total for l in lineas])
         else:
-            imp_neto = sum([l.importe_neto for l in lineas])       # importe neto gravado (todas las alicuotas)
+            # importe neto gravado (todas las alicuotas)
+            imp_neto = sum([l.importe_neto for l in lineas])
             imp_op_ex = "0.00"        # importe total operaciones exentas
-            imp_subtotal = imp_neto
 
         self.ws.CrearFactura(
             concepto=2,  # 2 es servicios, lo unico que hace el cedir.
@@ -120,8 +135,9 @@ class Afip(object):
             self.ws.AgregarIva(id_iva=5, base_imp=imp_neto, importe=imp_iva)
 
         # Si hay comprobantes asociados, los agregamos.
-        if comprobante_cedir.tipo_comprobante.id in [3, 4]:
-            comprobante_asociado = Comprobante.objects.get(id=comprobante_cedir.factura.id)
+        if comprobante_cedir.tipo_comprobante.id in [3, 4] and comprobante_cedir.factura:
+            comprobante_asociado = Comprobante.objects.get(
+                id=comprobante_cedir.factura.id)
             self.ws.AgregarCmpAsoc(
                 tipo=comprobante_asociado.codigo_afip,
                 pto_vta=comprobante_asociado.nro_terminal,
@@ -130,7 +146,7 @@ class Afip(object):
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
         try:
             self.ws.CAESolicitar()
-        except (ExpatError, ServerNotFoundError) as e:
+        except (ExpatError, ServerNotFoundError):
             raise AfipErrorRed("Error de red emitiendo el comprobante.")
         if self.ws.Resultado == "R":
             # Si la AFIP nos rechaza el comprobante, lanzamos excepcion.
@@ -147,6 +163,11 @@ class Afip(object):
 
     @requiere_ticket
     def consultar_comprobante(self, codigo_afip_tipo, nro_terminal, cbte_nro):
+        '''
+        Consulta que informacion tiene la AFIP sobre un comprobante nuestro dado su tipo,
+        terminal y numero.
+        Devuelve un diccionario con todos los datos.
+        '''
         self.ws.CompConsultar(codigo_afip_tipo, nro_terminal, cbte_nro)
         # Todos estos datos se setean en el objeto afip cuando la llamada a ConsultarComprobante es exitosa.
         # Notar que si falla (comprobante invalido, conexion...) queda con valores viejos!

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from decimal import Decimal
+from httplib2 import ServerNotFoundError
+from mock import patch
+
 from django.test import TestCase
-from mock import patch, Mock
-from comprobante.models import Comprobante, TipoComprobante
+from comprobante.models import Comprobante, TipoComprobante, Gravado
 from comprobante.calculador_informe import calculador_informe_factory, CalculadorInformeFactura, CalculadorInformeNotaCredito, CalculadorInformeNotaDebito
 from comprobante.afip import Afip, AfipErrorValidacion, AfipErrorRed
-from httplib2 import ServerNotFoundError
 
 
 class CreateInformeFactoryTest(TestCase):
@@ -213,3 +214,50 @@ class TestAfipAPI(TestCase):
         afip.emitir_comprobante(comprobante)
         self.assertEquals(mock_wsaa.return_value.Autenticar.call_count, 1)
         mock_wsfev1.return_value.CAESolicitar.assert_is_called()
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_distintos_gravados(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+
+        afip = Afip("", "", 1)
+        comprobante = Comprobante.objects.get(pk=1)
+
+        comprobante.gravado = Gravado.objects.get(pk=1)
+        afip.emitir_comprobante(comprobante)
+        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
+
+        comprobante.gravado = Gravado.objects.get(pk=2)
+        afip.emitir_comprobante(comprobante)
+        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
+
+        comprobante.gravado = Gravado.objects.get(pk=3)
+        afip.emitir_comprobante(comprobante)
+        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_comprobante_con_comprobantes_asociados(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+
+        afip = Afip("", "", 1)
+        comprobante = Comprobante.objects.get(pk=1)
+
+        comprobante.tipo_comprobante = TipoComprobante.objects.get(pk=3)
+        comprobante.factura = Comprobante.objects.get(pk=2)
+        afip.emitir_comprobante(comprobante)
+        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
