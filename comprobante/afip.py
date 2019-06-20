@@ -82,7 +82,7 @@ class Afip(object):
         Pide un ticket de acceso a la AFIP que sera usado en todas las requests.
         '''
         self.ta = self.wsaa.Autenticar(
-            "wsfev1", self.cert, self.clave, self.wsaa_url, debug=True)
+            "wsfe", self.cert, self.clave, self.wsaa_url, debug=True)
         if not self.ta and self.wsaa.Excepcion:
             raise AfipError("Error WSAA: %s" % self.wsaa.Excepcion)
 
@@ -103,7 +103,7 @@ class Afip(object):
             comprobante=comprobante_cedir.id)
         nro = long(self.ws.CompUltimoAutorizado(
             comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal) or 0) + 1
-        fecha = datetime.datetime.now().strftime("%Y-%m-%d")
+        fecha = datetime.datetime.now().strftime("%Y%m%d")
         if comprobante_cedir.gravado.id == 1:
             imp_neto = "0.00"
             imp_op_ex = sum([l.importe_neto for l in lineas])
@@ -125,6 +125,8 @@ class Afip(object):
             imp_iva=sum([l.iva for l in lineas]),
             imp_op_ex=imp_op_ex,
             fecha_cbte=fecha,
+            fecha_serv_desde=fecha, # Tengo duda de si dejar estas tres fechas o sacarlas.
+            fecha_serv_hasta=fecha,
             fecha_venc_pago=fecha)
 
         # Agregar el IVA
