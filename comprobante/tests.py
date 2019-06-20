@@ -8,11 +8,15 @@ from comprobante.calculador_informe import calculador_informe_factory, Calculado
 from comprobante.afip import Afip, AfipErrorValidacion, AfipErrorRed
 from httplib2 import ServerNotFoundError
 
+
 class CreateInformeFactoryTest(TestCase):
     def setUp(self):
-        self.tipo_comprobante_factura = TipoComprobante.objects.create(nombre='Factura')
-        self.tipo_comprobante_nota_debito = TipoComprobante.objects.create(nombre='Nota De Debito')
-        self.tipo_comprobante_nota_credito = TipoComprobante.objects.create(nombre='Nota De Credito')
+        self.tipo_comprobante_factura = TipoComprobante.objects.create(
+            nombre='Factura')
+        self.tipo_comprobante_nota_debito = TipoComprobante.objects.create(
+            nombre='Nota De Debito')
+        self.tipo_comprobante_nota_credito = TipoComprobante.objects.create(
+            nombre='Nota De Credito')
 
     def test_factory_success(self):
         comprobante = Comprobante.objects.create(tipo_comprobante=self.tipo_comprobante_factura,
@@ -47,7 +51,8 @@ class CreateInformeFactoryTest(TestCase):
                                                  fecha_recepcion=datetime.today()
                                                  )
         instance_created = calculador_informe_factory(comprobante)
-        self.assertTrue(isinstance(instance_created, CalculadorInformeNotaDebito))
+        self.assertTrue(isinstance(instance_created,
+                                   CalculadorInformeNotaDebito))
 
         comprobante = Comprobante.objects.create(tipo_comprobante=self.tipo_comprobante_nota_credito,
                                                  numero=2,
@@ -64,11 +69,13 @@ class CreateInformeFactoryTest(TestCase):
                                                  fecha_recepcion=datetime.today()
                                                  )
         instance_created = calculador_informe_factory(comprobante)
-        self.assertTrue(isinstance(instance_created, CalculadorInformeNotaCredito))
+        self.assertTrue(isinstance(instance_created,
+                                   CalculadorInformeNotaCredito))
 
 
 class TestCaluloRetencionCedir(TestCase):
-    fixtures = ["comprobantes.json", "presentaciones.json", "obras_sociales.json"]
+    fixtures = ["comprobantes.json",
+                "presentaciones.json", "obras_sociales.json"]
 
     def test_retencion_cedir_es_cero_si_no_hay_presentacion(self):
         comprobante = Comprobante.objects.get(pk=3)
@@ -85,7 +92,8 @@ class TestCaluloRetencionCedir(TestCase):
         self.assertIsNotNone(presentacion)
         pago = presentacion.pago.first()
         self.assertIsNotNone(pago)
-        retencion_esperada = pago.gasto_administrativo * presentacion.total_facturado / Decimal(100)
+        retencion_esperada = pago.gasto_administrativo * \
+            presentacion.total_facturado / Decimal(100)
         calculador = calculador_informe_factory(comprobante)
         self.assertEquals(calculador.retencion_cedir, retencion_esperada)
 
@@ -95,7 +103,8 @@ class TestCaluloRetencionCedir(TestCase):
         self.assertIsNotNone(presentacion)
         self.assertIsNone(presentacion.pago.first())
         calculador = calculador_informe_factory(comprobante)
-        retencion_esperada = Decimal("32.00") * presentacion.total_facturado / Decimal("100.00")
+        retencion_esperada = Decimal(
+            "32.00") * presentacion.total_facturado / Decimal("100.00")
         self.assertEquals(calculador.retencion_cedir, retencion_esperada)
 
     def test_retencion_cedir_para_presentacion_no_cobrada_que_no_va_por_AMR(self):
@@ -104,98 +113,103 @@ class TestCaluloRetencionCedir(TestCase):
         self.assertIsNotNone(presentacion)
         self.assertIsNone(presentacion.pago.first())
         calculador = calculador_informe_factory(comprobante)
-        retencion_esperada = Decimal("25.00") * presentacion.total_facturado / Decimal("100.00")
+        retencion_esperada = Decimal(
+            "25.00") * presentacion.total_facturado / Decimal("100.00")
         self.assertEquals(calculador.retencion_cedir, retencion_esperada)
 
 
 TICKET = "ticket"
 
+
 class TestAfipAPI(TestCase):
     '''
     Test sobre la clase AFIP.
     '''
+    fixtures = ["comprobantes.json"]
 
-    @patch("comprobante.afip.WSMTXCA")
-    def test_error_de_conexion_en_constructor_lanza_excepcion(self, mock_wsmtxca):
-        mock_wsmtxca.return_value.Conectar.side_effect = ServerNotFoundError
+    @patch("comprobante.afip.WSFEv1")
+    def test_error_de_conexion_en_constructor_lanza_excepcion(self, mock_wsfev1):
+        mock_wsfev1.return_value.Conectar.side_effect = ServerNotFoundError
         with self.assertRaises(AfipErrorRed):
             Afip("", "", 1)
 
     @patch("comprobante.afip.WSAA")
-    @patch("comprobante.afip.WSMTXCA")
-    def test_error_de_conexion_lanza_excepcion(self, mock_wsmtxca, mock_wsaa):
+    @patch("comprobante.afip.WSFEv1")
+    def test_error_de_conexion_lanza_excepcion(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
-        mock_wsmtxca.return_value.Conectar.return_value = True
-        mock_wsmtxca.return_value.CompUltimoAutorizado.return_value = 0
-        mock_wsmtxca.return_value.AgregarIva.return_value = None
-        mock_wsmtxca.return_value.CAESolicitar.side_effect = ServerNotFoundError
-        
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.side_effect = ServerNotFoundError
+
         afip = Afip("", "", 1)
+        comprobante = Comprobante.objects.get(pk=1)
         with self.assertRaises(AfipErrorRed):
-            afip.emitir_comprobante([], {}, [], tipo_cbte=1, punto_vta=1)
-
+            afip.emitir_comprobante(comprobante)
 
     @patch("comprobante.afip.WSAA")
-    @patch("comprobante.afip.WSMTXCA")
-    def test_comprobante_rechazado_por_webservice_lanza_excepcion(self, mock_wsmtxca, mock_wsaa):
+    @patch("comprobante.afip.WSFEv1")
+    def test_comprobante_rechazado_por_webservice_lanza_excepcion(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
-        mock_wsmtxca.return_value.Conectar.return_value = True
-        mock_wsmtxca.return_value.CompUltimoAutorizado.return_value = 0
-        mock_wsmtxca.return_value.AgregarIva.return_value = None
-        mock_wsmtxca.return_value.CAESolicitar.return_value = None
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
 
-        mock_wsmtxca.return_value.Resultado = "R"
-        
+        mock_wsfev1.return_value.Resultado = "R"
+
         afip = Afip("", "", 1)
+        comprobante = Comprobante.objects.get(pk=1)
         with self.assertRaises(AfipErrorValidacion):
-            afip.emitir_comprobante([], {}, [], tipo_cbte=1, punto_vta=1)
-    
-    @patch("comprobante.afip.WSAA")
-    @patch("comprobante.afip.WSMTXCA")
-    def test_comprobante_aceptado_por_weservice_devuelve_dict(self, mock_wsmtxca, mock_wsaa):
-        mock_wsaa.return_value.Autenticar.return_value = TICKET
-        mock_wsmtxca.return_value.Conectar.return_value = True
-        mock_wsmtxca.return_value.CompUltimoAutorizado.return_value = 0
-        mock_wsmtxca.return_value.AgregarIva.return_value = None
-        mock_wsmtxca.return_value.CAESolicitar.return_value = None
+            afip.emitir_comprobante(comprobante)
 
-        mock_wsmtxca.return_value.Resultado = "A"
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_comprobante_aceptado_por_weservice_devuelve_dict(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
 
         afip = Afip("", "", 1)
-        self.assertTrue(isinstance(afip.emitir_comprobante([], {}, [], tipo_cbte=1, punto_vta=1), dict))
-            
+        comprobante = Comprobante.objects.get(pk=1)
+        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
 
     @patch("comprobante.afip.WSAA", autospec=True)
-    @patch("comprobante.afip.WSMTXCA")
-    def test_ticket_expirado_renueva_y_emite(self, mock_wsmtxca, mock_wsaa):
+    @patch("comprobante.afip.WSFEv1")
+    def test_ticket_expirado_renueva_y_emite(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Expirado.side_effect = [True, False]
         mock_wsaa.return_value.Autenticar.side_effect = [TICKET, TICKET]
-        mock_wsmtxca.return_value.Conectar.return_value = True
-        mock_wsmtxca.return_value.CompUltimoAutorizado.return_value = 0
-        mock_wsmtxca.return_value.AgregarIva.return_value = None
-        mock_wsmtxca.return_value.CAESolicitar.return_value = None
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
 
-        mock_wsmtxca.return_value.Resultado = "A"
+        mock_wsfev1.return_value.Resultado = "A"
 
         afip = Afip("", "", 1)
-        afip.emitir_comprobante([], {}, [], tipo_cbte=1, punto_vta=1)
+        comprobante = Comprobante.objects.get(pk=1)
+        afip.emitir_comprobante(comprobante)
         self.assertEquals(mock_wsaa.return_value.Autenticar.call_count, 2)
-        mock_wsmtxca.return_value.CAESolicitar.assert_is_called()
-
+        mock_wsfev1.return_value.CAESolicitar.assert_is_called()
 
     @patch("comprobante.afip.WSAA")
-    @patch("comprobante.afip.WSMTXCA")
-    def test_ticket_valido_no_renueva_y_emite(self, mock_wsmtxca, mock_wsaa):
+    @patch("comprobante.afip.WSFEv1")
+    def test_ticket_valido_no_renueva_y_emite(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsaa.return_value.Expirado.return_value = False
-        mock_wsmtxca.return_value.Conectar.return_value = True
-        mock_wsmtxca.return_value.CompUltimoAutorizado.return_value = 0
-        mock_wsmtxca.return_value.AgregarIva.return_value = None
-        mock_wsmtxca.return_value.CAESolicitar.return_value = None
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
 
-        mock_wsmtxca.return_value.Resultado = "A"
+        mock_wsfev1.return_value.Resultado = "A"
 
         afip = Afip("", "", 1)
-        afip.emitir_comprobante([], {}, [], tipo_cbte=1, punto_vta=1)
+        comprobante = Comprobante.objects.get(pk=1)
+        afip.emitir_comprobante(comprobante)
         self.assertEquals(mock_wsaa.return_value.Autenticar.call_count, 1)
-        mock_wsmtxca.return_value.CAESolicitar.assert_is_called()
+        mock_wsfev1.return_value.CAESolicitar.assert_is_called()
