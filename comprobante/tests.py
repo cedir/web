@@ -166,7 +166,7 @@ class TestAfipAPI(TestCase):
 
     @patch("comprobante.afip.WSAA")
     @patch("comprobante.afip.WSFEv1")
-    def test_comprobante_aceptado_por_weservice_devuelve_dict(self, mock_wsfev1, mock_wsaa):
+    def test_comprobante_aceptado_por_weservice_setea_cae(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsfev1.return_value.Conectar.return_value = True
         mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
@@ -174,10 +174,15 @@ class TestAfipAPI(TestCase):
         mock_wsfev1.return_value.CAESolicitar.return_value = None
 
         mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "3019-12-31"
 
         afip = Afip("", "", 1)
         comprobante = Comprobante.objects.get(pk=1)
-        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
+        afip.emitir_comprobante(comprobante)
+        self.assertEquals(comprobante.cae, 1)
+        self.assertEquals(comprobante.vencimiento_cae, "3019-12-31")
+        self.assertEquals(comprobante.numero, 1)
 
     @patch("comprobante.afip.WSAA", autospec=True)
     @patch("comprobante.afip.WSFEv1")
@@ -190,6 +195,8 @@ class TestAfipAPI(TestCase):
         mock_wsfev1.return_value.CAESolicitar.return_value = None
 
         mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "3019-12-31"
 
         afip = Afip("", "", 1)
         comprobante = Comprobante.objects.get(pk=1)
@@ -208,6 +215,8 @@ class TestAfipAPI(TestCase):
         mock_wsfev1.return_value.CAESolicitar.return_value = None
 
         mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "3019-12-31"
 
         afip = Afip("", "", 1)
         comprobante = Comprobante.objects.get(pk=1)
@@ -217,7 +226,7 @@ class TestAfipAPI(TestCase):
 
     @patch("comprobante.afip.WSAA")
     @patch("comprobante.afip.WSFEv1")
-    def test_distintos_gravados(self, mock_wsfev1, mock_wsaa):
+    def test_comprobante_con_gravado_excento(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsaa.return_value.Expirado.return_value = False
         mock_wsfev1.return_value.Conectar.return_value = True
@@ -226,21 +235,63 @@ class TestAfipAPI(TestCase):
         mock_wsfev1.return_value.CAESolicitar.return_value = None
 
         mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "3019-12-31"
 
         afip = Afip("", "", 1)
         comprobante = Comprobante.objects.get(pk=1)
 
         comprobante.gravado = Gravado.objects.get(pk=1)
         afip.emitir_comprobante(comprobante)
-        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
+        self.assertEquals(comprobante.cae, 1)
+        self.assertEquals(comprobante.vencimiento_cae, "3019-12-31")
+        self.assertEquals(comprobante.numero, 1)
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_comprobante_con_gravado_10_5(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "3019-12-31"
+
+        afip = Afip("", "", 1)
+        comprobante = Comprobante.objects.get(pk=1)
 
         comprobante.gravado = Gravado.objects.get(pk=2)
         afip.emitir_comprobante(comprobante)
-        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
+        self.assertEquals(comprobante.cae, 1)
+        self.assertEquals(comprobante.vencimiento_cae, "3019-12-31")
+        self.assertEquals(comprobante.numero, 1)
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_comprobante_con_gravado_21(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "3019-12-31"
+
+        afip = Afip("", "", 1)
+        comprobante = Comprobante.objects.get(pk=1)
 
         comprobante.gravado = Gravado.objects.get(pk=3)
         afip.emitir_comprobante(comprobante)
-        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
+        self.assertEquals(comprobante.cae, 1)
+        self.assertEquals(comprobante.vencimiento_cae, "3019-12-31")
+        self.assertEquals(comprobante.numero, 1)
 
     @patch("comprobante.afip.WSAA")
     @patch("comprobante.afip.WSFEv1")
@@ -253,6 +304,8 @@ class TestAfipAPI(TestCase):
         mock_wsfev1.return_value.CAESolicitar.return_value = None
 
         mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "3019-12-31"
 
         afip = Afip("", "", 1)
         comprobante = Comprobante.objects.get(pk=1)
@@ -260,4 +313,6 @@ class TestAfipAPI(TestCase):
         comprobante.tipo_comprobante = TipoComprobante.objects.get(pk=3)
         comprobante.factura = Comprobante.objects.get(pk=2)
         afip.emitir_comprobante(comprobante)
-        self.assertTrue(isinstance(afip.emitir_comprobante(comprobante), dict))
+        self.assertEquals(comprobante.cae, 1)
+        self.assertEquals(comprobante.vencimiento_cae, "3019-12-31")
+        self.assertEquals(comprobante.numero, 1)

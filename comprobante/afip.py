@@ -90,7 +90,6 @@ class Afip(object):
         self.ws.SetTicketAcceso(self.ta)
 
     @requiere_ticket
-    # type: (Afip, Comprobante) -> Dict
     def emitir_comprobante(self, comprobante_cedir):
         '''
         Toma un comprobante nuestro, lo traduce al formato que usa la AFIP en su webservice
@@ -157,11 +156,9 @@ class Afip(object):
             # Si hay observaciones (en self.ws.Obs), deberiamos logearlas en la DB.
             pass
 
-        return {
-            "cae": self.ws.CAE,
-            "vencimiento": self.ws.Vencimiento,
-            "numero": nro
-        }
+        comprobante_cedir.cae = self.ws.CAE
+        comprobante_cedir.vencimiento_cae  = self.ws.Vencimiento
+        comprobante_cedir.numero = nro
 
     @requiere_ticket
     def consultar_comprobante(self, codigo_afip_tipo, nro_terminal, cbte_nro):
