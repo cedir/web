@@ -187,8 +187,13 @@ class TestAfipAPI(TestCase):
     @patch("comprobante.afip.WSAA", autospec=True)
     @patch("comprobante.afip.WSFEv1")
     def test_ticket_expirado_renueva_y_emite(self, mock_wsfev1, mock_wsaa):
-        mock_wsaa.return_value.Expirado.side_effect = [True, False]
+        '''
+        Se mockea WSAA.Expirado para que devuelva false en la primer llamada y luego true,
+        de manera de testear que en ese escenario, emitir_comprobante llama a WSAA.Autenticar
+        antes de cumplir su tarea (en total se llama dos veces con al del constructor). 
+        '''
         mock_wsaa.return_value.Autenticar.side_effect = [TICKET, TICKET]
+        mock_wsaa.return_value.Expirado.side_effect = [True, False]
         mock_wsfev1.return_value.Conectar.return_value = True
         mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
         mock_wsfev1.return_value.AgregarIva.return_value = None
@@ -207,6 +212,11 @@ class TestAfipAPI(TestCase):
     @patch("comprobante.afip.WSAA")
     @patch("comprobante.afip.WSFEv1")
     def test_ticket_valido_no_renueva_y_emite(self, mock_wsfev1, mock_wsaa):
+        '''
+        Se mockea WSAA.Expirado para que devuelva true y se testea que WSAA.Autenticar sea
+        llamada una sola vez, para asegurarnos de que no se pierde tiempo piediendo
+        tickets inutilmente. 
+        '''
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsaa.return_value.Expirado.return_value = False
         mock_wsfev1.return_value.Conectar.return_value = True

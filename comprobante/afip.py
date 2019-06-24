@@ -11,6 +11,12 @@ from pyafipws.wsfev1 import WSFEv1
 
 from comprobante.models import Comprobante, LineaDeComprobante
 
+IVA_EXCENTO = 1
+IVA_10_5 = 2
+IVA_21 = 3
+
+NOTA_DE_DEBITO = 3
+NOTA_DE_CREDITO = 4
 
 class AfipError(RuntimeError):
     '''
@@ -103,7 +109,8 @@ class Afip(object):
         nro = long(self.ws.CompUltimoAutorizado(
             comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal) or 0) + 1
         fecha = datetime.datetime.now().strftime("%Y%m%d")
-        if comprobante_cedir.gravado.id == 1:
+        imp_iva = sum([l.iva for l in lineas])
+        if comprobante_cedir.gravado.id == IVA_EXCENTO:
             imp_neto = "0.00"
             imp_op_ex = sum([l.importe_neto for l in lineas])
         else:
@@ -121,22 +128,21 @@ class Afip(object):
             cbt_hasta=nro,
             imp_total=comprobante_cedir.total_facturado,
             imp_neto=imp_neto,
-            imp_iva=sum([l.iva for l in lineas]),
+            imp_iva=imp_iva,
             imp_op_ex=imp_op_ex,
-            fecha_cbte=fecha,
-            fecha_serv_desde=fecha, # Tengo duda de si dejar estas tres fechas o sacarlas.
+            fecha_cbte=fecha, # Estas fechas no cambian nunca, pero son requisito para el concepto=2
+            fecha_serv_desde=fecha,
             fecha_serv_hasta=fecha,
             fecha_venc_pago=fecha)
 
         # Agregar el IVA
-        imp_iva = sum([l.iva for l in lineas])
-        if comprobante_cedir.gravado.id == 2:
+        if comprobante_cedir.gravado.id == IVA_10_5:
             self.ws.AgregarIva(id_iva=4, base_imp=imp_neto, importe=imp_iva)
-        elif comprobante_cedir.gravado.id == 3:
+        elif comprobante_cedir.gravado.id == IVA_21:
             self.ws.AgregarIva(id_iva=5, base_imp=imp_neto, importe=imp_iva)
 
         # Si hay comprobantes asociados, los agregamos.
-        if comprobante_cedir.tipo_comprobante.id in [3, 4] and comprobante_cedir.factura:
+        if comprobante_cedir.tipo_comprobante.id in [NOTA_DE_DEBITO, NOTA_DE_CREDITO] and comprobante_cedir.factura:
             comprobante_asociado = Comprobante.objects.get(
                 id=comprobante_cedir.factura.id)
             self.ws.AgregarCmpAsoc(
