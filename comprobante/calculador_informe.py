@@ -66,48 +66,42 @@ class CalculadorInformeFactura(CalculadorInforme):
     '''
     def __init__(self, comprobante):
         self.comprobante = comprobante
+        self.presentacion = self.comprobante.presentacion.first()
+        self.lineas = LineaDeComprobante.objects.filter(comprobante=self.comprobante)
+        if(self.presentacion is not None):
+            self.estudios = self.presentacion.estudios.all()
 
     @property
     def neto(self):
-        lineas = LineaDeComprobante.objects.filter(comprobante=self.comprobante)
-        return sum([l.importe_neto for l in lineas]) 
+        return sum([l.importe_neto for l in self.lineas]) 
 
     @property
     def iva(self):
-        lineas = LineaDeComprobante.objects.filter(comprobante=self.comprobante)
-        return sum([l.iva for l in lineas])
+        return sum([l.iva for l in self.lineas])
 
     @property
     def honorarios_medicos(self):
-        presentacion = self.comprobante.presentacion.first()
-        if not presentacion:
+        if not self.presentacion:
             return Decimal("0.00")
-        estudios = presentacion.estudios.all()
-        return sum([CalculadorHonorariosInformeContadora(estudio).total for estudio in estudios])
+        return sum([CalculadorHonorariosInformeContadora(estudio).total for estudio in self.estudios])
 
     @property
     def honorarios_anestesia(self):
-        presentacion = self.comprobante.presentacion.first()
-        if not presentacion:
+        if not self.presentacion:
             return Decimal("0.00")
-        estudios = presentacion.estudios.all()
-        return sum([estudio.arancel_anestesia for estudio in estudios]) * Decimal('0.9')
+        return sum([estudio.arancel_anestesia for estudio in self.estudios]) * Decimal('0.9')
 
     @property
     def retencion_anestesia(self):
-        presentacion = self.comprobante.presentacion.first()
-        if not presentacion:
+        if not self.presentacion:
             return Decimal("0.00")
-        estudios = presentacion.estudios.all()
-        return sum([estudio.arancel_anestesia for estudio in estudios]) * Decimal('0.1')
+        return sum([estudio.arancel_anestesia for estudio in self.estudios]) * Decimal('0.1')
     
     @property
     def retencion_cedir(self):
-        presentacion = self.comprobante.presentacion.first()
-        if not presentacion:
+        if not self.presentacion:
             return Decimal("0.00")
-        estudios = presentacion.estudios.all()
-        return sum([CalculadorHonorariosInformeContadora(estudio).cedir for estudio in estudios])
+        return sum([CalculadorHonorariosInformeContadora(estudio).cedir for estudio in self.estudios])
 
     @property
     # gasto administrativo
@@ -117,24 +111,21 @@ class CalculadorInformeFactura(CalculadorInforme):
         Pero si no hay pago, es segun Mariana, "un valor fijo que no cambia seguido" y se puede decidir aca.
         Hay que mover esta logica cuando hagamos facturacion, para no duplicar.
         '''
-        presentacion = self.comprobante.presentacion.first()
-        if not presentacion:
+        if not self.presentacion:
             return Decimal("0.00")
         pago = presentacion.pago.first()
         if pago:
-            return pago.gasto_administrativo * presentacion.total_facturado / Decimal("100.00")
-        if presentacion.obra_social.se_presenta_por_AMR == "1":
+            return pago.gasto_administrativo * self.presentacion.total_facturado / Decimal("100.00")
+        if self.presentacion.obra_social.se_presenta_por_AMR == "1":
             # Resulta que bool("0") es True. TODO: arreglar esto, en el model o en algun lado.
-            return Decimal("32.00") * presentacion.total_facturado / Decimal("100.00")
-        return Decimal("25.00") * presentacion.total_facturado / Decimal("100.00")
+            return Decimal("32.00") * self.presentacion.total_facturado / Decimal("100.00")
+        return Decimal("25.00") * self.presentacion.total_facturado / Decimal("100.00")
 
     @property
     def sala_recuperacion(self):
-        presentacion = self.comprobante.presentacion.first()
-        if not presentacion:
+        if not self.presentacion:
             return Decimal("0.00")
-        estudios = presentacion.estudios.all()
-        return sum([estudio.pension for estudio in estudios])
+        return sum([estudio.pension for estudio in self.estudios])
 
     @property
     def total_medicamentos(self):
@@ -148,11 +139,9 @@ class CalculadorInformeFactura(CalculadorInforme):
                 return est.get_total_medicacion()
             except NotImplementedError:
                 return est.importe_medicacion
-        presentacion = self.comprobante.presentacion.first()
-        if not presentacion:
+        if not self.presentacion:
             return Decimal("0.00")
-        estudios = presentacion.estudios.all()
-        return sum([aux(estudio) for estudio in estudios])
+        return sum([aux(estudio) for estudio in self.estudios])
 
     @property
     def total_material_especifico(self):
@@ -161,11 +150,9 @@ class CalculadorInformeFactura(CalculadorInforme):
                 return est.get_total_material_especifico()
             except NotImplementedError:
                 return Decimal("0.00")
-        presentacion = self.comprobante.presentacion.first()
-        if not presentacion:
+        if not self.resentacion:
             return Decimal("0.00")
-        estudios = presentacion.estudios.all()
-        return sum([aux(estudio) for estudio in estudios])
+        return sum([aux(estudio) for estudio in self.estudios])
 
 
 class CalculadorInformeNotaDebito(CalculadorInformeFactura):
