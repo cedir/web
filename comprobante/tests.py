@@ -19,56 +19,19 @@ class CreateInformeFactoryTest(TestCase):
         self.tipo_comprobante_nota_credito = TipoComprobante.objects.create(
             nombre='Nota De Credito')
 
-    def test_factory_success(self):
-        comprobante = Comprobante.objects.create(tipo_comprobante=self.tipo_comprobante_factura,
-                                                 numero=2,
-                                                 nombre_cliente='',
-                                                 domicilio_cliente='',
-                                                 nro_cuit='',
-                                                 gravado_paciente='',
-                                                 condicion_fiscal='',
-                                                 responsable='',
-                                                 sub_tipo='A',
-                                                 estado=Comprobante.NO_COBRADO,
-                                                 total_cobrado=0,
-                                                 fecha_emision=datetime.today(),
-                                                 fecha_recepcion=datetime.today()
-                                                 )
+    def test_factory_factura(self):
+        comprobante = Comprobante(tipo_comprobante=self.tipo_comprobante_factura)
         instance_created = calculador_informe_factory(comprobante)
         self.assertTrue(isinstance(instance_created, CalculadorInformeFactura))
 
-        comprobante = Comprobante.objects.create(tipo_comprobante=self.tipo_comprobante_nota_debito,
-                                                 numero=2,
-                                                 nombre_cliente='',
-                                                 domicilio_cliente='',
-                                                 nro_cuit='',
-                                                 gravado_paciente='',
-                                                 condicion_fiscal='',
-                                                 responsable='',
-                                                 sub_tipo='A',
-                                                 estado=Comprobante.NO_COBRADO,
-                                                 total_cobrado=0,
-                                                 fecha_emision=datetime.today(),
-                                                 fecha_recepcion=datetime.today()
-                                                 )
+    def test_factory_nota_debito(self):
+        comprobante = Comprobante(tipo_comprobante=self.tipo_comprobante_nota_debito)
         instance_created = calculador_informe_factory(comprobante)
         self.assertTrue(isinstance(instance_created,
                                    CalculadorInformeNotaDebito))
 
-        comprobante = Comprobante.objects.create(tipo_comprobante=self.tipo_comprobante_nota_credito,
-                                                 numero=2,
-                                                 nombre_cliente='',
-                                                 domicilio_cliente='',
-                                                 nro_cuit='',
-                                                 gravado_paciente='',
-                                                 condicion_fiscal='',
-                                                 responsable='',
-                                                 sub_tipo='A',
-                                                 estado=Comprobante.NO_COBRADO,
-                                                 total_cobrado=0,
-                                                 fecha_emision=datetime.today(),
-                                                 fecha_recepcion=datetime.today()
-                                                 )
+    def test_factory_nota_credito(self):
+        comprobante = Comprobante(tipo_comprobante=self.tipo_comprobante_nota_credito)
         instance_created = calculador_informe_factory(comprobante)
         self.assertTrue(isinstance(instance_created,
                                    CalculadorInformeNotaCredito))
