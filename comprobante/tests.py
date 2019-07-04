@@ -3,6 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from httplib2 import ServerNotFoundError
 from mock import patch
+import json
 
 from django.test import TestCase
 from comprobante.models import Comprobante, TipoComprobante, Gravado
@@ -326,3 +327,63 @@ class TestAfipAPI(TestCase):
         self.assertEquals(comprobante.cae, 1)
         self.assertEquals(comprobante.vencimiento_cae, "3019-12-31")
         self.assertEquals(comprobante.numero, 1)
+
+
+class TestCalculadorInformeComprobantes(TestCase):
+    """
+    Estos tests usan como fixture la facturacion completa de un mes y cargan una version serializada de un
+    informe de Mariana.
+    El calculador de informes tiene que producir exactamente el mismo informe que Mariana.
+    Se realiza un test por cada columna del informe de Mariana, pero se suman algunos de los nuestros ya que el nuestros
+    divide en mas columnas (es mas detallado).
+    """
+    fixtures = ["datos_para_informe_contadora.json", "pacientes.json",
+                "medicos.json", "anestesistas.json", "practicas.json"]
+
+    def setUp(self):
+        with open("fixtures/informe_ejemplo.json") as informe_file:
+            self.informe_ejemplo = json.loads(informe_file.read())
+        self.informe_calculado = [calculador_informe_factory(
+            comp) for comp in Comprobante.objects.all()]
+        assert(len(self.informe_ejemplo) == len(self.informe_calculado))
+
+        self.informe_ejemplo.sort(
+            cmp=lambda x, y: int(x["numero"]) - int(y["numero"]))
+        self.informe_calculado.sort(
+            cmp=lambda x, y: x.comprobante.numero - y.comprobante.numero)
+
+    def test_informe_contadora_total_facturado(self):
+        for i in range(len(self.informe_calculado)):
+            self.assertEquals(float(self.informe_calculado[i].total_facturado), self.informe_ejemplo[i]["total_facturado"],
+                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].total_facturado, self.informe_ejemplo[i]["total_facturado"]))
+
+    def test_informe_contadora_iva(self):
+        for i in range(len(self.informe_calculado)):
+            # Lo castie a int porque en un comprobante falla por centavos, que no es problema.
+            self.assertEquals(int(self.informe_calculado[i].iva), int(self.informe_ejemplo[i]["iva"]),
+                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].iva, self.informe_ejemplo[i]["iva"]))
+
+    def test_informe_contadora_honorarios_medicos(self):
+        for i in range(len(self.informe_calculado)):
+            self.assertEquals(float(self.informe_calculado[i].honorarios_medicos), self.informe_ejemplo[i]["honorarios_medicos"],
+                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].honorarios_medicos, self.informe_ejemplo[i]["honorarios_medicos"]))
+
+    def test_informe_contadora_honorarios_anestesistas(self):
+        for i in range(len(self.informe_calculado)):
+            self.assertEquals(float(self.informe_calculado[i].honorarios_anestesia), self.informe_ejemplo[i]["honorarios_anestesistas"],
+                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].honorarios_anestesia, self.informe_ejemplo[i]["honorarios_anestesistas"]))
+
+    def test_informe_contadora_total_medicamentos(self):
+        for i in range(len(self.informe_calculado)):
+            self.assertEquals(float(self.informe_calculado[i].total_medicamentos), self.informe_ejemplo[i]["total_medicamentos"],
+                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].total_medicamentos, self.informe_ejemplo[i]["total_medicamentos"]))
+
+    def test_informe_contadora_otros(self):
+        # El informe de ejemplo que nos paso Mariana tiene esta columna agregada. Sin un informe de ejemplo mas detallados no podemos testear
+        # cada uno por separado.
+        for i in range(len(self.informe_calculado)):
+            calculado = int(self.informe_calculado[i].retencion_impositiva + self.informe_calculado[i].retencion_cedir +
+                            self.informe_calculado[i].sala_recuperacion + self.informe_calculado[i].total_material_especifico)
+            ejemplo = int(self.informe_ejemplo[i]["otros"])
+            self.assertEquals(calculado, ejemplo, "numero: {}, calculado: {}, ejemplo: {}".format(
+                self.informe_ejemplo[i]["numero"], calculado, ejemplo))

@@ -20,6 +20,14 @@ def calculador_informe_factory(comprobante):
 
 class CalculadorInforme(object):
     @abstractproperty
+    def total_facturado(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def total_cobrado(self):
+        raise NotImplementedError
+
+    @abstractproperty
     def neto(self):
         raise NotImplementedError
 
@@ -72,6 +80,14 @@ class CalculadorInformeFactura(CalculadorInforme):
             self.estudios = self.presentacion.estudios.all()
 
     @property
+    def total_facturado(self):
+        return self.comprobante.total_facturado
+
+    @property
+    def total_cobrado(self):
+        return self.comprobante.total_cobrado
+
+    @property
     def neto(self):
         return sum([l.importe_neto for l in self.lineas]) 
 
@@ -113,7 +129,7 @@ class CalculadorInformeFactura(CalculadorInforme):
         '''
         if not self.presentacion:
             return Decimal("0.00")
-        pago = presentacion.pago.first()
+        pago = self.presentacion.pago.first()
         if pago:
             return pago.gasto_administrativo * self.presentacion.total_facturado / Decimal("100.00")
         if self.presentacion.obra_social.se_presenta_por_AMR == "1":
@@ -150,7 +166,7 @@ class CalculadorInformeFactura(CalculadorInforme):
                 return est.get_total_material_especifico()
             except NotImplementedError:
                 return Decimal("0.00")
-        if not self.resentacion:
+        if not self.presentacion:
             return Decimal("0.00")
         return sum([aux(estudio) for estudio in self.estudios])
 
@@ -163,6 +179,14 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
     def __init__(self, comprobante):
         self.comprobante = comprobante
         self.calculador_aux = CalculadorInformeNotaDebito(comprobante)
+
+    @property
+    def total_facturado(self):
+        return Decimal("-1") * self.calculador_aux.total_facturado
+
+    @property
+    def total_cobrado(self):
+        return Decimal("-1") * self.calculador_aux.total_cobrado
 
     @property
     def neto(self):

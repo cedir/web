@@ -75,6 +75,12 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'total_medicamentos',
                   'total_material_especifico')
 
+    def get_total_cobrado(self, comprobante):
+        return Decimal(self.context["calculador"].total_cobrado).quantize(Decimal('.01'), ROUND_UP)
+
+    def get_total_facturado(self, comprobante):
+        return Decimal(self.context["calculador"].total_facturado).quantize(Decimal('.01'), ROUND_UP)
+
     def get_neto(self, comprobante):
         return Decimal(self.context["calculador"].neto).quantize(Decimal('.01'), ROUND_UP)
 
