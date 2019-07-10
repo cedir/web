@@ -21,26 +21,29 @@ class CreateInformeFactoryTest(TestCase):
             nombre='Nota De Credito')
 
     def test_factory_factura(self):
-        comprobante = Comprobante(tipo_comprobante=self.tipo_comprobante_factura)
+        comprobante = Comprobante(
+            tipo_comprobante=self.tipo_comprobante_factura)
         instance_created = calculador_informe_factory(comprobante)
         self.assertTrue(isinstance(instance_created, CalculadorInformeFactura))
 
     def test_factory_nota_debito(self):
-        comprobante = Comprobante(tipo_comprobante=self.tipo_comprobante_nota_debito)
+        comprobante = Comprobante(
+            tipo_comprobante=self.tipo_comprobante_nota_debito)
         instance_created = calculador_informe_factory(comprobante)
         self.assertTrue(isinstance(instance_created,
                                    CalculadorInformeNotaDebito))
 
     def test_factory_nota_credito(self):
-        comprobante = Comprobante(tipo_comprobante=self.tipo_comprobante_nota_credito)
+        comprobante = Comprobante(
+            tipo_comprobante=self.tipo_comprobante_nota_credito)
         instance_created = calculador_informe_factory(comprobante)
         self.assertTrue(isinstance(instance_created,
                                    CalculadorInformeNotaCredito))
 
 
 class TestCaluloRetencionCedir(TestCase):
-    fixtures = ["comprobantes.json",
-                "presentaciones.json", "obras_sociales.json"]
+    fixtures = ["comprobantes.json", "practicas.json", "anestesistas.json",
+                "presentaciones.json", "obras_sociales.json", "estudios.json", "medicos.json", "pacientes.json"]
 
     def test_retencion_cedir_es_cero_si_no_hay_presentacion(self):
         comprobante = Comprobante.objects.get(pk=3)
@@ -48,7 +51,7 @@ class TestCaluloRetencionCedir(TestCase):
         calculador = calculador_informe_factory(comprobante)
         self.assertEquals(calculador.retencion_cedir, Decimal("0.00"))
 
-    def test_retencion_cedir_presentacion_cobrada(self):
+    def test_retencion_impositiva_presentacion_cobrada(self):
         """
         Comprobante de presentación con pago.
         """
@@ -60,9 +63,9 @@ class TestCaluloRetencionCedir(TestCase):
         retencion_esperada = pago.gasto_administrativo * \
             presentacion.total_facturado / Decimal(100)
         calculador = calculador_informe_factory(comprobante)
-        self.assertEquals(calculador.retencion_cedir, retencion_esperada)
+        self.assertEquals(calculador.retencion_impositiva, retencion_esperada)
 
-    def test_retencion_cedir_para_presentacion_no_cobrada_que_va_por_AMR(self):
+    def test_retencion_impositiva_para_presentacion_no_cobrada_que_va_por_AMR(self):
         comprobante = Comprobante.objects.get(pk=1)
         presentacion = comprobante.presentacion.first()
         self.assertIsNotNone(presentacion)
@@ -70,9 +73,9 @@ class TestCaluloRetencionCedir(TestCase):
         calculador = calculador_informe_factory(comprobante)
         retencion_esperada = Decimal(
             "32.00") * presentacion.total_facturado / Decimal("100.00")
-        self.assertEquals(calculador.retencion_cedir, retencion_esperada)
+        self.assertEquals(calculador.retencion_impositiva, retencion_esperada)
 
-    def test_retencion_cedir_para_presentacion_no_cobrada_que_no_va_por_AMR(self):
+    def test_retencion_impositiva_para_presentacion_no_cobrada_que_no_va_por_AMR(self):
         comprobante = Comprobante.objects.get(pk=4)
         presentacion = comprobante.presentacion.first()
         self.assertIsNotNone(presentacion)
@@ -80,7 +83,7 @@ class TestCaluloRetencionCedir(TestCase):
         calculador = calculador_informe_factory(comprobante)
         retencion_esperada = Decimal(
             "25.00") * presentacion.total_facturado / Decimal("100.00")
-        self.assertEquals(calculador.retencion_cedir, retencion_esperada)
+        self.assertEquals(calculador.retencion_impositiva, retencion_esperada)
 
 
 TICKET = "ticket"
@@ -290,63 +293,4 @@ class TestAfipAPI(TestCase):
         self.assertEquals(comprobante.cae, 1)
         self.assertEquals(comprobante.vencimiento_cae, "3019-12-31")
         self.assertEquals(comprobante.numero, 1)
-
-
-class TestCalculadorInformeComprobantes(TestCase):
-    """
-    Estos tests usan como fixture la facturacion completa de un mes y cargan una version serializada de un
-    informe de Mariana.
-    El calculador de informes tiene que producir exactamente el mismo informe que Mariana.
-    Se realiza un test por cada columna del informe de Mariana, pero se suman algunos de los nuestros ya que el nuestros
-    divide en mas columnas (es mas detallado).
-    """
-    fixtures = ["datos_para_informe_contadora.json", "pacientes.json",
-                "medicos.json", "anestesistas.json", "practicas.json"]
-
-    def setUp(self):
-        with open("fixtures/informe_ejemplo.json") as informe_file:
-            self.informe_ejemplo = json.loads(informe_file.read())
-        self.informe_calculado = [calculador_informe_factory(
-            comp) for comp in Comprobante.objects.all()]
-        assert(len(self.informe_ejemplo) == len(self.informe_calculado))
-
-        self.informe_ejemplo.sort(
-            cmp=lambda x, y: int(x["numero"]) - int(y["numero"]))
-        self.informe_calculado.sort(
-            cmp=lambda x, y: x.comprobante.numero - y.comprobante.numero)
-
-    def test_informe_contadora_total_facturado(self):
-        for i in range(len(self.informe_calculado)):
-            self.assertEquals(float(self.informe_calculado[i].total_facturado), self.informe_ejemplo[i]["total_facturado"],
-                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].total_facturado, self.informe_ejemplo[i]["total_facturado"]))
-
-    def test_informe_contadora_iva(self):
-        for i in range(len(self.informe_calculado)):
-            # Lo castie a int porque en un comprobante falla por centavos, que no es problema.
-            self.assertEquals(int(self.informe_calculado[i].iva), int(self.informe_ejemplo[i]["iva"]),
-                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].iva, self.informe_ejemplo[i]["iva"]))
-
-    def test_informe_contadora_honorarios_medicos(self):
-        for i in range(len(self.informe_calculado)):
-            self.assertEquals(float(self.informe_calculado[i].honorarios_medicos), self.informe_ejemplo[i]["honorarios_medicos"],
-                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].honorarios_medicos, self.informe_ejemplo[i]["honorarios_medicos"]))
-
-    def test_informe_contadora_honorarios_anestesistas(self):
-        for i in range(len(self.informe_calculado)):
-            self.assertEquals(float(self.informe_calculado[i].honorarios_anestesia), self.informe_ejemplo[i]["honorarios_anestesistas"],
-                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].honorarios_anestesia, self.informe_ejemplo[i]["honorarios_anestesistas"]))
-
-    def test_informe_contadora_total_medicamentos(self):
-        for i in range(len(self.informe_calculado)):
-            self.assertEquals(float(self.informe_calculado[i].total_medicamentos), self.informe_ejemplo[i]["total_medicamentos"],
-                              "numero: {}, calculado: {}, ejemplo: {}".format(self.informe_ejemplo[i]["numero"], self.informe_calculado[i].total_medicamentos, self.informe_ejemplo[i]["total_medicamentos"]))
-
-    def test_informe_contadora_otros(self):
-        # El informe de ejemplo que nos paso Mariana tiene esta columna agregada. Sin un informe de ejemplo mas detallados no podemos testear
-        # cada uno por separado.
-        for i in range(len(self.informe_calculado)):
-            calculado = int(self.informe_calculado[i].retencion_impositiva + self.informe_calculado[i].retencion_cedir +
-                            self.informe_calculado[i].sala_recuperacion + self.informe_calculado[i].total_material_especifico)
-            ejemplo = int(self.informe_ejemplo[i]["otros"])
-            self.assertEquals(calculado, ejemplo, "numero: {}, calculado: {}, ejemplo: {}".format(
-                self.informe_ejemplo[i]["numero"], calculado, ejemplo))
+        
