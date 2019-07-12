@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from decimal import Decimal
 from httplib2 import ServerNotFoundError
 from mock import patch
-import json
 
 from django.test import TestCase
 from comprobante.models import Comprobante, TipoComprobante, Gravado
@@ -12,6 +10,10 @@ from comprobante.afip import Afip, AfipErrorValidacion, AfipErrorRed
 
 
 class CreateInformeFactoryTest(TestCase):
+    """
+    Estos tests se aseguran de que el factory cree el calculador correcto para
+    cada tipo de comprobante.
+    """
     def setUp(self):
         self.tipo_comprobante_factura = TipoComprobante.objects.create(
             nombre='Factura')
@@ -41,11 +43,15 @@ class CreateInformeFactoryTest(TestCase):
                                    CalculadorInformeNotaCredito))
 
 
-class TestCaluloRetencionCedir(TestCase):
+class TestCaluloRetencionImpositiva(TestCase):
+    """
+    Estos tests checkean la logica de la retencion impositiva,
+    que cambia segun si la presentacion va por AMR o no.
+    """
     fixtures = ["comprobantes.json", "practicas.json", "anestesistas.json",
                 "presentaciones.json", "obras_sociales.json", "estudios.json", "medicos.json", "pacientes.json"]
 
-    def test_retencion_cedir_es_cero_si_no_hay_presentacion(self):
+    def test_retencion_impositiva_es_cero_si_no_hay_presentacion(self):
         comprobante = Comprobante.objects.get(pk=3)
         self.assertIsNone(comprobante.presentacion.first())
         calculador = calculador_informe_factory(comprobante)
@@ -157,7 +163,7 @@ class TestAfipAPI(TestCase):
         '''
         Se mockea WSAA.Expirado para que devuelva false en la primer llamada y luego true,
         de manera de testear que en ese escenario, emitir_comprobante llama a WSAA.Autenticar
-        antes de cumplir su tarea (en total se llama dos veces con al del constructor). 
+        antes de cumplir su tarea (en total se llama dos veces con al del constructor).
         '''
         mock_wsaa.return_value.Autenticar.side_effect = [TICKET, TICKET]
         mock_wsaa.return_value.Expirado.side_effect = [True, False]

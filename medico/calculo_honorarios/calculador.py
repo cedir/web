@@ -17,16 +17,16 @@ class CalculadorHonorarios(object):
         self.calcular()
 
     @abstractmethod
-    def get_importe(self, estudio):
+    def get_importe(self):
         raise NotImplementedError
 
     @abstractproperty
     def descuentos(self):
         raise NotImplementedError
 
-    def porcentaje_GA(self, estudio):
+    def porcentaje_GA(self):
         # TODO: Esto es un logica comun con CalculadorInforme y hay que moverlo a.... Obra Social?
-        if estudio.obra_social.se_presenta_por_AMR == "1":
+        if self.estudio.obra_social.se_presenta_por_AMR == "1":
             return Decimal("32.00")
         return Decimal("25.00")
 
@@ -40,7 +40,7 @@ class CalculadorHonorarios(object):
           apliquen.
         '''
         estudio = self.estudio
-        porcentaje_GA = self.porcentaje_GA(estudio)
+        porcentaje_GA = self.porcentaje_GA()
 
         importe_estudio = self.get_importe()
         monto_descuentos = self.descuentos.aplicar(estudio, importe_estudio)

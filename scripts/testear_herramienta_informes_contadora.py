@@ -1,14 +1,21 @@
-# Parsear el xlsx, armar una lista de diccionarios.
-# Para cada fila:
-#   buscar el comprobante
-#   generar la linea de informe
-#   comparar para cada atributo y hacer saltar diferencias
+# Este script sirve para testear la herramienta de informe de comprobantes para la contadora
+# contra un ejemplo de informe real en excel de Mariana.
+# Hace lo siguiente:
+#   Parsea el xlsx, arma un diccionario de {numero de factura: linea del informe de ejemplo}.
+#   Para cada comprobante en la DB que corresponda a una fila del informe de ejemplo:
+#       Crea un informe con la herramienta
+#       Compara campo por campo e imprime en consola los que tengan una diferencia
+#
+#
+# Para usarlo, copiarlo al directorio raiz de web y ejecutarlo como python testear_herramienta_informes_contadora.py
 
 import xlrd
 import wsgi
 
 from comprobante.models import Comprobante
 from comprobante.calculador_informe import calculador_informe_factory
+from presentacion.models import Presentacion
+from estudio.models import Estudio
 
 
 def parsear_informe():
@@ -53,16 +60,32 @@ def buscar_comprobantes(informe_ejemplo):
     return Comprobante.objects.filter(numero__in=numeros, fecha_emision__month__in=[1], fecha_emision__year__in=[2019])
 
 
+def printear_estudios(comp):
+    try:
+        presen = Presentacion.objects.get(comprobante__id=comp.id)
+        estudios = Estudio.objects.filter(presentacion__id=presen.id)
+    except:
+        print("    No hay presentacion")
+        return
+    print("    practica  act sol OS importe esPcF")
+    for est in estudios:
+        print("    {}       {}  {}  {}  {}  {}".format(est.practica.id, est.medico.id,
+                                                    est.medico_solicitante.id, est.obra_social.id, est.importe_estudio, est.es_pago_contra_factura))
+
+
 def main():
     lineas_ejemplo = parsear_informe()
     comprobantes_del_informe = buscar_comprobantes(lineas_ejemplo)
     assert(len(lineas_ejemplo) == len(comprobantes_del_informe))
+    
     for c in comprobantes_del_informe:
+        print("Comprobante {}".format(c.id))
+        printear_estudios(c)
+
         nuestro = calculador_informe_factory(c)
         # esto en particular lo podemos hacer porque no se chocan las numeros en este mes
         # pero podria no ser el caso
         ejemplo = lineas_ejemplo[c.numero]
-        print("Comprobante {}".format(c.id))
         if int(nuestro.total_facturado) != int(ejemplo["total_facturado"]):
             print("    Total Facturado - calculado: {0}, ejemplo: {1}".format(
                 nuestro.total_facturado, ejemplo["total_facturado"]))
@@ -83,6 +106,7 @@ def main():
         if int(otros) != int(ejemplo["otros"]):
             print(
                 "    Otros- calculado: {}, ejemplo: {}".format(otros, ejemplo["otros"]))
+        print("\n")
 
 
 if __name__ == "__main__":
