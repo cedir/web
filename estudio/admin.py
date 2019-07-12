@@ -1,5 +1,6 @@
 from django.contrib import admin
 from models import Estudio, Medicacion
+from estudio.forms import EstudioAdminForm
 
 
 class MedicacionInline(admin.TabularInline):
@@ -8,6 +9,7 @@ class MedicacionInline(admin.TabularInline):
 
 
 class EstudioAdmin(admin.ModelAdmin):
+    form = EstudioAdminForm
     actions = None
     fields = (u'fecha', u'paciente', u'practica', u'medico', u'medico_solicitante', u'obra_social', u'anestesista', u'motivo', u'informe', u'public_id', u'enlace_video')
     search_fields = [u'paciente__apellido', u'paciente__dni', u'fecha', ]
@@ -23,6 +25,11 @@ class EstudioAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_form(self, request, *args, **kwargs):
+        form = super(EstudioAdmin, self).get_form(request, *args, **kwargs)
+        form.current_user = request.user
+        return form
 
     class Media:
         js = (u'js/admin/estudio.js',)
