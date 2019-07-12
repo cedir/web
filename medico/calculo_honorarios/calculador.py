@@ -26,7 +26,7 @@ class CalculadorHonorarios(object):
 
     def porcentaje_GA(self):
         # TODO: Esto es un logica comun con CalculadorInforme y hay que moverlo a.... Obra Social?
-        if self.estudio.obra_social.se_presenta_por_AMR == "1":
+        if self.estudio.obra_social.se_presenta_por_AMR == 1:
             return Decimal("32.00")
         return Decimal("25.00")
 
@@ -44,7 +44,8 @@ class CalculadorHonorarios(object):
 
         importe_estudio = self.get_importe()
         monto_descuentos = self.descuentos.aplicar(estudio, importe_estudio)
-        self.total_honorarios = importe_estudio * (Decimal('100.00') - porcentaje_GA) / Decimal('100.00') - monto_descuentos
+        r1 = (Decimal('100.00') - porcentaje_GA) / Decimal('100.00')
+        self.total_honorarios = importe_estudio * r1 - monto_descuentos
 
 
 class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
@@ -67,7 +68,9 @@ class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
     @property
     def total(self):
         porcentajes = Porcentajes(self.estudio)
-        return Decimal(self.total_honorarios * (porcentajes.actuante + porcentajes.solicitante)) / Decimal('100.00')
+        # total = Decimal(self.total_honorarios) * (porcentajes.actuante + porcentajes.solicitante) / Decimal('100.00')
+        total = Decimal(self.total_honorarios) * (porcentajes.actuante) / Decimal('100.00')
+        return total
 
     @property
     def cedir(self):

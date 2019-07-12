@@ -73,21 +73,21 @@ class DescuentosNoAcumulables(Descuento):
 class DescuentoColangios(Descuento):
     def aplicar(self, estudio, importe):
         if estudio.practica.id in COLANGIOS:
-            return Decimal("3500.00")
+            return Decimal("2000.00")
         return Decimal("0.00")
 
 
 class DescuentoStent(Descuento):
     def aplicar(self, estudio, importe):
         if estudio.practica.id in STENT:
-            return Decimal("1500.00")
+            return Decimal("500.00")
         return Decimal("0.00")
 
 
 class DescuentoRadiofrecuencia(Descuento):
     def aplicar(self, estudio, importe):
         if estudio.practica.id in RADIOFRECUENCIA:
-            return Decimal("1500.00")
+            return Decimal("500.00")
         return Decimal("0.00")
 
 
@@ -102,4 +102,4 @@ class DescuentoPorPolipectomia(Descuento):
         if estudio.obra_social.id in (OS_UNR, ACA_SALUD, GALENO, OSPAC):
             return Decimal("0.00")
 
-        return Decimal("1210.00")
+        return Decimal("300.00")
