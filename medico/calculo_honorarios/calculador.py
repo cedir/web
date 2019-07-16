@@ -26,7 +26,7 @@ class CalculadorHonorarios(object):
 
     def porcentaje_GA(self):
         # TODO: Esto es un logica comun con CalculadorInforme y hay que moverlo a.... Obra Social?
-        if self.estudio.obra_social.se_presenta_por_AMR == 1:
+        if self.estudio.obra_social.se_presenta_por_AMR == 1 or self.estudio.obra_social.se_presenta_por_AMR == "1":
             return Decimal("32.00")
         return Decimal("25.00")
 

@@ -10,7 +10,12 @@
 # Para usarlo, copiarlo al directorio raiz de web y ejecutarlo como python testear_herramienta_informes_contadora.py
 
 import xlrd
-import wsgi
+# Correccion del path para importar desde el directorio padre
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir)
+import wsgi # Importar esto hace lo de las settings e inicia django
 
 from comprobante.models import Comprobante
 from comprobante.calculador_informe import calculador_informe_factory
@@ -69,8 +74,8 @@ def printear_estudios(comp):
         return
     print("    practica  act sol OS importe esPcF")
     for est in estudios:
-        print("    {}       {}  {}  {}  {}  {}".format(est.practica.id, est.medico.id,
-                                                    est.medico_solicitante.id, est.obra_social.id, est.importe_estudio, est.es_pago_contra_factura))
+        print("    {}       {}  {}  {}  {}  {}  {}".format(est.practica.id, est.medico.id,
+                                                    est.medico_solicitante.id, est.obra_social.id, est.importe_estudio, est.es_pago_contra_factura, est.diferencia_paciente))
 
 
 def main():
@@ -79,34 +84,41 @@ def main():
     assert(len(lineas_ejemplo) == len(comprobantes_del_informe))
     
     for c in comprobantes_del_informe:
-        print("Comprobante {}".format(c.id))
-        printear_estudios(c)
-
+        # print("Comprobante {}".format(c.id))
+        # printear_estudios(c)
+        try:
+            presen = Presentacion.objects.get(comprobante__id=c.id)
+        except:
+            continue
+        
         nuestro = calculador_informe_factory(c)
         # esto en particular lo podemos hacer porque no se chocan las numeros en este mes
         # pero podria no ser el caso
         ejemplo = lineas_ejemplo[c.numero]
-        if int(nuestro.total_facturado) != int(ejemplo["total_facturado"]):
-            print("    Total Facturado - calculado: {0}, ejemplo: {1}".format(
-                nuestro.total_facturado, ejemplo["total_facturado"]))
-        if int(nuestro.iva) != int(ejemplo["iva"]):
-            print(
-                "    IVA - calculado: {}, ejemplo: {}" .format(nuestro.iva, ejemplo["iva"]))
-        if int(nuestro.honorarios_medicos) != int(ejemplo["honorarios_medicos"]):
-            print("    Honorarios Medicos - calculado: {}, ejemplo: {}".format(
-                nuestro.honorarios_medicos, ejemplo["honorarios_medicos"]))
-        if int(nuestro.honorarios_anestesia) != int(ejemplo["honorarios_anestesistas"]):
-            print("    Honorarios Anestesistas - calculado: {}, ejemplo: {}".format(
-                nuestro.honorarios_anestesia, ejemplo["honorarios_anestesistas"]))
-        if int(nuestro.total_medicamentos) != int(ejemplo["medicacion"]):
-            print("    Total Medicamentos - calculado: {}, ejemplo: {}".format(
-                nuestro.total_medicamentos, ejemplo["medicacion"]))
+        # if int(nuestro.total_facturado) != int(ejemplo["total_facturado"]):
+        #     print("    Total Facturado - calculado: {0}, ejemplo: {1}".format(
+        #         nuestro.total_facturado, ejemplo["total_facturado"]))
+        # if int(nuestro.iva) != int(ejemplo["iva"]):
+        #     print(
+        #         "    IVA - calculado: {}, ejemplo: {}" .format(nuestro.iva, ejemplo["iva"]))
+        # if int(nuestro.honorarios_medicos) != int(ejemplo["honorarios_medicos"]):
+        #     print("Comprobante {}".format(c.id))
+        #     printear_estudios(c)
+        #     print("    Honorarios Medicos - calculado: {}, ejemplo: {}".format(
+        #         nuestro.honorarios_medicos, ejemplo["honorarios_medicos"]))
+        #     print("\n")
+        # if int(nuestro.honorarios_anestesia) != int(ejemplo["honorarios_anestesistas"]):
+        #     print("    Honorarios Anestesistas - calculado: {}, ejemplo: {}".format(
+        #         nuestro.honorarios_anestesia, ejemplo["honorarios_anestesistas"]))
+        # if int(nuestro.total_medicamentos) != int(ejemplo["medicacion"]):
+        #     printear_estudios(c)
+        #     print("    Total Medicamentos - calculado: {}, ejemplo: {}".format(
+        #         nuestro.total_medicamentos, ejemplo["medicacion"]))
         otros = nuestro.retencion_impositiva + nuestro.retencion_cedir + \
             nuestro.sala_recuperacion + nuestro.total_material_especifico
         if int(otros) != int(ejemplo["otros"]):
-            print(
-                "    Otros- calculado: {}, ejemplo: {}".format(otros, ejemplo["otros"]))
-        print("\n")
+            printear_estudios(c)
+            print("    Otros- calculado: {}, ejemplo: {}".format(otros, ejemplo["otros"]))
 
 
 if __name__ == "__main__":
