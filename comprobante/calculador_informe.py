@@ -36,10 +36,6 @@ class CalculadorInforme(object):
         raise NotImplementedError
 
     @abstractproperty
-    def honorarios_medicos(self):
-        raise NotImplementedError
-
-    @abstractproperty
     def honorarios_anestesia(self):
         raise NotImplementedError
 
@@ -49,10 +45,6 @@ class CalculadorInforme(object):
 
     @abstractproperty
     def retencion_impositiva(self):
-        raise NotImplementedError
-
-    @abstractproperty
-    def retencion_cedir(self):
         raise NotImplementedError
 
     @abstractproperty
@@ -67,6 +59,22 @@ class CalculadorInforme(object):
     def total_material_especifico(self):
         raise NotImplementedError
 
+    @abstractproperty
+    def honorarios_medicos(self):
+        raise NotImplementedError
+    
+    @abstractproperty
+    def honorarios_solicitantes(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def retencion_cedir(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def uso_de_materiales(self):
+        raise NotImplementedError
+
 
 class CalculadorInformeFactura(CalculadorInforme):
     '''
@@ -78,6 +86,7 @@ class CalculadorInformeFactura(CalculadorInforme):
         self.lineas = LineaDeComprobante.objects.filter(comprobante=self.comprobante)
         if(self.presentacion is not None):
             self.estudios = self.presentacion.estudios.all()
+            self.calculadores_honorarios = [CalculadorHonorariosInformeContadora(estudio) for estudio in self.estudios]
 
     @property
     def total_facturado(self):
@@ -96,12 +105,6 @@ class CalculadorInformeFactura(CalculadorInforme):
         return sum([l.iva for l in self.lineas])
 
     @property
-    def honorarios_medicos(self):
-        if not self.presentacion:
-            return Decimal("0.00")
-        return sum([CalculadorHonorariosInformeContadora(estudio).total for estudio in self.estudios])
-
-    @property
     def honorarios_anestesia(self):
         if not self.presentacion:
             return Decimal("0.00")
@@ -112,18 +115,36 @@ class CalculadorInformeFactura(CalculadorInforme):
         if not self.presentacion:
             return Decimal("0.00")
         return sum([estudio.arancel_anestesia for estudio in self.estudios]) * Decimal('0.1')
+
+    @property
+    def honorarios_medicos(self):
+        if not self.presentacion:
+            return Decimal("0.00")
+        return sum([calculador.actuante for calculador in self.calculadores_honorarios])
     
+    @property
+    def honorarios_solicitantes(self):
+        if not self.presentacion:
+            return Decimal("0.00")
+        return sum([calculador.solicitante for calculador in self.calculadores_honorarios])
+
     @property
     def retencion_cedir(self):
         if not self.presentacion:
             return Decimal("0.00")
-        return sum([CalculadorHonorariosInformeContadora(estudio).cedir for estudio in self.estudios])
+        return sum([calculador.cedir for calculador in self.calculadores_honorarios])
+
+    @property
+    def uso_de_materiales(self):
+        if not self.presentacion:
+            return Decimal("0.00")
+        return sum([calculador.uso_de_materiales for calculador in self.calculadores_honorarios])
 
     @property
     # gasto administrativo
     def retencion_impositiva(self):
         '''
-        La retencion del cedir depende se guarda en el pago de la presentacion y esos casos conviene sacarla de ahi.
+        La retencion impositiva se guarda en el pago de la presentacion y en esos casos conviene sacarla de ahi.
         Pero si no hay pago, es segun Mariana, "un valor fijo que no cambia seguido" y se puede decidir aca.
         Hay que mover esta logica cuando hagamos facturacion, para no duplicar.
         '''
@@ -172,10 +193,18 @@ class CalculadorInformeFactura(CalculadorInforme):
 
 
 class CalculadorInformeNotaDebito(CalculadorInformeFactura):
+    """
+    Las notas de debito tienen en principio las mismas reglas que una factura pero definimos esta clase por generalidad
+    y por si apareciera una regla especifica para mismas.
+    """
     pass
 
 
 class CalculadorInformeNotaCredito(CalculadorInforme):
+    """
+    Las notas de credito tienen la misma logica que las facturas pero los valores se muestran en negativo.
+    Por lo tanto, definimos esta clase que aplica la logica de un calculador de facturas pero devuelve el opuesto.
+    """
     def __init__(self, comprobante):
         self.comprobante = comprobante
         self.calculador_aux = CalculadorInformeNotaDebito(comprobante)
@@ -199,6 +228,18 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
     @property
     def honorarios_medicos(self):
         return Decimal("-1") * self.calculador_aux.honorarios_medicos
+        
+    @property
+    def honorarios_solicitantes(self):
+        return Decimal("-1") * self.calculador_aux.honorarios_solicitantes
+
+    @property
+    def retencion_cedir(self):
+        return Decimal("-1") * self.calculador_aux.retencion_cedir
+
+    @property
+    def uso_de_materiales(self):
+        return Decimal("-1") * self.calculador_aux.uso_de_materiales
 
     @property
     def honorarios_anestesia(self):
@@ -211,10 +252,6 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
     @property
     def retencion_impositiva(self):
         return Decimal("-1") * self.calculador_aux.retencion_impositiva
-
-    @property
-    def retencion_cedir(self):
-        return Decimal("-1") * self.calculador_aux.retencion_cedir
 
     @property
     def sala_recuperacion(self):
@@ -230,4 +267,8 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
 
 
 class CalculadorInformeLiquidacion(CalculadorInformeFactura):
+    """
+    Las liquidaciones tienen en principio las mismas reglas que una factura pero definimos esta clase por generalidad
+    y por si apareciera una regla especifica para mismas.
+    """
     pass

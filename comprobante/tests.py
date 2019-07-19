@@ -92,6 +92,33 @@ class TestCaluloRetencionImpositiva(TestCase):
         self.assertEquals(calculador.retencion_impositiva, retencion_esperada)
 
 
+class TestHerramientaInformeComprobantesContadora(TestCase):
+    """
+    Estos para la herramienta que genera el informe de comprobantes.
+    """
+    fixtures = ["comprobantes.json", "practicas.json", "anestesistas.json",
+                "presentaciones.json", "obras_sociales.json", "estudios.json", "medicos.json", "pacientes.json"]
+    def setUp(self):
+        self.lineas_informe = [calculador_informe_factory(c) for c in Comprobante.objects.all()]
+    
+    def test_informe_propiedades_definidas(self):
+        for linea in self.lineas_informe:
+            linea.total_facturado
+            linea.total_cobrado
+            linea.neto
+            linea.iva
+            linea.honorarios_anestesia
+            linea.retencion_anestesia
+            linea.retencion_impositiva
+            linea.retencion_cedir
+            linea.sala_recuperacion
+            linea.total_medicamentos
+            linea.total_material_especifico
+            linea.honorarios_medicos
+            linea.uso_de_materiales
+            linea.honorarios_solicitantes
+
+
 TICKET = "ticket"
 
 

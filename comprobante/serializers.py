@@ -40,6 +40,8 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     # Nro
     gravado = GravadoSerializer()
     honorarios_medicos = serializers.SerializerMethodField()
+    honorarios_solicitantes = serializers.SerializerMethodField()
+    uso_de_materiales = serializers.SerializerMethodField()
     honorarios_anestesistas = serializers.SerializerMethodField()
     retencion_anestesia = serializers.SerializerMethodField()
     retencion_impositiva = serializers.SerializerMethodField()
@@ -67,8 +69,10 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'total_facturado',
                   'total_cobrado',
                   'honorarios_medicos',
-                  'retencion_impositiva',
+                  'honorarios_solicitantes',
+                  'uso_de_materiales',
                   'retencion_cedir',
+                  'retencion_impositiva',
                   'sala_recuperacion',
                   'honorarios_anestesistas',
                   'retencion_anestesia',
@@ -90,6 +94,15 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     def get_honorarios_medicos(self, comprobante):
         return Decimal(self.context["calculador"].honorarios_medicos).quantize(Decimal('.01'), ROUND_UP)
 
+    def get_honorarios_solicitantes(self, comprobante):
+        return Decimal(self.context["calculador"].honorarios_solicitantes).quantize(Decimal('.01'), ROUND_UP)
+
+    def get_retencion_cedir(self, comprobante):
+        return Decimal(self.context["calculador"].retencion_cedir).quantize(Decimal('.01'), ROUND_UP)
+
+    def get_uso_de_materiales(self, comprobante):
+        return Decimal(self.context["calculador"].uso_de_materiales).quantize(Decimal('.01'), ROUND_UP)
+
     def get_honorarios_anestesistas(self, comprobante):
         return Decimal(self.context["calculador"].honorarios_anestesia).quantize(Decimal('.01'), ROUND_UP)
 
@@ -99,9 +112,6 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     def get_retencion_impositiva(self, comprobante):
         return Decimal(self.context["calculador"].retencion_impositiva).quantize(Decimal('.01'), ROUND_UP)
 
-    def get_retencion_cedir(self, comprobante):
-        return Decimal(self.context["calculador"].retencion_cedir).quantize(Decimal('.01'), ROUND_UP)
-
     def get_sala_recuperacion(self, comprobante):
         return Decimal(self.context["calculador"].sala_recuperacion).quantize(Decimal('.01'), ROUND_UP)
 
@@ -110,35 +120,3 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
 
     def get_total_material_especifico(self, comprobante):
         return Decimal(self.context["calculador"].total_material_especifico).quantize(Decimal('.01'), ROUND_UP)
-
-# Columnas Actuales
-# dr("Tipo") = c.TipoComprobante.Descripcion & " " & c.SubTipo.ToUpper() + "  -   " + c.Responsable.ToUpper()
-# dr("Nro") = c.NroComprobante.ToString()
-# dr("Estado") = c.Estado
-# dr("Fecha") = c.FechaEmision.ToString().Remove(10)
-# dr("Cliente") = c.NombreCliente.ToUpper()
-# dr("TotalFacturado") = Format(c.TotalFacturado, "#################0.00")
-# dr("Neto") = Format(0.0, "#################0.00")
-# dr("IVA") = Format(0.0, "#################0.00")
-# dr("Honorarios") = Format(0.0, "#################0.00")
-# dr("Anestesia") = Format(0.0, "#################0.00")
-# dr("TotalMedicacion") = Format(0.0, "#################0.00")
-#
-#
-# Columnas extras que hay que mostrar:
-# Retencion Impositiva
-# Retencion Cedir (GA)
-# Sala de recuperacion
-# Retencion Anestesia --> ya se esta mostrando. Aplicar 10% a la suma de todo es una opcion, o bien recorrer cada estudio y aplicar el porcentaje de cada anestesista. Sumarlos y mostrar eso es la otra opcion.
-# total Medicamentos         |
-# total Material especifico  |  --> Estos 2 hoy aparecen juntos como TotalMedicacion, pero deben ir separados
-
-"""
-NOTA: el calculo de honorario medico se aplican las mismas reglas que pago a medico. Si el estudio esta pagado al medico, no importa, volver a aplicar las reglas porque hay qye mostrar lo que se deberia pagar, y no lo que se pago.
-      calculo de honorario anestesia sale del campo "anestesia" del estudio. Sino esta cargado se muestra 0 (cero)
-
-NOTA 2: del calculo de pago a medico, se desprenden otros valores como "Retencion Impositiva" y "Gastos Administriativos".
-        Estos valores deben ser sumados por separado y mostrado en diferentes columnas.
-
-
-"""

@@ -59,23 +59,45 @@ class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
 
     @property
     def descuentos(self):
-        return DescuentosVarios(
+        _descuentos = DescuentosVarios(
             DescuentoPorPolipectomia(),
             DescuentoColangios(),
             DescuentoStent(),
             DescuentoRadiofrecuencia())
+        self._uso_de_materiales = _descuentos.aplicar(self.estudio, self.get_importe()) 
+        return _descuentos
+
+    # @property
+    # def total(self):
+    #     porcentajes = Porcentajes(self.estudio)
+    #     # total = Decimal(self.total_honorarios) * (porcentajes.actuante + porcentajes.solicitante) / Decimal('100.00')
+    #     total = Decimal(self.total_honorarios) * (porcentajes.actuante) / Decimal('100.00')
+    #     return total
+
 
     @property
-    def total(self):
+    def actuante(self):
         porcentajes = Porcentajes(self.estudio)
         # total = Decimal(self.total_honorarios) * (porcentajes.actuante + porcentajes.solicitante) / Decimal('100.00')
         total = Decimal(self.total_honorarios) * (porcentajes.actuante) / Decimal('100.00')
+        return total
+
+
+    @property
+    def solicitante(self):
+        porcentajes = Porcentajes(self.estudio)
+        # total = Decimal(self.total_honorarios) * (porcentajes.actuante + porcentajes.solicitante) / Decimal('100.00')
+        total = Decimal(self.total_honorarios) * (porcentajes.solicitante) / Decimal('100.00')
         return total
 
     @property
     def cedir(self):
         porcentajes = Porcentajes(self.estudio)
         return Decimal(self.total_honorarios * porcentajes.cedir) / Decimal('100.00')
+
+    @property
+    def uso_de_materiales(self):
+        return self._uso_de_materiales
 
 class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
     '''

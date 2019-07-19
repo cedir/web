@@ -13,3 +13,6 @@ static/templates/npm_deps/
 .idea
 .vscode
 ENV/
+informe_ejemplo.xlsx
+test.crt
+privada.csr

@@ -23,6 +23,7 @@ from presentacion.models import Presentacion
 from estudio.models import Estudio
 
 
+
 def parsear_informe():
     """
     Busca el informe de ejemplo y lo parsea en un diccionario de numero: linea
@@ -65,24 +66,37 @@ def buscar_comprobantes(informe_ejemplo):
     return Comprobante.objects.filter(numero__in=numeros, fecha_emision__month__in=[1], fecha_emision__year__in=[2019])
 
 
-def printear_estudios(comp):
+def printear_estudios(comp, linea):
     try:
         presen = Presentacion.objects.get(comprobante__id=comp.id)
         estudios = Estudio.objects.filter(presentacion__id=presen.id)
     except:
         print("    No hay presentacion")
         return
-    print("    practica  act sol OS importe esPcF")
+    
+    header_informe = ["hon_med", "ret_cedir", "uso_mats", "tot_med", "mat_esp", "hon_anes","ret_anes", "sala_recu", "ret_impos"]
+    informe = [linea.honorarios_medicos, linea.retencion_cedir, linea.uso_de_materiales,
+               linea.total_medicamentos, linea.total_material_especifico,
+               linea.honorarios_anestesia, linea.retencion_anestesia,
+               linea.sala_recuperacion, linea.retencion_impositiva]
+    informe_format = "{:>12}" * len(header_informe)
+    print(informe_format.format(*header_informe))
+    print(informe_format.format(*informe) + "\n")
+
+    header_estudio = ["practica", "act", "sol", "OS", "importe", "PcF", "dPac"]
+    row_format ="{:>12}" * len(header_estudio)
+    print(row_format.format(*header_estudio))
     for est in estudios:
-        print("    {}       {}  {}  {}  {}  {}  {}".format(est.practica.id, est.medico.id,
-                                                    est.medico_solicitante.id, est.obra_social.id, est.importe_estudio, est.es_pago_contra_factura, est.diferencia_paciente))
+        
+        row = [est.practica.id, est.medico.id, est.medico_solicitante.id, est.obra_social.id, est.importe_estudio, est.es_pago_contra_factura, est.diferencia_paciente]
+        print(row_format.format(*row))
 
 
 def main():
     lineas_ejemplo = parsear_informe()
     comprobantes_del_informe = buscar_comprobantes(lineas_ejemplo)
     assert(len(lineas_ejemplo) == len(comprobantes_del_informe))
-    
+
     for c in comprobantes_del_informe:
         # print("Comprobante {}".format(c.id))
         # printear_estudios(c)
@@ -90,36 +104,41 @@ def main():
             presen = Presentacion.objects.get(comprobante__id=c.id)
         except:
             continue
-        
+
         nuestro = calculador_informe_factory(c)
         # esto en particular lo podemos hacer porque no se chocan las numeros en este mes
         # pero podria no ser el caso
         ejemplo = lineas_ejemplo[c.numero]
-        # if int(nuestro.total_facturado) != int(ejemplo["total_facturado"]):
-        #     print("    Total Facturado - calculado: {0}, ejemplo: {1}".format(
-        #         nuestro.total_facturado, ejemplo["total_facturado"]))
-        # if int(nuestro.iva) != int(ejemplo["iva"]):
-        #     print(
-        #         "    IVA - calculado: {}, ejemplo: {}" .format(nuestro.iva, ejemplo["iva"]))
-        # if int(nuestro.honorarios_medicos) != int(ejemplo["honorarios_medicos"]):
-        #     print("Comprobante {}".format(c.id))
-        #     printear_estudios(c)
-        #     print("    Honorarios Medicos - calculado: {}, ejemplo: {}".format(
-        #         nuestro.honorarios_medicos, ejemplo["honorarios_medicos"]))
-        #     print("\n")
-        # if int(nuestro.honorarios_anestesia) != int(ejemplo["honorarios_anestesistas"]):
-        #     print("    Honorarios Anestesistas - calculado: {}, ejemplo: {}".format(
-        #         nuestro.honorarios_anestesia, ejemplo["honorarios_anestesistas"]))
-        # if int(nuestro.total_medicamentos) != int(ejemplo["medicacion"]):
-        #     printear_estudios(c)
-        #     print("    Total Medicamentos - calculado: {}, ejemplo: {}".format(
-        #         nuestro.total_medicamentos, ejemplo["medicacion"]))
+        print("\nComprobante {}".format(c.id))
+        printear_estudios(c, nuestro)
+        if int(nuestro.total_facturado) != int(ejemplo["total_facturado"]):
+            print("    Total Facturado - calculado: {0}, ejemplo: {1}".format(
+                nuestro.total_facturado, ejemplo["total_facturado"]))
+        if int(nuestro.iva) != int(ejemplo["iva"]):
+            print(
+                "    IVA - calculado: {}, ejemplo: {}" .format(nuestro.iva, ejemplo["iva"]))
+        if int(nuestro.honorarios_medicos) != int(ejemplo["honorarios_medicos"]):
+            print("    Honorarios Medicos - calculado: {}, ejemplo: {}".format(
+                nuestro.honorarios_medicos, ejemplo["honorarios_medicos"]))
+        if int(nuestro.honorarios_anestesia) != int(ejemplo["honorarios_anestesistas"]):
+            print("    Honorarios Anestesistas - calculado: {}, ejemplo: {}".format(
+                nuestro.honorarios_anestesia, ejemplo["honorarios_anestesistas"]))
+        if int(nuestro.total_medicamentos) != int(ejemplo["medicacion"]):
+            print("    Total Medicamentos - calculado: {}, ejemplo: {}".format(
+                nuestro.total_medicamentos, ejemplo["medicacion"]))
         otros = nuestro.retencion_impositiva + nuestro.retencion_cedir + \
-            nuestro.sala_recuperacion + nuestro.total_material_especifico
+            nuestro.sala_recuperacion + \
+            nuestro.total_material_especifico + nuestro.uso_de_materiales  + nuestro.honorarios_solicitantes
         if int(otros) != int(ejemplo["otros"]):
-            printear_estudios(c)
-            print("    Otros- calculado: {}, ejemplo: {}".format(otros, ejemplo["otros"]))
-
+            print(
+                "    Otros- calculado: {}, ejemplo: {}".format(otros, ejemplo["otros"]))
+            # if int(nuestro.total_medicamentos) != int(ejemplo["medicacion"]):
+            #     print("    Total Medicamentos - calculado: {}, ejemplo: {}".format(
+            #         nuestro.total_medicamentos, ejemplo["medicacion"]))
+        suma = int(nuestro.honorarios_anestesia + nuestro.honorarios_medicos + nuestro.total_medicamentos  + nuestro.iva + nuestro.retencion_anestesia + otros)
+        if int(nuestro.total_facturado) != suma:
+            print("    Total Facturado - calculado: {0}, suma: {1}".format(
+                nuestro.total_facturado, suma))
 
 if __name__ == "__main__":
     main()
