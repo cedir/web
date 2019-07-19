@@ -2,10 +2,12 @@ from datetime import datetime, timedelta
 from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import AnonymousUser, User
+
 from turno.views import anunciar, _is_feriado, _is_medico_con_licencia
 from estudio.models import Estudio
 from turno.models import Turno, PeriodoSinAtencion
 from medico.models import Medico
+from security.encryption import encode
 
 
 class TurnosTest(TestCase):
@@ -31,6 +33,11 @@ class TurnosTest(TestCase):
         self.assertContains(response, '{"status": true, "message": "Success"}')
 
         self.assertEqual(Estudio.objects.all().count(), turno.practicas.all().count())
+        estudio = Estudio.objects.all().first()
+        self.assertNotEquals(estudio.public_id, u'')
+
+    def test_anunciar_returns_error_if_practica_is_empty(self):
+        pass
 
     def test_guardar_truno_success(self):
         turnos_count_inicial = Turno.objects.all().count()

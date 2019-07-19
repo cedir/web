@@ -5,6 +5,7 @@ from decimal import Decimal, ROUND_UP
 from django.db import models
 from django.db.models.signals import pre_save
 
+from common.utils import generate_uuid
 from medico.models import Medico, PagoMedico
 from anestesista.models import Anestesista
 from practica.models import Practica
@@ -25,7 +26,7 @@ class Estudio(models.Model):
     motivo = models.CharField(u'Motivo', db_column="motivoEstudio", max_length=300, blank=True, default=u'')
     informe = models.TextField(blank=True, default=u'')
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo", blank=True)
-    public_id = models.CharField(max_length=100, db_column="publicID")
+    public_id = models.CharField(max_length=100, db_column="publicID", default=generate_uuid)
 
     medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name=u'medico_actuante')
     obra_social = models.ForeignKey(ObraSocial, db_column="idObraSocial")
