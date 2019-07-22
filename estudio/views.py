@@ -142,8 +142,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
         return self.serializers.get(self.action, self.serializer_class)
 
     def perform_create(self, serializer):
-        serializer.save()
-        estudio = Estudio(pk=serializer.data.get('id'))
+        estudio = serializer.save()
         add_log_entry(estudio, self.request.user, ADDITION, 'CREA')
 
 

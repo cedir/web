@@ -148,6 +148,8 @@ def get_turno(request, id_turno):
         return HttpResponse(json)
 
     ct = ContentType.objects.get_for_model(Turno)
+
+    # TODO: traer logs en una llamada sola, y mostrarlos todos (tambien los anulados, confirmados, etc.)
     created_log = LogEntry.objects.filter(content_type_id=ct.id, action_flag=ADDITION, object_id=id_turno)
     last_modified_log = LogEntry.objects.filter(content_type_id=ct.id, action_flag=CHANGE, object_id=id_turno)
 
@@ -187,6 +189,7 @@ def get_turnos_disponibles(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     return _get_turnos_disponibles(request.user, request.GET)
+
 
 def get_next_day_line(request):
     fecha = request.GET['fecha']
@@ -345,7 +348,7 @@ def anunciar(request, id_turno):
             estudio.anestesista_id = 1
             estudio.set_create_defaults()
             estudio.save()
-            estudio.public_id = encode(estudio.id)
+            estudio.public_id = encode(estudio.id)  # actualiza a un public_id mas corto, para facilidad al paciente.
             estudio.save()
 
             # log estudio

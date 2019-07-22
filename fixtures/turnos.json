@@ -26,6 +26,22 @@
     }
 },
 {
+    "model": "turno.estado",
+    "pk": 2,
+    "fields": {
+        "descripcion": "Confirmado",
+        "img": "icon_warning_16x16.png"
+    }
+},
+{
+    "model": "turno.estado",
+    "pk": 3,
+    "fields": {
+        "descripcion": "Anulado",
+        "img": "icon_warning_16x16.png"
+    }
+},
+{
     "model": "sala.sala",
     "pk": 1,
     "fields": {
