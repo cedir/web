@@ -18,6 +18,9 @@ class Estado(models.Model):
     class Meta:
         db_table = 'turnos_estados'
 
+    def __unicode__(self):
+        return self.descripcion
+
 
 class Turno(models.Model):
     fecha_otorgamiento = models.DateTimeField("Fecha Otorgamiento", null=False, blank=False)
