@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
-from django.contrib.admin.models import ADDITION
+from django.contrib.admin.models import ADDITION, CHANGE
 
 from common.drf.views import StandardResultsSetPagination
 from common.utils import add_log_entry
@@ -145,6 +145,10 @@ class EstudioViewSet(viewsets.ModelViewSet):
         estudio = serializer.save()
         add_log_entry(estudio, self.request.user, ADDITION, 'CREA')
 
+    def perform_update(self, serializer):
+        estudio = serializer.save()
+        add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA')
+
 
 class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
     """
@@ -174,7 +178,7 @@ class MedicacionViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
-        return Response({ "estudio": instance.estudio.id })
+        return Response({"estudio": instance.estudio.id})
     
     def perform_destroy(self, instance):
         instance.delete()

@@ -6,7 +6,7 @@ from django.test import Client
 from django.contrib.auth.models import User
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.admin.models import ADDITION
+from django.contrib.admin.models import ADDITION, CHANGE
 from rest_framework import status
 
 from estudio.models import Estudio
@@ -56,7 +56,18 @@ class CrearEstudioTest(TestCase):
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk).count(), 1)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk).first().action_flag, ADDITION)
 
-    def test_update_estudio_no_crea_log(self):
+
+class ActualizarEstudiosTest(TestCase):
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json']
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
+        self.client = Client(HTTP_POST='localhost')
+        self.client.login(username='walter', password='xx11')
+        self.estudio_data = {'fecha': datetime.today().date(), 'paciente': 1, 'practica': 1, 'medico': 1,
+                             'obra_social': 1, 'medico_solicitante': 1, 'anestesista': 1}
+
+    def test_update_estudio_crea_log(self):
         ct = ContentType.objects.get_for_model(Estudio)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk).count(), 0)
 
@@ -67,4 +78,4 @@ class CrearEstudioTest(TestCase):
         response = self.client.put('/api/estudio/{}/'.format(estudio.id), data=json.dumps(self.estudio_data), content_type='application/json')
 
         self.assertEquals(response.status_code, 200)
-        self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk).count(), 0)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk, object_id=estudio.id, action_flag=CHANGE).count(), 1)
