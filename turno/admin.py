@@ -1,5 +1,25 @@
 from django.contrib import admin
-from turno.models import InfoTurno, PeriodoSinAtencion
+from turno.models import InfoTurno, PeriodoSinAtencion, Turno
+
+
+class TurnoAdmin(admin.ModelAdmin):
+    search_fields = [u'medico__apellido', u'paciente__apellido', u'fechaTurno']
+    list_display = (u'fechaTurno', u'horaInicio', u'paciente', u'medico', u'obraSocial',)
+    ordering = (u'-fechaTurno', u'-horaInicio', )
+    raw_id_fields = (u'paciente', )
+    filter_horizontal = ('practicas',)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_save_and_continue'] = False
+        extra_context['show_save'] = False
+        return super(TurnoAdmin, self).changeform_view(request, object_id, extra_context=extra_context)
 
 
 class InfoTurnoAdmin(admin.ModelAdmin):
@@ -15,5 +35,6 @@ class PeriodoSinAtencionAdmin(admin.ModelAdmin):
     ordering = (u'medico__apellido', u'fecha_inicio', )
 
 
+admin.site.register(Turno, TurnoAdmin)
 admin.site.register(InfoTurno, InfoTurnoAdmin)
 admin.site.register(PeriodoSinAtencion, PeriodoSinAtencionAdmin)

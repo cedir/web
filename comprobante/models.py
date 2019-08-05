@@ -8,6 +8,9 @@ class TipoComprobante(models.Model):
     class Meta:
         db_table = 'tblComprobantesTipo'
 
+    def __unicode__(self):
+        return self.nombre
+
 
 class Gravado(models.Model):
     descripcion = models.CharField(max_length=128, db_column=u'descripcionGravado')

@@ -1,10 +1,14 @@
 from datetime import datetime, timedelta
 from django.test import TestCase
 from django.test import Client
-from django.contrib.auth.models import AnonymousUser, User
-from turno.views import anunciar, _is_feriado, _is_medico_con_licencia
+from django.contrib.auth.models import User
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.admin.models import ADDITION, CHANGE
+
+from turno.views import _is_feriado, _is_medico_con_licencia
 from estudio.models import Estudio
-from turno.models import Turno, PeriodoSinAtencion
+from turno.models import Turno, PeriodoSinAtencion, Estado
 from medico.models import Medico
 
 
@@ -29,14 +33,42 @@ class TurnosTest(TestCase):
         
         response = self.client.post('/turno/1/anunciar/', {})
         self.assertContains(response, '{"status": true, "message": "Success"}')
-
         self.assertEqual(Estudio.objects.all().count(), turno.practicas.all().count())
 
+    def test_anunciar_crea_logs_por_cada_estudio_creado_y_uno_para_el_anunciar(self):
+        ct_turno = ContentType.objects.get_for_model(Turno)
+        ct_estudio = ContentType.objects.get_for_model(Estudio)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk).count(), 0)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_estudio.pk).count(), 0)
+        self.assertEqual(Estudio.objects.all().count(), 0)
+        turno = Turno.objects.get(pk=1)
+
+        response = self.client.post('/turno/1/anunciar/', {})
+        self.assertContains(response, '{"status": true, "message": "Success"}')
+
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE).count(), 1)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_estudio.pk, action_flag=ADDITION).count(), turno.practicas.all().count())
+
+    def test_anunciar_actualiza_el_public_id_del_estudio_por_uno_mas_corto_que_el_original(self):
+        self.assertEqual(Estudio.objects.all().count(), 0)
+        turno = Turno.objects.get(pk=1)
+
+        response = self.client.post('/turno/1/anunciar/', {})
+        self.assertContains(response, '{"status": true, "message": "Success"}')
+        self.assertEqual(Estudio.objects.all().count(), turno.practicas.all().count())
+        estudio = Estudio.objects.all().first()
+        self.assertNotEquals(estudio.public_id, u'')
+        self.assertTrue(len(estudio.public_id) < 10)  # universal is 32
+
     def test_guardar_truno_success(self):
+        ct_turno = ContentType.objects.get_for_model(Turno)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk).count(), 0)
+
         turnos_count_inicial = Turno.objects.all().count()
         response = self.client.get('/turno/guardar/', self.turno_data)
         self.assertContains(response, '{"status": 1, "message": "El turno se ha creado correctamente."}')
         self.assertEqual(Turno.objects.all().count(), turnos_count_inicial + 1)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=ADDITION).count(), 1)
 
     def test_guardar_truno_error_superposicion_de_turnos(self):
         turnos_count_inicial = Turno.objects.all().count()
@@ -89,6 +121,66 @@ class TurnosTest(TestCase):
 
         self.assertContains(response, '{"status": 0, "message": "El medico no atiende en la fecha seleccionada"}')
         self.assertEqual(Turno.objects.all().count(), turnos_count_inicial)
+
+    def test_modificar_turno_existente_success(self):
+        ct_turno = ContentType.objects.get_for_model(Turno)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk).count(), 0)
+
+        turno = Turno.objects.get(pk=1)
+        turno.obraSocial.id = 1
+        turno.observacion = 'test'
+        turno.save()
+
+        response = self.client.get('/turno/1/actualizar/', {'observacion': 'otra cosa', 'id-obra-social': 2})
+        self.assertContains(response, '{"status": 1, "message": "El turno se ha guardado correctamente."}')
+
+        turno = Turno.objects.get(pk=1)
+        self.assertEquals(turno.obraSocial.id, 2)
+        self.assertEquals(turno.observacion, 'otra cosa')
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
+
+    def test_anular_turno_success(self):
+        ct_turno = ContentType.objects.get_for_model(Turno)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk).count(), 0)
+
+        turno = Turno.objects.get(pk=1)
+        self.assertEquals(turno.estado.id, Estado.PENDIENTE)
+
+        response = self.client.get('/turno/1/anular/', {'observacion_turno': 'descripcion anulacion'})
+        self.assertContains(response, '{"status": 1, "message": "El turno se ha anulado correctamente."}')
+
+        turno = Turno.objects.get(pk=1)
+        self.assertEquals(turno.estado.id, Estado.ANULADO)
+        self.assertEquals(turno.observacion, 'descripcion anulacion')
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
+
+    def test_reprogramar_turno_success(self):
+        ct_turno = ContentType.objects.get_for_model(Turno)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk).count(), 0)
+
+        turno = Turno.objects.get(pk=1)
+        self.assertEquals(turno.estado.id, Estado.PENDIENTE)
+
+        response = self.client.get('/turno/1/reprogramar/', {'observacion_turno': 'descripcion anulacion'})
+
+        turno = Turno.objects.get(pk=1)
+        self.assertEquals(turno.estado.id, Estado.ANULADO)
+        self.assertEquals(turno.observacion, 'descripcion anulacion')
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
+
+    def test_confirmar_turno_success(self):
+        ct_turno = ContentType.objects.get_for_model(Turno)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk).count(), 0)
+
+        turno = Turno.objects.get(pk=1)
+        self.assertEquals(turno.estado.id, Estado.PENDIENTE)
+
+        response = self.client.get('/turno/1/confirmar/', {})
+        self.assertContains(response, '{"status": 1, "message": "El turno se ha confirmado correctamente."}')
+
+        turno = Turno.objects.get(pk=1)
+        self.assertEquals(turno.estado.id, Estado.CONFIRMADO)
+        self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
 
 
 class IsFeriadoTest(TestCase):

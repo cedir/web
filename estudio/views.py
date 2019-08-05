@@ -1,15 +1,19 @@
+import simplejson
 from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
+from django.contrib.admin.models import ADDITION, CHANGE
+
 from common.drf.views import StandardResultsSetPagination
+from common.utils import add_log_entry
 from estudio.models import Estudio
 from estudio.models import Medicacion
 from medicamento.models import Medicamento
 from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from imprimir import generar_informe
-import simplejson
+
 
 def imprimir(request, id_estudio):
 
@@ -20,6 +24,7 @@ def imprimir(request, id_estudio):
     response['Content-Disposition'] = u'filename="Estudio de {0}.pdf"'.format(estudio.paciente.apellido)
 
     return generar_informe(response, estudio)
+
 
 def add_default_medicacion(request):
 
@@ -43,6 +48,7 @@ def add_default_medicacion(request):
     
     return HttpResponse(simplejson.dumps(response_dict))
 
+
 class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
     """
     Filtro de estudios por obra social
@@ -52,6 +58,7 @@ class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
         if obra_social:
             queryset = queryset.filter(obra_social__nombre__icontains=obra_social)
         return queryset
+
 
 class EstudioMedicoFilterBackend(filters.BaseFilterBackend):
     """
@@ -66,6 +73,7 @@ class EstudioMedicoFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(medico__nombre__icontains=nombre)
         return queryset
 
+
 class EstudioMedicoSolicitanteFilterBackend(filters.BaseFilterBackend):
     """
     Filtro de estudios por medico solicitante
@@ -78,6 +86,7 @@ class EstudioMedicoSolicitanteFilterBackend(filters.BaseFilterBackend):
         if nombre:
             queryset = queryset.filter(medico_solicitante__nombre__icontains=nombre)
         return queryset
+
 
 class EstudioPacienteFilterBackend(filters.BaseFilterBackend):
     """
@@ -112,6 +121,7 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(fecha__lte=fecha_hasta)
         return queryset
 
+
 class EstudioViewSet(viewsets.ModelViewSet):
     model = Estudio
     queryset = Estudio.objects.all()
@@ -130,6 +140,15 @@ class EstudioViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializer_class)
+
+    def perform_create(self, serializer):
+        estudio = serializer.save()
+        add_log_entry(estudio, self.request.user, ADDITION, 'CREA')
+
+    def perform_update(self, serializer):
+        estudio = serializer.save()
+        add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA')
+
 
 class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
     """
@@ -159,7 +178,7 @@ class MedicacionViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
-        return Response({ "estudio": instance.estudio.id })
+        return Response({"estudio": instance.estudio.id})
     
     def perform_destroy(self, instance):
         instance.delete()

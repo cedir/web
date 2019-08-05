@@ -8,3 +8,6 @@ class Sala(models.Model):
 
     class Meta:
         db_table = u'turnos_salas'
+
+    def __unicode__(self):
+        return self.nombre

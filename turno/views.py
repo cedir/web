@@ -24,6 +24,7 @@ from turno.models import Turno, Estado, PeriodoSinAtencion
 from turno.serializers import InfoTurnoSerializer
 from security.encryption import encode
 from common.drf.views import StandardResultsSetPagination
+from common.utils import add_log_entry
 
 
 PIXELS_PER_MINUTE = 1.333
@@ -147,6 +148,8 @@ def get_turno(request, id_turno):
         return HttpResponse(json)
 
     ct = ContentType.objects.get_for_model(Turno)
+
+    # TODO: traer logs en una llamada sola, y mostrarlos todos (tambien los anulados, confirmados, etc.)
     created_log = LogEntry.objects.filter(content_type_id=ct.id, action_flag=ADDITION, object_id=id_turno)
     last_modified_log = LogEntry.objects.filter(content_type_id=ct.id, action_flag=CHANGE, object_id=id_turno)
 
@@ -186,6 +189,7 @@ def get_turnos_disponibles(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     return _get_turnos_disponibles(request.user, request.GET)
+
 
 def get_next_day_line(request):
     fecha = request.GET['fecha']
@@ -268,7 +272,7 @@ def guardar(request):
 
         turno.save()
 
-        _add_log_entry(turno, request.user, ADDITION, 'CREA')
+        add_log_entry(turno, request.user, ADDITION, 'CREA')
 
         resp_dict = {'status': 1, 'message': "El turno se ha creado correctamente."}
         return HttpResponse(simplejson.dumps(resp_dict))
@@ -302,7 +306,7 @@ def update(request, id_turno):
         turno.observacion = observacion
         turno.save()
 
-        _add_log_entry(turno, request.user, CHANGE, "MODIFICA")
+        add_log_entry(turno, request.user, CHANGE, "MODIFICA")
 
         response_dict = {'status': 1, 'message': "El turno se ha guardado correctamente."}
         json = simplejson.dumps(response_dict)
@@ -344,12 +348,13 @@ def anunciar(request, id_turno):
             estudio.anestesista_id = 1
             estudio.set_create_defaults()
             estudio.save()
-            estudio.public_id = encode(estudio.id)
+            estudio.public_id = encode(estudio.id)  # actualiza a un public_id mas corto, para facilidad al paciente.
             estudio.save()
 
             # log estudio
-            _add_log_entry(turno, request.user, CHANGE, "ANUNCIA")
-            _add_log_entry(estudio, request.user, ADDITION, 'CREA (desde turnos)')
+            add_log_entry(estudio, request.user, ADDITION, 'CREA (desde turnos)')
+
+        add_log_entry(turno, request.user, CHANGE, "ANUNCIA")
 
         response_dict = {'status': True, 'message': "Success"}
         json = simplejson.dumps(response_dict)
@@ -389,7 +394,7 @@ def anular(request, id_turno):
 
         turno.save()
 
-        _add_log_entry(turno, request.user, CHANGE, "ANULA")
+        add_log_entry(turno, request.user, CHANGE, "ANULA")
 
         response_dict = {'status': 1, 'message': "El turno se ha anulado correctamente."}
         json = simplejson.dumps(response_dict)
@@ -423,7 +428,7 @@ def reprogramar(request, id_turno):
                 turno.observacion = observacion_turno
             turno.save()
 
-            _add_log_entry(turno, request.user, CHANGE, "REPROGRAMA")
+            add_log_entry(turno, request.user, CHANGE, "REPROGRAMA")
 
         practicas = turno.practicas.all()
 
@@ -458,7 +463,7 @@ def confirmar(request, id_turno):
 
         turno.estado = Estado.objects.get(id=Estado.CONFIRMADO)
         turno.save()
-        _add_log_entry(turno, request.user, CHANGE, "CONFIRMA")
+        add_log_entry(turno, request.user, CHANGE, "CONFIRMA")
 
         response_dict = {'status': 1, 'message': "El turno se ha confirmado correctamente."}
         json = simplejson.dumps(response_dict)
@@ -669,17 +674,6 @@ def _sql_date_to_normal_date(date_time):
         return arr2[2] + "/" + arr2[1] + "/" + arr2[0] + " " + time
     except Exception:
         return str(date_time)
-
-
-def _add_log_entry(turno, user, mode, message):
-    ct = ContentType.objects.get_for_model(type(turno))
-    LogEntry.objects.log_action(
-        user_id=user.id,
-        content_type_id=ct.pk,
-        object_id=turno.pk,
-        object_repr=turno.__unicode__(),
-        action_flag=mode,
-        change_message=message)
 
 
 class InfoTurnoViewSet(viewsets.ModelViewSet):
