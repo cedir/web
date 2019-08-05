@@ -7,6 +7,17 @@ import sys
 #PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = '/app/path'
 
+# Afip
+AFIP_WSDL_URL = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL"
+AFIP_WSAA_URL = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl"
+CEDIR_CERT_PATH= "cedir.crt"
+CEDIR_PV_PATH= "certificados/cedir.csr"
+CEDIR_CUIT= 
+BRUNETTI_CERT_PATH= "certificados/brunetti.crt"
+BRUNETTI_PV_PATH= "certificados/brunetti.csr"
+BRUNETTI_CUIT=
+
+# Debug
 DEBUG = True
 DEFAULT_CHARSET = 'utf8'
 

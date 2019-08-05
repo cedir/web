@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 from decimal import Decimal
-from httplib2 import ServerNotFoundError
-from mock import patch
 
 from django.test import TestCase
-from comprobante.models import Comprobante, TipoComprobante, Gravado
+from comprobante.models import Comprobante, TipoComprobante
 from comprobante.calculador_informe import calculador_informe_factory, CalculadorInformeFactura, CalculadorInformeNotaCredito, CalculadorInformeNotaDebito
-from comprobante.afip import Afip, AfipErrorValidacion, AfipErrorRed
 
 
 class CreateInformeFactoryTest(TestCase):

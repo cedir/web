@@ -16,3 +16,7 @@ ENV/
 informe_ejemplo.xlsx
 test.crt
 privada.csr
+certificados/privada_brunetti.csr
+certificados/certificado_brunetti.crt
+certificados/certificado_cedir.crt
+certificados/privada_cedir.csr

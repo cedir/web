@@ -19,3 +19,5 @@ git+https://github.com/reingart/pyafipws.git
 
 # testing or dev tools (TODO: should go on a different file)
 mock==1.0.1                    # Mocking and patching library for testing
+pylint
+pylint-django==0.11.1
