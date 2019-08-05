@@ -5,7 +5,7 @@ from turno.models import InfoTurno, PeriodoSinAtencion, Turno
 class TurnoAdmin(admin.ModelAdmin):
     search_fields = [u'medico__apellido', u'paciente__apellido', u'fechaTurno']
     list_display = (u'fechaTurno', u'horaInicio', u'paciente', u'medico', u'obraSocial',)
-    ordering = (u'fechaTurno', u'horaInicio', )
+    ordering = (u'-fechaTurno', u'-horaInicio', )
     raw_id_fields = (u'paciente', )
     filter_horizontal = ('practicas',)
 

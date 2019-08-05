@@ -26,7 +26,7 @@ class Estudio(models.Model):
     motivo = models.CharField(u'Motivo', db_column="motivoEstudio", max_length=300, blank=True, default=u'')
     informe = models.TextField(blank=True, default=u'')
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo", blank=True)
-    public_id = models.CharField(max_length=100, db_column="publicID", default=generate_uuid)
+    public_id = models.CharField(max_length=35, db_column="publicID", default=generate_uuid)
 
     medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name=u'medico_actuante')
     obra_social = models.ForeignKey(ObraSocial, db_column="idObraSocial")
