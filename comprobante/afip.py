@@ -10,7 +10,8 @@ from pyafipws.wsaa import WSAA
 from pyafipws.wsfev1 import WSFEv1
 
 from comprobante.models import Comprobante, LineaDeComprobante
-from settings import AFIP_WSAA_URL, AFIP_WSDL_URL
+from settings import AFIP_WSAA_URL, AFIP_WSDL_URL, \
+    CEDIR_CERT_PATH, CEDIR_PV_PATH, CEDIR_CUIT, BRUNETTI_CERT_PATH, BRUNETTI_PV_PATH, BRUNETTI_CUIT
 
 IVA_EXCENTO = 1
 IVA_10_5 = 2
@@ -56,9 +57,33 @@ def requiere_ticket(func):
 
 class Afip(object):
     '''
+    Esta clase redirige a la instancia indicada de _Afip segun si el comprobante
+    es de Cedir o de Brunetti.
+    '''
+    def __init__(self):
+        self.afip_cedir = _Afip(CEDIR_PV_PATH, CEDIR_CERT_PATH, CEDIR_CUIT)
+        self.afip_brunetti = _Afip(BRUNETTI_PV_PATH, BRUNETTI_CERT_PATH, BRUNETTI_CUIT)
+    def emitir_comprobante(self, comprobante_cedir):
+        if comprobante_cedir.responsable == "Cedir":
+            return self.afip_cedir.emitir_comprobante(comprobante_cedir)
+        else:
+            return self.afip_brunetti.emitir_comprobante(comprobante_cedir)
+    def consultar_comprobante(self, comprobante_cedir):
+        if comprobante_cedir.responsable == "Cedir":
+            return self.afip_cedir.consultar_comprobante(comprobante_cedir)
+        else:
+            return self.afip_brunetti.consultar_comprobante(comprobante_cedir)
+    def consultar_proximo_numero(self, responsable, nro_terminal, tipo_comprobante, subtipo):
+        if responsable == "Cedir":
+            return self.afip_cedir.consultar_proximo_numero(nro_terminal, tipo_comprobante, subtipo)
+        else:
+            return self.afip_brunetti.consultar_proximo_numero(nro_terminal, tipo_comprobante, subtipo)
+
+
+class _Afip(object):
+    '''
     Clase que abstrae la emision de comprobantes electronicos en la afip.
     '''
-
     def __init__(self, privada, certificado, cuit):
         # instanciar el componente para factura electrónica mercado interno
         self.webservice = WSFEv1()
@@ -159,7 +184,7 @@ class Afip(object):
             raise AfipErrorRed("Error de red emitiendo el comprobante.")
         if self.webservice.Resultado == "R":
             # Si la AFIP nos rechaza el comprobante, lanzamos excepcion.
-            raise AfipErrorValidacion(self.webservice.ErrMsg)
+            raise AfipErrorValidacion(self.webservice.ErrMsg or self.webservice.Obs)
         if self.webservice.Resultado == "O":
             # Si hay observaciones (en self.webservice.Obs), deberiamos logearlas en la DB.
             pass
@@ -169,12 +194,15 @@ class Afip(object):
         comprobante_cedir.numero = nro
 
     @requiere_ticket
-    def consultar_comprobante(self, codigo_afip_tipo, nro_terminal, cbte_nro):
+    def consultar_comprobante(self, comprobante):
         '''
         Consulta que informacion tiene la AFIP sobre un comprobante nuestro dado su tipo,
         terminal y numero.
         Devuelve un diccionario con todos los datos.
         '''
+        codigo_afip_tipo = comprobante.codigo_afip
+        nro_terminal = comprobante.nro_terminal
+        cbte_nro = comprobante.numero
         self.webservice.CompConsultar(codigo_afip_tipo, nro_terminal, cbte_nro)
         # Todos estos datos se setean en el objeto afip cuando la llamada a ConsultarComprobante es exitosa.
         # Notar que si falla (comprobante invalido, conexion...) queda con valores viejos!
@@ -187,3 +215,11 @@ class Afip(object):
             "CAE": self.webservice.CAE,
             "emision_tipo": self.webservice.EmisionTipo
         }
+
+    @requiere_ticket
+    def consultar_proximo_numero(self, nro_terminal, tipo_comprobante, subtipo):
+        conversion = {
+            'A': {1: 1, 3: 2, 4: 3},
+            'B': {1: 6, 3: 7, 4: 8}
+        }
+        return long(self.webservice.CompUltimoAutorizado(conversion[subtipo][tipo_comprobante.id], nro_terminal) or 0)
