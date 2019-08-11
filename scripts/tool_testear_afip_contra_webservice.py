@@ -23,9 +23,6 @@ import wsgi # Importar esto hace lo de las settings e inicia django
 from comprobante.models import Comprobante, TipoComprobante, Gravado, LineaDeComprobante
 from comprobante.afip import Afip
 
-def numero_comp_valido():
-    #
-    return 99999999
 
 def main():
     # Se necesitan dos instancias porque cedir y brunetti facturan por separado.
@@ -37,13 +34,10 @@ def main():
     numero = afip.consultar_proximo_numero("Cedir", 1, TipoComprobante.objects.get(pk=1), "B")
     
     # Esto es para poder usar la proxima id que pide afip y es un motivo fuerte para NO CORRER ESTE SCRIPT EN PRODUCCION!!
-    try:
-        Comprobante.objects.filter(nro_terminal=1, tipo_comprobante=TipoComprobante.objects.get(pk=1), numero=numero).delete()
-    except Comprobante.DoesNotExist:
-        pass
+    Comprobante.objects.filter(nro_terminal=1, tipo_comprobante=TipoComprobante.objects.get(pk=1), numero=numero).delete()
     
     # Creamos un comprobante
-    comprobante = Comprobante.objects.create(**{
+    comprobante = Comprobante(**{
         "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
         "domicilio_cliente": " - Springfield - (CP:2000)",
         "nro_cuit": "11",
@@ -61,15 +55,15 @@ def main():
         "fecha_recepcion": "2012-07-07",
         "tipo_comprobante": TipoComprobante.objects.get(pk=1),
     })
-    linea = LineaDeComprobante.objects.create(**{
+    lineas = [LineaDeComprobante(**{
         "comprobante": comprobante,
-        "importe_neto": "2800.00",
-        "sub_total": "2800.00",
-        "iva": "0",
-    })
+        "importe_neto": 2800.00,
+        "sub_total": 2800.00,
+        "iva": 0,
+    })]
 
     # Emitimos el comprobante en la AFIP.
-    afip.emitir_comprobante(comprobante)
+    afip.emitir_comprobante(comprobante, lineas)
 
     # Revisamos que los datos esten bien.
     print(comprobante.cae)
@@ -77,6 +71,11 @@ def main():
 
     # Le pedimos el comprobante a la AFIP y verificamos que los datos coincidan.
     print(afip.consultar_comprobante(comprobante))
+
+    # Si la AFIP emitio bien, ahora se guardan
+    comprobante.save()
+    lineas[0].save()
+
 
 if __name__ == "__main__":
     main()

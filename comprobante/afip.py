@@ -2,14 +2,14 @@
 '''
 Modulo encargado de la comunicacion con el Webservice de la AFIP.
 '''
-import datetime
+from datetime import datetime
 from xml.parsers.expat import ExpatError
 from httplib2 import ServerNotFoundError
 
 from pyafipws.wsaa import WSAA
 from pyafipws.wsfev1 import WSFEv1
 
-from comprobante.models import Comprobante, LineaDeComprobante
+from comprobante.models import Comprobante
 from settings import AFIP_WSAA_URL, AFIP_WSDL_URL, \
     CEDIR_CERT_PATH, CEDIR_PV_PATH, CEDIR_CUIT, BRUNETTI_CERT_PATH, BRUNETTI_PV_PATH, BRUNETTI_CUIT
 
@@ -63,11 +63,11 @@ class Afip(object):
     def __init__(self):
         self.afip_cedir = _Afip(CEDIR_PV_PATH, CEDIR_CERT_PATH, CEDIR_CUIT)
         self.afip_brunetti = _Afip(BRUNETTI_PV_PATH, BRUNETTI_CERT_PATH, BRUNETTI_CUIT)
-    def emitir_comprobante(self, comprobante_cedir):
+    def emitir_comprobante(self, comprobante_cedir, lineas):
         if comprobante_cedir.responsable == "Cedir":
-            return self.afip_cedir.emitir_comprobante(comprobante_cedir)
+            return self.afip_cedir.emitir_comprobante(comprobante_cedir, lineas)
         else:
-            return self.afip_brunetti.emitir_comprobante(comprobante_cedir)
+            return self.afip_brunetti.emitir_comprobante(comprobante_cedir, lineas)
     def consultar_comprobante(self, comprobante_cedir):
         if comprobante_cedir.responsable == "Cedir":
             return self.afip_cedir.consultar_comprobante(comprobante_cedir)
@@ -123,19 +123,17 @@ class _Afip(object):
         self.webservice.SetTicketAcceso(self.ticket_autenticacion)
 
     @requiere_ticket
-    def emitir_comprobante(self, comprobante_cedir):
+    def emitir_comprobante(self, comprobante_cedir, lineas):
         '''
-        Toma un comprobante nuestro, lo traduce al formato que usa la AFIP en su webservice
+        Toma un comprobante nuestro y una lista de lineas, lo traduce al formato que usa la AFIP en su webservice
         y trata de emitirlo.
         En caso de exito, setea las propiedades faltantes del comprobante que son dependientes
         de la AFIP.
         En caso de error, levanta una excepcion.
         '''
-        lineas = LineaDeComprobante.objects.filter(
-            comprobante=comprobante_cedir.id)
         nro = long(self.webservice.CompUltimoAutorizado(
             comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal) or 0) + 1
-        fecha = datetime.datetime.now().strftime("%Y%m%d")
+        fecha = datetime.now().strftime("%Y%m%d")
         imp_iva = sum([l.iva for l in lineas])
         if comprobante_cedir.gravado.id == IVA_EXCENTO:
             imp_neto = "0.00"
@@ -190,7 +188,7 @@ class _Afip(object):
             pass
 
         comprobante_cedir.cae = self.webservice.CAE
-        comprobante_cedir.vencimiento_cae = self.webservice.Vencimiento
+        comprobante_cedir.vencimiento_cae = datetime.strptime(self.webservice.Vencimiento,'%Y%m%d')
         comprobante_cedir.numero = nro
 
     @requiere_ticket
