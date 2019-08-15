@@ -10,7 +10,7 @@ from common.utils import add_log_entry
 from estudio.models import Estudio
 from estudio.models import Medicacion
 from medicamento.models import Medicamento
-from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
+from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer, EstudioRetrieveSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from imprimir import generar_informe
 
@@ -136,6 +136,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
     serializers = {
         'create': EstudioCreateUpdateSerializer,
         'update': EstudioCreateUpdateSerializer,
+        'retrieve': EstudioRetrieveSerializer,
     }
 
     def get_serializer_class(self):
