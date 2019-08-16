@@ -1,23 +1,22 @@
 # Django settings for apps project.
 
 import os
-import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-#PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_ROOT = '/app/path'
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+ULI_URL = 'https://localhost:3000'
 
 # Afip
 AFIP_WSDL_URL = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL"
 AFIP_WSAA_URL = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl"
-CEDIR_CERT_PATH= "cedir.crt"
-CEDIR_PV_PATH= "certificados/cedir.csr"
-CEDIR_CUIT= 
-BRUNETTI_CERT_PATH= "certificados/brunetti.crt"
-BRUNETTI_PV_PATH= "certificados/brunetti.csr"
-BRUNETTI_CUIT=
+CEDIR_CERT_PATH = "certificados/1.crt"
+CEDIR_PV_PATH = "certificados/1.csr"
+CEDIR_CUIT = 1
+BRUNETTI_CERT_PATH = "certificados/2.crt"
+BRUNETTI_PV_PATH = "certificados/2.csr"
+BRUNETTI_CUIT = 2
 
-# Debug
 DEBUG = True
 DEFAULT_CHARSET = 'utf8'
 
@@ -31,21 +30,22 @@ LOGIN_URL = '/usuario/entrar/'
 
 DATABASES = {
     'default': {
-    'ENGINE':'django.db.backends.postgresql_psycopg2',           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-    'NAME':'',             # Or path to database file if using sqlite3.
-    'USER':'',             # Not used with sqlite3.
-    'PASSWORD':'******',         # Not used with sqlite3.
-    'HOST':'localhost',           # Set to empty string for localhost. Not used with sqlite3.
-    'PORT':'5432',             # Set to empty string for default. Not used with sqlite3.
+        'ENGINE':'django.db.backends.postgresql_psycopg2',           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME':'a',             # Or path to database file if using sqlite3.
+        'USER':'a',             # Not used with sqlite3.
+        'PASSWORD':'a',         # Not used with sqlite3.
+        'HOST':'a',           # Set to empty string for localhost. Not used with sqlite3.
+        'PORT':'5432',             # Set to empty string for default. Not used with sqlite3.
     }
 }
-
-if 'test' in sys.argv or 'test_coverage' in sys.argv:  # Covers regular testing and django-coverage
-    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
+DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
 FIXTURE_DIRS = (
-    os.path.join(PROJECT_ROOT, "fixtures"),
+    os.path.join(os.getcwd(), "fixtures"),
 )
+
+print(PROJECT_ROOT)
+print(FIXTURE_DIRS)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -101,7 +101,6 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     PROJECT_ROOT + u'/static/templates',
-    u'/usr/local/lib/python2.7/dist-packages/django/contrib/admin/static',
     #Alias /css /var/www/cedir/static/templates/css
     PROJECT_ROOT + u'/static', # media_files
     #Alias /images /var/www/cedir/static/templates/images
@@ -145,25 +144,25 @@ WSGI_APPLICATION = 'wsgi.application'
 
 
 TEMPLATES = [
-     {
-         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-         'DIRS': [PROJECT_ROOT + u'/static/templates', ],
-         'APP_DIRS': True,
-         'OPTIONS': {
-             'context_processors': [
-                 'django.template.context_processors.debug',
-                 'django.template.context_processors.request',
-                 'django.contrib.auth.context_processors.auth',
-                 'django.contrib.messages.context_processors.messages',
-             ],
-             #'loaders': [
-             #    'django.template.loaders.eggs.Loader',
-             #    'django.template.loaders.filesystem.Loader',
-             #    'django.template.loaders.app_directories.Loader',
-             #]
-         },
-     },
- ]
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.getcwd() + u'/static/templates', ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            #'loaders': [
+            #    'django.template.loaders.eggs.Loader',
+            #    'django.template.loaders.filesystem.Loader',
+            #    'django.template.loaders.app_directories.Loader',
+            #]
+        },
+    },
+]
 
 INSTALLED_APPS = [
     'django.contrib.auth',
@@ -234,7 +233,7 @@ FORMAT_DATE = u'%d/%m/%Y'
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
-LOG_PATH = '/var/log/www.cedirsalud.com.ar/'
+LOG_PATH = 'logs/'
 
 LOGGING = {
     'version': 1,
@@ -244,8 +243,8 @@ LOGGING = {
             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
         'logging': {
-                    'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
-                },
+            'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
+        },
         'simple': {
             'format': '%(levelname)s %(message)s'
         },
@@ -292,5 +291,3 @@ EMAIL_NOTIFICATION_ACCOUNTS = [u'email@address.com']
 
 CAPTCHA_PUBLIC = '6LckIhUUAAAAAAsZYnp18fbeUoOPy6X5NOKFAVzf'
 CAPTCHA_SECRET = ''
-
-ULI_URL = 'http://'
