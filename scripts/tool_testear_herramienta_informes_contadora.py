@@ -12,12 +12,13 @@
 import xlrd
 # Correccion del path para importar desde el directorio padre
 import os,sys,inspect
+from datetime import datetime
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir)
 import wsgi # Importar esto hace lo de las settings e inicia django
 
-from comprobante.models import Comprobante
+from comprobante.models import Comprobante, TipoComprobante
 from comprobante.calculador_informe import calculador_informe_factory
 from presentacion.models import Presentacion
 from estudio.models import Estudio
@@ -29,7 +30,10 @@ def parsear_informe():
     Busca el informe de ejemplo y lo parsea en un diccionario de numero: linea
     """
     # Give the location of the file
-    loc = ("informe_ejemplo.xlsx")
+    if len(sys.argv) > 1:
+        loc = sys.argv[1]
+    else:
+        loc = "informe_ejemplo.xlsx"
 
     # To open Workbook
     wb = xlrd.open_workbook(loc)
@@ -42,7 +46,7 @@ def parsear_informe():
             "estado": row[0].value,
             "tipo": row[1].value,
             "numero": row[2].value,
-            "fecha": row[3].value,
+            "fecha": datetime(*xlrd.xldate_as_tuple(row[3].value, wb.datemode)),
             "obra_social": row[4].value,
             "monto": row[5].value,
             "iva": row[6].value,
@@ -54,7 +58,7 @@ def parsear_informe():
             "retencion_anestesistas": row[13].value,
         }
         for row in sheet.get_rows()
-        if row[0].value != ""
+        if row[0].value != "" and "Liquidacion" not in row[1].value
     }
 
 
@@ -62,8 +66,17 @@ def buscar_comprobantes(informe_ejemplo):
     """
     Busca todos lso comprobantes correspondientes al informe de ejemplo.
     """
-    numeros = [inf["numero"] for inf in informe_ejemplo.values()]
-    return Comprobante.objects.filter(numero__in=numeros, fecha_emision__month__in=[1], fecha_emision__year__in=[2019])
+    filtros = [{
+            # En realidad nos faltaria el numero de terminal peor no aparece en el informe de mariana. Filtramos lo mejor posible.
+            "numero": inf["numero"],
+            "tipo_comprobante": TipoComprobante.objects.get(pk=1) if "Factura" in inf["tipo"] \
+                    else TipoComprobante.objects.get(pk=3) if "Nota De Debito" in inf["tipo"] \
+                    else TipoComprobante.objects.get(pk=4),
+            "sub_tipo": "A" if "A" in inf["tipo"] else "B",
+            "fecha_emision": inf["fecha"],
+            "responsable": "Cedir" if  "CEDIR" in inf["tipo"] else "Brunetti"
+        } for inf in informe_ejemplo.values()]
+    return [Comprobante.objects.get(**f) for f in filtros]
 
 
 def printear_estudios(comp, linea):
@@ -73,7 +86,7 @@ def printear_estudios(comp, linea):
     except:
         print("    No hay presentacion")
         return
-    
+
     header_informe = ["hon_med", "ret_cedir", "uso_mats", "tot_med", "mat_esp", "hon_anes","ret_anes", "sala_recu", "ret_impos"]
     informe = [linea.honorarios_medicos, linea.retencion_cedir, linea.uso_de_materiales,
                linea.total_medicamentos, linea.total_material_especifico,
@@ -87,7 +100,7 @@ def printear_estudios(comp, linea):
     row_format ="{:>12}" * len(header_estudio)
     print(row_format.format(*header_estudio))
     for est in estudios:
-        
+
         row = [est.practica.id, est.medico.id, est.medico_solicitante.id, est.obra_social.id, est.importe_estudio, est.es_pago_contra_factura, est.diferencia_paciente]
         print(row_format.format(*row))
 
@@ -95,6 +108,8 @@ def printear_estudios(comp, linea):
 def main():
     lineas_ejemplo = parsear_informe()
     comprobantes_del_informe = buscar_comprobantes(lineas_ejemplo)
+    print(len(lineas_ejemplo))
+    print(len(comprobantes_del_informe))
     assert(len(lineas_ejemplo) == len(comprobantes_del_informe))
 
     for c in comprobantes_del_informe:
