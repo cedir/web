@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
+from rest_framework.decorators import detail_route
 from django.contrib.admin.models import ADDITION, CHANGE
 
 from common.drf.views import StandardResultsSetPagination
@@ -149,6 +150,12 @@ class EstudioViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         estudio = serializer.save()
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA')
+
+    @detail_route(methods=['patch'])
+    def update_importes_estudios_y_pago_contra_factura(self, request, pk=None):
+        #TODO: ver si esta logica no deberia ir en el update normal del estudio
+        # y asi solo tener un boton guardar.
+        estudio = Estudio.objects.get(pk=pk)
 
 
 class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
