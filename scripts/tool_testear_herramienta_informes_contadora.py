@@ -125,35 +125,42 @@ def main():
         # pero podria no ser el caso
         ejemplo = lineas_ejemplo[c.numero]
         print("\nComprobante {}".format(c.id))
-        printear_estudios(c, nuestro)
-        if int(nuestro.total_facturado) != int(ejemplo["total_facturado"]):
-            print("    Total Facturado - calculado: {0}, ejemplo: {1}".format(
-                nuestro.total_facturado, ejemplo["total_facturado"]))
-        if int(nuestro.iva) != int(ejemplo["iva"]):
-            print(
-                "    IVA - calculado: {}, ejemplo: {}" .format(nuestro.iva, ejemplo["iva"]))
-        if int(nuestro.honorarios_medicos) != int(ejemplo["honorarios_medicos"]):
-            print("    Honorarios Medicos - calculado: {}, ejemplo: {}".format(
-                nuestro.honorarios_medicos, ejemplo["honorarios_medicos"]))
-        if int(nuestro.honorarios_anestesia) != int(ejemplo["honorarios_anestesistas"]):
-            print("    Honorarios Anestesistas - calculado: {}, ejemplo: {}".format(
-                nuestro.honorarios_anestesia, ejemplo["honorarios_anestesistas"]))
-        if int(nuestro.total_medicamentos) != int(ejemplo["medicacion"]):
-            print("    Total Medicamentos - calculado: {}, ejemplo: {}".format(
-                nuestro.total_medicamentos, ejemplo["medicacion"]))
+        # printear_estudios(c, nuestro)
+        # if int(nuestro.total_facturado) != int(ejemplo["total_facturado"]):
+        #     print("    Total Facturado - calculado: {0}, ejemplo: {1}".format(
+        #         nuestro.total_facturado, ejemplo["total_facturado"]))
+        # if int(nuestro.iva) != int(ejemplo["iva"]):
+        #     print(
+        #         "    IVA - calculado: {}, ejemplo: {}" .format(nuestro.iva, ejemplo["iva"]))
         otros = nuestro.retencion_impositiva + nuestro.retencion_cedir + \
             nuestro.sala_recuperacion + \
             nuestro.total_material_especifico + nuestro.uso_de_materiales  + nuestro.honorarios_solicitantes
-        if int(otros) != int(ejemplo["otros"]):
-            print(
-                "    Otros- calculado: {}, ejemplo: {}".format(otros, ejemplo["otros"]))
+        suma = int(nuestro.honorarios_anestesia + nuestro.honorarios_medicos + nuestro.total_medicamentos  + nuestro.iva + nuestro.retencion_anestesia + otros)
+        if int(nuestro.total_facturado) != suma:
+            printear_estudios(c, nuestro)
+            print("    Total Facturado - calculado: {0}, suma: {1}".format(
+                nuestro.total_facturado, suma))
+            if int(nuestro.honorarios_medicos) != int(ejemplo["honorarios_medicos"]):
+                print("    Honorarios Medicos - calculado: {}, ejemplo: {}".format(
+                    nuestro.honorarios_medicos, ejemplo["honorarios_medicos"]))
+            if int(nuestro.honorarios_anestesia) != int(ejemplo["honorarios_anestesistas"]):
+                print("    Honorarios Anestesistas - calculado: {}, ejemplo: {}".format(
+                    nuestro.honorarios_anestesia, ejemplo["honorarios_anestesistas"]))
+            if int(nuestro.total_medicamentos) != int(ejemplo["medicacion"]):
+                print("    Total Medicamentos - calculado: {}, ejemplo: {}".format(
+                    nuestro.total_medicamentos, ejemplo["medicacion"]))
+            if int(otros) != int(ejemplo["otros"]):
+                print(
+                    "    Otros- calculado: {}, ejemplo: {}".format(otros, ejemplo["otros"]))
+                print("        ret_imp: {}".format(nuestro.retencion_impositiva))
+                print("        ret_cedir: {}".format(nuestro.retencion_cedir))
+                print("        sala_rec: {}".format(nuestro.sala_recuperacion))
+                print("        mat_esp: {}".format(nuestro.total_material_especifico))
+                print("        uso_mat: {}".format(nuestro.uso_de_materiales))
+                print("        hon_sol: {}".format(nuestro.honorarios_solicitantes))
             # if int(nuestro.total_medicamentos) != int(ejemplo["medicacion"]):
             #     print("    Total Medicamentos - calculado: {}, ejemplo: {}".format(
             #         nuestro.total_medicamentos, ejemplo["medicacion"]))
-        suma = int(nuestro.honorarios_anestesia + nuestro.honorarios_medicos + nuestro.total_medicamentos  + nuestro.iva + nuestro.retencion_anestesia + otros)
-        if int(nuestro.total_facturado) != suma:
-            print("    Total Facturado - calculado: {0}, suma: {1}".format(
-                nuestro.total_facturado, suma))
 
 if __name__ == "__main__":
     main()

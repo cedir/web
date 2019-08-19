@@ -24,10 +24,6 @@ class CalculadorInforme(object):
         raise NotImplementedError
 
     @abstractproperty
-    def total_cobrado(self):
-        raise NotImplementedError
-
-    @abstractproperty
     def neto(self):
         raise NotImplementedError
 
@@ -62,7 +58,7 @@ class CalculadorInforme(object):
     @abstractproperty
     def honorarios_medicos(self):
         raise NotImplementedError
-    
+
     @abstractproperty
     def honorarios_solicitantes(self):
         raise NotImplementedError
@@ -84,7 +80,7 @@ class CalculadorInformeFactura(CalculadorInforme):
         self.comprobante = comprobante
         self.presentacion = self.comprobante.presentacion.first()
         self.lineas = LineaDeComprobante.objects.filter(comprobante=self.comprobante)
-        if(self.presentacion is not None):
+        if self.presentacion is not None:
             self.estudios = self.presentacion.estudios.all()
             self.calculadores_honorarios = [CalculadorHonorariosInformeContadora(estudio) for estudio in self.estudios]
 
@@ -93,12 +89,8 @@ class CalculadorInformeFactura(CalculadorInforme):
         return self.comprobante.total_facturado
 
     @property
-    def total_cobrado(self):
-        return self.comprobante.total_cobrado
-
-    @property
     def neto(self):
-        return sum([l.importe_neto for l in self.lineas]) 
+        return sum([l.importe_neto for l in self.lineas])
 
     @property
     def iva(self):
@@ -121,7 +113,7 @@ class CalculadorInformeFactura(CalculadorInforme):
         if not self.presentacion:
             return Decimal("0.00")
         return sum([calculador.actuante for calculador in self.calculadores_honorarios])
-    
+
     @property
     def honorarios_solicitantes(self):
         if not self.presentacion:
@@ -214,21 +206,17 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
         return Decimal("-1") * self.calculador_aux.total_facturado
 
     @property
-    def total_cobrado(self):
-        return Decimal("-1") * self.calculador_aux.total_cobrado
-
-    @property
     def neto(self):
         return Decimal("-1") * self.calculador_aux.neto
 
     @property
     def iva(self):
         return Decimal("-1") * self.calculador_aux.iva
-        
+
     @property
     def honorarios_medicos(self):
         return Decimal("-1") * self.calculador_aux.honorarios_medicos
-        
+
     @property
     def honorarios_solicitantes(self):
         return Decimal("-1") * self.calculador_aux.honorarios_solicitantes

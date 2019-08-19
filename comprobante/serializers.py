@@ -51,7 +51,8 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     total_material_especifico = serializers.SerializerMethodField()
     neto = serializers.SerializerMethodField()
     iva = serializers.SerializerMethodField()
-    
+    total_facturado = serializers.SerializerMethodField()
+
     class Meta:
         model = Comprobante
         fields = ('id',
@@ -67,7 +68,6 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'iva',
                   'gravado',
                   'total_facturado',
-                  'total_cobrado',
                   'honorarios_medicos',
                   'honorarios_solicitantes',
                   'uso_de_materiales',
@@ -78,9 +78,6 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
                   'retencion_anestesia',
                   'total_medicamentos',
                   'total_material_especifico')
-
-    def get_total_cobrado(self, comprobante):
-        return Decimal(self.context["calculador"].total_cobrado).quantize(Decimal('.01'), ROUND_UP)
 
     def get_total_facturado(self, comprobante):
         return Decimal(self.context["calculador"].total_facturado).quantize(Decimal('.01'), ROUND_UP)
