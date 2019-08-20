@@ -66,6 +66,9 @@ def buscar_comprobantes(informe_ejemplo):
     """
     Busca todos lso comprobantes correspondientes al informe de ejemplo.
     """
+    if len(sys.argv) > 2:
+        id_comprobante = sys.argv[2]
+        return [Comprobante.objects.get(pk=id_comprobante)]
     filtros = [{
             # En realidad nos faltaria el numero de terminal peor no aparece en el informe de mariana. Filtramos lo mejor posible.
             "numero": inf["numero"],
@@ -110,7 +113,7 @@ def main():
     comprobantes_del_informe = buscar_comprobantes(lineas_ejemplo)
     print(len(lineas_ejemplo))
     print(len(comprobantes_del_informe))
-    assert(len(lineas_ejemplo) == len(comprobantes_del_informe))
+    assert(len(lineas_ejemplo) == len(comprobantes_del_informe) or len(sys.argv) > 2)
 
     for c in comprobantes_del_informe:
         # print("Comprobante {}".format(c.id))
