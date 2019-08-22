@@ -1,5 +1,5 @@
-from django.db import models
 from datetime import timedelta
+from django.db import models
 
 
 class TipoComprobante(models.Model):
@@ -16,7 +16,7 @@ class Gravado(models.Model):
     descripcion = models.CharField(max_length=128, db_column=u'descripcionGravado')
     porcentaje = models.DecimalField(db_column=u'porcentajeGravado', max_digits=4, decimal_places=2)
 
-    class Meta:
+    class Meta(object):
         db_table = 'tblGravado'
 
 
@@ -94,7 +94,7 @@ class Comprobante(models.Model):
     def fecha_vencimiento(self):
         return self.fecha_emision + timedelta(days=30)
 
-    class Meta:
+    class Meta(object):
         permissions = (
             ("informe_ventas", u"Permite generar el informe de ventas."),
         )
@@ -108,5 +108,5 @@ class LineaDeComprobante(models.Model):
     iva = models.DecimalField(db_column=u'importeIVA', max_digits=16, decimal_places=2)
     importe_neto = models.DecimalField(db_column=u'importeNeto', max_digits=16, decimal_places=2)
 
-    class Meta:
+    class Meta(object):
         db_table = 'tblComprobanteLineas'

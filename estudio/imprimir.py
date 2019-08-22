@@ -51,7 +51,7 @@ def _datos_estudio(elements, estudio):
     if edad:
         paciente = u'<b>Paciente ....................:</b> {} ({} años)'.format(estudio.paciente, edad)
     else:
-        paciente = u'<b>Paciente ....................:</b> {}'.format(estudio.paciente, edad)
+        paciente = u'<b>Paciente ....................:</b> {}'.format(estudio.paciente)
 
     elements.append(Paragraph(paciente, font_std))
 

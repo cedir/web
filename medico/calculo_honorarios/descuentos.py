@@ -80,7 +80,7 @@ class DescuentoColangios(Descuento):
 class DescuentoStent(Descuento):
     def aplicar(self, estudio, importe):
         if estudio.practica.id in STENT:
-            return Decimal("500.00")
+            return Decimal("900.00")
         return Decimal("0.00")
 
 
@@ -102,4 +102,4 @@ class DescuentoPorPolipectomia(Descuento):
         if estudio.obra_social.id in (OS_UNR, ACA_SALUD, GALENO, OSPAC):
             return Decimal("0.00")
 
-        return Decimal("1210.00")
+        return Decimal("500.00")

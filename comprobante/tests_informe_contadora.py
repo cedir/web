@@ -18,7 +18,6 @@ class TestHerramientaInformeComprobantesContadora(TestCase):
     def test_informe_propiedades_definidas(self):
         for linea in self.lineas_informe:
             linea.total_facturado
-            linea.total_cobrado
             linea.neto
             linea.iva
             linea.honorarios_anestesia

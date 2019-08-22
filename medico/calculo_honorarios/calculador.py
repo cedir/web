@@ -25,10 +25,7 @@ class CalculadorHonorarios(object):
         raise NotImplementedError
 
     def porcentaje_GA(self):
-        # TODO: Esto es un logica comun con CalculadorInforme y hay que moverlo a.... Obra Social?
-        if self.estudio.obra_social.se_presenta_por_AMR == 1 or self.estudio.obra_social.se_presenta_por_AMR == "1":
-            return Decimal("32.00")
-        return Decimal("25.00")
+        return self.estudio.retencion_impositiva * Decimal('100.00')
 
     def calcular(self):
         '''
@@ -64,16 +61,8 @@ class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
             DescuentoColangios(),
             DescuentoStent(),
             DescuentoRadiofrecuencia())
-        self._uso_de_materiales = _descuentos.aplicar(self.estudio, self.get_importe()) 
+        self._uso_de_materiales = _descuentos.aplicar(self.estudio, self.get_importe())
         return _descuentos
-
-    # @property
-    # def total(self):
-    #     porcentajes = Porcentajes(self.estudio)
-    #     # total = Decimal(self.total_honorarios) * (porcentajes.actuante + porcentajes.solicitante) / Decimal('100.00')
-    #     total = Decimal(self.total_honorarios) * (porcentajes.actuante) / Decimal('100.00')
-    #     return total
-
 
     @property
     def actuante(self):
