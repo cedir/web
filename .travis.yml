@@ -10,4 +10,4 @@ install:
     - cp settings-travis.py settings.py
 script:
     - python manage.py test
-    - pylint --errors-only comprobante/afip.py
+    - pylint comprobante/ medico/ estudio/

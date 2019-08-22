@@ -1,25 +1,23 @@
-from itertools import groupby
+# pylint: disable=unused-argument
 from decimal import Decimal, ROUND_UP
 from rest_framework import serializers
-
-from anestesista.calculador_honorarios.calculador_honorarios import CalculadorHonorariosAnestesista
 
 from .models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado
 
 class TipoComprobanteSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = TipoComprobante
         fields = ('id', 'nombre')
 
 
 class GravadoSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = Gravado
         fields = ('id', 'descripcion', 'porcentaje')
 
 
 class LineaDeComprobanteSerializer(serializers.ModelSerializer):
-    class Meta:
+    class Meta(object):
         model = LineaDeComprobante
         fields = ('id', 'concepto', 'sub_total', 'iva', 'importe_neto')
 
@@ -29,7 +27,7 @@ class ComprobanteSerializer(serializers.ModelSerializer):
     gravado = GravadoSerializer()
     lineas = LineaDeComprobanteSerializer(many=True)
 
-    class Meta:
+    class Meta(object):
         model = Comprobante
         fields = ('id', 'nombre_cliente', 'sub_tipo', 'numero', 'nro_terminal', 'total_facturado', 'total_cobrado',
                   'fecha_emision', 'tipo_comprobante', 'gravado', 'lineas')
@@ -53,7 +51,7 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     iva = serializers.SerializerMethodField()
     total_facturado = serializers.SerializerMethodField()
 
-    class Meta:
+    class Meta(object):
         model = Comprobante
         fields = ('id',
                   'numero',
