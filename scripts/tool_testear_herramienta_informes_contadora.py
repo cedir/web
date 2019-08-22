@@ -1,3 +1,4 @@
+# pylint: disable=unused-import,wrong-import-position,invalid-name,wrong-import-order
 # Este script sirve para testear la herramienta de informe de comprobantes para la contadora
 # contra un ejemplo de informe real en excel de Mariana.
 # Hace lo siguiente:
@@ -6,24 +7,24 @@
 #       Crea un informe con la herramienta
 #       Compara campo por campo e imprime en consola los que tengan una diferencia
 #
-#
-# Para usarlo, copiarlo al directorio raiz de web y ejecutarlo como python testear_herramienta_informes_contadora.py
 
-import xlrd
 # Correccion del path para importar desde el directorio padre
-import os,sys,inspect
+from __future__ import print_function
+import os
+import sys
+import  inspect
 from datetime import datetime
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
-sys.path.insert(0,parentdir)
+sys.path.insert(0, parentdir)
 import wsgi # Importar esto hace lo de las settings e inicia django
+from django.core.exceptions import ObjectDoesNotExist
+import xlrd
 
 from comprobante.models import Comprobante, TipoComprobante
 from comprobante.calculador_informe import calculador_informe_factory
 from presentacion.models import Presentacion
 from estudio.models import Estudio
-
-
 
 def parsear_informe():
     """
@@ -70,27 +71,24 @@ def buscar_comprobantes(informe_ejemplo):
         id_comprobante = sys.argv[2]
         return [Comprobante.objects.get(pk=id_comprobante)]
     filtros = [{
-            # En realidad nos faltaria el numero de terminal peor no aparece en el informe de mariana. Filtramos lo mejor posible.
-            "numero": inf["numero"],
-            "tipo_comprobante": TipoComprobante.objects.get(pk=1) if "Factura" in inf["tipo"] \
-                    else TipoComprobante.objects.get(pk=3) if "Nota De Debito" in inf["tipo"] \
-                    else TipoComprobante.objects.get(pk=4),
-            "sub_tipo": "A" if "A" in inf["tipo"] else "B",
-            "fecha_emision": inf["fecha"],
-            "responsable": "Cedir" if  "CEDIR" in inf["tipo"] else "Brunetti"
-        } for inf in informe_ejemplo.values()]
+        # En realidad nos faltaria el numero de terminal peor no aparece en el informe de mariana. Filtramos lo mejor posible.
+        "numero": inf["numero"],
+        "tipo_comprobante": TipoComprobante.objects.get(pk=1) if "Factura" in inf["tipo"] \
+        else TipoComprobante.objects.get(pk=3) if "Nota De Debito" in inf["tipo"] \
+        else TipoComprobante.objects.get(pk=4),
+        "sub_tipo": "A" if "A" in inf["tipo"] else "B",
+        "fecha_emision": inf["fecha"],
+        "responsable": "Cedir" if "CEDIR" in inf["tipo"] else "Brunetti"
+    } for inf in informe_ejemplo.values()]
     return [Comprobante.objects.get(**f) for f in filtros]
 
 
 def printear_estudios(comp, linea):
-    try:
-        presen = Presentacion.objects.get(comprobante__id=comp.id)
-        estudios = Estudio.objects.filter(presentacion__id=presen.id)
-    except:
-        print("    No hay presentacion")
-        return
+    presen = Presentacion.objects.get(comprobante__id=comp.id)
+    estudios = Estudio.objects.filter(presentacion__id=presen.id)
 
-    header_informe = ["hon_med", "ret_cedir", "uso_mats", "tot_med", "mat_esp", "hon_anes","ret_anes", "sala_recu", "ret_impos"]
+    header_informe = ["hon_med", "ret_cedir", "uso_mats", "tot_med",
+                      "mat_esp", "hon_anes", "ret_anes", "sala_recu", "ret_impos"]
     informe = [linea.honorarios_medicos, linea.retencion_cedir, linea.uso_de_materiales,
                linea.total_medicamentos, linea.total_material_especifico,
                linea.honorarios_anestesia, linea.retencion_anestesia,
@@ -100,11 +98,12 @@ def printear_estudios(comp, linea):
     print(informe_format.format(*informe) + "\n")
 
     header_estudio = ["practica", "act", "sol", "OS", "importe", "PcF", "dPac"]
-    row_format ="{:>12}" * len(header_estudio)
+    row_format = "{:>12}" * len(header_estudio)
     print(row_format.format(*header_estudio))
     for est in estudios:
 
-        row = [est.practica.id, est.medico.id, est.medico_solicitante.id, est.obra_social.id, est.importe_estudio, est.es_pago_contra_factura, est.diferencia_paciente]
+        row = [est.practica.id, est.medico.id, est.medico_solicitante.id, est.obra_social.id,
+               est.importe_estudio, est.es_pago_contra_factura, est.diferencia_paciente]
         print(row_format.format(*row))
 
 
@@ -113,32 +112,26 @@ def main():
     comprobantes_del_informe = buscar_comprobantes(lineas_ejemplo)
     print(len(lineas_ejemplo))
     print(len(comprobantes_del_informe))
-    assert(len(lineas_ejemplo) == len(comprobantes_del_informe) or len(sys.argv) > 2)
+    assert(len(lineas_ejemplo) == len(
+        comprobantes_del_informe) or len(sys.argv) > 2)
 
     for c in comprobantes_del_informe:
         # print("Comprobante {}".format(c.id))
         # printear_estudios(c)
         try:
-            presen = Presentacion.objects.get(comprobante__id=c.id)
-        except:
+            Presentacion.objects.get(comprobante__id=c.id)
+        except ObjectDoesNotExist:
             continue
 
         nuestro = calculador_informe_factory(c)
-        # esto en particular lo podemos hacer porque no se chocan las numeros en este mes
-        # pero podria no ser el caso
         ejemplo = lineas_ejemplo[c.numero]
         print("\nComprobante {}".format(c.id))
-        # printear_estudios(c, nuestro)
-        # if int(nuestro.total_facturado) != int(ejemplo["total_facturado"]):
-        #     print("    Total Facturado - calculado: {0}, ejemplo: {1}".format(
-        #         nuestro.total_facturado, ejemplo["total_facturado"]))
-        # if int(nuestro.iva) != int(ejemplo["iva"]):
-        #     print(
-        #         "    IVA - calculado: {}, ejemplo: {}" .format(nuestro.iva, ejemplo["iva"]))
         otros = nuestro.retencion_impositiva + nuestro.retencion_cedir + \
             nuestro.sala_recuperacion + \
-            nuestro.total_material_especifico + nuestro.uso_de_materiales  + nuestro.honorarios_solicitantes
-        suma = int(nuestro.honorarios_anestesia + nuestro.honorarios_medicos + nuestro.total_medicamentos  + nuestro.iva + nuestro.retencion_anestesia + otros)
+            nuestro.total_material_especifico + \
+            nuestro.uso_de_materiales + nuestro.honorarios_solicitantes
+        suma = int(nuestro.honorarios_anestesia + nuestro.honorarios_medicos +
+                   nuestro.total_medicamentos + nuestro.iva + nuestro.retencion_anestesia + otros)
         if int(nuestro.total_facturado) != suma:
             printear_estudios(c, nuestro)
             print("    Total Facturado - calculado: {0}, suma: {1}".format(
@@ -155,15 +148,19 @@ def main():
             if int(otros) != int(ejemplo["otros"]):
                 print(
                     "    Otros- calculado: {}, ejemplo: {}".format(otros, ejemplo["otros"]))
-                print("        ret_imp: {}".format(nuestro.retencion_impositiva))
+                print("        ret_imp: {}".format(
+                    nuestro.retencion_impositiva))
                 print("        ret_cedir: {}".format(nuestro.retencion_cedir))
                 print("        sala_rec: {}".format(nuestro.sala_recuperacion))
-                print("        mat_esp: {}".format(nuestro.total_material_especifico))
+                print("        mat_esp: {}".format(
+                    nuestro.total_material_especifico))
                 print("        uso_mat: {}".format(nuestro.uso_de_materiales))
-                print("        hon_sol: {}".format(nuestro.honorarios_solicitantes))
+                print("        hon_sol: {}".format(
+                    nuestro.honorarios_solicitantes))
             # if int(nuestro.total_medicamentos) != int(ejemplo["medicacion"]):
             #     print("    Total Medicamentos - calculado: {}, ejemplo: {}".format(
             #         nuestro.total_medicamentos, ejemplo["medicacion"]))
+
 
 if __name__ == "__main__":
     main()
