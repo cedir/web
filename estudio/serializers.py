@@ -7,7 +7,7 @@ from medico.serializers import MedicoSerializer
 from anestesista.serializers import AnestesistaSerializer
 from practica.serializers import PracticaSerializer
 from medicamento.serializers import MedicamentoSerializer
-from presentacion.serializers import PresentacionSmallSerializer, PresentacionSerializer
+from presentacion.serializers import PresentacionSmallSerializer
 
 
 class EstudioSerializer(serializers.ModelSerializer):
@@ -17,22 +17,21 @@ class EstudioSerializer(serializers.ModelSerializer):
     medico = MedicoSerializer()
     medico_solicitante = MedicoSerializer()
     anestesista = AnestesistaSerializer()
-    presentacion = PresentacionSmallSerializer()
     
     class Meta:
         model = Estudio
         fields = (u'id', u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
-                  u'medico_solicitante', u'anestesista', u'motivo', u'informe', u'presentacion')
+                  u'medico_solicitante', u'anestesista', u'motivo', u'informe')
 
 
 class EstudioRetrieveSerializer(EstudioSerializer):
-    presentacion = PresentacionSerializer()  # TODO: definir si esto va aca o en una llamada aparte?
+    presentacion = PresentacionSmallSerializer()  # TODO: definir si esto va aca o en una llamada aparte? Ojo que ULI hace presentacion.estado para permitir modificar o no
 
     class Meta:
         model = Estudio
         fields = (u'id', u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
                   u'medico_solicitante', u'anestesista', u'motivo', u'informe', u'presentacion',
-                  u'fecha_cobro', u'importe_estudio', u'importe_medicacion', u'pension', u'diferencia_paciente', u'arancel_anestesia'
+                  u'fecha_cobro', u'importe_estudio', u'importe_medicacion', u'pension', u'diferencia_paciente', u'arancel_anestesia',
                   u'es_pago_contra_factura', u'pago_contra_factura')
 
 

@@ -1,14 +1,18 @@
 from rest_framework import serializers
 from presentacion.models import Presentacion
 from obra_social.serializers import ObraSocialSerializer
-from comprobante.serializers import ComprobanteSerializer
+from comprobante.serializers import ComprobanteSerializer, ComprobanteSmallSerializer
 
 
-class PresentacionSmallSerializer(serializers.HyperlinkedModelSerializer):
-    
+class PresentacionSmallSerializer(serializers.ModelSerializer):
+    comprobante = ComprobanteSmallSerializer()
+    estado = serializers.SerializerMethodField()
+
     class Meta:
         model = Presentacion
-        fields = (u'id', u'estado')
+
+    def get_estado(self, obj):
+        return Presentacion.ESTADOS[obj.estado][1]
 
 
 class PresentacionSerializer(serializers.ModelSerializer):
