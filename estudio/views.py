@@ -152,10 +152,13 @@ class EstudioViewSet(viewsets.ModelViewSet):
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA')
 
     @detail_route(methods=['patch'])
-    def update_importes_estudios_y_pago_contra_factura(self, request, pk=None):
+    def update_importes_y_pago_contra_factura(self, request, pk=None):
         #TODO: ver si esta logica no deberia ir en el update normal del estudio
         # y asi solo tener un boton guardar.
         estudio = Estudio.objects.get(pk=pk)
+
+        print "WWWWWWWWWW {}".format(request.POST.get('importe'))
+        return Response({"success": True})
 
 
 class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
