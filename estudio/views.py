@@ -1,4 +1,6 @@
 import simplejson
+from decimal import Decimal
+
 from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework import viewsets, generics, status
@@ -153,12 +155,29 @@ class EstudioViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['patch'])
     def update_importes_y_pago_contra_factura(self, request, pk=None):
-        #TODO: ver si esta logica no deberia ir en el update normal del estudio
-        # y asi solo tener un boton guardar.
-        estudio = Estudio.objects.get(pk=pk)
+        pension = request.data.get('pension')
+        diferencia_paciente = request.data.get('diferencia_paciente')
+        arancel_anestesia = request.data.get('arancel_anestesia')
+        pago_contra_factura = request.data.get('pago_contra_factura')
 
-        print "WWWWWWWWWW {}".format(request.POST.get('importe'))
-        return Response({"success": True})
+        estudio = Estudio.objects.get(pk=pk)
+        estudio.pension = Decimal(pension)
+        estudio.diferencia_paciente = Decimal(diferencia_paciente)
+        estudio.arancel_anestesia = Decimal(arancel_anestesia)
+        pago_contra_factura = Decimal(pago_contra_factura)
+
+        if pago_contra_factura != estudio.pago_contra_factura:
+            try:
+                if pago_contra_factura > 0:
+                    estudio.set_pago_contra_factura(pago_contra_factura)
+                elif pago_contra_factura == 0:
+                    estudio.anular_pago_contra_factura()
+            except Exception as ex:
+                return Response({u'success': False, u'message': ex.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        estudio.save()
+        add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA IMPORTES')
+        return Response({u'success': True})
 
 
 class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):

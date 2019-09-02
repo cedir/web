@@ -132,6 +132,23 @@ class Estudio(models.Model):
         total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Material Especifico')])
         return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
 
+    def set_pago_contra_factura(self, importe):
+        assert not self.presentacion_id, u'Estudio ya fue presentado y no puede modificarse'
+        assert not(self.pago_medico_actuante_id or self.pago_medico_solicitante_id), u'Estudio ya fue pagado al medico y no puede modificarse'
+
+        self.es_pago_contra_factura = 1
+        self.pago_contra_factura = importe
+        self.fecha_cobro = datetime.datetime.today()
+
+    def anular_pago_contra_factura(self):
+        assert bool(self.es_pago_contra_factura), u'El estudio no esta como Pago Contra Factura'
+        assert not(self.pago_medico_actuante_id or self.pago_medico_solicitante_id), u'Estudio ya fue pagado al medico y no puede modificarse'
+        assert self.fecha_cobro, u'El estudio no esta cobrado y por ende no es Pago Contra Factura'
+
+        self.es_pago_contra_factura = 0
+        self.pago_contra_factura = 0
+        self.fecha_cobro = None
+
 
 def asignar_presentacion_nula(sender, instance, **kwargs):
     """
@@ -140,7 +157,7 @@ def asignar_presentacion_nula(sender, instance, **kwargs):
     Cuando se actualice esto, este codigo puede ser eliminado.
     """
     if instance.id:
-        return  # is no esta creando, no hay nada que hacer
+        return  # si no esta creando, no hay nada que hacer
 
     presentacion = Presentacion()
     presentacion.id = 0
