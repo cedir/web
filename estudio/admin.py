@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from django.db.models import Q
 from django.contrib import admin
 from models import Estudio, Medicacion
 
@@ -29,8 +30,8 @@ class EstudioAdmin(admin.ModelAdmin):
         extra_context = extra_context or {}
 
         estudio = Estudio.objects.get(pk=object_id)
-
-        if estudio.fecha != datetime.now().date() and request.user.groups.filter(name__icontains='Medicos').exists():
+        groups = request.user.groups.filter(Q(name__icontains='Medicos') | Q(name__icontains='Tecnicos'))
+        if estudio.fecha != datetime.now().date() and groups.exists():
             # dejamos a Medicos modificar el estudio solo el dia del estudio
             extra_context['show_save_and_continue'] = False
             extra_context['show_save'] = False

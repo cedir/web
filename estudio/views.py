@@ -168,10 +168,12 @@ class EstudioViewSet(viewsets.ModelViewSet):
 
         if pago_contra_factura != estudio.pago_contra_factura:
             try:
-                if pago_contra_factura > 0:
+                if pago_contra_factura > Decimal(0):
                     estudio.set_pago_contra_factura(pago_contra_factura)
-                elif pago_contra_factura == 0:
+                elif pago_contra_factura == Decimal(0):
                     estudio.anular_pago_contra_factura()
+                else:
+                    return Response({u'success': False, u'message': 'No estan permitidos valores negativos'}, status=status.HTTP_400_BAD_REQUEST)
             except Exception as ex:
                 return Response({u'success': False, u'message': ex.message}, status=status.HTTP_400_BAD_REQUEST)
 

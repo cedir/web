@@ -25,7 +25,7 @@ class EstudioSerializer(serializers.ModelSerializer):
 
 
 class EstudioRetrieveSerializer(EstudioSerializer):
-    presentacion = PresentacionSmallSerializer()  # TODO: definir si esto va aca o en una llamada aparte? Ojo que ULI hace presentacion.estado para permitir modificar o no
+    presentacion = PresentacionSmallSerializer()
 
     class Meta:
         model = Estudio
