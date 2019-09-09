@@ -166,6 +166,9 @@ class EstudioViewSet(viewsets.ModelViewSet):
         estudio.arancel_anestesia = Decimal(arancel_anestesia)
         pago_contra_factura = Decimal(pago_contra_factura)
 
+        if self.presentacion_id or bool(self.es_pago_contra_factura):
+            return Response({u'success': False, u'message': 'El estudio esta presentado/pcf y no se puede modificar'}, status=status.HTTP_400_BAD_REQUEST)
+
         if pago_contra_factura != estudio.pago_contra_factura:
             try:
                 if pago_contra_factura > Decimal(0):
