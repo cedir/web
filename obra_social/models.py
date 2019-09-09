@@ -1,6 +1,5 @@
 #-*- coding: utf-8 -*-
 from django.db import models
-from compositekey import db
 
 CONDICIONES_FISCALES = (('CONSUMIDOR FINAL', 'CONSUMIDOR FINAL'),
                         ('RESPONSABLE INSCRIPTO', 'RESPONSABLE INSCRIPTO'),
