@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from .models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado
 
+
 class TipoComprobanteSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = TipoComprobante
@@ -31,6 +32,15 @@ class ComprobanteSerializer(serializers.ModelSerializer):
         model = Comprobante
         fields = ('id', 'nombre_cliente', 'sub_tipo', 'numero', 'nro_terminal', 'total_facturado', 'total_cobrado',
                   'fecha_emision', 'tipo_comprobante', 'gravado', 'lineas')
+
+
+class ComprobanteSmallSerializer(serializers.ModelSerializer):
+    tipo_comprobante = TipoComprobanteSerializer()
+
+    class Meta:
+        model = Comprobante
+        fields = ('id', 'nombre_cliente', 'sub_tipo', 'numero', 'nro_terminal', 'total_facturado', 'total_cobrado',
+                  'fecha_emision', 'tipo_comprobante', 'responsable')
 
 
 class ComprobanteListadoSerializer(serializers.ModelSerializer):

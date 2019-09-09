@@ -1,8 +1,11 @@
 import simplejson
+from decimal import Decimal
+
 from django.http import HttpResponse
 from rest_framework import filters
 from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
+from rest_framework.decorators import detail_route
 from django.contrib.admin.models import ADDITION, CHANGE
 
 from common.drf.views import StandardResultsSetPagination
@@ -10,7 +13,7 @@ from common.utils import add_log_entry
 from estudio.models import Estudio
 from estudio.models import Medicacion
 from medicamento.models import Medicamento
-from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
+from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer, EstudioRetrieveSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from imprimir import generar_informe
 
@@ -136,6 +139,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
     serializers = {
         'create': EstudioCreateUpdateSerializer,
         'update': EstudioCreateUpdateSerializer,
+        'retrieve': EstudioRetrieveSerializer,
     }
 
     def get_serializer_class(self):
@@ -148,6 +152,37 @@ class EstudioViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         estudio = serializer.save()
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA')
+
+    @detail_route(methods=['patch'])
+    def update_importes_y_pago_contra_factura(self, request, pk=None):
+        pension = request.data.get('pension')
+        diferencia_paciente = request.data.get('diferencia_paciente')
+        arancel_anestesia = request.data.get('arancel_anestesia')
+        pago_contra_factura = request.data.get('pago_contra_factura')
+
+        estudio = Estudio.objects.get(pk=pk)
+        estudio.pension = Decimal(pension)
+        estudio.diferencia_paciente = Decimal(diferencia_paciente)
+        estudio.arancel_anestesia = Decimal(arancel_anestesia)
+        pago_contra_factura = Decimal(pago_contra_factura)
+
+        if estudio.presentacion_id or bool(estudio.es_pago_contra_factura):
+            return Response({u'success': False, u'message': 'El estudio esta presentado/pcf y no se puede modificar'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if pago_contra_factura != estudio.pago_contra_factura:
+            try:
+                if pago_contra_factura > Decimal(0):
+                    estudio.set_pago_contra_factura(pago_contra_factura)
+                elif pago_contra_factura == Decimal(0):
+                    estudio.anular_pago_contra_factura()
+                else:
+                    return Response({u'success': False, u'message': 'No estan permitidos valores negativos'}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as ex:
+                return Response({u'success': False, u'message': ex.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        estudio.save()
+        add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA IMPORTES')
+        return Response({u'success': True})
 
 
 class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
