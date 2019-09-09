@@ -11,8 +11,7 @@ static/templates/media_files
 static/templates/bower_components/
 static/templates/npm_deps/
 .idea
-.vscode
 ENV/
+certificados/
+
 informe_ejemplo.xlsx
-test.crt
-privada.csr

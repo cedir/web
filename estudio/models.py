@@ -67,7 +67,7 @@ class Estudio(models.Model):
 
     def is_link_vencido(self):
         return True if datetime.date.today() >= self.fecha_vencimiento_link_video else False
-    
+
     def save(self, *args, **kwargs):
         if not self.id:  # creation
             self.set_create_defaults()
@@ -95,6 +95,16 @@ class Estudio(models.Model):
         self.importe_estudio_cobrado = 0
         self.importe_medicacion_cobrado = 0
         self.arancel_anestesia = 0
+
+    @property
+    def retencion_impositiva(self):
+        """
+        Para calculo de honorarios e informe de comprobantes.
+        """
+        if self.obra_social.se_presenta_por_AMR == "1" or self.obra_social.se_presenta_por_AMR == 1:
+            return Decimal("0.32")
+        else:
+            return Decimal("0.25")
 
     def get_importe_total(self):
         # TODO: escribir unit tests para este metodo, no se esta usando por ahora.
@@ -129,7 +139,7 @@ class Estudio(models.Model):
         if self.fecha_cobro:
             raise NotImplementedError('Imposible saber el total de material especifico ya que los registros'
                                       'estudioXmedicamento se han borrado')
-        total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Material Especifico')])
+        total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Mat Esp')])
         return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
 
     def set_pago_contra_factura(self, importe):
