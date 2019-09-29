@@ -19,6 +19,7 @@ IVA_21 = 3
 
 NOTA_DE_DEBITO = 3
 NOTA_DE_CREDITO = 4
+FACTURA_ELECTRONICA_MIPYME = 5
 
 
 class AfipError(RuntimeError):
@@ -175,6 +176,9 @@ class _Afip(object):
                 pto_vta=comprobante_asociado.nro_terminal,
                 nro=comprobante_asociado.numero)
 
+        if comprobante_cedir.tipo_comprobante.id >= FACTURA_ELECTRONICA_MIPYME:
+            self.webservice.AgregarOpcional(2101, "0150506102000109564632")
+
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
         try:
             self.webservice.CAESolicitar()
@@ -217,7 +221,7 @@ class _Afip(object):
     @requiere_ticket
     def consultar_proximo_numero(self, nro_terminal, tipo_comprobante, subtipo):
         conversion = {
-            'A': {1: 1, 3: 2, 4: 3},
-            'B': {1: 6, 3: 7, 4: 8}
+            'A': {1: 1, 3: 2, 4: 3, 5: 201},
+            'B': {1: 6, 3: 7, 4: 8, 5: 206}
         }
-        return long(self.webservice.CompUltimoAutorizado(conversion[subtipo][tipo_comprobante.id], nro_terminal) or 0)
+        return long(self.webservice.CompUltimoAutorizado(conversion[subtipo][tipo_comprobante.id], nro_terminal) or 0) + 1

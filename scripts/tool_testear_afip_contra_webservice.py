@@ -32,15 +32,15 @@ def main():
     # En la realidad podemos usar nuestro conteneo de numeros de comprobantes sin problemas,
     # pero aca no y de todas formas es util tener a mano esta info.
     numero = afip.consultar_proximo_numero("Cedir", 1, TipoComprobante.objects.get(pk=1), "B")
-    
+
     # Esto es para poder usar la proxima id que pide afip y es un motivo fuerte para NO CORRER ESTE SCRIPT EN PRODUCCION!!
     Comprobante.objects.filter(nro_terminal=1, tipo_comprobante=TipoComprobante.objects.get(pk=1), numero=numero).delete()
-    
+
     # Creamos un comprobante
     comprobante = Comprobante(**{
         "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
         "domicilio_cliente": " - Springfield - (CP:2000)",
-        "nro_cuit": "11",
+        "nro_cuit": "30604958640",
         "gravado_paciente": "",
         "condicion_fiscal": "EXENTO",
         "gravado": Gravado.objects.get(pk=1),
@@ -76,6 +76,39 @@ def main():
     comprobante.save()
     lineas[0].save()
 
+    # Lo mismo, pero con una Factura de Credito Electronica MiPyME
+    numero = afip.consultar_proximo_numero("Cedir", 1, TipoComprobante.objects.get(pk=5), "A")
+    Comprobante.objects.filter(nro_terminal=1, tipo_comprobante=TipoComprobante.objects.get(pk=5), numero=numero).delete()
+    comprobante = Comprobante(**{
+        "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+        "domicilio_cliente": " - Springfield - (CP:2000)",
+        "nro_cuit": "11",
+        "gravado_paciente": "",
+        "condicion_fiscal": "EXENTO",
+        "gravado": Gravado.objects.get(pk=1),
+        "responsable": "Cedir",
+        "sub_tipo": "B",
+        "estado": "PENDIENTE",
+        "numero": numero,
+        "nro_terminal": 1,
+        "total_facturado": "2800.00",
+        "total_cobrado": "0.00",
+        "fecha_emision": "2012-07-07",
+        "fecha_recepcion": "2012-07-07",
+        "tipo_comprobante": TipoComprobante.objects.get(pk=5),
+    })
+    lineas = [LineaDeComprobante(**{
+        "comprobante": comprobante,
+        "importe_neto": 2800.00,
+        "sub_total": 2800.00,
+        "iva": 0,
+    })]
+    afip.emitir_comprobante(comprobante, lineas)
+    print(comprobante.cae)
+    print(comprobante.vencimiento_cae)
+    print(afip.consultar_comprobante(comprobante))
+    comprobante.save()
+    lineas[0].save()
 
 if __name__ == "__main__":
     main()
