@@ -20,6 +20,8 @@ IVA_21 = 3
 NOTA_DE_DEBITO = 3
 NOTA_DE_CREDITO = 4
 FACTURA_ELECTRONICA_MIPYME = 5
+NOTA_DE_DEBITO_ELECTRONICA_MIPYME = 6
+NOTA_DE_CREDITO_ELECTRONICA_MIPYME = 7
 
 
 class AfipError(RuntimeError):
@@ -168,7 +170,11 @@ class _Afip(object):
             self.webservice.AgregarIva(id_iva=5, base_imp=imp_neto, importe=imp_iva)
 
         # Si hay comprobantes asociados, los agregamos.
-        if comprobante_cedir.tipo_comprobante.id in [NOTA_DE_DEBITO, NOTA_DE_CREDITO] and comprobante_cedir.factura:
+        if comprobante_cedir.tipo_comprobante.id in [
+            NOTA_DE_DEBITO,
+            NOTA_DE_CREDITO,
+            NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
+            NOTA_DE_CREDITO_ELECTRONICA_MIPYME] and comprobante_cedir.factura:
             comprobante_asociado = Comprobante.objects.get(
                 id=comprobante_cedir.factura.id)
             self.webservice.AgregarCmpAsoc(
@@ -176,7 +182,10 @@ class _Afip(object):
                 pto_vta=comprobante_asociado.nro_terminal,
                 nro=comprobante_asociado.numero)
 
-        if comprobante_cedir.tipo_comprobante.id >= FACTURA_ELECTRONICA_MIPYME:
+        if comprobante_cedir.tipo_comprobante.id in [
+            FACTURA_ELECTRONICA_MIPYME,
+            NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
+            NOTA_DE_CREDITO_ELECTRONICA_MIPYME]:
             self.webservice.AgregarOpcional(2101, "0150506102000109564632")
 
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
