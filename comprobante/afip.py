@@ -219,9 +219,6 @@ class _Afip(object):
         }
 
     @requiere_ticket
-    def consultar_proximo_numero(self, nro_terminal, tipo_comprobante, subtipo):
-        conversion = {
-            'A': {1: 1, 3: 2, 4: 3, 5: 201},
-            'B': {1: 6, 3: 7, 4: 8, 5: 206}
-        }
-        return long(self.webservice.CompUltimoAutorizado(conversion[subtipo][tipo_comprobante.id], nro_terminal) or 0) + 1
+    def consultar_proximo_numero(self, nro_terminal, tipo_comprobante, sub_tipo):
+        codigo_afip = Comprobante(nro_terminal=nro_terminal, tipo_comprobante=tipo_comprobante, sub_tipo=sub_tipo).codigo_afip
+        return long(self.webservice.CompUltimoAutorizado(codigo_afip, nro_terminal) or 0) + 1
