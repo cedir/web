@@ -134,9 +134,10 @@ class _Afip(object):
         de la AFIP.
         En caso de error, levanta una excepcion.
         '''
-        nro = long(self.webservice.CompUltimoAutorizado(
-            comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal) or 0) + 1
+        nro = self.consultar_proximo_numero(comprobante_cedir.nro_terminal, comprobante_cedir.tipo_comprobante, comprobante_cedir.sub_tipo)
         fecha = datetime.now().strftime("%Y%m%d")
+        # En estos tipos de comprobante en especifico, la AFIP te prohibe poner un campo fecha de vencimiento.
+        fecha_vto = None if comprobante_cedir.tipo_comprobante.id in [NOTA_DE_DEBITO_ELECTRONICA_MIPYME, NOTA_DE_CREDITO_ELECTRONICA_MIPYME] else fecha
         imp_iva = sum([l.iva for l in lineas])
         if comprobante_cedir.gravado.id == IVA_EXCENTO:
             imp_neto = "0.00"
@@ -158,10 +159,10 @@ class _Afip(object):
             imp_neto=imp_neto,
             imp_iva=imp_iva,
             imp_op_ex=imp_op_ex,
-            fecha_cbte=fecha, # Estas fechas no cambian nunca, pero son requisito para el concepto=2
+            fecha_cbte=fecha, # Estas fechas no cambian nunca, pero son requisito de la AFIP para el concepto=2
             fecha_serv_desde=fecha,
             fecha_serv_hasta=fecha,
-            fecha_venc_pago=fecha)
+            fecha_venc_pago=fecha_vto)
 
         # Agregar el IVA
         if comprobante_cedir.gravado.id == IVA_10_5:
@@ -175,12 +176,13 @@ class _Afip(object):
             NOTA_DE_CREDITO,
             NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
             NOTA_DE_CREDITO_ELECTRONICA_MIPYME] and comprobante_cedir.factura:
-            comprobante_asociado = Comprobante.objects.get(
-                id=comprobante_cedir.factura.id)
+            comprobante_asociado = comprobante_cedir.factura
             self.webservice.AgregarCmpAsoc(
                 tipo=comprobante_asociado.codigo_afip,
                 pto_vta=comprobante_asociado.nro_terminal,
-                nro=comprobante_asociado.numero)
+                nro=comprobante_asociado.numero,
+                cuit=comprobante_asociado.nro_id_afip
+            )
 
         if comprobante_cedir.tipo_comprobante.id in [
             FACTURA_ELECTRONICA_MIPYME,
@@ -207,8 +209,7 @@ class _Afip(object):
     @requiere_ticket
     def consultar_comprobante(self, comprobante):
         '''
-        Consulta que informacion tiene la AFIP sobre un comprobante nuestro dado su tipo,
-        terminal y numero.
+        Consulta que informacion tiene la AFIP sobre un comprobante nuestro.
         Devuelve un diccionario con todos los datos.
         '''
         codigo_afip_tipo = comprobante.codigo_afip
