@@ -263,6 +263,8 @@ class TestAfipAPI(TestCase):
         afip.emitir_comprobante(factura, lineas_factura)
         assert factura.cae == 1
 
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
     def test_emitir_nota_de_debito(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsaa.return_value.Expirado.return_value = False
@@ -330,6 +332,8 @@ class TestAfipAPI(TestCase):
         afip.emitir_comprobante(nota_debito, lineas_nota_debito)
         assert nota_debito.cae == 1
 
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
     def test_emitir_nota_de_credito(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsaa.return_value.Expirado.return_value = False
@@ -422,6 +426,8 @@ class TestAfipAPI(TestCase):
         afip.emitir_comprobante(nota_credito, lineas_nota_credito)
         assert nota_credito.cae == 1
 
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
     def test_emitir_factura_de_credito_electronica(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsaa.return_value.Expirado.return_value = False
@@ -463,6 +469,8 @@ class TestAfipAPI(TestCase):
         afip.emitir_comprobante(factura_electronica, lineas_factura_electronica)
         assert factura_electronica.cae == 1
 
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
     def test_emitir_nota_de_debito_electronica(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsaa.return_value.Expirado.return_value = False
@@ -531,6 +539,8 @@ class TestAfipAPI(TestCase):
         afip.emitir_comprobante(nota_de_debito_electronica, lineas_nota_de_debito_electronica)
         assert nota_de_debito_electronica.cae == 1
 
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
     def test_emitir_nota_de_credito_electronica(self, mock_wsfev1, mock_wsaa):
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsaa.return_value.Expirado.return_value = False
