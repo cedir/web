@@ -94,7 +94,6 @@ def main():
     # Nota de Debito
     #########
     numero = afip.consultar_proximo_numero("Cedir", 91, TipoComprobante.objects.get(pk=3), "A")
-    Comprobante.objects.filter(nro_terminal=91, tipo_comprobante=TipoComprobante.objects.get(pk=3), numero=numero).delete()
     nota_debito = Comprobante(**{
         "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
         "domicilio_cliente": " - Springfield - (CP:2000)",
@@ -126,14 +125,12 @@ def main():
     print(nota_debito.cae)
     print(nota_debito.vencimiento_cae)
     print(afip.consultar_comprobante(nota_debito))
-    # nota_debito.save()
-    # lineas_nota_debito[0].save()
+    print("")
 
     #########
     # Nota de Credito
     #########
     numero = afip.consultar_proximo_numero("Cedir", 91, TipoComprobante.objects.get(pk=4), "A")
-    Comprobante.objects.filter(nro_terminal=91, tipo_comprobante=TipoComprobante.objects.get(pk=4), numero=numero).delete()
     nota_credito = Comprobante(**{
         "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
         "domicilio_cliente": " - Springfield - (CP:2000)",
@@ -165,15 +162,13 @@ def main():
     print(nota_credito.cae)
     print(nota_credito.vencimiento_cae)
     print(afip.consultar_comprobante(nota_credito))
-    # nota_credito.save()
-    # lineas_nota_credito[0].save()
+    print("")
 
     #######################################
     # Factura de Credito Electronica MiPyME
     #######################################
 
     numero = afip.consultar_proximo_numero("Brunetti", 3, TipoComprobante.objects.get(pk=5), "B")
-    Comprobante.objects.filter(nro_terminal=3, tipo_comprobante=TipoComprobante.objects.get(pk=5), numero=numero).delete()
     factura_electronica = Comprobante(**{
         "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
         "domicilio_cliente": " - Springfield - (CP:2000)",
@@ -204,15 +199,13 @@ def main():
     print(factura_electronica.cae)
     print(factura_electronica.vencimiento_cae)
     print(afip.consultar_comprobante(factura_electronica))
-    factura_electronica.save()
-    lineas_factura_electronica[0].save()
+    print("")
 
     #######################################
     # Nota de Debito Electronica MiPyME
     #######################################
 
     numero = afip.consultar_proximo_numero("Brunetti", 3, TipoComprobante.objects.get(pk=6), "B")
-    Comprobante.objects.filter(nro_terminal=3, tipo_comprobante=TipoComprobante.objects.get(pk=6), numero=numero).delete()
     nota_de_debito_electronica = Comprobante(**{
         "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
         "domicilio_cliente": " - Springfield - (CP:2000)",
@@ -244,15 +237,13 @@ def main():
     print(nota_de_debito_electronica.cae)
     print(nota_de_debito_electronica.vencimiento_cae)
     print(afip.consultar_comprobante(nota_de_debito_electronica))
-    nota_de_debito_electronica.save()
-    lineas_nota_de_debito_electronica[0].save()
+    print("")
 
     #######################################
     # Nota de Credito Electronica MiPyME
     #######################################
 
     numero = afip.consultar_proximo_numero("Brunetti", 3, TipoComprobante.objects.get(pk=7), "B")
-    Comprobante.objects.filter(nro_terminal=3, tipo_comprobante=TipoComprobante.objects.get(pk=7), numero=numero).delete()
     nota_de_credito_electronica = Comprobante(**{
         "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
         "domicilio_cliente": " - Springfield - (CP:2000)",
@@ -284,8 +275,7 @@ def main():
     print(nota_de_credito_electronica.cae)
     print(nota_de_credito_electronica.vencimiento_cae)
     print(afip.consultar_comprobante(nota_de_credito_electronica))
-    nota_de_credito_electronica.save()
-    lineas_nota_de_credito_electronica[0].save()
+    print("")
 
 if __name__ == "__main__":
     main()

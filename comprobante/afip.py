@@ -2,7 +2,7 @@
 '''
 Modulo encargado de la comunicacion con el Webservice de la AFIP.
 '''
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from xml.parsers.expat import ExpatError
 from httplib2 import ServerNotFoundError
 
@@ -135,9 +135,9 @@ class _Afip(object):
         En caso de error, levanta una excepcion.
         '''
         nro = self.consultar_proximo_numero(comprobante_cedir.nro_terminal, comprobante_cedir.tipo_comprobante, comprobante_cedir.sub_tipo)
-        fecha = date.today().strftime("%Y%m%d")
+        fecha = comprobante_cedir.fecha_emision.strftime("%Y%m%d")
         # En estos tipos de comprobante en especifico, la AFIP te prohibe poner un campo fecha de vencimiento.
-        fecha_vto = None if comprobante_cedir.tipo_comprobante.id in [NOTA_DE_DEBITO_ELECTRONICA_MIPYME, NOTA_DE_CREDITO_ELECTRONICA_MIPYME] else fecha
+        fecha_vto = None if comprobante_cedir.tipo_comprobante.id in [NOTA_DE_DEBITO_ELECTRONICA_MIPYME, NOTA_DE_CREDITO_ELECTRONICA_MIPYME] else comprobante_cedir.fecha_vencimiento.strftime("%Y%m%d")
         imp_iva = sum([l.iva for l in lineas])
         if comprobante_cedir.gravado.id == IVA_EXCENTO:
             imp_neto = "0.00"
@@ -172,7 +172,7 @@ class _Afip(object):
 
         # Si hay comprobantes asociados, los agregamos.
         if comprobante_cedir.tipo_comprobante.id in [
-            NOTA_DE_DEBITO,
+            NOTA_DE_DEBITO, # Para comprobantes no electronicos puede no ser necesario pero se los deja por completitud
             NOTA_DE_CREDITO,
             NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
             NOTA_DE_CREDITO_ELECTRONICA_MIPYME] and comprobante_cedir.factura:
@@ -185,10 +185,13 @@ class _Afip(object):
                 fecha=comprobante_asociado.fecha_emision.strftime("%Y%m%d")
             )
 
+        # Si es Factura de Credito Electronica, hayq eu agregar como opcional el CBU del Cedir
         if comprobante_cedir.tipo_comprobante.id in [
             FACTURA_ELECTRONICA_MIPYME]:
             self.webservice.AgregarOpcional(2101, "0150506102000109564632")
 
+        # Si es Nota de Debito/Credito Electronica, hay que agregar un opcional indicando que no es anulacion.
+        # En principio, el Cedir nunca anula facturas.
         if comprobante_cedir.tipo_comprobante.id in [
             NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
             NOTA_DE_CREDITO_ELECTRONICA_MIPYME]:
