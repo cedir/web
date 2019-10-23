@@ -2,7 +2,7 @@
 '''
 Modulo encargado de la comunicacion con el Webservice de la AFIP.
 '''
-from datetime import datetime
+from datetime import date, datetime
 from xml.parsers.expat import ExpatError
 from httplib2 import ServerNotFoundError
 
@@ -135,7 +135,7 @@ class _Afip(object):
         En caso de error, levanta una excepcion.
         '''
         nro = self.consultar_proximo_numero(comprobante_cedir.nro_terminal, comprobante_cedir.tipo_comprobante, comprobante_cedir.sub_tipo)
-        fecha = datetime.now().strftime("%Y%m%d")
+        fecha = date.today().strftime("%Y%m%d")
         # En estos tipos de comprobante en especifico, la AFIP te prohibe poner un campo fecha de vencimiento.
         fecha_vto = None if comprobante_cedir.tipo_comprobante.id in [NOTA_DE_DEBITO_ELECTRONICA_MIPYME, NOTA_DE_CREDITO_ELECTRONICA_MIPYME] else fecha
         imp_iva = sum([l.iva for l in lineas])
@@ -181,14 +181,18 @@ class _Afip(object):
                 tipo=comprobante_asociado.codigo_afip,
                 pto_vta=comprobante_asociado.nro_terminal,
                 nro=comprobante_asociado.numero,
-                cuit=comprobante_asociado.nro_id_afip
+                cuit=self.webservice.Cuit, # Cuit emisor.
+                fecha=comprobante_asociado.fecha_emision.strftime("%Y%m%d")
             )
 
         if comprobante_cedir.tipo_comprobante.id in [
-            FACTURA_ELECTRONICA_MIPYME,
+            FACTURA_ELECTRONICA_MIPYME]:
+            self.webservice.AgregarOpcional(2101, "0150506102000109564632")
+
+        if comprobante_cedir.tipo_comprobante.id in [
             NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
             NOTA_DE_CREDITO_ELECTRONICA_MIPYME]:
-            self.webservice.AgregarOpcional(2101, "0150506102000109564632")
+            self.webservice.AgregarOpcional(22, "N")
 
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
         try:
@@ -203,7 +207,7 @@ class _Afip(object):
             pass
 
         comprobante_cedir.cae = self.webservice.CAE
-        comprobante_cedir.vencimiento_cae = datetime.strptime(self.webservice.Vencimiento,'%Y%m%d')
+        comprobante_cedir.vencimiento_cae = datetime.strptime(self.webservice.Vencimiento,'%Y%m%d').date()
         comprobante_cedir.numero = nro
 
     @requiere_ticket

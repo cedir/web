@@ -23,6 +23,7 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 import wsgi # Importar esto hace lo de las settings e inicia django
+from datetime import date
 from comprobante.models import Comprobante, TipoComprobante, Gravado, LineaDeComprobante
 from comprobante.afip import Afip
 
@@ -41,7 +42,7 @@ def main():
 
     # Esto es para poder usar la proxima id que pide afip y es un motivo fuerte para NO CORRER ESTE SCRIPT EN PRODUCCION!!
     # (los numeros en homologacion y produccion no coincididen entonces en la DB dev tenemos colisiones de numero)
-    Comprobante.objects.filter(nro_terminal=91, tipo_comprobante=TipoComprobante.objects.get(pk=1), numero=numero).delete()
+    # Comprobante.objects.filter(nro_terminal=91, tipo_comprobante=TipoComprobante.objects.get(pk=1), numero=numero).delete()
 
     # Creamos un Factura
     # Esto crea el objeto, pero no lo guarda en DB.
@@ -59,8 +60,8 @@ def main():
         "nro_terminal": 91,
         "total_facturado": "2800.00",
         "total_cobrado": "0.00",
-        "fecha_emision": "2012-07-07",
-        "fecha_recepcion": "2012-07-07",
+        "fecha_emision": date.today(),
+        "fecha_recepcion": date.today(),
         "tipo_comprobante": TipoComprobante.objects.get(pk=1),
     })
     # Creamos una linea de comprobante, parte necesaria de un comprobante para nuestro sistema.
@@ -86,8 +87,8 @@ def main():
 
     # Si la AFIP emitio bien, ahora se guardan.
     # Aca deberia haber codigo que hizo las verificaciones en realidad, pero esto es un PoC.
-    factura.save()
-    lineas_factura[0].save()
+    # factura.save()
+    # lineas_factura[0].save()
 
     #########
     # Nota de Debito
@@ -108,8 +109,8 @@ def main():
         "nro_terminal": 91,
         "total_facturado": "2800.00",
         "total_cobrado": "0.00",
-        "fecha_emision": "2012-07-07",
-        "fecha_recepcion": "2012-07-07",
+        "fecha_emision": date.today(),
+        "fecha_recepcion": date.today(),
         "tipo_comprobante": TipoComprobante.objects.get(pk=3),
         "factura": factura  # Ponemos como comprobante asociado la factura que hicimos recien.
     })
@@ -125,8 +126,8 @@ def main():
     print(nota_debito.cae)
     print(nota_debito.vencimiento_cae)
     print(afip.consultar_comprobante(nota_debito))
-    nota_debito.save()
-    lineas_nota_debito[0].save()
+    # nota_debito.save()
+    # lineas_nota_debito[0].save()
 
     #########
     # Nota de Credito
@@ -147,8 +148,8 @@ def main():
         "nro_terminal": 91,
         "total_facturado": "2800.00",
         "total_cobrado": "0.00",
-        "fecha_emision": "2012-07-07",
-        "fecha_recepcion": "2012-07-07",
+        "fecha_emision": date.today(),
+        "fecha_recepcion": date.today(),
         "tipo_comprobante": TipoComprobante.objects.get(pk=4),
         "factura": nota_debito  # Ponemos como comprobante asociado la factura que hicimos recien.
     })
@@ -164,8 +165,8 @@ def main():
     print(nota_credito.cae)
     print(nota_credito.vencimiento_cae)
     print(afip.consultar_comprobante(nota_credito))
-    nota_credito.save()
-    lineas_nota_credito[0].save()
+    # nota_credito.save()
+    # lineas_nota_credito[0].save()
 
     #######################################
     # Factura de Credito Electronica MiPyME
@@ -187,8 +188,8 @@ def main():
         "nro_terminal": 3,
         "total_facturado": "100000.00",
         "total_cobrado": "0.00",
-        "fecha_emision": "2012-07-07",
-        "fecha_recepcion": "2012-07-07",
+        "fecha_emision": date.today(),
+        "fecha_recepcion": date.today(),
         "tipo_comprobante": TipoComprobante.objects.get(pk=5),
     })
     lineas_factura_electronica = [LineaDeComprobante(**{
@@ -226,8 +227,8 @@ def main():
         "nro_terminal": 3,
         "total_facturado": "100000.00",
         "total_cobrado": "0.00",
-        "fecha_emision": "2012-07-07",
-        "fecha_recepcion": "2012-07-07",
+        "fecha_emision": date.today(),
+        "fecha_recepcion": date.today(),
         "tipo_comprobante": TipoComprobante.objects.get(pk=6),
         "factura": factura_electronica
     })
@@ -266,10 +267,10 @@ def main():
         "nro_terminal": 3,
         "total_facturado": "100000.00",
         "total_cobrado": "0.00",
-        "fecha_emision": "2012-07-07",
-        "fecha_recepcion": "2012-07-07",
+        "fecha_emision": date.today(),
+        "fecha_recepcion": date.today(),
         "tipo_comprobante": TipoComprobante.objects.get(pk=7),
-        "factura": nota_de_debito_electronica
+        "factura": factura_electronica
     })
     lineas_nota_de_credito_electronica = [LineaDeComprobante(**{
         "comprobante": nota_de_credito_electronica,
