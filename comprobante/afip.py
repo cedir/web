@@ -2,7 +2,7 @@
 '''
 Modulo encargado de la comunicacion con el Webservice de la AFIP.
 '''
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from xml.parsers.expat import ExpatError
 from httplib2 import ServerNotFoundError
 
@@ -19,6 +19,9 @@ IVA_21 = 3
 
 NOTA_DE_DEBITO = 3
 NOTA_DE_CREDITO = 4
+FACTURA_ELECTRONICA_MIPYME = 5
+NOTA_DE_DEBITO_ELECTRONICA_MIPYME = 6
+NOTA_DE_CREDITO_ELECTRONICA_MIPYME = 7
 
 
 class AfipError(RuntimeError):
@@ -131,9 +134,10 @@ class _Afip(object):
         de la AFIP.
         En caso de error, levanta una excepcion.
         '''
-        nro = long(self.webservice.CompUltimoAutorizado(
-            comprobante_cedir.codigo_afip, comprobante_cedir.nro_terminal) or 0) + 1
-        fecha = datetime.now().strftime("%Y%m%d")
+        nro = self.consultar_proximo_numero(comprobante_cedir.nro_terminal, comprobante_cedir.tipo_comprobante, comprobante_cedir.sub_tipo)
+        fecha = comprobante_cedir.fecha_emision.strftime("%Y%m%d")
+        # En estos tipos de comprobante en especifico, la AFIP te prohibe poner un campo fecha de vencimiento.
+        fecha_vto = None if comprobante_cedir.tipo_comprobante.id in [NOTA_DE_DEBITO_ELECTRONICA_MIPYME, NOTA_DE_CREDITO_ELECTRONICA_MIPYME] else comprobante_cedir.fecha_vencimiento.strftime("%Y%m%d")
         imp_iva = sum([l.iva for l in lineas])
         if comprobante_cedir.gravado.id == IVA_EXCENTO:
             imp_neto = "0.00"
@@ -155,10 +159,10 @@ class _Afip(object):
             imp_neto=imp_neto,
             imp_iva=imp_iva,
             imp_op_ex=imp_op_ex,
-            fecha_cbte=fecha, # Estas fechas no cambian nunca, pero son requisito para el concepto=2
+            fecha_cbte=fecha, # Estas fechas no cambian nunca, pero son requisito de la AFIP para el concepto=2
             fecha_serv_desde=fecha,
             fecha_serv_hasta=fecha,
-            fecha_venc_pago=fecha)
+            fecha_venc_pago=fecha_vto)
 
         # Agregar el IVA
         if comprobante_cedir.gravado.id == IVA_10_5:
@@ -167,13 +171,31 @@ class _Afip(object):
             self.webservice.AgregarIva(id_iva=5, base_imp=imp_neto, importe=imp_iva)
 
         # Si hay comprobantes asociados, los agregamos.
-        if comprobante_cedir.tipo_comprobante.id in [NOTA_DE_DEBITO, NOTA_DE_CREDITO] and comprobante_cedir.factura:
-            comprobante_asociado = Comprobante.objects.get(
-                id=comprobante_cedir.factura.id)
+        if comprobante_cedir.tipo_comprobante.id in [
+            NOTA_DE_DEBITO, # Para comprobantes no electronicos puede no ser necesario pero se los deja por completitud
+            NOTA_DE_CREDITO,
+            NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
+            NOTA_DE_CREDITO_ELECTRONICA_MIPYME] and comprobante_cedir.factura:
+            comprobante_asociado = comprobante_cedir.factura
             self.webservice.AgregarCmpAsoc(
                 tipo=comprobante_asociado.codigo_afip,
                 pto_vta=comprobante_asociado.nro_terminal,
-                nro=comprobante_asociado.numero)
+                nro=comprobante_asociado.numero,
+                cuit=self.webservice.Cuit, # Cuit emisor.
+                fecha=comprobante_asociado.fecha_emision.strftime("%Y%m%d")
+            )
+
+        # Si es Factura de Credito Electronica, hayq eu agregar como opcional el CBU del Cedir
+        if comprobante_cedir.tipo_comprobante.id in [
+            FACTURA_ELECTRONICA_MIPYME]:
+            self.webservice.AgregarOpcional(2101, "0150506102000109564632")
+
+        # Si es Nota de Debito/Credito Electronica, hay que agregar un opcional indicando que no es anulacion.
+        # En principio, el Cedir nunca anula facturas.
+        if comprobante_cedir.tipo_comprobante.id in [
+            NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
+            NOTA_DE_CREDITO_ELECTRONICA_MIPYME]:
+            self.webservice.AgregarOpcional(22, "N")
 
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
         try:
@@ -188,14 +210,13 @@ class _Afip(object):
             pass
 
         comprobante_cedir.cae = self.webservice.CAE
-        comprobante_cedir.vencimiento_cae = datetime.strptime(self.webservice.Vencimiento,'%Y%m%d')
+        comprobante_cedir.vencimiento_cae = datetime.strptime(self.webservice.Vencimiento,'%Y%m%d').date()
         comprobante_cedir.numero = nro
 
     @requiere_ticket
     def consultar_comprobante(self, comprobante):
         '''
-        Consulta que informacion tiene la AFIP sobre un comprobante nuestro dado su tipo,
-        terminal y numero.
+        Consulta que informacion tiene la AFIP sobre un comprobante nuestro.
         Devuelve un diccionario con todos los datos.
         '''
         codigo_afip_tipo = comprobante.codigo_afip
@@ -215,9 +236,6 @@ class _Afip(object):
         }
 
     @requiere_ticket
-    def consultar_proximo_numero(self, nro_terminal, tipo_comprobante, subtipo):
-        conversion = {
-            'A': {1: 1, 3: 2, 4: 3},
-            'B': {1: 6, 3: 7, 4: 8}
-        }
-        return long(self.webservice.CompUltimoAutorizado(conversion[subtipo][tipo_comprobante.id], nro_terminal) or 0)
+    def consultar_proximo_numero(self, nro_terminal, tipo_comprobante, sub_tipo):
+        codigo_afip = Comprobante(nro_terminal=nro_terminal, tipo_comprobante=tipo_comprobante, sub_tipo=sub_tipo).codigo_afip
+        return long(self.webservice.CompUltimoAutorizado(codigo_afip, nro_terminal) or 0) + 1

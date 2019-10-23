@@ -3,7 +3,7 @@ from httplib2 import ServerNotFoundError
 from mock import patch
 
 from django.test import TestCase
-from comprobante.models import Comprobante, TipoComprobante, Gravado
+from comprobante.models import Comprobante, TipoComprobante, Gravado, LineaDeComprobante
 from comprobante.afip import Afip, AfipErrorValidacion, AfipErrorRed
 
 
@@ -106,7 +106,7 @@ class TestAfipAPI(TestCase):
         '''
         Se mockea WSAA.Expirado para que devuelva true y se testea que WSAA.Autenticar sea
         llamada una sola vez, para asegurarnos de que no se pierde tiempo piediendo
-        tickets inutilmente. 
+        tickets inutilmente.
         '''
         mock_wsaa.return_value.Autenticar.return_value = TICKET
         mock_wsaa.return_value.Expirado.return_value = False
@@ -218,4 +218,419 @@ class TestAfipAPI(TestCase):
         assert comprobante.cae == 1
         assert comprobante.vencimiento_cae.strftime("%Y-%m-%d") == "3019-12-31"
         assert comprobante.numero == 1
-        
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_emitir_factura(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "30191231"
+
+        afip = Afip()
+        numero = afip.consultar_proximo_numero("Cedir", 91, TipoComprobante.objects.get(pk=1), "A")
+        factura = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Cedir",
+            "sub_tipo": "A",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 91,
+            "total_facturado": "2800.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=1),
+        })
+        # Creamos una linea de comprobante, parte necesaria de un comprobante para nuestro sistema.
+        lineas_factura = [LineaDeComprobante(**{
+            "comprobante": factura,
+            "importe_neto": 2800.00,
+            "sub_total": 2800.00,
+            "iva": 0,
+        })]
+        afip.emitir_comprobante(factura, lineas_factura)
+        assert factura.cae == 1
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_emitir_nota_de_debito(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "30191231"
+
+        afip = Afip()
+        numero = afip.consultar_proximo_numero("Cedir", 91, TipoComprobante.objects.get(pk=1), "A")
+        factura = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Cedir",
+            "sub_tipo": "A",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 91,
+            "total_facturado": "2800.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=1),
+        })
+        lineas_factura = [LineaDeComprobante(**{
+            "comprobante": factura,
+            "importe_neto": 2800.00,
+            "sub_total": 2800.00,
+            "iva": 0,
+        })]
+        numero = afip.consultar_proximo_numero("Cedir", 91, TipoComprobante.objects.get(pk=3), "A")
+        nota_debito = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Cedir",
+            "sub_tipo": "A",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 91,
+            "total_facturado": "2800.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=3),
+            "factura": factura
+        })
+        lineas_nota_debito = [LineaDeComprobante(**{
+            "comprobante": nota_debito,
+            "importe_neto": 2800.00,
+            "sub_total": 2800.00,
+            "iva": 0,
+        })]
+        afip.emitir_comprobante(nota_debito, lineas_nota_debito)
+        assert nota_debito.cae == 1
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_emitir_nota_de_credito(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "30191231"
+        afip = Afip()
+        numero = afip.consultar_proximo_numero("Cedir", 91, TipoComprobante.objects.get(pk=1), "A")
+        factura = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Cedir",
+            "sub_tipo": "A",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 91,
+            "total_facturado": "2800.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=1),
+        })
+        lineas_factura = [LineaDeComprobante(**{
+            "comprobante": factura,
+            "importe_neto": 2800.00,
+            "sub_total": 2800.00,
+            "iva": 0,
+        })]
+        numero = afip.consultar_proximo_numero("Cedir", 91, TipoComprobante.objects.get(pk=3), "A")
+        nota_debito = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Cedir",
+            "sub_tipo": "A",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 91,
+            "total_facturado": "2800.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=3),
+            "factura": factura
+        })
+        lineas_nota_debito = [LineaDeComprobante(**{
+            "comprobante": nota_debito,
+            "importe_neto": 2800.00,
+            "sub_total": 2800.00,
+            "iva": 0,
+        })]
+        numero = afip.consultar_proximo_numero("Cedir", 91, TipoComprobante.objects.get(pk=4), "A")
+        nota_credito = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Cedir",
+            "sub_tipo": "A",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 91,
+            "total_facturado": "2800.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=4),
+            "factura": nota_debito  # Ponemos como comprobante asociado la factura que hicimos recien.
+        })
+        lineas_nota_credito = [LineaDeComprobante(**{
+            "comprobante": nota_credito,
+            "importe_neto": 2800.00,
+            "sub_total": 2800.00,
+            "iva": 0,
+        })]
+        afip.emitir_comprobante(nota_credito, lineas_nota_credito)
+        assert nota_credito.cae == 1
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_emitir_factura_de_credito_electronica(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "30191231"
+
+        afip = Afip()
+        numero = afip.consultar_proximo_numero("Brunetti", 3, TipoComprobante.objects.get(pk=5), "B")
+        factura_electronica = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Brunetti",
+            "sub_tipo": "B",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 3,
+            "total_facturado": "100000.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=5),
+        })
+        lineas_factura_electronica = [LineaDeComprobante(**{
+            "comprobante": factura_electronica,
+            "importe_neto": 100000.00,
+            "sub_total": 100000.00,
+            "iva": 0,
+        })]
+        afip.emitir_comprobante(factura_electronica, lineas_factura_electronica)
+        assert factura_electronica.cae == 1
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_emitir_nota_de_debito_electronica(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "30191231"
+
+        afip = Afip()
+        numero = afip.consultar_proximo_numero("Brunetti", 3, TipoComprobante.objects.get(pk=5), "B")
+        factura_electronica = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Brunetti",
+            "sub_tipo": "B",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 3,
+            "total_facturado": "100000.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=5),
+        })
+        lineas_factura_electronica = [LineaDeComprobante(**{
+            "comprobante": factura_electronica,
+            "importe_neto": 100000.00,
+            "sub_total": 100000.00,
+            "iva": 0,
+        })]
+        numero = afip.consultar_proximo_numero("Brunetti", 3, TipoComprobante.objects.get(pk=6), "B")
+        Comprobante.objects.filter(nro_terminal=3, tipo_comprobante=TipoComprobante.objects.get(pk=6), numero=numero).delete()
+        nota_de_debito_electronica = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Brunetti",
+            "sub_tipo": "B",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 3,
+            "total_facturado": "100000.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=6),
+            "factura": factura_electronica
+        })
+        lineas_nota_de_debito_electronica = [LineaDeComprobante(**{
+            "comprobante": nota_de_debito_electronica,
+            "importe_neto": 100000.00,
+            "sub_total": 100000.00,
+            "iva": 0,
+        })]
+        afip.emitir_comprobante(nota_de_debito_electronica, lineas_nota_de_debito_electronica)
+        assert nota_de_debito_electronica.cae == 1
+
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_emitir_nota_de_credito_electronica(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsaa.return_value.Expirado.return_value = False
+        mock_wsfev1.return_value.Conectar.return_value = True
+        mock_wsfev1.return_value.CompUltimoAutorizado.return_value = 0
+        mock_wsfev1.return_value.AgregarIva.return_value = None
+        mock_wsfev1.return_value.CAESolicitar.return_value = None
+
+        mock_wsfev1.return_value.Resultado = "A"
+        mock_wsfev1.return_value.CAE = 1
+        mock_wsfev1.return_value.Vencimiento = "30191231"
+
+        afip = Afip()
+        numero = afip.consultar_proximo_numero("Brunetti", 3, TipoComprobante.objects.get(pk=5), "B")
+        factura_electronica = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Brunetti",
+            "sub_tipo": "B",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 3,
+            "total_facturado": "100000.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=5),
+        })
+        lineas_factura_electronica = [LineaDeComprobante(**{
+            "comprobante": factura_electronica,
+            "importe_neto": 100000.00,
+            "sub_total": 100000.00,
+            "iva": 0,
+        })]
+        numero = afip.consultar_proximo_numero("Brunetti", 3, TipoComprobante.objects.get(pk=6), "B")
+        Comprobante.objects.filter(nro_terminal=3, tipo_comprobante=TipoComprobante.objects.get(pk=6), numero=numero).delete()
+        nota_de_debito_electronica = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Brunetti",
+            "sub_tipo": "B",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 3,
+            "total_facturado": "100000.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=6),
+            "factura": factura_electronica
+        })
+        lineas_nota_de_debito_electronica = [LineaDeComprobante(**{
+            "comprobante": nota_de_debito_electronica,
+            "importe_neto": 100000.00,
+            "sub_total": 100000.00,
+            "iva": 0,
+        })]
+        numero = afip.consultar_proximo_numero("Brunetti", 3, TipoComprobante.objects.get(pk=7), "B")
+        nota_de_credito_electronica = Comprobante(**{
+            "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+            "domicilio_cliente": " - Springfield - (CP:2000)",
+            "nro_cuit": "30604958640",
+            "gravado_paciente": "",
+            "condicion_fiscal": "EXENTO",
+            "gravado": Gravado.objects.get(pk=1),
+            "responsable": "Brunetti",
+            "sub_tipo": "B",
+            "estado": "PENDIENTE",
+            "numero": numero,
+            "nro_terminal": 3,
+            "total_facturado": "100000.00",
+            "total_cobrado": "0.00",
+            "fecha_emision": "2012-07-07",
+            "fecha_recepcion": "2012-07-07",
+            "tipo_comprobante": TipoComprobante.objects.get(pk=7),
+            "factura": nota_de_debito_electronica
+        })
+        lineas_nota_de_credito_electronica = [LineaDeComprobante(**{
+            "comprobante": nota_de_credito_electronica,
+            "importe_neto": 100000.00,
+            "sub_total": 100000.00,
+            "iva": 0,
+        })]
+        afip.emitir_comprobante(nota_de_credito_electronica, lineas_nota_de_credito_electronica)
+        assert nota_de_credito_electronica.cae == 1

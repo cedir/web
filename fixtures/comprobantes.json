@@ -226,5 +226,26 @@
     "fields": {
         "nombre": "Nota De Credito"
     }
+},
+{
+    "model": "comprobante.tipocomprobante",
+    "pk": 5,
+    "fields": {
+        "nombre": "Factura de Credito Electronica MiPYMES"
+    }
+},
+{
+    "model": "comprobante.tipocomprobante",
+    "pk": 6,
+    "fields": {
+        "nombre": "Nota de Debito Electronica MiPYMES"
+    }
+},
+{
+    "model": "comprobante.tipocomprobante",
+    "pk": 7,
+    "fields": {
+        "nombre": "Factura de Credito Electronica MiPYMES"
+    }
 }
 ]
