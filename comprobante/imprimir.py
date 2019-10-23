@@ -21,6 +21,7 @@ font_bld = 'Helvetica-Bold'
 # TODO pasar a base de datos
 responsables = {
     'cedir': {
+        'CBU': '0150506102000109564632',
         'CUIT': '30709300152',
         'nombre': u'C.E.DI.R Centro de Endoscopia Digestiva',
         'razon': u'C.E.D.I.R Sociedad Colectiva',
@@ -156,6 +157,7 @@ def zona_derecha(p, cabecera, responsable):
     th = 9
     ld = 28
     fc = 0.45
+    sp = 20
 
     p.saveState()
     p.rect(width - ew - margin, height - top - eh , ew, eh, stroke=1, fill=0)
@@ -174,8 +176,15 @@ def zona_derecha(p, cabecera, responsable):
     # Fecha de emisión
     t.textOut(u'Fecha de Emisión: ')
     t.setFont(font_std, th)
-    t.setLeading(ld)
+    t.setLeading(sp)
     t.textLine(cabecera['fecha'])
+
+    # CBU
+    t.setFont(font_bld, th)
+    t.textOut(u'CBU: ')
+    t.setFont(font_std, th)
+    t.setLeading(fc*ld)
+    t.textLine(responsable['CBU'])
 
     # CUIT
     t.setFont(font_bld, th)
