@@ -17,6 +17,7 @@ width, height = A4
 margin = 6*mm
 font_std = 'Helvetica'
 font_bld = 'Helvetica-Bold'
+max_char = 24
 
 # TODO pasar a base de datos
 responsables = {
@@ -30,7 +31,13 @@ responsables = {
         'condicion_ib': '021-335420-4',
         'inicio_actividades': '30/06/2005',
         'leyenda': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
-        'mensaje': 'Pasados 30 días corridos de recibida sin haberse producido el rechazo total, aceptación o pago de esta FACTURA DE CREDITO ELECTRONICA, se considerará que la misma constituye título ejecutivo, en los términos del artículo 523 del Código Procesal, Civil y Comercial de la Nación y concordantes. La aceptación expresa o tácita implicará la plena conformidad para la transferencia de la información contenida en el documento a terceros, en caso de optar por su cesión, transmisión o negociación.'
+        'mensaje': '''Pasados 30 días corridos de recibida sin haberse producido el rechazo total, 
+                    aceptación o pago de esta FACTURA DE CREDITO ELECTRONICA, se considerará que 
+                    la misma constituye título ejecutivo, en los términos del artículo 523 del 
+                    Código Procesal, Civil y Comercial de la Nación y concordantes. La aceptación 
+                    expresa o tácita implicará la plena conformidad para la transferencia de la 
+                    información contenida en el documento a terceros, en caso de optar por su cesión, 
+                    transmisión o negociación.'''
     },
     'brunetti': {
         'CUIT': '20118070659',
@@ -112,7 +119,7 @@ def encabezado(p, tipo):
 def zona_izquierda(p, responsable):
     top = margin + 10*mm
     ew = (width - 2*margin) / 2
-    eh = 45*mm
+    eh = 50*mm
     th = 9
     ld = 25
 
@@ -154,7 +161,7 @@ def zona_izquierda(p, responsable):
 def zona_derecha(p, cabecera, responsable):
     top = margin + 10*mm
     ew = (width - 2*margin) / 2
-    eh = 45*mm
+    eh = 50*mm
     th = 9
     ld = 28
     fc = 0.45
@@ -163,11 +170,13 @@ def zona_derecha(p, cabecera, responsable):
     p.saveState()
     p.rect(width - ew - margin, height - top - eh , ew, eh, stroke=1, fill=0)
 
-    t = p.beginText(width - ew - margin + 17*mm, height - top - 30)
+    t = p.beginText(width - ew - margin + 17*mm, height - top - 25)
 
     # Descripción factura
     t.setFont(font_bld, 16)
-    t.textLine(cabecera['tipo'].upper())
+
+    for s in cabecera['tipo'].split('\n'):
+        t.textLine(s.upper())
 
     # Punto y Numero
     t.setFont(font_bld, th)
@@ -228,7 +237,7 @@ def zona_central(p, cabecera):
 
 
 def post_encabezado(p, cabecera):
-    top = margin +55*mm
+    top = margin + 60*mm
     ew = width - 2*margin
     eh = 8*mm
     th = 10
@@ -262,7 +271,7 @@ def post_encabezado(p, cabecera):
 
 
 def datos_cliente(p, cliente):
-    top = margin + 63*mm
+    top = margin + 68*mm
     ew = width - 2*margin
     eh = 25*mm
     th = 10
@@ -322,7 +331,7 @@ def detalle_lineas(p, header, sizes, lineas):
         ('FONTSIZE',(0,0),(-1,-1),9),
         ])
     mw, mh = table.wrapOn(p, width, height)
-    table.drawOn(p, margin, height - 94*mm - mh)
+    table.drawOn(p, margin, height - 99*mm - mh)
 
 
 def detalle_iva(p, detalle):
@@ -467,6 +476,22 @@ def obtener_detalle_iva(c):
     ]
     return result
 
+def format_tipo_comprobante(nombre):
+
+    if len(nombre) <= max_char:
+        return nombre
+    
+    result = ''
+    amount_chars = 0
+    
+    for word in nombre.split(' '):
+        amount_chars += len(word)
+        if amount_chars > max_char:
+            result += '\n'
+            amount_chars = 0
+        result += word + ' '
+    
+    return result
 
 def obtener_comprobante(cae):
     c = Comprobante.objects.get(cae=cae)
@@ -474,7 +499,7 @@ def obtener_comprobante(cae):
     return {
         'cabecera': {
             'codigo': u'{0:02d}'.format(c.codigo_afip),
-            'tipo': c.tipo_comprobante.nombre,
+            'tipo': format_tipo_comprobante(c.tipo_comprobante.nombre),
             'letra': c.sub_tipo,
             'punto_venta': c.nro_terminal,
             'numero': c.numero,
