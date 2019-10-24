@@ -29,7 +29,8 @@ responsables = {
         'condicion_iva': u'IVA Responsable Inscripto',
         'condicion_ib': '021-335420-4',
         'inicio_actividades': '30/06/2005',
-        'mensaje': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
+        'leyenda': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
+        'mensaje': 'Pasados 30 días corridos de recibida sin haberse producido el rechazo total, aceptación o pago de esta FACTURA DE CREDITO ELECTRONICA, se considerará que la misma constituye título ejecutivo, en los términos del artículo 523 del Código Procesal, Civil y Comercial de la Nación y concordantes. La aceptación expresa o tácita implicará la plena conformidad para la transferencia de la información contenida en el documento a terceros, en caso de optar por su cesión, transmisión o negociación.'
     },
     'brunetti': {
         'CUIT': '20118070659',
@@ -337,7 +338,7 @@ def detalle_iva(p, detalle):
 
 
 def pie_de_pagina(p, responsable, leyenda):
-    mensaje = responsable['mensaje'] if leyenda else u''
+    mensaje = responsable['leyenda'] if leyenda else u''
     top = 250*mm
     ew = width - 2*margin
     eh = 7*mm if mensaje else 0
