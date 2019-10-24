@@ -15,11 +15,11 @@ https://groups.google.com/forum/#!forum/pyafipws
 
 ## Steps to start with the project
 
-- Install virtualenv: pip install virtualenv
-- Create virtual environment: virtualenv cedir
-- Activate virtual environment inside the directory created by virtualenv: source bin/activate
-- Clone git repository: git clone https://github.com/cedir/web
-- Install libraries inside web directory: pip install -r requeriments.txt
+- Install virtualenv: `pip install virtualenv`
+- Create virtual environment: `virtualenv cedir`
+- Activate virtual environment inside the directory created by virtualenv: `source bin/activate`
+- Clone git repository: `git clone https://github.com/cedir/web`
+- Install libraries inside web directory: `pip install -r requeriments.txt`
 - Install postgres and pgadmin4 with your operative system's package manager
 - Start pgadmin4 and create the admin user
 - In pgadmin4, go to file -> preferences -> Binary paths -> PostgreSQL Binary Path, and paste the directory where psql is installed (usually /usr/bin)
@@ -27,25 +27,25 @@ https://groups.google.com/forum/#!forum/pyafipws
    If you don't know where postgres is installed, execute sudo find / -name "psql"
 
  - Create the database inside the postgres terminal:
-
+`
          sudo su postgres -l
 
          initdb --locale $LANG -E UTF8 -D '/var/lib/postgres/data/'
 
          exit
-
+`
  - Start postgres service:
-
+`
      sudo systemctl enable --now postgresql.service
 
      sudo systemctl start postgresql.service
-
- - Restore database: psql -h localhost -F p -d nombre_base_de_datos < ./db.out
+`
+ - Restore database: `psql -h localhost -F p -d nombre_base_de_datos < ./db.out`
  - Create file settings.py, containing the database credentials and the directory where the logs will be saved, in the directory where manage.py is. You can use settings.py.bak as a template: `cp settings.py.bak settings.py`.
- - Execute tests: python manage.py tests (see Troubleshooting)
+ - Execute tests: `python manage.py tests` (see Troubleshooting)
  - Install nodejs with your operative system's package manager
- - Install dependencies: npm install
- - Run server: python manage.py runserver
+ - Install dependencies: `npm install`
+ - Run server: `python manage.py runserver`
 
 ### Troubleshooting:
 
