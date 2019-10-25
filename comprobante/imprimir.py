@@ -37,9 +37,9 @@ responsables = {
                     'ELECTRONICA, se considerará que la misma\n'
                     'constituye título ejecutivo, en los términos del\n'
                     'artículo 523 del Código Procesal, Civil y\n'
-                    'Comercial de la Nación y concordantes. La\n'
-                    'aceptación expresa o tácita implicará la plena\n'
-                    'conformidad para la transferencia de la\n'
+                    'Comercial de la Nación y concordantes.\n'
+                    'La aceptación expresa o tácita implicará la\n'
+                    'plena conformidad para la transferencia de la\n'
                     'información contenida en el documento a\n'
                     'terceros, en caso de optar por su cesión,\n'
                     'transmisión o negociación.')
@@ -338,7 +338,11 @@ def detalle_lineas(p, header, sizes, lineas):
     mw, mh = table.wrapOn(p, width, height)
     table.drawOn(p, margin, height - 99*mm - mh)
 
-def imprimir_mensaje(p, responsable):
+def imprimir_mensaje(p, responsable, cabecera):
+
+    #Verifica que el tipo de comprobante sea factura electronica antes de imprimir el mensaje
+    if cabecera['id_comprobante'] != 5:
+        return
 
     mensaje = responsable['mensaje'].split('\n')
 
@@ -406,7 +410,7 @@ def generar_factura(response, comp, leyenda):
 
         detalle_lineas(p, comp['headers'], comp['sizes'], comp['lineas'])
 
-        imprimir_mensaje(p, comp['responsable'])
+        imprimir_mensaje(p, comp['responsable'], comp['cabecera'])
 
         detalle_iva(p, comp['detalle'])
 
@@ -525,6 +529,7 @@ def obtener_comprobante(cae):
         'cabecera': {
             'codigo': u'{0:02d}'.format(c.codigo_afip),
             'tipo': format_tipo_comprobante(c.tipo_comprobante.nombre),
+            'id_comprobante': c.tipo_comprobante.id,
             'letra': c.sub_tipo,
             'punto_venta': c.nro_terminal,
             'numero': c.numero,
