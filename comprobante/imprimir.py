@@ -30,7 +30,7 @@ responsables = {
         'condicion_iva': u'IVA Responsable Inscripto',
         'condicion_ib': '021-335420-4',
         'inicio_actividades': '30/06/2005',
-        'imprimir_leyenda_honorarios': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
+        'mensaje_leyenda_honorarios': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
         'mensaje_legal_factura_electronica': ('Pasados 30 días corridos de recibida sin \n'
                     'haberse producido el rechazo total, aceptación\n'
                     'o pago de esta FACTURA DE CREDITO\n'
@@ -195,7 +195,7 @@ def zona_derecha(p, cabecera, responsable):
     t.textLine(cabecera['fecha'])
 
     # CBU
-    if cabecera['id_comprobante'] == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
+    if cabecera['id_tipo_comprobante'] == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
         t.setFont(font_bld, th)
         t.textOut(u'CBU: ')
         t.setFont(font_std, th)
@@ -341,8 +341,7 @@ def detalle_lineas(p, header, sizes, lineas):
 
 def imprimir_mensaje(p, responsable, cabecera):
 
-    #Verifica que el tipo de comprobante sea factura electronica antes de imprimir el mensaje
-    if cabecera['id_comprobante'] != ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
+    if cabecera['id_tipo_comprobante'] != ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
         return
 
     mensaje = responsable['mensaje_legal_factura_electronica'].split('\n')
@@ -374,8 +373,8 @@ def detalle_iva(p, detalle):
     table.drawOn(p, width - margin - 8*cm, 55*mm)
 
 
-def pie_de_pagina(p, responsable, leyenda):
-    mensaje = responsable['imprimir_leyenda_honorarios'] if leyenda else u''
+def pie_de_pagina(p, responsable, imprimir_leyenda_honorarios):
+    mensaje = responsable['mensaje_leyenda_honorarios'] if imprimir_leyenda_honorarios else u''
     top = 250*mm
     ew = width - 2*margin
     eh = 7*mm if mensaje else 0
@@ -530,7 +529,7 @@ def obtener_comprobante(cae):
         'cabecera': {
             'codigo': u'{0:02d}'.format(c.codigo_afip),
             'tipo': format_tipo_comprobante(c.tipo_comprobante.nombre),
-            'id_comprobante': c.tipo_comprobante.id,
+            'id_tipo_comprobante': c.tipo_comprobante.id,
             'letra': c.sub_tipo,
             'punto_venta': c.nro_terminal,
             'numero': c.numero,
