@@ -1,6 +1,7 @@
 from datetime import timedelta
 from django.db import models
 
+ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA = 5
 
 class TipoComprobante(models.Model):
     nombre = models.CharField(max_length=128, db_column=u'tipoComprobante')

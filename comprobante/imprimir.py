@@ -30,8 +30,8 @@ responsables = {
         'condicion_iva': u'IVA Responsable Inscripto',
         'condicion_ib': '021-335420-4',
         'inicio_actividades': '30/06/2005',
-        'leyenda': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
-        'mensaje': ('Pasados 30 días corridos de recibida sin \n'
+        'mensaje': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
+        'mensaje_legal_factura_electronica': ('Pasados 30 días corridos de recibida sin \n'
                     'haberse producido el rechazo total, aceptación\n'
                     'o pago de esta FACTURA DE CREDITO\n'
                     'ELECTRONICA, se considerará que la misma\n'
@@ -195,11 +195,12 @@ def zona_derecha(p, cabecera, responsable):
     t.textLine(cabecera['fecha'])
 
     # CBU
-    t.setFont(font_bld, th)
-    t.textOut(u'CBU: ')
-    t.setFont(font_std, th)
-    t.setLeading(fc*ld)
-    t.textLine(responsable['CBU'])
+    if cabecera['id_comprobante'] == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
+        t.setFont(font_bld, th)
+        t.textOut(u'CBU: ')
+        t.setFont(font_std, th)
+        t.setLeading(fc*ld)
+        t.textLine(responsable['CBU'])
 
     # CUIT
     t.setFont(font_bld, th)
@@ -341,10 +342,10 @@ def detalle_lineas(p, header, sizes, lineas):
 def imprimir_mensaje(p, responsable, cabecera):
 
     #Verifica que el tipo de comprobante sea factura electronica antes de imprimir el mensaje
-    if cabecera['id_comprobante'] != 5:
+    if cabecera['id_comprobante'] != ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
         return
 
-    mensaje = responsable['mensaje'].split('\n')
+    mensaje = responsable['mensaje_legal_factura_electronica'].split('\n')
 
     top = 170*mm
     ew = (width - 2*margin) / 2
@@ -374,7 +375,7 @@ def detalle_iva(p, detalle):
 
 
 def pie_de_pagina(p, responsable, leyenda):
-    mensaje = responsable['leyenda'] if leyenda else u''
+    mensaje = responsable['mensaje'] if leyenda else u''
     top = 250*mm
     ew = width - 2*margin
     eh = 7*mm if mensaje else 0
