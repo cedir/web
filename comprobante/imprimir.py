@@ -30,7 +30,7 @@ responsables = {
         'condicion_iva': u'IVA Responsable Inscripto',
         'condicion_ib': '021-335420-4',
         'inicio_actividades': '30/06/2005',
-        'mensaje': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
+        'imprimir_leyenda_honorarios': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
         'mensaje_legal_factura_electronica': ('Pasados 30 días corridos de recibida sin \n'
                     'haberse producido el rechazo total, aceptación\n'
                     'o pago de esta FACTURA DE CREDITO\n'
@@ -375,7 +375,7 @@ def detalle_iva(p, detalle):
 
 
 def pie_de_pagina(p, responsable, leyenda):
-    mensaje = responsable['mensaje'] if leyenda else u''
+    mensaje = responsable['imprimir_leyenda_honorarios'] if leyenda else u''
     top = 250*mm
     ew = width - 2*margin
     eh = 7*mm if mensaje else 0
