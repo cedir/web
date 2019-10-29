@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from httplib2 import ServerNotFoundError
 from mock import patch
 
@@ -249,8 +250,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 91,
             "total_facturado": "2800.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=1),
         })
         # Creamos una linea de comprobante, parte necesaria de un comprobante para nuestro sistema.
@@ -293,8 +294,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 91,
             "total_facturado": "2800.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=1),
         })
         lineas_factura = [LineaDeComprobante(**{
@@ -318,8 +319,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 91,
             "total_facturado": "2800.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=3),
             "factura": factura
         })
@@ -361,8 +362,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 91,
             "total_facturado": "2800.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=1),
         })
         lineas_factura = [LineaDeComprobante(**{
@@ -386,8 +387,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 91,
             "total_facturado": "2800.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=3),
             "factura": factura
         })
@@ -412,8 +413,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 91,
             "total_facturado": "2800.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=4),
             "factura": nota_debito  # Ponemos como comprobante asociado la factura que hicimos recien.
         })
@@ -456,8 +457,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 3,
             "total_facturado": "100000.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=5),
         })
         lineas_factura_electronica = [LineaDeComprobante(**{
@@ -499,8 +500,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 3,
             "total_facturado": "100000.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=5),
         })
         lineas_factura_electronica = [LineaDeComprobante(**{
@@ -525,8 +526,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 3,
             "total_facturado": "100000.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=6),
             "factura": factura_electronica
         })
@@ -569,8 +570,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 3,
             "total_facturado": "100000.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=5),
         })
         lineas_factura_electronica = [LineaDeComprobante(**{
@@ -595,8 +596,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 3,
             "total_facturado": "100000.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=6),
             "factura": factura_electronica
         })
@@ -621,8 +622,8 @@ class TestAfipAPI(TestCase):
             "nro_terminal": 3,
             "total_facturado": "100000.00",
             "total_cobrado": "0.00",
-            "fecha_emision": "2012-07-07",
-            "fecha_recepcion": "2012-07-07",
+            "fecha_emision": datetime.today(),
+            "fecha_recepcion": datetime.today(),
             "tipo_comprobante": TipoComprobante.objects.get(pk=7),
             "factura": nota_de_debito_electronica
         })

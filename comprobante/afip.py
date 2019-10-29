@@ -66,16 +66,19 @@ class Afip(object):
     def __init__(self):
         self.afip_cedir = _Afip(CEDIR_PV_PATH, CEDIR_CERT_PATH, CEDIR_CUIT)
         self.afip_brunetti = _Afip(BRUNETTI_PV_PATH, BRUNETTI_CERT_PATH, BRUNETTI_CUIT)
+
     def emitir_comprobante(self, comprobante_cedir, lineas):
         if comprobante_cedir.responsable == "Cedir":
             return self.afip_cedir.emitir_comprobante(comprobante_cedir, lineas)
         else:
             return self.afip_brunetti.emitir_comprobante(comprobante_cedir, lineas)
+
     def consultar_comprobante(self, comprobante_cedir):
         if comprobante_cedir.responsable == "Cedir":
             return self.afip_cedir.consultar_comprobante(comprobante_cedir)
         else:
             return self.afip_brunetti.consultar_comprobante(comprobante_cedir)
+
     def consultar_proximo_numero(self, responsable, nro_terminal, tipo_comprobante, subtipo):
         if responsable == "Cedir":
             return self.afip_cedir.consultar_proximo_numero(nro_terminal, tipo_comprobante, subtipo)
