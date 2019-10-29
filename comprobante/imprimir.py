@@ -17,10 +17,12 @@ width, height = A4
 margin = 6*mm
 font_std = 'Helvetica'
 font_bld = 'Helvetica-Bold'
+max_char = 24
 
 # TODO pasar a base de datos
 responsables = {
     'cedir': {
+        'CBU': '0150506102000109564632',
         'CUIT': '30709300152',
         'nombre': u'C.E.DI.R Centro de Endoscopia Digestiva',
         'razon': u'C.E.D.I.R Sociedad Colectiva',
@@ -28,7 +30,19 @@ responsables = {
         'condicion_iva': u'IVA Responsable Inscripto',
         'condicion_ib': '021-335420-4',
         'inicio_actividades': '30/06/2005',
-        'mensaje': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
+        'mensaje_leyenda_honorarios': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
+        'mensaje_legal_factura_electronica': ('Pasados 30 días corridos de recibida sin \n'
+                    'haberse producido el rechazo total, aceptación\n'
+                    'o pago de esta FACTURA DE CREDITO\n'
+                    'ELECTRONICA, se considerará que la misma\n'
+                    'constituye título ejecutivo, en los términos del\n'
+                    'artículo 523 del Código Procesal, Civil y\n'
+                    'Comercial de la Nación y concordantes.\n'
+                    'La aceptación expresa o tácita implicará la\n'
+                    'plena conformidad para la transferencia de la\n'
+                    'información contenida en el documento a\n'
+                    'terceros, en caso de optar por su cesión,\n'
+                    'transmisión o negociación.')
     },
     'brunetti': {
         'CUIT': '20118070659',
@@ -110,7 +124,7 @@ def encabezado(p, tipo):
 def zona_izquierda(p, responsable):
     top = margin + 10*mm
     ew = (width - 2*margin) / 2
-    eh = 45*mm
+    eh = 50*mm
     th = 9
     ld = 25
 
@@ -152,19 +166,22 @@ def zona_izquierda(p, responsable):
 def zona_derecha(p, cabecera, responsable):
     top = margin + 10*mm
     ew = (width - 2*margin) / 2
-    eh = 45*mm
+    eh = 50*mm
     th = 9
     ld = 28
     fc = 0.45
+    sp = 20
 
     p.saveState()
     p.rect(width - ew - margin, height - top - eh , ew, eh, stroke=1, fill=0)
 
-    t = p.beginText(width - ew - margin + 17*mm, height - top - 30)
+    t = p.beginText(width - ew - margin + 17*mm, height - top - 25)
 
     # Descripción factura
     t.setFont(font_bld, 16)
-    t.textLine(cabecera['tipo'].upper())
+
+    for s in cabecera['tipo'].split('\n'):
+        t.textLine(s.upper())
 
     # Punto y Numero
     t.setFont(font_bld, th)
@@ -174,8 +191,16 @@ def zona_derecha(p, cabecera, responsable):
     # Fecha de emisión
     t.textOut(u'Fecha de Emisión: ')
     t.setFont(font_std, th)
-    t.setLeading(ld)
+    t.setLeading(sp)
     t.textLine(cabecera['fecha'])
+
+    # CBU
+    if cabecera['id_tipo_comprobante'] == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
+        t.setFont(font_bld, th)
+        t.textOut(u'CBU: ')
+        t.setFont(font_std, th)
+        t.setLeading(fc*ld)
+        t.textLine(responsable['CBU'])
 
     # CUIT
     t.setFont(font_bld, th)
@@ -218,7 +243,7 @@ def zona_central(p, cabecera):
 
 
 def post_encabezado(p, cabecera):
-    top = margin +55*mm
+    top = margin + 60*mm
     ew = width - 2*margin
     eh = 8*mm
     th = 10
@@ -252,7 +277,7 @@ def post_encabezado(p, cabecera):
 
 
 def datos_cliente(p, cliente):
-    top = margin + 63*mm
+    top = margin + 68*mm
     ew = width - 2*margin
     eh = 25*mm
     th = 10
@@ -312,7 +337,28 @@ def detalle_lineas(p, header, sizes, lineas):
         ('FONTSIZE',(0,0),(-1,-1),9),
         ])
     mw, mh = table.wrapOn(p, width, height)
-    table.drawOn(p, margin, height - 94*mm - mh)
+    table.drawOn(p, margin, height - 99*mm - mh)
+
+def imprimir_mensaje(p, responsable, cabecera):
+
+    if cabecera['id_tipo_comprobante'] != ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
+        return
+
+    mensaje = responsable['mensaje_legal_factura_electronica'].split('\n')
+
+    top = 170*mm
+    ew = (width - 2*margin) / 2
+    eh = 72*mm 
+    y_pos = height - top - eh - 2
+
+    p.saveState()
+    p.rect( margin, y_pos , ew, eh, stroke=1, fill=0)
+    p.setFont(font_std, 12)
+
+    for line, i in zip(mensaje, range(len(mensaje))):
+        p.drawString(margin * 2, y_pos + eh - margin - i*15 - 5, line)
+
+    p.restoreState()
 
 
 def detalle_iva(p, detalle):
@@ -327,8 +373,8 @@ def detalle_iva(p, detalle):
     table.drawOn(p, width - margin - 8*cm, 55*mm)
 
 
-def pie_de_pagina(p, responsable, leyenda):
-    mensaje = responsable['mensaje'] if leyenda else u''
+def pie_de_pagina(p, responsable, imprimir_leyenda_honorarios):
+    mensaje = responsable['mensaje_leyenda_honorarios'] if imprimir_leyenda_honorarios else u''
     top = 250*mm
     ew = width - 2*margin
     eh = 7*mm if mensaje else 0
@@ -363,6 +409,8 @@ def generar_factura(response, comp, leyenda):
         datos_cliente(p, comp['cliente'])
 
         detalle_lineas(p, comp['headers'], comp['sizes'], comp['lineas'])
+
+        imprimir_mensaje(p, comp['responsable'], comp['cabecera'])
 
         detalle_iva(p, comp['detalle'])
 
@@ -457,6 +505,22 @@ def obtener_detalle_iva(c):
     ]
     return result
 
+def format_tipo_comprobante(nombre):
+
+    if len(nombre) <= max_char:
+        return nombre
+    
+    result = ''
+    amount_chars = 0
+    
+    for word in nombre.split(' '):
+        amount_chars += len(word)
+        if amount_chars > max_char:
+            result += '\n'
+            amount_chars = 0
+        result += word + ' '
+    
+    return result
 
 def obtener_comprobante(cae):
     c = Comprobante.objects.get(cae=cae)
@@ -464,7 +528,8 @@ def obtener_comprobante(cae):
     return {
         'cabecera': {
             'codigo': u'{0:02d}'.format(c.codigo_afip),
-            'tipo': c.tipo_comprobante.nombre,
+            'tipo': format_tipo_comprobante(c.tipo_comprobante.nombre),
+            'id_tipo_comprobante': c.tipo_comprobante.id,
             'letra': c.sub_tipo,
             'punto_venta': c.nro_terminal,
             'numero': c.numero,
