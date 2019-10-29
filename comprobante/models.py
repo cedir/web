@@ -1,7 +1,13 @@
 from datetime import timedelta
 from django.db import models
 
+ID_TIPO_COMPROBANTE_FACTURA = 1
+ID_TIPO_COMPROBANTE_LIQUIDACION = 2
+ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO = 3
+ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO = 4
 ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA = 5
+ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA = 6
+ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA = 7
 
 class TipoComprobante(models.Model):
     nombre = models.CharField(max_length=128, db_column=u'tipoComprobante')
@@ -58,8 +64,22 @@ class Comprobante(models.Model):
     @property
     def codigo_afip(self):
         conversion = {
-            'A': {1: 1, 3: 2, 4: 3, 5: 201, 6: 202, 7: 203},
-            'B': {1: 6, 3: 7, 4: 8, 5: 206, 6: 207, 7: 208}
+            'A': {
+                ID_TIPO_COMPROBANTE_FACTURA: 1,
+                ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO: 2,
+                ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO: 3,
+                ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA: 201,
+                ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA: 202,
+                ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA: 203
+            },
+            'B': {
+                ID_TIPO_COMPROBANTE_FACTURA: 6,
+                ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO: 7,
+                ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO: 8,
+                ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA: 206,
+                ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA: 207,
+                ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA: 208
+            }
         }
         return conversion[self.sub_tipo][self.tipo_comprobante.id]
 

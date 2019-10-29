@@ -2,31 +2,25 @@ from abc import abstractproperty
 from decimal import Decimal
 
 from medico.calculo_honorarios import CalculadorHonorariosInformeContadora
-from comprobante.models import LineaDeComprobante
-
-FACTURA = 1
-LIQUIDACION = 2
-NOTA_DE_DEBITO = 3
-NOTA_DE_CREDITO = 4
-FACTURA_ELECTRONICA_MIPYME = 5
-NOTA_DE_DEBITO_ELECTRONICA_MIPYME = 6
-NOTA_DE_CREDITO_ELECTRONICA_MIPYME = 7
-
+from comprobante.models import LineaDeComprobante, ID_TIPO_COMPROBANTE_FACTURA, \
+    ID_TIPO_COMPROBANTE_LIQUIDACION, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO, \
+    ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
+    ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA
 
 def calculador_informe_factory(comprobante):
-    if comprobante.tipo_comprobante.id == FACTURA:
+    if comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_FACTURA:
         return CalculadorInformeFactura(comprobante)
-    elif comprobante.tipo_comprobante.id == NOTA_DE_DEBITO:
+    elif comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_LIQUIDACION:
         return CalculadorInformeFactura(comprobante)
-    elif comprobante.tipo_comprobante.id == NOTA_DE_CREDITO:
+    elif comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO:
+        return CalculadorInformeFactura(comprobante)
+    elif comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO:
         return CalculadorInformeNotaCredito(comprobante)
-    elif comprobante.tipo_comprobante.id == LIQUIDACION:
+    elif comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
         return CalculadorInformeFactura(comprobante)
-    elif comprobante.tipo_comprobante.id == FACTURA_ELECTRONICA_MIPYME:
+    elif comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA:
         return CalculadorInformeFactura(comprobante)
-    elif comprobante.tipo_comprobante.id == NOTA_DE_DEBITO_ELECTRONICA_MIPYME:
-        return CalculadorInformeFactura(comprobante)
-    elif comprobante.tipo_comprobante.id == NOTA_DE_CREDITO_ELECTRONICA_MIPYME:
+    elif comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA:
         return CalculadorInformeNotaCredito(comprobante)
     else:
         raise Exception(comprobante.tipo_comprobante.nombre)

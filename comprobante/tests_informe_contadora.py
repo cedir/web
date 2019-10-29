@@ -6,7 +6,10 @@ from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import User
 
-from comprobante.models import Comprobante, TipoComprobante
+from comprobante.models import Comprobante, TipoComprobante, ID_TIPO_COMPROBANTE_FACTURA, \
+    ID_TIPO_COMPROBANTE_LIQUIDACION, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO, \
+    ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
+    ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA
 from comprobante.calculador_informe import calculador_informe_factory, CalculadorInformeFactura, CalculadorInformeNotaCredito
 
 
@@ -44,13 +47,13 @@ class CreateInformeFactoryTest(TestCase):
     fixtures = ["comprobantes.json"]
 
     def setUp(self):
-        self.tipo_comprobante_factura = TipoComprobante.objects.get(pk=1)
-        self.tipo_comprobante_liquidacion = TipoComprobante.objects.get(pk=2)
-        self.tipo_comprobante_nota_debito = TipoComprobante.objects.get(pk=3)
-        self.tipo_comprobante_nota_credito = TipoComprobante.objects.get(pk=4)
-        self.tipo_comprobante_factura_electronica = TipoComprobante.objects.get(pk=5)
-        self.tipo_comprobante_nota_debito_electronica = TipoComprobante.objects.get(pk=6)
-        self.tipo_comprobante_nota_credito_electronica = TipoComprobante.objects.get(pk=7)
+        self.tipo_comprobante_factura = TipoComprobante.objects.get(pk=ID_TIPO_COMPROBANTE_FACTURA)
+        self.tipo_comprobante_liquidacion = TipoComprobante.objects.get(pk=ID_TIPO_COMPROBANTE_LIQUIDACION)
+        self.tipo_comprobante_nota_debito = TipoComprobante.objects.get(pk=ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)
+        self.tipo_comprobante_nota_credito = TipoComprobante.objects.get(pk=ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+        self.tipo_comprobante_factura_electronica = TipoComprobante.objects.get(pk=ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA)
+        self.tipo_comprobante_nota_debito_electronica = TipoComprobante.objects.get(pk=ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)
+        self.tipo_comprobante_nota_credito_electronica = TipoComprobante.objects.get(pk=ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
 
     def test_factory_factura(self):
         comprobante = Comprobante(

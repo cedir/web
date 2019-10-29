@@ -9,20 +9,16 @@ from httplib2 import ServerNotFoundError
 from pyafipws.wsaa import WSAA
 from pyafipws.wsfev1 import WSFEv1
 
-from comprobante.models import Comprobante
+from comprobante.models import Comprobante, ID_TIPO_COMPROBANTE_FACTURA, \
+    ID_TIPO_COMPROBANTE_LIQUIDACION, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO, \
+    ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
+    ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA
 from settings import AFIP_WSAA_URL, AFIP_WSDL_URL, \
     CEDIR_CERT_PATH, CEDIR_PV_PATH, CEDIR_CUIT, BRUNETTI_CERT_PATH, BRUNETTI_PV_PATH, BRUNETTI_CUIT
 
 IVA_EXCENTO = 1
 IVA_10_5 = 2
 IVA_21 = 3
-
-NOTA_DE_DEBITO = 3
-NOTA_DE_CREDITO = 4
-FACTURA_ELECTRONICA_MIPYME = 5
-NOTA_DE_DEBITO_ELECTRONICA_MIPYME = 6
-NOTA_DE_CREDITO_ELECTRONICA_MIPYME = 7
-
 
 class AfipError(RuntimeError):
     '''
@@ -140,7 +136,7 @@ class _Afip(object):
         nro = self.consultar_proximo_numero(comprobante_cedir.nro_terminal, comprobante_cedir.tipo_comprobante, comprobante_cedir.sub_tipo)
         fecha = comprobante_cedir.fecha_emision.strftime("%Y%m%d")
         # En estos tipos de comprobante en especifico, la AFIP te prohibe poner un campo fecha de vencimiento.
-        fecha_vto = None if comprobante_cedir.tipo_comprobante.id in [NOTA_DE_DEBITO_ELECTRONICA_MIPYME, NOTA_DE_CREDITO_ELECTRONICA_MIPYME] else comprobante_cedir.fecha_vencimiento.strftime("%Y%m%d")
+        fecha_vto = None if comprobante_cedir.tipo_comprobante.id in [ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA] else comprobante_cedir.fecha_vencimiento.strftime("%Y%m%d")
         imp_iva = sum([l.iva for l in lineas])
         if comprobante_cedir.gravado.id == IVA_EXCENTO:
             imp_neto = "0.00"
@@ -175,10 +171,10 @@ class _Afip(object):
 
         # Si hay comprobantes asociados, los agregamos.
         if comprobante_cedir.tipo_comprobante.id in [
-            NOTA_DE_DEBITO, # Para comprobantes no electronicos puede no ser necesario pero se los deja por completitud
-            NOTA_DE_CREDITO,
-            NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
-            NOTA_DE_CREDITO_ELECTRONICA_MIPYME] and comprobante_cedir.factura:
+            ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO, # Para comprobantes no electronicos puede no ser necesario pero se los deja por completitud
+            ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO,
+            ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA,
+            ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA] and comprobante_cedir.factura:
             comprobante_asociado = comprobante_cedir.factura
             self.webservice.AgregarCmpAsoc(
                 tipo=comprobante_asociado.codigo_afip,
@@ -190,14 +186,14 @@ class _Afip(object):
 
         # Si es Factura de Credito Electronica, hayq eu agregar como opcional el CBU del Cedir
         if comprobante_cedir.tipo_comprobante.id in [
-            FACTURA_ELECTRONICA_MIPYME]:
+            ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA]:
             self.webservice.AgregarOpcional(2101, "0150506102000109564632")
 
         # Si es Nota de Debito/Credito Electronica, hay que agregar un opcional indicando que no es anulacion.
         # En principio, el Cedir nunca anula facturas.
         if comprobante_cedir.tipo_comprobante.id in [
-            NOTA_DE_DEBITO_ELECTRONICA_MIPYME,
-            NOTA_DE_CREDITO_ELECTRONICA_MIPYME]:
+            ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA,
+            ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA]:
             self.webservice.AgregarOpcional(22, "N")
 
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
