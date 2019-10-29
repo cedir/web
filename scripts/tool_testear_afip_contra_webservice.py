@@ -8,7 +8,6 @@ El script emite un comprobante de cada uno de los tipos validos que tenemos. (ex
 
 ATENCION: esto emite comprobantes contra la url y con los certificados configurados en settings.py
 O sea qe si lo corres en produccion, facturas en falso :)
-Tambien borra comprobantes de la DB para no tener colisiones de numero.
 
 Para correrlo contra el entorno de test, se necesitan las urls correctas y certificados de homologacion.
 Tener en cuenta que el servicio de homologacion se cae bastante.

@@ -4,16 +4,30 @@ from decimal import Decimal
 from medico.calculo_honorarios import CalculadorHonorariosInformeContadora
 from comprobante.models import LineaDeComprobante
 
+FACTURA = 1
+LIQUIDACION = 2
+NOTA_DE_DEBITO = 3
+NOTA_DE_CREDITO = 4
+FACTURA_ELECTRONICA_MIPYME = 5
+NOTA_DE_DEBITO_ELECTRONICA_MIPYME = 6
+NOTA_DE_CREDITO_ELECTRONICA_MIPYME = 7
+
 
 def calculador_informe_factory(comprobante):
-    if comprobante.tipo_comprobante.nombre in "Factura":
+    if comprobante.tipo_comprobante.id == FACTURA:
         return CalculadorInformeFactura(comprobante)
-    elif comprobante.tipo_comprobante.nombre == "Nota De Debito":
-        return CalculadorInformeNotaDebito(comprobante)
-    elif comprobante.tipo_comprobante.nombre == "Nota De Credito":
+    elif comprobante.tipo_comprobante.id == NOTA_DE_DEBITO:
+        return CalculadorInformeFactura(comprobante)
+    elif comprobante.tipo_comprobante.id == NOTA_DE_CREDITO:
         return CalculadorInformeNotaCredito(comprobante)
-    elif comprobante.tipo_comprobante.nombre == "Liquidacion":
-        return CalculadorInformeLiquidacion(comprobante)
+    elif comprobante.tipo_comprobante.id == LIQUIDACION:
+        return CalculadorInformeFactura(comprobante)
+    elif comprobante.tipo_comprobante.id == FACTURA_ELECTRONICA_MIPYME:
+        return CalculadorInformeFactura(comprobante)
+    elif comprobante.tipo_comprobante.id == NOTA_DE_DEBITO_ELECTRONICA_MIPYME:
+        return CalculadorInformeFactura(comprobante)
+    elif comprobante.tipo_comprobante.id == NOTA_DE_CREDITO_ELECTRONICA_MIPYME:
+        return CalculadorInformeNotaCredito(comprobante)
     else:
         raise Exception(comprobante.tipo_comprobante.nombre)
 
@@ -181,23 +195,14 @@ class CalculadorInformeFactura(CalculadorInforme):
             return Decimal("0.00")
         return sum([aux(estudio) * (1 - estudio.retencion_impositiva) for estudio in self.estudios])
 
-
-class CalculadorInformeNotaDebito(CalculadorInformeFactura):
-    """
-    Las notas de debito tienen en principio las mismas reglas que una factura pero definimos esta clase por generalidad
-    y por si apareciera una regla especifica para mismas.
-    """
-    pass
-
-
 class CalculadorInformeNotaCredito(CalculadorInforme):
     """
     Las notas de credito tienen la misma logica que las facturas pero los valores se muestran en negativo.
-    Por lo tanto, definimos esta clase que aplica la logica de un calculador de facturas pero devuelve el opuesto.
+    Por lo tanto, definimos esta clase que aplica la logica de un calculador de facturas pero devuelve el valor negativo.
     """
     def __init__(self, comprobante):
         self.comprobante = comprobante
-        self.calculador_aux = CalculadorInformeNotaDebito(comprobante)
+        self.calculador_aux = CalculadorInformeFactura(comprobante)
 
     @property
     def total_facturado(self):
@@ -250,11 +255,3 @@ class CalculadorInformeNotaCredito(CalculadorInforme):
     @property
     def total_material_especifico(self):
         return Decimal("-1") * self.calculador_aux.total_material_especifico
-
-
-class CalculadorInformeLiquidacion(CalculadorInformeFactura):
-    """
-    Las liquidaciones tienen en principio las mismas reglas que una factura pero definimos esta clase por generalidad
-    y por si apareciera una regla especifica para mismas.
-    """
-    pass

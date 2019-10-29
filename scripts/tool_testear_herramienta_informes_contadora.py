@@ -7,6 +7,11 @@
 #       Crea un informe con la herramienta
 #       Compara campo por campo e imprime en consola los que tengan una diferencia
 #
+# Llamarlo con:
+# $ python scripts/tool_testear_herramienta_informes_contadora.py path_a_informe_ejemplo.xlsx
+#
+# Los informes de ejemplo se encuentran en el mega, en una carpeta "informes_comproabntes_ejemplo"
+
 
 # Correccion del path para importar desde el directorio padre
 from __future__ import print_function
