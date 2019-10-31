@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from django.db import models
 
 CONDICIONES_FISCALES = (('CONSUMIDOR FINAL', 'CONSUMIDOR FINAL'),
@@ -6,6 +6,7 @@ CONDICIONES_FISCALES = (('CONSUMIDOR FINAL', 'CONSUMIDOR FINAL'),
                         ('EXENTO', 'EXENTO'))
 BOOLEANOS = (('1', 'Si'),
              ('0', 'No'))
+
 
 class ObraSocial(models.Model):
     id = models.AutoField(primary_key=True, db_column="idObraSocial")
@@ -22,11 +23,14 @@ class ObraSocial(models.Model):
                                 blank=True, default='')
     localidad = models.CharField(u'Localidad', db_column='localidad', max_length=200,
                                  blank=True, default='')
-    codigo_postal = models.IntegerField(u'Código Postal', db_column='codigoPostal', blank=True, default=0)
+    codigo_postal = models.IntegerField(
+        u'Código Postal', db_column='codigoPostal', blank=True, default=0)
     condicion_fiscal = models.CharField(u'Condición Fiscal', db_column='condicionFiscal', max_length=200,
                                         choices=CONDICIONES_FISCALES, default='CONSUMIDOR FINAL')
-    observaciones = models.TextField(u'Observaciones', db_column="observaciones", blank=True)
-
+    observaciones = models.TextField(
+        u'Observaciones', db_column="observaciones", blank=True)
+    valor_aproximado_pension = models.DecimalField(
+        u'Valor Aproximado Pension', db_column=u'valorAproximadoPension', max_digits=10, decimal_places=2, default=0)
 
     class Meta(object):
         db_table = 'AlmacenObraSocial'
@@ -38,11 +42,14 @@ class ObraSocial(models.Model):
     def is_particular_or_especial(self):
         return self.nombre in ('PARTICULAR', 'PARTICULAR ESPECIAL', )
 
+
 class ArancelObraSocial(models.Model):
     practica = models.ForeignKey(u'practica.Practica', db_column='idEstudio')
     obra_social = models.ForeignKey(ObraSocial, db_column='idObraSocial', )
-    precio = models.DecimalField(db_column='Precio', max_digits=16, decimal_places=2)
-    precio_anestesia = models.DecimalField(db_column='precioAnestesia', max_digits=16, decimal_places=2)
+    precio = models.DecimalField(
+        db_column='Precio', max_digits=16, decimal_places=2)
+    precio_anestesia = models.DecimalField(
+        db_column='precioAnestesia', max_digits=16, decimal_places=2)
     fecha = models.DateField()
 
     class Meta(object):
