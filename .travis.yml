@@ -10,4 +10,4 @@ install:
     - cp settings-travis.py settings.py
 script:
     - python manage.py test
-    - pylint comprobante/ medico/ estudio/
+    - pylint caja/ comprobante/ estudio/ medico/ medicamento/ obra_social/ paciente/ practica/ presentacion/ sala/ scripts/ security/ turno/ usuario/

@@ -15,7 +15,7 @@ admin.site.register(ObraSocial, ObraSocialAdmin)
 
 class ArancelObraSocialAdmin(admin.ModelAdmin):
     actions = None
-    search_fields = [u'practica', u'obra_social']
+    search_fields = [u'practica__descripcion', u'obra_social__nombre']
     list_display = (u'practica', u'obra_social', u'precio', u'precio_anestesia', u'fecha')
 
     def has_delete_permission(self, request, obj=None):
