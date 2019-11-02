@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import redirect
 from rest_framework import generics
+from rest_framework import viewsets
 from rest_framework.response import Response
 
 import zipfile
@@ -11,10 +12,11 @@ import StringIO
 from imprimir import generar_factura, obtener_comprobante, obtener_filename
 from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
 
-from comprobante.serializers import ComprobanteListadoSerializer
+from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer
 from comprobante.models import Comprobante
 from comprobante.calculador_informe import calculador_informe_factory
 
+from common.drf.views import StandardResultsSetPagination
 
 def imprimir(request, cae):
     # Imprime leyenda?
@@ -70,3 +72,11 @@ class InformeMensualView(generics.ListAPIView):
         data = [ComprobanteListadoSerializer(q, context={'calculador': calculador_informe_factory(q)}).data
                 for q in queryset]
         return Response(data)
+
+class ComprobanteViewSet(viewsets.ModelViewSet):
+    queryset = Comprobante.objects.all()
+    serializer_class = ComprobanteSerializer
+    page_size = 50
+    pagination_class = StandardResultsSetPagination
+
+
