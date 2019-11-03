@@ -1,6 +1,6 @@
 from django.test import TestCase
 from datetime import datetime
-from comprobante.comprobante_asociado import obtener_comprobante_id, crear_comprobante_asociado
+from comprobante.comprobante_asociado import crear_comprobante_asociado
 from comprobante.afip import Afip
 from comprobante.models import Comprobante, TipoComprobante, LineaDeComprobante, \
     ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
@@ -196,16 +196,4 @@ class TestComprobantesAsociados(TestCase):
         })]
 
         afip.emitir_comprobante(comp,lineas_factura)
-
         assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)
-
-    def test_obtener_comprobante_con_id_valido(self):
-        
-        comprobantes_list = Comprobante.objects.all()
-
-        for i in range(1,len(comprobantes_list)):
-            assert comprobantes_list[i-1] == obtener_comprobante_id(i)
-
-    def test_obtener_comprobante_con_id_invalido(self):
-        assert obtener_comprobante_id(232) == HTTP_BAD_REQUEST 
-        assert obtener_comprobante_id(1000) == HTTP_BAD_REQUEST 
