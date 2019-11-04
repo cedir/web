@@ -7,8 +7,8 @@ from comprobante.models import Comprobante, TipoComprobante, LineaDeComprobante,
     ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA
 
-HTTP_BAD_REQUEST = 400
-HTTP_OK = 200
+from comprobante.models import HTTP_BAD_REQUEST, HTTP_OK
+
 NUMERO_TERMINAL = 91
 
 class TestComprobantesAsociados(TestCase):
@@ -34,7 +34,7 @@ class TestComprobantesAsociados(TestCase):
 
         afip.emitir_comprobante(comp,lineas_factura)
 
-        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)['status']
 
     def test_falla_crear_nota_de_credito_asociada_a_factura_electronica(self):
         afip = Afip()
@@ -58,7 +58,7 @@ class TestComprobantesAsociados(TestCase):
         afip.emitir_comprobante(comp,lineas_factura)
 
 
-        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)['status']
 
     def test_crear_nota_de_debito_asociada_a_factura_valido(self):
         afip = Afip()
@@ -79,7 +79,7 @@ class TestComprobantesAsociados(TestCase):
 
         afip.emitir_comprobante(comp,lineas_factura)
 
-        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)
+        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)['status']
 
     def test_falla_crear_nota_de_debito_asociada_a_factura_electronica(self):
         afip = Afip()
@@ -104,7 +104,7 @@ class TestComprobantesAsociados(TestCase):
         afip.emitir_comprobante(comp,lineas_factura)
 
 
-        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)
+        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)['status']
 
     def test_crear_nota_de_credito_electronica_asociada_a_factura_electronica_valido(self):
         afip = Afip()
@@ -128,7 +128,7 @@ class TestComprobantesAsociados(TestCase):
 
         afip.emitir_comprobante(comp,lineas_factura)
 
-        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
+        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)['status']
 
     def test_falla_crear_nota_de_credito_electronica_asociada_a_factura(self):
         afip = Afip()
@@ -150,7 +150,7 @@ class TestComprobantesAsociados(TestCase):
 
         afip.emitir_comprobante(comp,lineas_factura)
 
-        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
+        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)['status']
 
     def test_crear_nota_de_debito_electronica_asociada_a_factura_electronica_valido(self):
         
@@ -175,7 +175,7 @@ class TestComprobantesAsociados(TestCase):
 
         afip.emitir_comprobante(comp,lineas_factura)
 
-        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)
+        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)['status']
 
     def test_falla_crear_nota_de_debito_electronica_asociada_a_factura(self):
         afip = Afip()
@@ -196,4 +196,4 @@ class TestComprobantesAsociados(TestCase):
         })]
 
         afip.emitir_comprobante(comp,lineas_factura)
-        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)
+        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)['status']

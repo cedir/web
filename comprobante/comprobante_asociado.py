@@ -1,13 +1,12 @@
 from datetime import date
 from comprobante.models import Comprobante, TipoComprobante, LineaDeComprobante
-from comprobante.afip import Afip
+from comprobante.afip import Afip, AfipError, AfipErrorRed, AfipErrorValidacion
 
 from comprobante.models import ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA
 
-HTTP_BAD_REQUEST = 400
-HTTP_OK = 200
+from comprobante.models import HTTP_BAD_REQUEST, HTTP_OK, HTTP_SERVER_ERROR
 
 def tipos_comprobante_validos(id_comp_old, id_comp_new):
     if id_comp_old == ID_TIPO_COMPROBANTE_FACTURA:
@@ -51,8 +50,11 @@ def crear_linea(comp, importe):
 
 
 def crear_comprobante_asociado(comp, importe, id_tipo_comp):
+    mensaje = ''
+
     if es_factura(id_tipo_comp) or not tipos_comprobante_validos(comp.tipo_comprobante.id, id_tipo_comp):
-        return HTTP_BAD_REQUEST
+        mensaje = 'No se puede generar ese tipo de comprobante asociado al actual'
+        return {'status': HTTP_BAD_REQUEST, 'mensaje': mensaje}
 
     res = HTTP_OK
 
@@ -67,7 +69,17 @@ def crear_comprobante_asociado(comp, importe, id_tipo_comp):
         afip.emitir_comprobante(comprobante,lineas)
 
         comprobante.save()
+    except AfipErrorValidacion as e:
+        mensaje = 'La AFIP rechazo la generacion del comprobante'
+        res = HTTP_SERVER_ERROR
+    except AfipErrorRed as e:
+        mensaje = 'Ocurrio un error de comunicacion con la AFIP. Reintente mas tarde'
+        res = HTTP_SERVER_ERROR
+    except AfipError as e:
+        mensaje = 'Ocurrio un error con la AFIP. Reintente mas tarde'
+        res = HTTP_SERVER_ERROR
     except:
+        mensaje = 'Ocurrio un error inesperado'
         res = HTTP_BAD_REQUEST
     
-    return res
+    return {'status' : res, 'mensaje' : mensaje}
