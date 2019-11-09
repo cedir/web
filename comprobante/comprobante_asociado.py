@@ -50,36 +50,18 @@ def crear_linea(comp, importe):
 
 
 def crear_comprobante_asociado(comp, importe, id_tipo_comp):
-    mensaje = ''
-
     if es_factura(id_tipo_comp) or not tipos_comprobante_validos(comp.tipo_comprobante.id, id_tipo_comp):
-        mensaje = 'No se puede generar ese tipo de comprobante asociado al actual'
-        return {'status': HTTP_BAD_REQUEST, 'mensaje': mensaje}
+        raise TiposNoValidos
 
-    res = HTTP_OK
+    afip = Afip()
+    nro_siguiente = afip.consultar_proximo_numero(comp.responsable, comp.nro_terminal,TipoComprobante.objects.get(pk = id_tipo_comp), comp.sub_tipo)
 
-    try:
-        afip = Afip()
-        nro_siguiente = afip.consultar_proximo_numero(comp.responsable, comp.nro_terminal,TipoComprobante.objects.get(pk = id_tipo_comp), comp.sub_tipo)
+    comprobante = copiar_comprobante(comp, importe, id_tipo_comp, nro_siguiente)
 
-        comprobante = copiar_comprobante(comp, importe, id_tipo_comp, nro_siguiente)
+    lineas = crear_linea(comprobante, importe)
 
-        lineas = crear_linea(comprobante, importe)
+    afip.emitir_comprobante(comprobante,lineas)
 
-        afip.emitir_comprobante(comprobante,lineas)
+    comprobante.save()
 
-        comprobante.save()
-    except AfipErrorValidacion as e:
-        mensaje = 'La AFIP rechazo la generacion del comprobante'
-        res = HTTP_SERVER_ERROR
-    except AfipErrorRed as e:
-        mensaje = 'Ocurrio un error de comunicacion con la AFIP. Reintente mas tarde'
-        res = HTTP_SERVER_ERROR
-    except AfipError as e:
-        mensaje = 'Ocurrio un error con la AFIP. Reintente mas tarde'
-        res = HTTP_SERVER_ERROR
-    except:
-        mensaje = 'Ocurrio un error inesperado'
-        res = HTTP_BAD_REQUEST
-    
-    return {'status' : res, 'mensaje' : mensaje}
+    return comprobante

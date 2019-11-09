@@ -3,8 +3,10 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import redirect
 from rest_framework import generics
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import list_route
 
 import zipfile
 import StringIO
@@ -15,8 +17,14 @@ from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
 from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer
 from comprobante.models import Comprobante
 from comprobante.calculador_informe import calculador_informe_factory
+from comprobante.comprobante_asociado import crear_comprobante_asociado, obtener_comprobante_id
+from comprobante.afip import AfipErrorRed, AfipErrorValidacion
 
 from common.drf.views import StandardResultsSetPagination
+
+HTTP_BAD_REQUEST = 400
+HTTP_OK = 200
+HTTP_SERVER_ERROR = 500
 
 def imprimir(request, cae):
     # Imprime leyenda?
@@ -61,7 +69,6 @@ def ventas(request, responsable, anio, mes):
 
     return resp
 
-
 class InformeMensualView(generics.ListAPIView):
     serializer_class = ComprobanteListadoSerializer
 
@@ -79,4 +86,24 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
     page_size = 50
     pagination_class = StandardResultsSetPagination
 
+    @list_route(methods=['POST'])
+    def crear_comprobante_asociado(self, request, pk=None):
+        id_comprobante_asociado = int(request.POST['id-comprobante-asociado'])
+        importe = int(request.POST['importe'])
+        id_tipo_nuevo_comprobante = int(request.POST['id-tipo'])
+
+        try:
+            comp = crear_comprobante_asociado(comp, importe, id_tipo_nuevo_comprobante)
+            return {'status': HTTP_CREATED, 'data': comp, 'message': 'Comprobante creado correctamente'}
+        except DoesNotExist:
+            return {'status': HTTP_BAD_REQUEST, 'data': {}, 'message': 'El comprobante seleccionado no existe en la base de datos.'}
+        except TiposNoValidos:
+            return {'status': HTTP_BAD_REQUEST, 'data': {}, 'message': 'No se puede crear un comprobante asociado con el tipo seleccionado.'}
+        except AfipErrorRed:
+            return {'status': HTTP_SERVER_ERROR, 'data': {}, 'message': 'No se realizar la conexion con la Afip, intente mas tarde'}
+        except AfipErrorValidacion:
+            return {'status': HTTP_SERVER_ERROR, 'data': {}, 'message': 'Afip rechazo el comprobante'}
+        
+
+        return HttpResponse("status: %d, message: %s" % (res['status'], res['mensaje']))
 
