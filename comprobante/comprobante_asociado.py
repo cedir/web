@@ -6,7 +6,8 @@ from comprobante.models import ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_
     ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA
 
-from comprobante.models import HTTP_BAD_REQUEST, HTTP_OK, HTTP_SERVER_ERROR
+class TiposNoValidos(Exception):
+    pass
 
 def tipos_comprobante_validos(id_comp_old, id_comp_new):
     if id_comp_old == ID_TIPO_COMPROBANTE_FACTURA:

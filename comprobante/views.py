@@ -17,7 +17,7 @@ from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
 from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer
 from comprobante.models import Comprobante
 from comprobante.calculador_informe import calculador_informe_factory
-from comprobante.comprobante_asociado import crear_comprobante_asociado, obtener_comprobante_id
+from comprobante.comprobante_asociado import crear_comprobante_asociado, TiposNoValidos
 from comprobante.afip import AfipErrorRed, AfipErrorValidacion
 
 from common.drf.views import StandardResultsSetPagination

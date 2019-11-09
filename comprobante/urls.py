@@ -1,5 +1,5 @@
 from django.conf.urls import include, url
-from comprobante.views import imprimir, ventas, crear_asociado, InformeMensualView, ComprobanteViewSet
+from comprobante.views import imprimir, ventas, InformeMensualView, ComprobanteViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
