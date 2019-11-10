@@ -93,7 +93,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
         id_tipo_nuevo_comprobante = int(request.POST['id-tipo'])
 
         try:
-            comp = crear_comprobante_asociado(comp, importe, id_tipo_nuevo_comprobante)
+            comp = crear_comprobante_asociado(id_comprobante_asociado, importe, id_tipo_nuevo_comprobante)
             return {'status': HTTP_CREATED, 'data': comp, 'message': 'Comprobante creado correctamente'}
         except DoesNotExist:
             return {'status': HTTP_BAD_REQUEST, 'data': {}, 'message': 'El comprobante seleccionado no existe en la base de datos.'}
@@ -103,7 +103,3 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
             return {'status': HTTP_SERVER_ERROR, 'data': {}, 'message': 'No se realizar la conexion con la Afip, intente mas tarde'}
         except AfipErrorValidacion:
             return {'status': HTTP_SERVER_ERROR, 'data': {}, 'message': 'Afip rechazo el comprobante'}
-        
-
-        return HttpResponse("status: %d, message: %s" % (res['status'], res['mensaje']))
-

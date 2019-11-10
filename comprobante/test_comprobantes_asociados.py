@@ -1,13 +1,12 @@
 from django.test import TestCase
-from datetime import datetime
-from comprobante.comprobante_asociado import crear_comprobante_asociado
-from comprobante.afip import Afip
+from mock import patch
+from datetime import date
+from comprobante.comprobante_asociado import crear_comprobante_asociado, TiposNoValidos
+from comprobante.afip import Afip, AfipErrorRed, AfipErrorValidacion
 from comprobante.models import Comprobante, TipoComprobante, LineaDeComprobante, \
     ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA
-
-from comprobante.models import HTTP_BAD_REQUEST, HTTP_OK
 
 NUMERO_TERMINAL = 91
 
@@ -15,185 +14,98 @@ class TestComprobantesAsociados(TestCase):
 
     fixtures = ['comprobantes.json']
 
-    def test_crear_nota_de_credito_asociada_a_factura_valido(self):
-        afip = Afip()
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_genera_comprobante_asociado_si_se_crea_una_nota_de_credito_asociada_a_factura(self, afip_mock):
+        afip = afip_mock()
+        afip.consultar_proximo_numero.return_value = 10
+
+        comp = Comprobante.objects.get(pk = 1)
+
+        c = crear_comprobante_asociado(1, 200, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+
+        assert c.nombre_cliente == comp.nombre_cliente
+        assert c.nro_cuit == comp.nro_cuit
+        assert c.responsable == comp.responsable
+        assert c.condicion_fiscal == comp.condicion_fiscal
+        assert c.total_facturado == 200
+        assert c.tipo_comprobante == TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+        assert c.nro_terminal == comp.nro_terminal
+
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_falla_crear_comprobante_asociado_si_es_nota_de_credito_asociada_a_factura_electronica(self, mock):
+        c = Comprobante.objects.get(pk = 1)
+        c.tipo_comprobante = TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
+        c.save()
+        with self.assertRaises(TiposNoValidos):
+            crear_comprobante_asociado(1, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_genera_comprobante_asociado_si_se_crea_una_nota_de_debito_asociada_a_factura(self, afip_mock):
+        afip = afip_mock()
+        afip.consultar_proximo_numero.return_value = 11
         
         comp = Comprobante.objects.get(pk = 1)
-        comp.nro_terminal = NUMERO_TERMINAL
-        comp.numero = afip.consultar_proximo_numero(comp.responsable, NUMERO_TERMINAL, comp.tipo_comprobante, comp.sub_tipo)
-        comp.fecha_emision = datetime.today()
-        comp.fecha_recepcion = datetime.today()
-        comp.nro_cuit = '30604958640'
 
-        lineas_factura = [LineaDeComprobante(**{
-            "comprobante": comp,
-            "importe_neto": 2800.00,
-            "sub_total": 2800.00,
-            "iva": 0,
-        })]
+        c = crear_comprobante_asociado(1, 300, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)
 
-        afip.emitir_comprobante(comp,lineas_factura)
+        assert c.nombre_cliente == comp.nombre_cliente
+        assert c.nro_cuit == comp.nro_cuit
+        assert c.responsable == comp.responsable
+        assert c.condicion_fiscal == comp.condicion_fiscal
+        assert c.total_facturado == 300
+        assert c.tipo_comprobante == TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)
+        assert c.nro_terminal == comp.nro_terminal
 
-        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)['status']
-
-    def test_falla_crear_nota_de_credito_asociada_a_factura_electronica(self):
-        afip = Afip()
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_falla_crear_comprobante_asociado_si_es_nota_de_debito_asociada_a_factura_electronica(self, afip_mock):
+        c = Comprobante.objects.get(pk = 1)
+        c.tipo_comprobante = TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
+        c.save()
+        with self.assertRaises(TiposNoValidos):
+            crear_comprobante_asociado(1, 300, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)
+    
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_genera_comprobante_asociado_si_se_crea_una_nota_de_credito_electronica_asociada_a_factura_electronica(self, afip_mock):
+        afip = afip_mock()
+        afip.consultar_proximo_numero.return_value = 12
         
         comp = Comprobante.objects.get(pk = 1)
-        comp.nro_terminal = NUMERO_TERMINAL
         comp.tipo_comprobante = TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA)
-        comp.numero = afip.consultar_proximo_numero(comp.responsable, NUMERO_TERMINAL, comp.tipo_comprobante, comp.sub_tipo)
-        comp.fecha_emision = datetime.today()
-        comp.fecha_recepcion = datetime.today()
-        comp.nro_cuit = '30604958640'
-        comp.total_facturado = '100000.00'
+        comp.save()
+        c = crear_comprobante_asociado(1, 400, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
 
-        lineas_factura = [LineaDeComprobante(**{
-            "comprobante": comp,
-            "importe_neto": 100000.00,
-            "sub_total": 100000.00,
-            "iva": 0,
-        })]
+        assert c.nombre_cliente == comp.nombre_cliente
+        assert c.nro_cuit == comp.nro_cuit
+        assert c.responsable == comp.responsable
+        assert c.condicion_fiscal == comp.condicion_fiscal
+        assert c.total_facturado == 400
+        assert c.tipo_comprobante == TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
+        assert c.nro_terminal == comp.nro_terminal  
 
-        afip.emitir_comprobante(comp,lineas_factura)
-
-
-        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)['status']
-
-    def test_crear_nota_de_debito_asociada_a_factura_valido(self):
-        afip = Afip()
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_falla_crear_comprobante_asociado_si_es_nota_de_credito_electronica_asociada_a_factura(self, afip_mock):
+        with self.assertRaises(TiposNoValidos):
+            crear_comprobante_asociado(1, 400, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
+            
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_genera_comprobante_asociado_si_se_crea_una_nota_de_debito_electronica_asociada_a_factura_electronica(self, afip_mock):
+        afip = afip_mock()
+        afip.consultar_proximo_numero.return_value = 13
         
         comp = Comprobante.objects.get(pk = 1)
-        comp.nro_terminal = NUMERO_TERMINAL
-        comp.numero = afip.consultar_proximo_numero(comp.responsable, NUMERO_TERMINAL, comp.tipo_comprobante, comp.sub_tipo)
-        comp.fecha_emision = datetime.today()
-        comp.fecha_recepcion = datetime.today()
-        comp.nro_cuit = '30604958640'
-
-        lineas_factura = [LineaDeComprobante(**{
-            "comprobante": comp,
-            "importe_neto": 2800.00,
-            "sub_total": 2800.00,
-            "iva": 0,
-        })]
-
-        afip.emitir_comprobante(comp,lineas_factura)
-
-        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)['status']
-
-    def test_falla_crear_nota_de_debito_asociada_a_factura_electronica(self):
-        afip = Afip()
-                
-        comp = Comprobante.objects.get(pk = 1)
-        comp.nro_terminal = NUMERO_TERMINAL
-        comp.sub_tipo = 'A'
         comp.tipo_comprobante = TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA)
-        comp.numero = afip.consultar_proximo_numero(comp.responsable, NUMERO_TERMINAL, comp.tipo_comprobante, comp.sub_tipo)
-        comp.fecha_emision = datetime.today()
-        comp.fecha_recepcion = datetime.today()
-        comp.nro_cuit = '30604958640'
-        comp.total_facturado = '100000.00'
+        comp.save()
+        c = crear_comprobante_asociado(1, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)
 
-        lineas_factura = [LineaDeComprobante(**{
-            "comprobante": comp,
-            "importe_neto": 100000.00,
-            "sub_total": 100000.00,
-            "iva": 0,
-        })]
+        assert c.nombre_cliente == comp.nombre_cliente
+        assert c.nro_cuit == comp.nro_cuit
+        assert c.responsable == comp.responsable
+        assert c.condicion_fiscal == comp.condicion_fiscal
+        assert c.total_facturado == 500
+        assert c.tipo_comprobante == TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)
+        assert c.nro_terminal == comp.nro_terminal  
 
-        afip.emitir_comprobante(comp,lineas_factura)
-
-
-        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)['status']
-
-    def test_crear_nota_de_credito_electronica_asociada_a_factura_electronica_valido(self):
-        afip = Afip()
-        
-        comp = Comprobante.objects.get(pk = 1)
-        comp.nro_terminal = NUMERO_TERMINAL
-        comp.sub_tipo = 'A'
-        comp.tipo_comprobante = TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA)
-        comp.numero = afip.consultar_proximo_numero(comp.responsable, NUMERO_TERMINAL, comp.tipo_comprobante, comp.sub_tipo)
-        comp.fecha_emision = datetime.today()
-        comp.fecha_recepcion = datetime.today()
-        comp.nro_cuit = '30604958640'
-        comp.total_facturado = '100000.00'
-
-        lineas_factura = [LineaDeComprobante(**{
-            "comprobante": comp,
-            "importe_neto": 100000.00,
-            "sub_total": 100000.00,
-            "iva": 0,
-        })]
-
-        afip.emitir_comprobante(comp,lineas_factura)
-
-        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)['status']
-
-    def test_falla_crear_nota_de_credito_electronica_asociada_a_factura(self):
-        afip = Afip()
-        
-        comp = Comprobante.objects.get(pk = 1)
-        comp.nro_terminal = NUMERO_TERMINAL
-        comp.sub_tipo = 'A'
-        comp.numero = afip.consultar_proximo_numero(comp.responsable, NUMERO_TERMINAL, comp.tipo_comprobante, comp.sub_tipo)
-        comp.fecha_emision = datetime.today()
-        comp.fecha_recepcion = datetime.today()
-        comp.nro_cuit = '30604958640'
-
-        lineas_factura = [LineaDeComprobante(**{
-            "comprobante": comp,
-            "importe_neto": 2800.00,
-            "sub_total": 2800.00,
-            "iva": 0,
-        })]
-
-        afip.emitir_comprobante(comp,lineas_factura)
-
-        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)['status']
-
-    def test_crear_nota_de_debito_electronica_asociada_a_factura_electronica_valido(self):
-        
-        afip = Afip()
-        
-        comp = Comprobante.objects.get(pk = 1)
-        comp.nro_terminal = NUMERO_TERMINAL
-        comp.sub_tipo = 'A'
-        comp.tipo_comprobante = TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA)
-        comp.numero = afip.consultar_proximo_numero(comp.responsable, NUMERO_TERMINAL, comp.tipo_comprobante, comp.sub_tipo)
-        comp.fecha_emision = datetime.today()
-        comp.fecha_recepcion = datetime.today()
-        comp.nro_cuit = '30604958640'
-        comp.total_facturado = '100000.00'
-
-        lineas_factura = [LineaDeComprobante(**{
-            "comprobante": comp,
-            "importe_neto": 100000.00,
-            "sub_total": 100000.00,
-            "iva": 0,
-        })]
-
-        afip.emitir_comprobante(comp,lineas_factura)
-
-        assert HTTP_OK == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)['status']
-
-    def test_falla_crear_nota_de_debito_electronica_asociada_a_factura(self):
-        afip = Afip()
-        
-        comp = Comprobante.objects.get(pk = 1)
-        comp.nro_terminal = NUMERO_TERMINAL
-        comp.sub_tipo = 'A'
-        comp.numero = afip.consultar_proximo_numero(comp.responsable, NUMERO_TERMINAL, comp.tipo_comprobante, comp.sub_tipo)
-        comp.fecha_emision = datetime.today()
-        comp.fecha_recepcion = datetime.today()
-        comp.nro_cuit = '30604958640'
-
-        lineas_factura = [LineaDeComprobante(**{
-            "comprobante": comp,
-            "importe_neto": 2800.00,
-            "sub_total": 2800.00,
-            "iva": 0,
-        })]
-
-        afip.emitir_comprobante(comp,lineas_factura)
-        assert HTTP_BAD_REQUEST == crear_comprobante_asociado(comp, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)['status']
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_falla_crear_comprobante_asociado_si_es_nota_de_debito_electronica_asociada_a_factura(self, afip_mock):
+        with self.assertRaises(TiposNoValidos):
+            crear_comprobante_asociado(1, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)

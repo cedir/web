@@ -20,26 +20,26 @@ def tipos_comprobante_validos(id_comp_old, id_comp_new):
 def es_factura(id_comp):
     return id_comp == ID_TIPO_COMPROBANTE_FACTURA or id_comp == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA
 
-def copiar_comprobante(comp, importe, id_tipo_comp, numero):
+def crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
     return Comprobante(**{
-            'nombre_cliente' : comp.nombre_cliente,
-            'domicilio_cliente': comp.domicilio_cliente,
-            'nro_cuit': comp.nro_cuit,
-            'gravado_paciente': comp.gravado_paciente,
-            'condicion_fiscal': comp.condicion_fiscal,
-            'responsable': comp.responsable,
-            'sub_tipo': comp.sub_tipo,
-            'estado': 'PENDIENTE',
-            'numero': numero,
-            'nro_terminal': 91,
-            'total_facturado': importe,
-            'total_cobrado': '0.00',
-            'fecha_emision': date.today(),
-            'fecha_recepcion': date.today(),
-            'tipo_comprobante': TipoComprobante.objects.get(pk = id_tipo_comp),
-            'factura': comp,
-            'gravado': comp.gravado,
-        })
+        'nombre_cliente' : comp.nombre_cliente,
+        'domicilio_cliente': comp.domicilio_cliente,
+        'nro_cuit': comp.nro_cuit,
+        'gravado_paciente': comp.gravado_paciente,
+        'condicion_fiscal': comp.condicion_fiscal,
+        'responsable': comp.responsable,
+        'sub_tipo': comp.sub_tipo,
+        'estado': 'PENDIENTE',
+        'numero': numero,
+        'nro_terminal': comp.nro_terminal,
+        'total_facturado': importe,
+        'total_cobrado': '0.00',
+        'fecha_emision': date.today(),
+        'fecha_recepcion': date.today(),
+        'tipo_comprobante': TipoComprobante.objects.get(pk = id_tipo_comp),
+        'factura': comp,
+        'gravado': comp.gravado,
+    })
 
 def crear_linea(comp, importe):
     return [LineaDeComprobante(**{
@@ -50,18 +50,22 @@ def crear_linea(comp, importe):
     })]
 
 
-def crear_comprobante_asociado(comp, importe, id_tipo_comp):
+def crear_comprobante_asociado(id_comp, importe, id_tipo_comp):
+
+    comp = Comprobante.objects.get(pk = id_comp)
+
     if es_factura(id_tipo_comp) or not tipos_comprobante_validos(comp.tipo_comprobante.id, id_tipo_comp):
         raise TiposNoValidos
 
     afip = Afip()
-    nro_siguiente = afip.consultar_proximo_numero(comp.responsable, comp.nro_terminal,TipoComprobante.objects.get(pk = id_tipo_comp), comp.sub_tipo)
 
-    comprobante = copiar_comprobante(comp, importe, id_tipo_comp, nro_siguiente)
+    nro_siguiente = afip.consultar_proximo_numero(comp.responsable, comp.nro_terminal, TipoComprobante.objects.get(pk = id_tipo_comp), comp.sub_tipo)
+
+    comprobante = crear_comprobante_similar(comp, importe, id_tipo_comp, nro_siguiente)
 
     lineas = crear_linea(comprobante, importe)
 
-    afip.emitir_comprobante(comprobante,lineas)
+    afip.emitir_comprobante(comprobante, lineas)
 
     comprobante.save()
 
