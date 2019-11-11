@@ -16,7 +16,7 @@ from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
 from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer
 from comprobante.models import Comprobante
 from comprobante.calculador_informe import calculador_informe_factory
-from comprobante.comprobante_asociado import crear_comprobante_asociado, TiposNoValidos
+from comprobante.comprobante_asociado import crear_comprobante_asociado, TipoComprobanteAsociadoNoValidoException
 from comprobante.afip import AfipErrorRed, AfipErrorValidacion
 
 from common.drf.views import StandardResultsSetPagination
@@ -94,7 +94,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
         except Comprobante.DoesNotExist:
             content = {'data': {}, 'message': 'El comprobante seleccionado no existe en la base de datos.'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        except TiposNoValidos:
+        except TipoComprobanteAsociadoNoValidoException:
             content =  {'data': {}, 'message': 'No se puede crear un comprobante asociado con el tipo seleccionado.'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         except AfipErrorRed:
