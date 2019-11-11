@@ -2,8 +2,7 @@
 from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import redirect
-from rest_framework import generics
-from rest_framework import viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
 
@@ -20,10 +19,6 @@ from comprobante.comprobante_asociado import crear_comprobante_asociado, TiposNo
 from comprobante.afip import AfipErrorRed, AfipErrorValidacion
 
 from common.drf.views import StandardResultsSetPagination
-
-HTTP_BAD_REQUEST = 400
-HTTP_OK = 200
-HTTP_SERVER_ERROR = 500
 
 def imprimir(request, cae):
     # Imprime leyenda?
@@ -88,17 +83,22 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
     @list_route(methods=['POST'])
     def crear_comprobante_asociado(self, request, pk=None):
         id_comprobante_asociado = int(request.POST['id-comprobante-asociado'])
-        importe = int(request.POST['importe'])
+        importe = decimal(request.POST['importe'])
         id_tipo_nuevo_comprobante = int(request.POST['id-tipo'])
 
         try:
             comp = crear_comprobante_asociado(id_comprobante_asociado, importe, id_tipo_nuevo_comprobante)
-            return {'status': HTTP_CREATED, 'data': comp, 'message': 'Comprobante creado correctamente'}
+            content = {'data': comp, 'message': 'Comprobante creado correctamente'}
+            return Response(content, status=status.HTTP_201_CREATED)
         except Comprobante.DoesNotExist:
-            return {'status': HTTP_BAD_REQUEST, 'data': {}, 'message': 'El comprobante seleccionado no existe en la base de datos.'}
+            content = {'data': {}, 'message': 'El comprobante seleccionado no existe en la base de datos.'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
         except TiposNoValidos:
-            return {'status': HTTP_BAD_REQUEST, 'data': {}, 'message': 'No se puede crear un comprobante asociado con el tipo seleccionado.'}
+            content =  {'data': {}, 'message': 'No se puede crear un comprobante asociado con el tipo seleccionado.'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
         except AfipErrorRed:
-            return {'status': HTTP_SERVER_ERROR, 'data': {}, 'message': 'No se realizar la conexion con la Afip, intente mas tarde'}
+            content = {'data': {}, 'message': 'No se pudo realizar la conexion con Afip, intente mas tarde'}
+            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except AfipErrorValidacion:
-            return {'status': HTTP_SERVER_ERROR, 'data': {}, 'message': 'Afip rechazo el comprobante'}
+            content = {'data': {}, 'message': 'Afip rechazo el comprobante'}
+            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
