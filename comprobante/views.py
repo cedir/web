@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
+from decimal import Decimal
 
 import zipfile
 import StringIO
@@ -83,7 +84,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
     @list_route(methods=['POST'])
     def crear_comprobante_asociado(self, request, pk=None):
         id_comprobante_asociado = int(request.POST['id-comprobante-asociado'])
-        importe = decimal(request.POST['importe'])
+        importe = Decimal(request.POST['importe'])
         id_tipo_nuevo_comprobante = int(request.POST['id-tipo'])
 
         try:

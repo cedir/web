@@ -1,7 +1,7 @@
 from django.test import TestCase
 from mock import patch
 from datetime import date
-from comprobante.comprobante_asociado import crear_comprobante_asociado, TiposNoValidos
+from comprobante.comprobante_asociado import crear_comprobante_asociado, TipoComprobanteAsociadoNoValidoException
 from comprobante.afip import AfipErrorRed, AfipErrorValidacion
 from comprobante.models import Comprobante, TipoComprobante, LineaDeComprobante, \
     ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
@@ -36,7 +36,7 @@ class TestComprobantesAsociados(TestCase):
         c = Comprobante.objects.get(pk = 1)
         c.tipo_comprobante = TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
         c.save()
-        with self.assertRaises(TiposNoValidos):
+        with self.assertRaises(TipoComprobanteAsociadoNoValidoException):
             crear_comprobante_asociado(1, 500, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
 
     @patch('comprobante.comprobante_asociado.Afip')
@@ -61,7 +61,7 @@ class TestComprobantesAsociados(TestCase):
         c = Comprobante.objects.get(pk = 1)
         c.tipo_comprobante = TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
         c.save()
-        with self.assertRaises(TiposNoValidos):
+        with self.assertRaises(TipoComprobanteAsociadoNoValidoException):
             crear_comprobante_asociado(1, 300, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO)
     
     @patch('comprobante.comprobante_asociado.Afip')
@@ -84,7 +84,7 @@ class TestComprobantesAsociados(TestCase):
 
     @patch('comprobante.comprobante_asociado.Afip')
     def test_falla_crear_comprobante_asociado_si_es_nota_de_credito_electronica_asociada_a_factura(self, afip_mock):
-        with self.assertRaises(TiposNoValidos):
+        with self.assertRaises(TipoComprobanteAsociadoNoValidoException):
             crear_comprobante_asociado(1, 400, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA)
             
     @patch('comprobante.comprobante_asociado.Afip')
@@ -107,7 +107,7 @@ class TestComprobantesAsociados(TestCase):
 
     @patch('comprobante.comprobante_asociado.Afip')
     def test_falla_crear_comprobante_asociado_si_es_nota_de_debito_electronica_asociada_a_factura(self, afip_mock):
-        with self.assertRaises(TiposNoValidos):
+        with self.assertRaises(TipoComprobanteAsociadoNoValidoException):
             crear_comprobante_asociado(1, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)
 
     def test_crear_comprobante_asociado_falla_si_el_comprobante_no_existe(self):

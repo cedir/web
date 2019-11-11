@@ -7,20 +7,20 @@ from comprobante.models import ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_
     ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA
 
 
-class TiposNoValidos(Exception):
+class TipoComprobanteAsociadoNoValidoException(Exception):
     pass
 
 
-def tipos_comprobante_validos(id_comp_old, id_comp_new):
-    if id_comp_old == ID_TIPO_COMPROBANTE_FACTURA:
-        return id_comp_new == ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO or id_comp_new == ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO
-    elif id_comp_old == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
-        return id_comp_new == ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA or id_comp_new == ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA
+def is_tipos_comprobante_validos(id_tipo_comprobante_asociado, id_tipo_comprobante):
+    if id_tipo_comprobante_asociado == ID_TIPO_COMPROBANTE_FACTURA:
+        return id_tipo_comprobante == ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO or id_tipo_comprobante == ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO
+    elif id_tipo_comprobante_asociado == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
+        return id_tipo_comprobante == ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA or id_tipo_comprobante == ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA
     else:
         return False
 
-def es_factura(id_comp):
-    return id_comp == ID_TIPO_COMPROBANTE_FACTURA or id_comp == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA
+def es_factura(id_tipo_comp):
+    return id_tipo_comp == ID_TIPO_COMPROBANTE_FACTURA or id_tipo_comp == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA
 
 def crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
     return Comprobante(**{
@@ -31,7 +31,7 @@ def crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
         'condicion_fiscal': comp.condicion_fiscal,
         'responsable': comp.responsable,
         'sub_tipo': comp.sub_tipo,
-        'estado': 'PENDIENTE',
+        'estado': Comprobante.NO_COBRADO,
         'numero': numero,
         'nro_terminal': comp.nro_terminal,
         'total_facturado': importe,
@@ -56,8 +56,8 @@ def crear_comprobante_asociado(id_comp, importe, id_tipo_comp):
 
     comp = Comprobante.objects.get(pk = id_comp)
 
-    if es_factura(id_tipo_comp) or not tipos_comprobante_validos(comp.tipo_comprobante.id, id_tipo_comp):
-        raise TiposNoValidos
+    if es_factura(id_tipo_comp) or not is_tipos_comprobante_validos(comp.tipo_comprobante.id, id_tipo_comp):
+        raise TipoComprobanteAsociadoNoValidoException
 
     afip = Afip()
 
