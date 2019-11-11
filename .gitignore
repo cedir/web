@@ -15,3 +15,4 @@ ENV/
 certificados/
 
 informes_comprobantes_ejemplos/
+.pytest_cache/
