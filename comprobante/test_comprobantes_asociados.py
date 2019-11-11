@@ -110,6 +110,22 @@ class TestComprobantesAsociados(TestCase):
         with self.assertRaises(TiposNoValidos):
             crear_comprobante_asociado(1, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)
 
-    def test_generar_comprobante_asociado_falla_si_el_comprobante_no_existe(self):
+    def test_crear_comprobante_asociado_falla_si_el_comprobante_no_existe(self):
         with self.assertRaises(Comprobante.DoesNotExist):
             crear_comprobante_asociado(50, 100, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_crear_comprobante_asociado_falla_si_no_se_realiza_la_conexion_con_afip(self, afip_mock):
+        afip_mock.side_effect = AfipErrorRed
+
+        with self.assertRaises(AfipErrorRed):
+            crear_comprobante_asociado(1, 100, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_crear_comprobante_asociado_falla_si_afip_no_valida_el_comprobante(self, afip_mock):
+        afip = afip_mock()
+
+        afip.emitir_comprobante.side_effect = AfipErrorValidacion
+
+        with self.assertRaises(AfipErrorValidacion):
+            crear_comprobante_asociado(1, 100, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
