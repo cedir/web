@@ -3,7 +3,6 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import redirect
 from rest_framework import generics
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
@@ -95,7 +94,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
         try:
             comp = crear_comprobante_asociado(id_comprobante_asociado, importe, id_tipo_nuevo_comprobante)
             return {'status': HTTP_CREATED, 'data': comp, 'message': 'Comprobante creado correctamente'}
-        except DoesNotExist:
+        except Comprobante.DoesNotExist:
             return {'status': HTTP_BAD_REQUEST, 'data': {}, 'message': 'El comprobante seleccionado no existe en la base de datos.'}
         except TiposNoValidos:
             return {'status': HTTP_BAD_REQUEST, 'data': {}, 'message': 'No se puede crear un comprobante asociado con el tipo seleccionado.'}

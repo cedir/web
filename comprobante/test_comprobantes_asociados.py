@@ -2,7 +2,7 @@ from django.test import TestCase
 from mock import patch
 from datetime import date
 from comprobante.comprobante_asociado import crear_comprobante_asociado, TiposNoValidos
-from comprobante.afip import Afip, AfipErrorRed, AfipErrorValidacion
+from comprobante.afip import AfipErrorRed, AfipErrorValidacion
 from comprobante.models import Comprobante, TipoComprobante, LineaDeComprobante, \
     ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA, \
@@ -109,3 +109,7 @@ class TestComprobantesAsociados(TestCase):
     def test_falla_crear_comprobante_asociado_si_es_nota_de_debito_electronica_asociada_a_factura(self, afip_mock):
         with self.assertRaises(TiposNoValidos):
             crear_comprobante_asociado(1, 500, ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA)
+
+    def test_generar_comprobante_asociado_falla_si_el_comprobante_no_existe(self):
+        with self.assertRaises(Comprobante.DoesNotExist):
+            crear_comprobante_asociado(50, 100, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
