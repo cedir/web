@@ -19,10 +19,10 @@ def is_tipos_comprobante_validos(id_tipo_comprobante_asociado, id_tipo_comproban
     else:
         return False
 
-def es_factura(id_tipo_comp):
+def _es_factura(id_tipo_comp):
     return id_tipo_comp == ID_TIPO_COMPROBANTE_FACTURA or id_tipo_comp == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA
 
-def crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
+def _crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
     return Comprobante(**{
         'nombre_cliente' : comp.nombre_cliente,
         'domicilio_cliente': comp.domicilio_cliente,
@@ -43,7 +43,7 @@ def crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
         'gravado': comp.gravado,
     })
 
-def crear_linea(comp, importe):
+def _crear_linea(comp, importe):
     return [LineaDeComprobante(**{
         'comprobante': comp,
         'importe_neto': importe,
@@ -56,16 +56,16 @@ def crear_comprobante_asociado(id_comp, importe, id_tipo_comp):
 
     comp = Comprobante.objects.get(pk = id_comp)
 
-    if es_factura(id_tipo_comp) or not is_tipos_comprobante_validos(comp.tipo_comprobante.id, id_tipo_comp):
+    if _es_factura(id_tipo_comp) or not is_tipos_comprobante_validos(comp.tipo_comprobante.id, id_tipo_comp):
         raise TipoComprobanteAsociadoNoValidoException
 
     afip = Afip()
 
     nro_siguiente = afip.consultar_proximo_numero(comp.responsable, comp.nro_terminal, TipoComprobante.objects.get(pk = id_tipo_comp), comp.sub_tipo)
 
-    comprobante = crear_comprobante_similar(comp, importe, id_tipo_comp, nro_siguiente)
+    comprobante = _crear_comprobante_similar(comp, importe, id_tipo_comp, nro_siguiente)
 
-    lineas = crear_linea(comprobante, importe)
+    lineas = _crear_linea(comprobante, importe)
 
     afip.emitir_comprobante(comprobante, lineas)
 
