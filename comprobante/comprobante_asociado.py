@@ -46,6 +46,7 @@ def _crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
 def _crear_linea(comp, importe):
     return [LineaDeComprobante(**{
         'comprobante': comp,
+        'concepto': 'AJUSTA FACTURA {} No {}-{} SEGUN DEBITO APLICADO'.format(comp.sub_tipo, comp.nro_terminal, comp.numero),
         'importe_neto': importe,
         'sub_total': importe,
         'iva': 0,
