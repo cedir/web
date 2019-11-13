@@ -129,3 +129,23 @@ class TestComprobantesAsociados(TestCase):
 
         with self.assertRaises(AfipErrorValidacion):
             crear_comprobante_asociado(1, 100, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_comprobante_no_se_guarda_en_bd_si_afip_devuelve_error(self, afip_mock):
+        afip = afip_mock()
+
+        afip.emitir_comprobante.side_effect = AfipErrorValidacion
+        
+        cantidad_inicial = Comprobante.objects.count()
+
+        with self.assertRaises(AfipErrorValidacion):
+            crear_comprobante_asociado(1,199,ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+        
+        assert cantidad_inicial == Comprobante.objects.count()
+        
+        afip.emitir_comprobante.side_effect = AfipErrorRed
+
+        with self.assertRaises(AfipErrorRed):
+            crear_comprobante_asociado(1, 100, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+
+        assert cantidad_inicial == Comprobante.objects.count()
