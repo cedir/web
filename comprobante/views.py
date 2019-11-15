@@ -97,9 +97,9 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
         except TipoComprobanteAsociadoNoValidoException:
             content =  {'data': {}, 'message': 'No se puede crear un comprobante asociado con el tipo seleccionado.'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        except AfipErrorRed:
-            content = {'data': {}, 'message': 'No se pudo realizar la conexion con Afip, intente mas tarde'}
+        except AfipErrorRed as e:
+            content = {'data': {}, 'message': 'No se pudo realizar la conexion con Afip, intente mas tarde.\nError: ' + str(e)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except AfipErrorValidacion:
-            content = {'data': {}, 'message': 'Afip rechazo el comprobante'}
+            content = {'data': {}, 'message': 'Afip rechazo el comprobante.\nError: ' + str(e)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
