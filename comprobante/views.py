@@ -89,7 +89,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
 
         try:
             comp = crear_comprobante_asociado(id_comprobante_asociado, importe, id_tipo_nuevo_comprobante)
-            content = {'data': comp, 'message': 'Comprobante creado correctamente'}
+            content = {'data': (ComprobanteSerializer(comp)).data , 'message': 'Comprobante creado correctamente'}
             return Response(content, status=status.HTTP_201_CREATED)
         except Comprobante.DoesNotExist:
             content = {'data': {}, 'message': 'El comprobante seleccionado no existe en la base de datos.'}
