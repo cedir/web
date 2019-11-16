@@ -17,6 +17,14 @@ class TestAfipAPI(TestCase):
     '''
     fixtures = ["comprobantes.json"]
 
+    @patch("comprobante.afip.__Afip")
+    def test_sobre_singleton_afip_devuelve_la_misma_instancia_luego_de_crearse_mas_de_una_vez(self, afip_mock):
+        instancia1 = Afip()
+        instancia2 = Afip()
+
+        assert instancia1.afip_cedir == instancia2.afip_cedir
+        assert instancia1.afip_brunetti == instancia2.afip_brunetti
+
     @patch("comprobante.afip.WSFEv1")
     def test_error_de_conexion_en_constructor_lanza_excepcion(self, mock_wsfev1):
         mock_wsfev1.return_value.Conectar.side_effect = ServerNotFoundError

@@ -82,7 +82,7 @@ class Afip(object):
             return self.afip_brunetti.consultar_proximo_numero(nro_terminal, tipo_comprobante, subtipo)
 
 
-class _Afip(object):
+class __Afip(object):
     '''
     Clase que abstrae la emision de comprobantes electronicos en la afip.
     '''
@@ -238,3 +238,11 @@ class _Afip(object):
     def consultar_proximo_numero(self, nro_terminal, tipo_comprobante, sub_tipo):
         codigo_afip = Comprobante(nro_terminal=nro_terminal, tipo_comprobante=tipo_comprobante, sub_tipo=sub_tipo).codigo_afip
         return long(self.webservice.CompUltimoAutorizado(codigo_afip, nro_terminal) or 0) + 1
+
+class _Afip(__Afip):
+    _instance = None
+    
+    def __new__(self, privada, certificado, cuit):
+        if not self._instance:
+            self._instance = object.__new__(self, privada, certificado, cuit)
+        return self._instance
