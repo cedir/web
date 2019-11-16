@@ -17,13 +17,15 @@ class TestAfipAPI(TestCase):
     '''
     fixtures = ["comprobantes.json"]
 
-    @patch("comprobante.afip.__Afip")
-    def test_sobre_singleton_afip_devuelve_la_misma_instancia_luego_de_crearse_mas_de_una_vez(self, afip_mock):
+    @patch("comprobante.afip.WSAA")
+    @patch("comprobante.afip.WSFEv1")
+    def test_sobre_singleton_afip_devuelve_la_misma_instancia_luego_de_crearse_mas_de_una_vez(self, mock_wsfev1, mock_wsaa):
+        mock_wsaa.return_value.Autenticar.return_value = TICKET
+        mock_wsfev1.return_value.Conectar.return_value = True
         instancia1 = Afip()
         instancia2 = Afip()
 
-        assert instancia1.afip_cedir == instancia2.afip_cedir
-        assert instancia1.afip_brunetti == instancia2.afip_brunetti
+        assert instancia1 is instancia2
 
     @patch("comprobante.afip.WSFEv1")
     def test_error_de_conexion_en_constructor_lanza_excepcion(self, mock_wsfev1):

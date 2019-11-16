@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from comprobante.views import imprimir, ventas, InformeMensualView, ComprobanteViewSet
 from rest_framework.routers import DefaultRouter
 
-router = DefaultRouter()
+router = DefaultRouter(trailing_slash=False)
 router.register(r'comprobante', ComprobanteViewSet)
 
 urlpatterns = [

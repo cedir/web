@@ -54,7 +54,7 @@ def requiere_ticket(func):
     return wrapper
 
 
-class Afip(object):
+class AfipRouter(object):
     '''
     Esta clase redirige a la instancia indicada de _Afip segun si el comprobante
     es de Cedir o de Brunetti.
@@ -82,7 +82,7 @@ class Afip(object):
             return self.afip_brunetti.consultar_proximo_numero(nro_terminal, tipo_comprobante, subtipo)
 
 
-class __Afip(object):
+class _Afip(object):
     '''
     Clase que abstrae la emision de comprobantes electronicos en la afip.
     '''
@@ -239,10 +239,10 @@ class __Afip(object):
         codigo_afip = Comprobante(nro_terminal=nro_terminal, tipo_comprobante=tipo_comprobante, sub_tipo=sub_tipo).codigo_afip
         return long(self.webservice.CompUltimoAutorizado(codigo_afip, nro_terminal) or 0) + 1
 
-class _Afip(__Afip):
+class Afip(AfipRouter):
     _instance = None
     
-    def __new__(self, privada, certificado, cuit):
-        if not self._instance:
-            self._instance = object.__new__(self, privada, certificado, cuit)
-        return self._instance
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = object.__new__(cls)
+        return cls._instance
