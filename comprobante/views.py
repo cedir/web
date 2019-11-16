@@ -13,7 +13,7 @@ import StringIO
 from imprimir import generar_factura, obtener_comprobante, obtener_filename
 from informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
 
-from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer
+from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer, ComprobanteSmallSerializer
 from comprobante.models import Comprobante
 from comprobante.calculador_informe import calculador_informe_factory
 from comprobante.comprobante_asociado import crear_comprobante_asociado, TipoComprobanteAsociadoNoValidoException
@@ -89,7 +89,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
 
         try:
             comp = crear_comprobante_asociado(id_comprobante_asociado, importe, id_tipo_nuevo_comprobante)
-            content = {'data': (ComprobanteSerializer(comp)).data , 'message': 'Comprobante creado correctamente'}
+            content = {'data': ComprobanteSmallSerializer(comp).data , 'message': 'Comprobante creado correctamente'}
             return Response(content, status=status.HTTP_201_CREATED)
         except Comprobante.DoesNotExist:
             content = {'data': {}, 'message': 'El comprobante seleccionado no existe en la base de datos.'}
