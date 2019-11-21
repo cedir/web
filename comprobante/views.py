@@ -100,6 +100,6 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
         except AfipErrorRed as e:
             content = {'data': {}, 'message': 'No se pudo realizar la conexion con Afip, intente mas tarde.\nError: ' + str(e)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except AfipErrorValidacion:
+        except AfipErrorValidacion as e:
             content = {'data': {}, 'message': 'Afip rechazo el comprobante.\nError: ' + str(e)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
