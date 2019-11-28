@@ -539,7 +539,7 @@ def obtener_comprobante(cae):
             'fecha': c.fecha_emision.strftime('%d/%m/%Y'),
             'desde': u'  /  /    ',
             'hasta': u'  /  /    ',
-            'vencimiento': (c.fecha_emision + timedelta(days=30)).strftime('%d/%m/%Y'),
+            'vencimiento': (c.fecha_vencimiento).strftime('%d/%m/%Y'),
             'CAE': c.cae,
             'CAE_vencimiento': c.vencimiento_cae.strftime('%d/%m/%Y'),
             'codigo_barras': obtener_codigo_barras(c),

@@ -111,9 +111,15 @@ class Comprobante(models.Model):
     def codigo_alicuota_afip(self):
         return (2 + self.gravado.id) if self.gravado else 3
 
+    #TODO obtener el nombre de las obras sociales por alguna consulta a una base de datos
     @property
     def fecha_vencimiento(self):
-        return self.fecha_emision + timedelta(days=30)
+        dias = 30
+        if self.tipo_comprobante.id == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA and "SWISS MEDICAL" in self.nombre_cliente.upper():
+            dias = 60
+        if self.tipo_comprobante.id == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA and "SANCOR" in self.nombre_cliente.upper():
+            dias = 80
+        return self.fecha_emision + timedelta(days=dias)
 
     class Meta(object):
         permissions = (
