@@ -149,9 +149,6 @@ class CalculadorInformeFactura(CalculadorInforme):
         '''
         if not self.presentacion:
             return Decimal("0.00")
-        pago = self.presentacion.pago.first()
-        if pago:
-            return pago.gasto_administrativo * self.presentacion.total_facturado / Decimal("100.00")
         if self.presentacion.obra_social.se_presenta_por_AMR == "1" or self.presentacion.obra_social.se_presenta_por_AMR == 1:
             return Decimal("32.00") * self.presentacion.total_facturado / Decimal("100.00")
         return Decimal("25.00") * self.presentacion.total_facturado / Decimal("100.00")
