@@ -8,6 +8,7 @@ from presentacion.serializers import PresentacionSerializer
 from presentacion.obra_social_custom_code.osde_presentacion_digital import \
     OsdeRowEstudio, OsdeRowMedicacion, OsdeRowPension, OsdeRowMaterialEspecifico
 from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowEstudio
+from estudio.serializers import EstudioDePresetancionSerializer
 
 
 class PresentacionViewSet(viewsets.ModelViewSet):
@@ -54,6 +55,19 @@ class PresentacionViewSet(viewsets.ModelViewSet):
                 csv_string = '{}\n{}'.format(csv_string, AmrRowEstudio(estudio, comprobante).get_row())
 
             response = HttpResponse(csv_string, content_type='text/plain')
+        except Exception as ex:
+            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+        return response
+
+    @detail_route(methods=['get'])
+    def estudios(self, request, pk=None):
+        presentacion = Presentacion.objects.get(pk=pk)
+        estudios = presentacion.estudios.all().order_by('fecha', 'id')
+        try:
+            response = HttpResponse(simplejson.dumps([
+                EstudioDePresetancionSerializer(estudio).data
+                for estudio in estudios
+            ]), content_type='application/json')
         except Exception as ex:
             response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
         return response

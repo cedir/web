@@ -17,7 +17,7 @@ class EstudioSerializer(serializers.ModelSerializer):
     medico = MedicoSerializer()
     medico_solicitante = MedicoSerializer()
     anestesista = AnestesistaSerializer()
-    
+
     class Meta:
         model = Estudio
         fields = (u'id', u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
@@ -51,7 +51,22 @@ class MedicacionSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class MedicacionCreateUpdateSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Medicacion
         fields = (u'id', u'medicamento', u'importe', u'estudio')
+
+class EstudioDePresetancionSerializer(serializers.ModelSerializer):
+    paciente = PacienteSerializer()
+    practica = PracticaSerializer()
+    total_medicacion = serializers.SerializerMethodField()
+
+    def get_total_medicacion(self, estudio):
+        if estudio.presentacion.estado == 2:
+            return estudio.get_total_medicacion()
+        else:
+            return estudio.importe_medicacion
+
+    class Meta:
+        model = Estudio
+        fields = (u'id', u'fecha', u'paciente', u'practica', u'total_medicacion')
