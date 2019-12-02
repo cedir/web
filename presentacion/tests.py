@@ -1,17 +1,10 @@
-from datetime import datetime
 import json
 from decimal import Decimal
-from mock import patch
 
 from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import User
-from django.contrib.admin.models import LogEntry
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.admin.models import ADDITION, CHANGE
-from rest_framework import status
 
-from estudio.models import Estudio
 from presentacion.models import Presentacion
 
 class TestDetallesObrasSociales(TestCase):
