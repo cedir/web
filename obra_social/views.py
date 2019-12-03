@@ -1,3 +1,4 @@
+import datetime
 import simplejson
 from django.http import HttpResponse
 from rest_framework import filters, viewsets, generics
@@ -30,8 +31,8 @@ class ObraSocialViewSet(viewsets.ModelViewSet):
     def estudios_sin_presentar(self, request, pk=None):
         estudios = Estudio.objects.filter(
             obra_social__pk=pk,
-            presentacion__pk=0,
             es_pago_contra_factura=0,
+            presentacion_id=0
         ).order_by('fecha', 'id')
         try:
             response = HttpResponse(simplejson.dumps([

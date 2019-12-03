@@ -16,7 +16,7 @@ class TestDetallesObrasSociales(TestCase):
 
     def test_detalle_osde(self):
         estudio = Estudio.objects.get(pk=9)
-        assert estudio.presentacion is None
+        assert estudio.presentacion_id == 0
         assert estudio.obra_social.pk == 1
         response = self.client.get('/api/obra_social/1/estudios_sin_presentar/')
         estudios_response = json.loads(response.content)
