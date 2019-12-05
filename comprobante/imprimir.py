@@ -19,6 +19,22 @@ font_std = 'Helvetica'
 font_bld = 'Helvetica-Bold'
 max_char = 24
 
+mensajes = {
+    'mensaje_leyenda_honorarios': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
+    'mensaje_legal_factura_electronica': ('Pasados 30 días corridos de recibida sin \n'
+                        'haberse producido el rechazo total, aceptación\n'
+                        'o pago de esta FACTURA DE CREDITO\n'
+                        'ELECTRONICA, se considerará que la misma\n'
+                        'constituye título ejecutivo, en los términos del\n'
+                        'artículo 523 del Código Procesal, Civil y\n'
+                        'Comercial de la Nación y concordantes.\n'
+                        'La aceptación expresa o tácita implicará la\n'
+                        'plena conformidad para la transferencia de la\n'
+                        'información contenida en el documento a\n'
+                        'terceros, en caso de optar por su cesión,\n'
+                        'transmisión o negociación.')
+}
+
 # TODO pasar a base de datos
 responsables = {
     'cedir': {
@@ -30,19 +46,6 @@ responsables = {
         'condicion_iva': u'IVA Responsable Inscripto',
         'condicion_ib': '021-335420-4',
         'inicio_actividades': '30/06/2005',
-        'mensaje_leyenda_honorarios': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
-        'mensaje_legal_factura_electronica': ('Pasados 30 días corridos de recibida sin \n'
-                    'haberse producido el rechazo total, aceptación\n'
-                    'o pago de esta FACTURA DE CREDITO\n'
-                    'ELECTRONICA, se considerará que la misma\n'
-                    'constituye título ejecutivo, en los términos del\n'
-                    'artículo 523 del Código Procesal, Civil y\n'
-                    'Comercial de la Nación y concordantes.\n'
-                    'La aceptación expresa o tácita implicará la\n'
-                    'plena conformidad para la transferencia de la\n'
-                    'información contenida en el documento a\n'
-                    'terceros, en caso de optar por su cesión,\n'
-                    'transmisión o negociación.')
     },
     'brunetti': {
         'CUIT': '20118070659',
@@ -344,7 +347,7 @@ def imprimir_mensaje(p, responsable, cabecera):
     if cabecera['id_tipo_comprobante'] != ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
         return
 
-    mensaje = responsable['mensaje_legal_factura_electronica'].split('\n')
+    mensaje = mensajes['mensaje_legal_factura_electronica'].split('\n')
 
     top = 170*mm
     ew = (width - 2*margin) / 2
@@ -374,7 +377,7 @@ def detalle_iva(p, detalle):
 
 
 def pie_de_pagina(p, responsable, imprimir_leyenda_honorarios):
-    mensaje = responsable['mensaje_leyenda_honorarios'] if imprimir_leyenda_honorarios else u''
+    mensaje = mensajes['mensaje_leyenda_honorarios'] if imprimir_leyenda_honorarios else u''
     top = 250*mm
     ew = width - 2*margin
     eh = 7*mm if mensaje else 0
@@ -536,7 +539,7 @@ def obtener_comprobante(cae):
             'fecha': c.fecha_emision.strftime('%d/%m/%Y'),
             'desde': u'  /  /    ',
             'hasta': u'  /  /    ',
-            'vencimiento': (c.fecha_emision + timedelta(days=30)).strftime('%d/%m/%Y'),
+            'vencimiento': (c.fecha_vencimiento).strftime('%d/%m/%Y'),
             'CAE': c.cae,
             'CAE_vencimiento': c.vencimiento_cae.strftime('%d/%m/%Y'),
             'codigo_barras': obtener_codigo_barras(c),
