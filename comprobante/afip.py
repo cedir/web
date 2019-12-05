@@ -14,9 +14,8 @@ from comprobante.models import Comprobante, ID_TIPO_COMPROBANTE_FACTURA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA
 from settings import AFIP_WSAA_URL, AFIP_WSDL_URL, \
-    CEDIR_CERT_PATH, CEDIR_PV_PATH, CEDIR_CUIT, BRUNETTI_CERT_PATH, BRUNETTI_PV_PATH, BRUNETTI_CUIT
+    CEDIR_CERT_PATH, CEDIR_PV_PATH, CEDIR_CUIT, BRUNETTI_CERT_PATH, BRUNETTI_PV_PATH, BRUNETTI_CUIT, CACHE_PATH
 
-CACHE_DIRECTORY = 'comprobante/cache/tickets/'
 IVA_EXCENTO = 1
 IVA_10_5 = 2
 IVA_21 = 3
@@ -118,7 +117,7 @@ class _Afip(object):
         Pide un ticket de acceso a la AFIP que sera usado en todas las requests.
         '''
         self.ticket_autenticacion = self.wsaa.Autenticar(
-            "wsfe", self.cert, self.clave, self.wsaa_url, cache=CACHE_DIRECTORY ,debug=True)
+            "wsfe", self.cert, self.clave, self.wsaa_url, cache=CACHE_PATH ,debug=True)
         if not self.ticket_autenticacion and self.wsaa.Excepcion:
             raise AfipError("Error WSAA: %s" % self.wsaa.Excepcion)
 
