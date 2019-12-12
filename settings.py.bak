@@ -16,6 +16,7 @@ CEDIR_CUIT=
 BRUNETTI_CERT_PATH= "certificados/brunetti.crt"
 BRUNETTI_PV_PATH= "certificados/brunetti.csr"
 BRUNETTI_CUIT=
+CACHE_PATH = "comprobante/cache/tickets/"
 
 # Debug
 DEBUG = True
