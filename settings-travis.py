@@ -16,6 +16,7 @@ CEDIR_CUIT = 1
 BRUNETTI_CERT_PATH = "certificados/2.crt"
 BRUNETTI_PV_PATH = "certificados/2.csr"
 BRUNETTI_CUIT = 2
+CACHE_PATH = "comprobante/cache/tickets/"
 
 DEBUG = True
 DEFAULT_CHARSET = 'utf8'
