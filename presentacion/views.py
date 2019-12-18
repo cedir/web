@@ -4,11 +4,11 @@ from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from common.drf.views import StandardResultsSetPagination
 from presentacion.models import Presentacion
-from presentacion.serializers import PresentacionSerializer
+from presentacion.serializers import PresentacionSerializer, PresentacionRetrieveSerializer, PresentacionCreateUpdateSerializer, PresentacionCreateUpdateSerializer
 from presentacion.obra_social_custom_code.osde_presentacion_digital import \
     OsdeRowEstudio, OsdeRowMedicacion, OsdeRowPension, OsdeRowMaterialEspecifico
 from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowEstudio
-from estudio.serializers import EstudioDePresetancionSerializer
+from estudio.serializers import EstudioDePresetancionRetrieveSerializer
 
 
 class PresentacionViewSet(viewsets.ModelViewSet):
@@ -17,6 +17,27 @@ class PresentacionViewSet(viewsets.ModelViewSet):
     filter_fields = ('obra_social',)
     pagination_class = StandardResultsSetPagination
     page_size = 50
+
+    serializers = {
+        'retrieve': PresentacionRetrieveSerializer,
+        'create': PresentacionCreateUpdateSerializer,
+        'update': PresentacionCreateUpdateSerializer
+    }
+
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializer_class)
+
+    def perform_create(self, serializer):
+        # Traer obra social
+        # Chequear que todos los estudios sean de esa obra social
+        # Si estado == PENDIENTE, crear un comprobante.
+        #   importe = suma de importes
+        #   gravado segun el gravado que llegue
+        pass
+
+    def perform_update(self, serializer):
+        pass
+
 
     @detail_route(methods=['get'])
     def get_detalle_osde(self, request, pk=None):
@@ -65,9 +86,46 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         estudios = presentacion.estudios.all().order_by('fecha', 'id')
         try:
             response = HttpResponse(simplejson.dumps([
-                EstudioDePresetancionSerializer(estudio).data
+                EstudioDePresetancionRetrieveSerializer(estudio).data
                 for estudio in estudios
             ]), content_type='application/json')
         except Exception as ex:
             response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
         return response
+
+    # @detail_route(methods=['patch'])
+    # def cerrar(self, request, pk=None):
+    #     # Parametros: importes que cambian, importe final.
+    #     # Validar que esta ABIERTA.
+    #     # Pasar a PENDIENTE. Generar comprobante.
+    #     presentacion = Presentacion.objects.get(pk=pk)
+    #     try:
+    #         response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
+    #     except Exception as ex:
+    #         response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+    #     return response
+
+    # @detail_route(methods=['patch'])
+    # def abrir(self, request, pk=None):
+    #     # Validar que esta PENDIENTE
+    #     # Pasar a ABIERTA.
+    #     # Anular comprobante y generar una nota?
+    #     presentacion = Presentacion.objects.get(pk=pk)
+    #     try:
+    #         response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
+    #     except Exception as ex:
+    #         response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+    #     return response
+
+    # @detail_route(methods=['patch'])
+    # def cobrar(self, request, pk=None):
+    #     # Verificar que esta PENDIENTE
+    #     # Pasar a COBRADA
+    #     # Setear valores cobrados de estudios
+    #     # Generar un PagoPresentacion
+    #     presentacion = Presentacion.objects.get(pk=pk)
+    #     try:
+    #         response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
+    #     except Exception as ex:
+    #         response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+    #     return response

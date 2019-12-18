@@ -1,11 +1,11 @@
 import datetime
 import simplejson
-from django.http import HttpResponse
+from django.http import JsonResponse
 from rest_framework import filters, viewsets, generics
 from rest_framework.decorators import detail_route
 from estudio.models import Estudio
 from obra_social.models import ObraSocial
-from estudio.serializers import EstudioDePresetancionSerializer
+from estudio.serializers import EstudioDePresetancionRetrieveSerializer
 from obra_social.serializers import ObraSocialSerializer
 
 class ObraSocialNombreFilterBackend(filters.BaseFilterBackend):
@@ -17,7 +17,7 @@ class ObraSocialNombreFilterBackend(filters.BaseFilterBackend):
         if nombre:
             queryset = queryset.filter(nombre__icontains=nombre)
 
-            return queryset
+        return queryset
 
 # Create your views here.
 class ObraSocialViewSet(viewsets.ModelViewSet):
@@ -29,16 +29,22 @@ class ObraSocialViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['get'])
     def estudios_sin_presentar(self, request, pk=None):
+        # Un estudio no presentado en realidad deberia tener presentacion=NULL
+        # El legacy le pone id=0
+        # Como aca presentacion es FK (como corresponde), esto esta bastante DUDOSO por ahora y complica despues el serializer
+        # Cuando el legacy arregle eso (o lo tiremos) esto deberia cambiar para buscar presentacion=None
         estudios = Estudio.objects.filter(
             obra_social__pk=pk,
             es_pago_contra_factura=0,
-            presentacion_id=0
+            presentacion_id=0,
+            fecha__year__gt=2017,
         ).order_by('fecha', 'id')
         try:
-            response = HttpResponse(simplejson.dumps([
-                EstudioDePresetancionSerializer(estudio).data
-                for estudio in estudios
-            ]), content_type='application/json')
+            response = JsonResponse(
+                EstudioDePresetancionRetrieveSerializer(estudios, many=True).data,
+                status=200,
+                safe=False
+            )
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+            response = JsonResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
         return response
