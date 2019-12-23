@@ -29,9 +29,11 @@ class PresentacionRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Presentacion
 
-class PresentacionCreateUpdateSerializer(serializers.Serializer):
+class PresentacionCreateUpdateSerializer(serializers.ModelSerializer):
     estado = EstadoField()
-    estudios = EstudioDePresetancionCreateUpdateSerializer(many=True)
+    obra_social_id = serializers.IntegerField()
+    estudios = serializers.ListField()
+    comprobante = serializers.DictField()
 
     class Meta:
         model = Presentacion

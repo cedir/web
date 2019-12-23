@@ -1,15 +1,23 @@
 import simplejson
-from django.http import HttpResponse
-from rest_framework import viewsets
+from datetime import date
+from decimal import Decimal
+
+from django.http import HttpResponse, JsonResponse
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from common.drf.views import StandardResultsSetPagination
+
 from presentacion.models import Presentacion
 from presentacion.serializers import PresentacionSerializer, PresentacionRetrieveSerializer, PresentacionCreateUpdateSerializer, PresentacionCreateUpdateSerializer
 from presentacion.obra_social_custom_code.osde_presentacion_digital import \
     OsdeRowEstudio, OsdeRowMedicacion, OsdeRowPension, OsdeRowMaterialEspecifico
 from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowEstudio
+from estudio.models import Estudio
 from estudio.serializers import EstudioDePresetancionRetrieveSerializer
-
+from obra_social.models import ObraSocial
+from comprobante.models import Comprobante, LineaDeComprobante, Gravado, TipoComprobante
+from comprobante.afip import Afip, AfipErrorRed, AfipErrorValidacion
 
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
@@ -28,15 +36,105 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         return self.serializers.get(self.action, self.serializer_class)
 
     def perform_create(self, serializer):
-        # Traer obra social
-        # Chequear que todos los estudios sean de esa obra social
-        # Si estado == PENDIENTE, crear un comprobante.
-        #   importe = suma de importes
-        #   gravado segun el gravado que llegue
-        pass
+        obra_social = ObraSocial.objects.get(pk=serializer.data['obra_social_id'])
+        periodo = serializer.validated_data['periodo']
+        fecha = serializer.validated_data['fecha']
+        estado = serializer.validated_data['estado']
+        estudios_data = serializer.data['estudios']
+        comprobante_data = serializer.validated_data['comprobante']
+        nro_comprobante = comprobante_data['numero']
+        tipo_comprobante = TipoComprobante.objects.get(pk=comprobante_data['tipo_id'])
+        sub_tipo = comprobante_data['sub_tipo']
+        nro_terminal = comprobante_data['nro_terminal']
+        responsable = comprobante_data['responsable']
+        gravado = Gravado.objects.get(pk=comprobante_data['gravado_id'])
+        presentacion = None
 
-    def perform_update(self, serializer):
-        pass
+        assert responsable in ('Cedir', 'Brunetti')
+        assert sub_tipo in ('A', 'B')
+        assert not (obra_social.is_particular_or_especial())
+        # REFACTOR: no se me ocurrio una mejor forma de hacer este chequeo
+        # Si ya existe esta tupla de comprobante, queremos que falle ahora.
+        try:
+            Comprobante.objects.get(numero=nro_comprobante, responsable=responsable,
+                tipo_comprobante=tipo_comprobante, sub_tipo=sub_tipo, nro_terminal=nro_terminal)
+            assert False
+        except :
+            pass
+        for estudio_data in estudios_data:
+            estudio = Estudio.objects.get(pk=estudio_data['id'])
+            assert(estudio.obra_social) == obra_social
+
+        neto = sum([Decimal(e['importe_estudio']) for e in estudios_data])
+        iva = neto * gravado.porcentaje
+        total = neto + iva
+        if estado == Presentacion.PENDIENTE:
+            comprobante = Comprobante(
+                nombre_cliente=obra_social.nombre,
+                domicilio_cliente=obra_social.direccion,
+                nro_cuit=obra_social.nro_cuit,
+                condicion_fiscal=obra_social.condicion_fiscal,
+                responsable=responsable,
+                tipo_comprobante=tipo_comprobante,
+                sub_tipo=sub_tipo,
+                nro_terminal=nro_terminal,
+                estado=Comprobante.NO_COBRADO,
+                numero=nro_comprobante,
+                total_facturado=total,
+                fecha_emision=date.today(),
+                gravado=gravado,
+            )
+            linea = LineaDeComprobante(
+                comprobante=comprobante,
+                concepto='FACTURACION CORRESPONDIENTE A ' + periodo,
+                importe_neto=neto,
+                iva=iva,
+                sub_total=total
+            )
+            try:
+                Afip().emitir_comprobante(comprobante, [linea])
+            except AfipErrorRed as e:
+                content = {'data': {}, 'message': 'No se pudo realizar la conexion con Afip, intente mas tarde.\nError: ' + str(e)}
+                return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except AfipErrorValidacion as e:
+                content = {'data': {}, 'message': 'Afip rechazo el comprobante.\nError: ' + str(e)}
+                return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            presentacion = Presentacion(
+                obra_social=obra_social,
+                comprobante=comprobante,
+                fecha=fecha,
+                estado=Presentacion.PENDIENTE,
+                periodo=periodo,
+                iva=iva,
+                total=neto,
+                total_facturado=total
+            )
+            comprobante.save()
+            linea.save()
+        elif Presentacion.ABIERTO:
+            presentacion = Presentacion(
+                obra_social=obra_social,
+                comprobante=None,
+                fecha=fecha,
+                estado=Presentacion.ABIERTO,
+                periodo=periodo,
+                iva=iva,
+                total=neto,
+                total_facturado=total
+            )
+
+        for estudio_data in estudios_data:
+            estudio = Estudio.objects.get(pk=estudio_data['id'])
+            estudio.nro_de_orden = estudio_data['nro_de_orden']
+            estudio.importe_estudio = estudio_data['importe_estudio']
+            estudio.pension = estudio_data['pension']
+            estudio.diferencia_paciente = estudio_data['diferencia_paciente']
+            estudio.arancel_anestesia = estudio_data['arancel_anestesia']
+            estudio.save()
+        presentacion.save()
+
+    # def perform_update(self, serializer):
+    #     pass
 
 
     @detail_route(methods=['get'])
