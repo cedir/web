@@ -183,10 +183,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         presentacion = Presentacion.objects.get(pk=pk)
         estudios = presentacion.estudios.all().order_by('fecha', 'id')
         try:
-            response = HttpResponse(simplejson.dumps([
-                EstudioDePresetancionRetrieveSerializer(estudio).data
-                for estudio in estudios
-            ]), content_type='application/json')
+            response = JsonResponse(EstudioDePresetancionRetrieveSerializer(estudios, many=True).data, safe=False)
         except Exception as ex:
             response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
         return response
