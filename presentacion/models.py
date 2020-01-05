@@ -19,7 +19,7 @@ class Presentacion(models.Model):
 
     id = models.AutoField(primary_key=True, db_column=u'idFacturacion')
     obra_social = models.ForeignKey(ObraSocial, db_column=u'idObraSocial')
-    comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'presentacion')
+    comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'presentacion', null=True)
     fecha = models.DateField(u'Fecha', db_column=u'fechaFacturacion')
     estado = models.SmallIntegerField(db_column=u'pagado', choices=ESTADOS)
     periodo = models.CharField(max_length=128)

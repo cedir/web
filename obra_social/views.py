@@ -1,4 +1,3 @@
-import datetime
 import simplejson
 from django.http import JsonResponse
 from rest_framework import filters, viewsets, generics

@@ -47,7 +47,15 @@ class TestEstudiosDePresentacion(TestCase):
         estudios_response = json.loads(response.content)
         assert len(estudios_response) == n_estudios
 
-    @patch('presentacion.views.Afip')
+class TestCrearPresentacion(TestCase):
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
+        self.client = Client(HTTP_GET='localhost')
+        self.client.login(username='test', password='test')
+
+    @patch('presentacion.serializers.Afip')
     def test_crear_presentacion_cerrada(self, afip_mock):
         afip = afip_mock()
         afip.emitir_comprobante.return_value = None
@@ -81,7 +89,7 @@ class TestEstudiosDePresentacion(TestCase):
         }
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
-        presentacion = Presentacion.objects.get(json.loads(response.content)['id'])
+        presentacion = Presentacion.objects.get(pk=json.loads(response.content)['id'])
         assert presentacion.estado == Presentacion.PENDIENTE
         assert presentacion.comprobante is not None
 
@@ -116,7 +124,7 @@ class TestEstudiosDePresentacion(TestCase):
         }
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
-        presentacion = Presentacion.objects.get(json.loads(response.content)['id'])
+        presentacion = Presentacion.objects.get(pk=json.loads(response.content)['id'])
         assert presentacion.estado == Presentacion.ABIERTO
         assert presentacion.comprobante is None
 
