@@ -76,7 +76,7 @@ class InformeMensualView(generics.ListAPIView):
         return Response(data)
 
 class ComprobanteViewSet(viewsets.ModelViewSet):
-    queryset = Comprobante.objects.all()
+    queryset = Comprobante.objects.all().order_by('-id')
     serializer_class = ComprobanteSerializer
     page_size = 50
     pagination_class = StandardResultsSetPagination
