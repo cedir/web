@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<loginTicketResponse version="1.0">
+    <header>
+        <source>CN=wsaahomo, O=AFIP, C=AR, SERIALNUMBER=CUIT 33693450239</source>
+        <destination>C=ar, O=brunetti, SERIALNUMBER=CUIT 20118070659, CN=brunetti</destination>
+        <uniqueId>3068256617</uniqueId>
+        <generationTime>2020-01-10T13:42:37.078-03:00</generationTime>
+        <expirationTime>2020-01-11T01:42:37.078-03:00</expirationTime>
+    </header>
+    <credentials>
+        <token>PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pgo8c3NvIHZlcnNpb249IjIuMCI+CiAgICA8aWQgc3JjPSJDTj13c2FhaG9tbywgTz1BRklQLCBDPUFSLCBTRVJJQUxOVU1CRVI9Q1VJVCAzMzY5MzQ1MDIzOSIgZHN0PSJDTj13c2ZlLCBPPUFGSVAsIEM9QVIiIHVuaXF1ZV9pZD0iMTEwOTQwNDE4MCIgZ2VuX3RpbWU9IjE1Nzg2NzQ0OTciIGV4cF90aW1lPSIxNTc4NzE3NzU3Ii8+CiAgICA8b3BlcmF0aW9uIHR5cGU9ImxvZ2luIiB2YWx1ZT0iZ3JhbnRlZCI+CiAgICAgICAgPGxvZ2luIGVudGl0eT0iMzM2OTM0NTAyMzkiIHNlcnZpY2U9IndzZmUiIHVpZD0iQz1hciwgTz1icnVuZXR0aSwgU0VSSUFMTlVNQkVSPUNVSVQgMjAxMTgwNzA2NTksIENOPWJydW5ldHRpIiBhdXRobWV0aG9kPSJjbXMiIHJlZ21ldGhvZD0iMjIiPgogICAgICAgICAgICA8cmVsYXRpb25zPgogICAgICAgICAgICAgICAgPHJlbGF0aW9uIGtleT0iMjAxMTgwNzA2NTkiIHJlbHR5cGU9IjQiLz4KICAgICAgICAgICAgPC9yZWxhdGlvbnM+CiAgICAgICAgPC9sb2dpbj4KICAgIDwvb3BlcmF0aW9uPgo8L3Nzbz4K</token>
+        <sign>Qo39+wS6UAs4f1iotY/sTF1RgVQ/0j9YyZOtLVp1UvmGdgvuXhF1zeKxogcSUVLoZfvVUpOl5N1OldzJ0JnXqCb2qIjm65dGh+jWCyzBEIGcGFSgdZWywa/D383rOoRwo6ve4fLAw0dRz/f99BYzSZxKJ/kjO8gfeVjmAyGrMBI=</sign>
+    </credentials>
+</loginTicketResponse>

@@ -85,10 +85,10 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
     def crear_comprobante_asociado(self, request, pk=None):
         id_comprobante_asociado = int(request.POST['id-comprobante-asociado'])
         importe = Decimal(request.POST['importe'])
-        id_tipo_nuevo_comprobante = int(request.POST['id-tipo'])
+        concepto = request.POST['concepto']
 
         try:
-            comp = crear_comprobante_asociado(id_comprobante_asociado, importe, id_tipo_nuevo_comprobante)
+            comp = crear_comprobante_asociado(id_comprobante_asociado, importe, concepto)
             content = {'data': ComprobanteSmallSerializer(comp).data , 'message': 'Comprobante creado correctamente'}
             return Response(content, status=status.HTTP_201_CREATED)
         except Comprobante.DoesNotExist:
@@ -102,4 +102,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except AfipErrorValidacion as e:
             content = {'data': {}, 'message': 'Afip rechazo el comprobante.\nError: ' + str(e)}
+            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            content = {'data': {}, 'message': 'Ocurrio un error inesperado.\nError: ' + str(e)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
