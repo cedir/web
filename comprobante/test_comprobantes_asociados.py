@@ -136,6 +136,42 @@ class TestComprobantesAsociados(TestCase):
             crear_comprobante_asociado(50, 100, '')
 
     @patch('comprobante.comprobante_asociado.Afip')
+    def test_guarda_linea_en_db(self, afip_mock):
+        afip = afip_mock()
+        afip.consultar_proximo_numero.return_value = 15
+
+        cantidad_inicial = LineaDeComprobante.objects.count()
+
+        nuevo_comp = crear_comprobante_asociado(1, 400, '')
+
+        assert cantidad_inicial + 1 == LineaDeComprobante.objects.count()
+        assert LineaDeComprobante.objects.latest('id').concepto == 'AJUSTA FACTURA {} No {}-{} SEGUN DEBITO APLICADO'.format(nuevo_comp.sub_tipo, nuevo_comp.nro_terminal, nuevo_comp.numero)
+
+        nuevo_comp = crear_comprobante_asociado(1, 400, 'prueba')
+
+        assert cantidad_inicial + 2 == LineaDeComprobante.objects.count()
+        assert LineaDeComprobante.objects.latest('id').concepto == 'prueba'
+
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_no_guarda_linea_en_db_si_comprobante_falla(self, afip_mock):
+        afip = afip_mock()
+        afip.emitir_comprobante.side_effect = AfipErrorValidacion
+
+        cantidad_inicial = LineaDeComprobante.objects.count()
+
+        with self.assertRaises(AfipErrorValidacion):
+            crear_comprobante_asociado(1,199,'')
+        
+        assert cantidad_inicial == LineaDeComprobante.objects.count()
+        
+        afip.emitir_comprobante.side_effect = AfipErrorRed
+
+        with self.assertRaises(AfipErrorRed):
+            crear_comprobante_asociado(1, 100, '')
+
+        assert cantidad_inicial == LineaDeComprobante.objects.count()
+
+    @patch('comprobante.comprobante_asociado.Afip')
     def test_crear_comprobante_asociado_falla_si_no_se_realiza_la_conexion_con_afip(self, afip_mock):
         afip_mock.side_effect = AfipErrorRed
 

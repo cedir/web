@@ -83,4 +83,8 @@ def crear_comprobante_asociado(id_comp, importe, concepto):
 
     comprobante.save()
 
+    lineas[0].comprobante = Comprobante.objects.get(pk=comprobante.id)
+
+    lineas[0].save()
+
     return comprobante
