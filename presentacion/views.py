@@ -17,6 +17,7 @@ from estudio.models import Estudio
 from estudio.serializers import EstudioDePresetancionRetrieveSerializer
 from obra_social.models import ObraSocial
 from comprobante.models import Comprobante, LineaDeComprobante, Gravado, TipoComprobante
+from comprobante.afip import AfipErrorRed, AfipErrorValidacion, AfipError
 
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
@@ -33,6 +34,19 @@ class PresentacionViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializer_class)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super(PresentacionViewSet, self).create(request, *args, **kwargs)
+        except AfipErrorRed as e:
+            content = u'No se pudo realizar la conexion con Afip, intente mas tarde.\nError: ' + unicode(e)
+            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except AfipErrorValidacion as e:
+            content = u'Afip rechazo el comprobante. \nError: ' + unicode(e)
+            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except AfipError as e:
+            content = u'Error no especificado de Afip. \nError: ' + unicode(e)
+            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @detail_route(methods=['get'])
     def get_detalle_osde(self, request, pk=None):

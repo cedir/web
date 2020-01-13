@@ -176,6 +176,31 @@
     }
 },
 {
+    "model": "comprobante.comprobante",
+    "pk": 8,
+    "fields": {
+        "nombre_cliente": "Liquidado",
+        "domicilio_cliente": " - Springfield - (CP:2000)",
+        "nro_cuit": "",
+        "gravado_paciente": "",
+        "condicion_fiscal": "",
+        "responsable": "",
+        "sub_tipo": "",
+        "estado": "PENDIENTE",
+        "numero": 1,
+        "nro_terminal": 0,
+        "total_facturado": "4444.44",
+        "total_cobrado": "0.00",
+        "fecha_emision": "2011-07-20",
+        "fecha_recepcion": "2011-07-20",
+        "tipo_comprobante": 2,
+        "factura": null,
+        "gravado": null,
+        "cae": null,
+        "vencimiento_cae": null
+    }
+},
+{
     "model": "comprobante.gravado",
     "pk": 1,
     "fields": {
