@@ -14,7 +14,7 @@ class TestDetallesObrasSociales(TestCase):
         self.client = Client(HTTP_GET='localhost')
         self.client.login(username='test', password='test')
 
-    def test_detalle_osde(self):
+    def test_estudios_sin_presentar_trae_estudios_sin_presentar(self):
         estudio = Estudio.objects.get(pk=9)
         assert estudio.presentacion_id == 0
         assert estudio.obra_social.pk == 1
