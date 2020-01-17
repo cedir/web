@@ -35,11 +35,11 @@ def _crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
         'condicion_fiscal': comp.condicion_fiscal,
         'responsable': comp.responsable,
         'sub_tipo': comp.sub_tipo,
-        'estado': Comprobante.NO_COBRADO,
+        'estado': Comprobante.COBRADO,
         'numero': numero,
         'nro_terminal': comp.nro_terminal,
-        'total_facturado': importe,
-        'total_cobrado': '0.00',
+        'total_facturado': importe + importe * comp.gravado.porcentaje / 100,
+        'total_cobrado': importe + importe * comp.gravado.porcentaje / 100,
         'fecha_emision': date.today(),
         'fecha_recepcion': date.today(),
         'tipo_comprobante': TipoComprobante.objects.get(pk = id_tipo_comp),
@@ -48,12 +48,13 @@ def _crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
     })
 
 def _crear_linea(comp, importe, concepto):
+    iva = importe * comp.gravado.porcentaje / 100
     return [LineaDeComprobante(**{
         'comprobante': comp,
         'concepto': concepto if concepto != '' else 'AJUSTA FACTURA {} No {}-{} SEGUN DEBITO APLICADO'.format(comp.sub_tipo, comp.nro_terminal, comp.numero),
         'importe_neto': importe,
-        'sub_total': importe,
-        'iva': 0,
+        'sub_total': importe + iva,
+        'iva': iva,
     })]
 
 
