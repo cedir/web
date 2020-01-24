@@ -165,9 +165,9 @@ class _Afip(object):
 
         # Agregar el IVA
         if comprobante_cedir.gravado.id == IVA_10_5:
-            self.webservice.AgregarIva(id_iva=4, base_imp=imp_neto, importe=imp_iva)
+            self.webservice.AgregarIva(iva_id=4, base_imp=imp_neto, importe=imp_iva)
         elif comprobante_cedir.gravado.id == IVA_21:
-            self.webservice.AgregarIva(id_iva=5, base_imp=imp_neto, importe=imp_iva)
+            self.webservice.AgregarIva(iva_id=5, base_imp=imp_neto, importe=imp_iva)
 
         # Si hay comprobantes asociados, los agregamos.
         if comprobante_cedir.tipo_comprobante.id in [
