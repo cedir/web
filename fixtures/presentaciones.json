@@ -1,6 +1,20 @@
 [
 {
     "model": "presentacion.presentacion",
+    "pk": 0,
+    "fields": {
+        "obra_social": 1,
+        "comprobante": 1,
+        "fecha": "2011-07-20",
+        "estado": 0,
+        "periodo": "PARCHE",
+        "iva": "0.00",
+        "total": "2800.00",
+        "total_facturado": "2800.00"
+    }
+},
+{
+    "model": "presentacion.presentacion",
     "pk": 1,
     "fields": {
         "obra_social": 1,

@@ -158,5 +158,20 @@
         "fecha": "2013-11-19",
         "anestesista": 1
     }
+},
+{
+    "model": "estudio.estudio",
+    "pk": 9,
+    "fields": {
+        "paciente": 1,
+        "practica": 18,
+        "medico": 2,
+        "obra_social": 1,
+        "presentacion_id":0,
+        "medico_solicitante": 1,
+        "importe_estudio": "10000.00",
+        "fecha": "2019-11-19",
+        "anestesista": 1
+    }
 }
 ]

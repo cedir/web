@@ -32,6 +32,8 @@ class ObraSocial(models.Model):
     valor_aproximado_pension = models.DecimalField(
         u'Valor Aproximado Pension', db_column=u'valorAproximadoPension', max_digits=10, decimal_places=2, default=0)
 
+    nro_cuit = models.CharField(u'CUIT', db_column='nroCuit', max_length=200, default="")
+
     class Meta(object):
         db_table = 'AlmacenObraSocial'
         ordering = ['nombre']

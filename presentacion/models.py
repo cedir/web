@@ -19,16 +19,13 @@ class Presentacion(models.Model):
 
     id = models.AutoField(primary_key=True, db_column=u'idFacturacion')
     obra_social = models.ForeignKey(ObraSocial, db_column=u'idObraSocial')
-    comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'presentacion')
+    comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'presentacion', null=True)
     fecha = models.DateField(u'Fecha', db_column=u'fechaFacturacion')
     estado = models.SmallIntegerField(db_column=u'pagado', choices=ESTADOS)
     periodo = models.CharField(max_length=128)
     iva = models.DecimalField(max_digits=16, decimal_places=2)
     total = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'))
     total_facturado = models.DecimalField(db_column=u'totalFacturado', max_digits=16, decimal_places=2, default=Decimal('0.00'))
-
-    #"tipoFactura" smallint, no me acuerdo para que se usa esto
-    #"responsableDeFactura" character varying, no me acuerdo para que se usa esto
 
     class Meta:
         db_table = 'tblFacturacion'
@@ -44,6 +41,6 @@ class PagoPresentacion(models.Model):
     nro_recivo = models.CharField(max_length=128, db_column=u'nroRecivo')
     importe = models.DecimalField(db_column=u'importePago', max_digits=16, decimal_places=2)
     gasto_administrativo = models.DecimalField(db_column=u'gastoAdministrativo', default=Decimal('0.00'), max_digits=16, decimal_places=2)
-    
+
     class Meta:
         db_table = 'tblPagoFacturacion'

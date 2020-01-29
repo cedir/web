@@ -6,6 +6,7 @@ from datetime import date, datetime, timedelta
 from xml.parsers.expat import ExpatError
 from httplib2 import ServerNotFoundError
 
+from pysimplesoap.client import SoapFault
 from pyafipws.wsaa import WSAA
 from pyafipws.wsfev1 import WSFEv1
 
@@ -101,7 +102,7 @@ class _Afip(object):
         # conectar
         try:
             self.webservice.Conectar(cache, wsdl, proxy, wrapper, cacert)
-        except (ExpatError, ServerNotFoundError):
+        except (ExpatError, ServerNotFoundError, SoapFault):
             raise AfipErrorRed("Error en la conexion inicial con la AFIP.")
 
         self.cert = certificado       # archivos a tramitar previamente ante AFIP
@@ -116,8 +117,11 @@ class _Afip(object):
         '''
         Pide un ticket de acceso a la AFIP que sera usado en todas las requests.
         '''
-        self.ticket_autenticacion = self.wsaa.Autenticar(
-            "wsfe", self.cert, self.clave, self.wsaa_url, cache=CACHE_PATH ,debug=True)
+        try:
+            self.ticket_autenticacion = self.wsaa.Autenticar(
+                "wsfe", self.cert, self.clave, self.wsaa_url, cache=CACHE_PATH, debug=True)
+        except SoapFault:
+            raise AfipErrorRed("Error autenticando en la Afip.")
         if not self.ticket_autenticacion and self.wsaa.Excepcion:
             raise AfipError("Error WSAA: %s" % self.wsaa.Excepcion)
 
@@ -199,7 +203,7 @@ class _Afip(object):
         # llamar al webservice de AFIP para autorizar la factura y obtener CAE:
         try:
             self.webservice.CAESolicitar()
-        except (ExpatError, ServerNotFoundError):
+        except (ExpatError, ServerNotFoundError, SoapFault):
             raise AfipErrorRed("Error de red emitiendo el comprobante.")
         if self.webservice.Resultado == "R":
             # Si la AFIP nos rechaza el comprobante, lanzamos excepcion.
