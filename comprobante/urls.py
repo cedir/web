@@ -3,7 +3,7 @@ from comprobante.views import imprimir, ventas, InformeMensualView, ComprobanteV
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter(trailing_slash=False)
-router.register(r'comprobante', ComprobanteViewSet)
+router.register(r'comprobante', ComprobanteViewSet, base_name='Comprobante')
 
 urlpatterns = [
     url(r'^comprobante/imprimir/(?P<cae>\d+)/$', imprimir, name='comprobante_imprimir'),

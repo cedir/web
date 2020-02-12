@@ -76,10 +76,13 @@ class InformeMensualView(generics.ListAPIView):
         return Response(data)
 
 class ComprobanteViewSet(viewsets.ModelViewSet):
-    queryset = Comprobante.objects.all().order_by('-id')
     serializer_class = ComprobanteSerializer
     page_size = 50
     pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        filtro = self.request.GET.get('filtro').upper() if 'filtro' in self.request.GET else ''
+        return Comprobante.objects.filter(nombre_cliente__contains=filtro).order_by('-id')
 
     @list_route(methods=['POST'])
     def crear_comprobante_asociado(self, request, pk=None):
