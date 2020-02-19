@@ -207,3 +207,12 @@ class TestComprobantesAsociados(TestCase):
             crear_comprobante_asociado(1, Decimal(100), '')
 
         assert cantidad_inicial == Comprobante.objects.count()
+
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_guarda_decimales_en_comprobante(self, afip_mock):
+        afip = afip_mock()
+        afip.consultar_proximo_numero.return_value = 11
+
+        nuevo_comp = crear_comprobante_asociado(1, Decimal(200.52), '')
+
+        assert nuevo_comp.total_facturado == Decimal(200.52).quantize(Decimal(10)**-2)
