@@ -1,6 +1,7 @@
 from datetime import date
 from comprobante.models import Comprobante, TipoComprobante, LineaDeComprobante
 from comprobante.afip import Afip, AfipError, AfipErrorRed, AfipErrorValidacion
+from decimal import Decimal
 
 from comprobante.models import ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA, \
     ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA, \
@@ -27,6 +28,8 @@ def _es_factura(id_tipo_comp):
     return id_tipo_comp == ID_TIPO_COMPROBANTE_FACTURA or id_tipo_comp == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA
 
 def _crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
+    iva = importe * comp.gravado.porcentaje / 100
+    iva = iva.quantize(Decimal(10) ** -2)
     return Comprobante(**{
         'nombre_cliente' : comp.nombre_cliente,
         'domicilio_cliente': comp.domicilio_cliente,
@@ -38,8 +41,8 @@ def _crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
         'estado': Comprobante.COBRADO,
         'numero': numero,
         'nro_terminal': comp.nro_terminal,
-        'total_facturado': importe + importe * comp.gravado.porcentaje / 100,
-        'total_cobrado': importe + importe * comp.gravado.porcentaje / 100,
+        'total_facturado': importe + iva,
+        'total_cobrado': importe + iva,
         'fecha_emision': date.today(),
         'fecha_recepcion': date.today(),
         'tipo_comprobante': TipoComprobante.objects.get(pk = id_tipo_comp),
@@ -49,6 +52,7 @@ def _crear_comprobante_similar(comp, importe, id_tipo_comp, numero):
 
 def _crear_linea(comp, importe, concepto):
     iva = importe * comp.gravado.porcentaje / 100
+    iva = iva.quantize(Decimal(10) ** -2)
     return [LineaDeComprobante(**{
         'comprobante': comp,
         'concepto': concepto if concepto != '' else 'AJUSTA FACTURA {} No {}-{} SEGUN DEBITO APLICADO'.format(comp.sub_tipo, comp.nro_terminal, comp.numero),
@@ -59,6 +63,8 @@ def _crear_linea(comp, importe, concepto):
 
 
 def crear_comprobante_asociado(id_comp, importe, concepto):
+
+    importe = importe.quantize(Decimal(10) ** -2)
 
     comp = Comprobante.objects.get(pk = id_comp)
 
