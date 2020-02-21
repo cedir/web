@@ -17,6 +17,7 @@ from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from imprimir import generar_informe
 
+from estudio.models import ID_INSTITUCION_CEDIR, ID_INSTITUCION_HOSPITAL_ITALIANO
 
 def imprimir(request, id_estudio):
 
@@ -124,6 +125,16 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(fecha__lte=fecha_hasta)
         return queryset
 
+class InstitucionFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        institucion = request.query_params.get(u'institucion')
+        if institucion:
+            queryset = queryset.filter(institucion=institucion)
+        else: 
+            queryset = queryset.filter(institucion=ID_INSTITUCION_CEDIR)
+
+        return queryset
+
 
 class EstudioViewSet(viewsets.ModelViewSet):
     model = Estudio
@@ -131,7 +142,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
     serializer_class = EstudioSerializer
     filter_backends = (EstudioObraSocialFilterBackend, EstudioMedicoFilterBackend,
         EstudioMedicoSolicitanteFilterBackend, EstudioPacienteFilterBackend,
-        EstudioFechaFilterBackend, filters.OrderingFilter, )
+        EstudioFechaFilterBackend, InstitucionFilterBackend, filters.OrderingFilter, )
     pagination_class = StandardResultsSetPagination
     ordering_fields = ('fecha', 'id')
     page_size = 20
