@@ -32,7 +32,7 @@
         "importe_estudio_cobrado": "0.00",
         "importe_medicacion_cobrado": "0.00",
         "arancel_anestesia": "1035.00",
-        "institucion": 1
+        "sucursal": 1
     }
 },
 {
@@ -68,7 +68,7 @@
         "importe_estudio_cobrado": "1368.36",
         "importe_medicacion_cobrado": "267.06",
         "arancel_anestesia": "535.00",
-        "institucion": 1
+        "sucursal": 1
     }
 },
 {
@@ -84,7 +84,7 @@
         "importe_estudio": "10000.00",
         "fecha": "2013-11-19",
         "anestesista": 1,
-        "institucion": 2
+        "sucursal": 2
     }
 },
 {
@@ -100,7 +100,7 @@
         "importe_estudio": "10000.00",
         "fecha": "2013-11-19",
         "anestesista": 1,
-        "institucion": 2
+        "sucursal": 2
     }
 },
 {
@@ -116,7 +116,7 @@
         "importe_estudio": "10000.00",
         "fecha": "2013-11-19",
         "anestesista": 1,
-        "institucion": 2
+        "sucursal": 2
     }
 },
 {
@@ -132,7 +132,7 @@
         "importe_estudio": "10000.00",
         "fecha": "2013-11-19",
         "anestesista": 1,
-        "institucion": 1
+        "sucursal": 1
     }
 },
 {
@@ -148,7 +148,7 @@
         "importe_estudio": "10000.00",
         "fecha": "2013-11-19",
         "anestesista": 1,
-        "institucion": 1
+        "sucursal": 1
     }
 },
 {
@@ -164,7 +164,7 @@
         "importe_estudio": "10000.00",
         "fecha": "2013-11-19",
         "anestesista": 1,
-        "institucion": 1
+        "sucursal": 1
     }
 },
 {
@@ -180,7 +180,7 @@
         "importe_estudio": "10000.00",
         "fecha": "2019-11-19",
         "anestesista": 1,
-        "institucion": 1
+        "sucursal": 1
     }
 }
 ]

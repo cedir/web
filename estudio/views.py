@@ -17,7 +17,7 @@ from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from imprimir import generar_informe
 
-from estudio.models import ID_INSTITUCION_CEDIR, ID_INSTITUCION_HOSPITAL_ITALIANO
+from estudio.models import ID_SUCURSAL_CEDIR, ID_SUCURSAL_HOSPITAL_ITALIANO
 
 def imprimir(request, id_estudio):
 
@@ -127,11 +127,11 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
 
 class InstitucionFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        institucion = request.query_params.get(u'institucion')
-        if institucion:
-            queryset = queryset.filter(institucion=institucion)
+        sucursal = request.query_params.get(u'sucursal')
+        if sucursal:
+            queryset = queryset.filter(sucursal=sucursal)
         else: 
-            queryset = queryset.filter(institucion=ID_INSTITUCION_CEDIR)
+            queryset = queryset.filter(sucursal=ID_SUCURSAL_CEDIR)
 
         return queryset
 

@@ -17,8 +17,8 @@ from presentacion.models import Presentacion
 
 MAX_DAYS_VIDEO_LINK_AVAILABLE = 30
 
-ID_INSTITUCION_CEDIR = 1
-ID_INSTITUCION_HOSPITAL_ITALIANO = 2
+ID_SUCURSAL_CEDIR = 1
+ID_SUCURSAL_HOSPITAL_ITALIANO = 2
 
 class Estudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
@@ -29,7 +29,7 @@ class Estudio(models.Model):
     informe = models.TextField(blank=True, default=u'')
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo", blank=True)
     public_id = models.CharField(max_length=35, db_column="publicID", default=generate_uuid)
-    institucion = models.IntegerField(u'Institucion', db_column='institucion', default=ID_INSTITUCION_CEDIR, choices=[(ID_INSTITUCION_CEDIR, "Cedir"), (ID_INSTITUCION_HOSPITAL_ITALIANO, "Hospital Italiano")])
+    sucursal = models.IntegerField(u'Sucursal', db_column='sucursal', default=ID_SUCURSAL_CEDIR, choices=[(ID_SUCURSAL_CEDIR, "Cedir"), (ID_SUCURSAL_HOSPITAL_ITALIANO, "Hospital Italiano")])
 
     medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name=u'medico_actuante')
     obra_social = models.ForeignKey(ObraSocial, db_column="idObraSocial")
