@@ -14,6 +14,7 @@ from rest_framework import status
 from estudio.models import Estudio
 from presentacion.models import Presentacion
 
+from estudio.models import ID_SUCURSAL_CEDIR, ID_SUCURSAL_HOSPITAL_ITALIANO
 
 class CrearEstudioTest(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json']
@@ -206,14 +207,14 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
 
 class RetreiveEstudiosTest(TestCase):
     fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
-                'anestesistas.json', 'presentaciones.json']
+                'anestesistas.json', 'presentaciones.json', 'estudios.json']
 
     def setUp(self):
         self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
         self.client = Client(HTTP_POST='localhost')
         self.client.login(username='walter', password='xx11')
         self.estudio = Estudio.objects.create(fecha=datetime.today().date(), paciente_id=1, practica_id=1, medico_id=1,
-                                              obra_social_id=1, medico_solicitante_id=1, anestesista_id=1)
+                                              obra_social_id=1, medico_solicitante_id=1, anestesista_id=1, sucursal=1)
         self.estudio.presentacion = Presentacion.objects.get(pk=1)
         self.estudio.save()
 
@@ -222,3 +223,27 @@ class RetreiveEstudiosTest(TestCase):
 
         payload = json.loads(response.content)
         self.assertEqual(payload.get('presentacion').get('estado'), 'Pendiente')
+
+    def test_filtro_por_sucursal_funciona_si_sucursal_es_cedir(self):
+        results = Estudio.objects.all()
+
+        response = json.loads(self.client.get('/api/estudio/?sucursal={}'.format(ID_SUCURSAL_CEDIR), content_type='application/json').content)['results']
+
+        for estudio in response:
+            self.assertEqual(results[estudio['id'] - 1].sucursal, ID_SUCURSAL_CEDIR)
+
+    def test_filtro_por_sucursal_funciona_si_sucursal_es_hospital_italiano(self):
+        results = Estudio.objects.all()
+
+        response = json.loads(self.client.get('/api/estudio/?sucursal={}'.format(ID_SUCURSAL_HOSPITAL_ITALIANO), content_type='application/json').content)['results']
+
+        for estudio in response:
+            self.assertEqual(results[estudio['id'] - 1].sucursal, ID_SUCURSAL_HOSPITAL_ITALIANO)
+
+    def test_filtro_por_sucursal_devuelve_estudios_cedir_si_no_se_envia_sucursal(self):
+        results = Estudio.objects.all()
+
+        response = json.loads(self.client.get('/api/estudio/', content_type='application/json').content)['results']
+
+        for estudio in response:
+            self.assertEqual(results[estudio['id'] - 1].sucursal, ID_SUCURSAL_CEDIR)
