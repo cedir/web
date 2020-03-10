@@ -123,9 +123,10 @@ class Comprobante(models.Model):
 
     def anular(self):
         from comprobante.comprobante_asociado import crear_comprobante_asociado
+        nuevo_comprobante = crear_comprobante_asociado(self.id, self.total_facturado, "Anula comprobante nro " + str(self.id))
         self.estado = Comprobante.ANULADO
         self.save()
-        return crear_comprobante_asociado(self.id, self.total_facturado, "Anula comprobante nro " + str(self.id))
+        return nuevo_comprobante
 
     class Meta(object):
         permissions = (
