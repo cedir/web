@@ -25,6 +25,17 @@
     }
 },
 {
+    "model": "comprobante.lineadecomprobante",
+    "pk": 1,
+    "fields": {
+        "comprobante": 1,
+        "concepto": "asd",
+        "sub_total": "12.10",
+        "iva": "2.10",
+        "importe_neto": "10.00"
+    }
+},
+{
     "model": "comprobante.comprobante",
     "pk": 2,
     "fields": {

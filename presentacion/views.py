@@ -135,8 +135,9 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             presentacion = Presentacion.objects.get(pk=pk)
             if presentacion.estado != Presentacion.PENDIENTE:
                 return HttpResponse(simplejson.dumps({'error': "La presentacion debe estar en estado PENDIENTE"}), status=400, content_type='application/json')
+            presentacion.comprobante.anular()
+            presentacion.comprobante = None
             presentacion.estado = Presentacion.ABIERTO
-            presentacion.comprobante = presentacion.comprobante.anular()
             presentacion.save()
             return JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
         except Exception as ex:

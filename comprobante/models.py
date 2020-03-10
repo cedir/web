@@ -123,7 +123,11 @@ class Comprobante(models.Model):
 
     def anular(self):
         from comprobante.comprobante_asociado import crear_comprobante_asociado
-        nuevo_comprobante = crear_comprobante_asociado(self.id, self.total_facturado, "Anula comprobante nro " + str(self.id))
+        if self.tipo_comprobante.id != ID_TIPO_COMPROBANTE_LIQUIDACION:
+            linea = LineaDeComprobante.objects.filter(comprobante=self).first()
+            nuevo_comprobante = crear_comprobante_asociado(self.id, linea.importe_neto, "Anula comprobante nro " + str(self.id))
+        else:
+            nuevo_comprobante = None
         self.estado = Comprobante.ANULADO
         self.save()
         return nuevo_comprobante

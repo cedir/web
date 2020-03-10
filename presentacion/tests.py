@@ -225,7 +225,7 @@ class TestAbrirPresentacion(TestCase):
         presentacion = Presentacion.objects.get(pk=1)
         assert presentacion.estado == Presentacion.ABIERTO
         assert Comprobante.objects.get(pk=pk_comprobante_viejo).estado == Comprobante.ANULADO
-        assert presentacion.comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO
+        assert presentacion.comprobante == None
 
     def test_abrir_presentacion_no_pendiente_falla(self):
         presentacion = Presentacion.objects.get(pk=1)
