@@ -99,39 +99,60 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
         return response
 
-    # @detail_route(methods=['patch'])
-    # def cerrar(self, request, pk=None):
-    #     # Parametros: importes que cambian, importe final.
-    #     # Validar que esta ABIERTA.
-    #     # Pasar a PENDIENTE. Generar comprobante.
-    #     presentacion = Presentacion.objects.get(pk=pk)
-    #     try:
-    #         response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
-    #     except Exception as ex:
-    #         response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
-    #     return response
+    @detail_route(methods=['post'])
+    def guardar(self, request, pk=None):
+        # Copiar bastante la implmentacion de ViewSet.create
+        # Fijarme de usar el validate del serializaer, o un serializer nuevo, pero DRY.
+        presentacion = Presentacion.objects.get(pk=pk)
+        estudios = presentacion.estudios.all().order_by('fecha', 'id')
+        try:
+            response = JsonResponse(EstudioDePresetancionRetrieveSerializer(estudios, many=True).data, safe=False)
+        except Exception as ex:
+            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+        return response
 
-    # @detail_route(methods=['patch'])
-    # def abrir(self, request, pk=None):
-    #     # Validar que esta PENDIENTE
-    #     # Pasar a ABIERTA.
-    #     # Anular comprobante y generar una nota?
-    #     presentacion = Presentacion.objects.get(pk=pk)
-    #     try:
-    #         response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
-    #     except Exception as ex:
-    #         response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
-    #     return response
+    @detail_route(methods=['patch'])
+    def cerrar(self, request, pk=None):
+        # Parametros: importes que cambian, importe final.
+        # Validar que esta ABIERTO.
+        # Pasar a PENDIENTE. Generar comprobante.
+        presentacion = Presentacion.objects.get(pk=pk)
+        try:
+            presentacion = Presentacion.objects.get(pk=pk)
+            if presentacion.estado != Presentacion.ABIERTO:
+                return HttpResponse(simplejson.dumps({'error': "La presentacion debe estar en estado ABIERTO"}), status=400, content_type='application/json')
+            response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
+        except Exception as ex:
+            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+        return response
 
-    # @detail_route(methods=['patch'])
-    # def cobrar(self, request, pk=None):
-    #     # Verificar que esta PENDIENTE
-    #     # Pasar a COBRADA
-    #     # Setear valores cobrados de estudios
-    #     # Generar un PagoPresentacion
-    #     presentacion = Presentacion.objects.get(pk=pk)
-    #     try:
-    #         response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
-    #     except Exception as ex:
-    #         response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
-    #     return response
+    @detail_route(methods=['patch'])
+    def abrir(self, request, pk=None):
+        # Validar que esta PENDIENTE
+        # Pasar a ABIERTA.
+        # Anular comprobante y generar una nota?
+        try:
+            presentacion = Presentacion.objects.get(pk=pk)
+            if presentacion.estado != Presentacion.PENDIENTE:
+                return HttpResponse(simplejson.dumps({'error': "La presentacion debe estar en estado PENDIENTE"}), status=400, content_type='application/json')
+            presentacion.estado = Presentacion.ABIERTO
+            presentacion.comprobante = presentacion.comprobante.anular()
+            presentacion.save()
+            return JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
+        except Exception as ex:
+            return HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+
+    @detail_route(methods=['patch'])
+    def cobrar(self, request, pk=None):
+        # Verificar que esta PENDIENTE
+        # Pasar a COBRADA
+        # Setear valores cobrados de estudios
+        # Generar un PagoPresentacion
+        try:
+            response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
+            presentacion = Presentacion.objects.get(pk=pk)
+            if presentacion.estado != Presentacion.PENDIENTE:
+                return HttpResponse(simplejson.dumps({'error': "La presentacion debe estar en estado PENDIENTE"}), status=400, content_type='application/json')
+        except Exception as ex:
+            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+        return response

@@ -69,7 +69,7 @@ def crear_comprobante_asociado(id_comp, importe, concepto):
     comp = Comprobante.objects.get(pk = id_comp)
 
     if comp.tipo_comprobante.id == ID_TIPO_COMPROBANTE_LIQUIDACION:
-        raise TipoComprobanteAsociadoNoValidoException
+        raise TipoComprobanteAsociadoNoValidoException("No es posible usar una liquidacion como comprobante asociado")
 
     id_new_comp =  _obtener_tipo_comprobante_asociado(comp.tipo_comprobante.id)
 

@@ -121,6 +121,12 @@ class Comprobante(models.Model):
             dias = 80
         return self.fecha_emision + timedelta(days=dias)
 
+    def anular(self):
+        from comprobante.comprobante_asociado import crear_comprobante_asociado
+        self.estado = Comprobante.ANULADO
+        self.save()
+        return crear_comprobante_asociado(self.id, self.total_facturado, "Anula comprobante nro " + str(self.id))
+
     class Meta(object):
         permissions = (
             ("informe_ventas", u"Permite generar el informe de ventas."),

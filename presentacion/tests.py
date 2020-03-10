@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from presentacion.models import Presentacion
 from obra_social.models import ObraSocial
 from estudio.models import Estudio
-from comprobante.models import Comprobante
+from comprobante.models import Comprobante, ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO
 from comprobante.afip import AfipError
 
 class TestDetallesObrasSociales(TestCase):
@@ -201,3 +201,43 @@ class TestCrearPresentacion(TestCase):
         comprobantes_despues = Comprobante.objects.all().count()
         assert response.status_code == 500
         assert comprobantes_antes == comprobantes_despues
+
+class TestAbrirPresentacion(TestCase):
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
+        self.client = Client(HTTP_GET='localhost')
+        self.client.login(username='test', password='test')
+
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_abrir_presentacion_ok(self, afip_mock):
+        afip = afip_mock()
+        afip.consultar_proximo_numero.return_value = 10
+
+        presentacion = Presentacion.objects.get(pk=1)
+        pk_comprobante_viejo = presentacion.comprobante.pk
+        assert presentacion.estado == Presentacion.PENDIENTE
+        assert presentacion.comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_FACTURA
+        assert presentacion.comprobante.estado == Comprobante.NO_COBRADO
+        response = self.client.patch('/api/presentacion/1/abrir/')
+        assert response.status_code == 200
+        presentacion = Presentacion.objects.get(pk=1)
+        assert presentacion.estado == Presentacion.ABIERTO
+        assert Comprobante.objects.get(pk=pk_comprobante_viejo).estado == Comprobante.ANULADO
+        assert presentacion.comprobante.tipo_comprobante.id == ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO
+
+    def test_abrir_presentacion_no_pendiente_falla(self):
+        presentacion = Presentacion.objects.get(pk=1)
+        presentacion.estado = Presentacion.ABIERTO
+        presentacion.save()
+        response = self.client.patch('/api/presentacion/1/abrir/')
+        assert response.status_code == 400
+        assert presentacion.estado == Presentacion.ABIERTO
+
+        presentacion = Presentacion.objects.get(pk=1)
+        presentacion.estado = Presentacion.COBRADO
+        presentacion.save()
+        response = self.client.patch('/api/presentacion/1/abrir/')
+        assert response.status_code == 400
+        assert presentacion.estado == Presentacion.COBRADO
