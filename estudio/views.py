@@ -125,7 +125,7 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(fecha__lte=fecha_hasta)
         return queryset
 
-class InstitucionFilterBackend(filters.BaseFilterBackend):
+class SucursalFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         sucursal = request.query_params.get(u'sucursal')
         if sucursal:
@@ -142,7 +142,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
     serializer_class = EstudioSerializer
     filter_backends = (EstudioObraSocialFilterBackend, EstudioMedicoFilterBackend,
         EstudioMedicoSolicitanteFilterBackend, EstudioPacienteFilterBackend,
-        EstudioFechaFilterBackend, InstitucionFilterBackend, filters.OrderingFilter, )
+        EstudioFechaFilterBackend, SucursalFilterBackend, filters.OrderingFilter, )
     pagination_class = StandardResultsSetPagination
     ordering_fields = ('fecha', 'id')
     page_size = 20
