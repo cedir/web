@@ -4,6 +4,7 @@
     "pk": 1,
     "fields": {
         "nombre": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+        "nro_cuit": "1",
         "se_presenta_por_ARA": 0,
         "se_presenta_por_AMR": 1,
         "direccion": "asdasdas",
@@ -19,6 +20,7 @@
     "pk": 2,
     "fields": {
         "nombre": "PARTICULAR",
+        "nro_cuit": "0",
         "se_presenta_por_ARA": 0,
         "se_presenta_por_AMR": 0,
         "direccion": "",

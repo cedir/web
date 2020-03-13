@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, status
+from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from common.drf.views import StandardResultsSetPagination
@@ -16,8 +17,10 @@ from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRow
 from estudio.models import Estudio
 from estudio.serializers import EstudioDePresetancionRetrieveSerializer
 from obra_social.models import ObraSocial
-from comprobante.models import Comprobante, LineaDeComprobante, Gravado, TipoComprobante
-from comprobante.afip import AfipErrorRed, AfipErrorValidacion, AfipError
+from comprobante.models import Comprobante, LineaDeComprobante, Gravado, TipoComprobante, \
+    ID_TIPO_COMPROBANTE_LIQUIDACION
+from comprobante.afip import Afip, AfipErrorRed, AfipErrorValidacion, AfipError
+from comprobante.serializers import comprobante_cerrar_presentacion_serializer_factory
 
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
@@ -99,29 +102,33 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
         return response
 
-    @detail_route(methods=['post'])
-    def guardar(self, request, pk=None):
-        # Copiar bastante la implmentacion de ViewSet.create
-        # Fijarme de usar el validate del serializaer, o un serializer nuevo, pero DRY.
-        presentacion = Presentacion.objects.get(pk=pk)
-        estudios = presentacion.estudios.all().order_by('fecha', 'id')
-        try:
-            response = JsonResponse(EstudioDePresetancionRetrieveSerializer(estudios, many=True).data, safe=False)
-        except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
-        return response
-
     @detail_route(methods=['patch'])
     def cerrar(self, request, pk=None):
-        # Parametros: importes que cambian, importe final.
         # Validar que esta ABIERTO.
-        # Pasar a PENDIENTE. Generar comprobante.
-        presentacion = Presentacion.objects.get(pk=pk)
+        # Pasar a PENDIENTE.
+        # Generar comprobante.
+
+        # Pasar cosas de Comprobante a un serializer?
         try:
             presentacion = Presentacion.objects.get(pk=pk)
             if presentacion.estado != Presentacion.ABIERTO:
-                return HttpResponse(simplejson.dumps({'error': "La presentacion debe estar en estado ABIERTO"}), status=400, content_type='application/json')
-            response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
+                raise ValidationError("La presentacion debe estar en estado ABIERTO")
+            obra_social = presentacion.obra_social
+            comprobante_data = request.data
+            comprobante_data["neto"] = sum([Decimal(e.importe_estudio) for e in presentacion.estudios.all()])
+            comprobante_data["nombre_cliente"] = obra_social.nombre
+            comprobante_data["domicilio_cliente"] = obra_social.direccion
+            comprobante_data["nro_cuit"] = obra_social.nro_cuit
+            comprobante_data["condicion_fiscal"] = obra_social.condicion_fiscal
+            comprobante_serializer = comprobante_cerrar_presentacion_serializer_factory(data=comprobante_data)
+            comprobante_serializer.is_valid(raise_exception=True)
+            comprobante_serializer.save()
+            response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
+            presentacion.estado = Presentacion.PENDIENTE
+            presentacion.save()
+
+        except ValidationError as ex:
+            response = Response(ex.message, status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
         return response
