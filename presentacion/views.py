@@ -122,10 +122,14 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             comprobante_data["condicion_fiscal"] = obra_social.condicion_fiscal
             comprobante_serializer = comprobante_cerrar_presentacion_serializer_factory(data=comprobante_data)
             comprobante_serializer.is_valid(raise_exception=True)
-            comprobante_serializer.save()
-            response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
+            comprobante = comprobante_serializer.save()
+            linea = comprobante.lineas.first()
             presentacion.estado = Presentacion.PENDIENTE
+            presentacion.total = linea.importe_neto
+            presentacion.iva = linea.iva
+            presentacion.total_facturado = linea.sub_total
             presentacion.save()
+            response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
 
         except ValidationError as ex:
             response = Response(ex.message, status.HTTP_400_BAD_REQUEST)

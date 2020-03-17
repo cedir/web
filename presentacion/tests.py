@@ -68,25 +68,17 @@ class TestCrearPresentacion(TestCase):
             "estudios": [
                 {
                     "id": 9,
-                    "nro_de_orden": "FE003450603",
-                    "importe_estudio": 5,
-                    "pension": 1,
-                    "diferencia_paciente": 1,
-                    "medicacion": 1,
-                    "arancel_anestesia": 1
                 }
             ]
         }
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
+        assert response.status_code == 201
         presentacion = Presentacion.objects.get(pk=json.loads(response.content)['id'])
         assert presentacion.estado == Presentacion.ABIERTO
         assert presentacion.comprobante is None
 
-    @patch('presentacion.serializers.Afip')
-    def test_crear_presentacion_actualiza_estudios(self, afip_mock):
-        afip = afip_mock()
-        afip.emitir_comprobante.return_value = None
+    def test_crear_presentacion_actualiza_estudios(self):
         estudio = Estudio.objects.get(pk=9)
         assert estudio.obra_social_id == 1
         assert estudio.presentacion_id == 0
@@ -98,12 +90,6 @@ class TestCrearPresentacion(TestCase):
             "estudios": [
                 {
                     "id": 9,
-                    "nro_de_orden": "FE003450603",
-                    "importe_estudio": 5,
-                    "pension": 1,
-                    "diferencia_paciente": 1,
-                    "medicacion": 1,
-                    "arancel_anestesia": 1
                 }
             ]
         }
@@ -111,7 +97,6 @@ class TestCrearPresentacion(TestCase):
                                 content_type='application/json')
         estudio = Estudio.objects.get(pk=9)
         assert estudio.presentacion_id != 0
-        assert estudio.importe_estudio == Decimal(5)
 
 class TestAbrirPresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']

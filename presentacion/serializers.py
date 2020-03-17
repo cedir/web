@@ -38,7 +38,6 @@ class PresentacionRetrieveSerializer(serializers.ModelSerializer):
 class PresentacionCreateUpdateSerializer(serializers.ModelSerializer):
     obra_social_id = serializers.IntegerField()
     estudios = serializers.ListField()
-    comprobante = serializers.DictField()
 
     def to_representation(self, instance):
         return {
@@ -46,7 +45,6 @@ class PresentacionCreateUpdateSerializer(serializers.ModelSerializer):
             u'obra_social_id': instance.obra_social_id,
             u'periodo': instance.periodo,
             u'fecha': instance.fecha,
-            u'comprobante': ComprobanteSerializer(instance.comprobante).data
         }
 
     def validate(self, data):
@@ -62,18 +60,16 @@ class PresentacionCreateUpdateSerializer(serializers.ModelSerializer):
         obra_social = ObraSocial.objects.get(pk=validated_data['obra_social_id'])
         periodo = validated_data['periodo']
         estudios_data = validated_data['estudios']
+        del validated_data['estudios']
         presentacion = Presentacion.objects.create(
             comprobante=None,
-            estado=Presentacion.PENDIENTE,
+            iva=0,
+            total=0,
+            estado=Presentacion.ABIERTO,
             **validated_data
         )
         for estudio_data in estudios_data:
             estudio = Estudio.objects.get(pk=estudio_data['id'])
-            estudio.nro_de_orden = estudio_data['nro_de_orden']
-            estudio.importe_estudio = estudio_data['importe_estudio']
-            estudio.pension = estudio_data['pension']
-            estudio.diferencia_paciente = estudio_data['diferencia_paciente']
-            estudio.arancel_anestesia = estudio_data['arancel_anestesia']
             estudio.presentacion = presentacion
             estudio.save()
         return presentacion
@@ -86,5 +82,4 @@ class PresentacionCreateUpdateSerializer(serializers.ModelSerializer):
             u'periodo',
             u'fecha',
             u'estudios',
-            u'comprobante'
         )
