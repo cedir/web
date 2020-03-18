@@ -52,7 +52,7 @@ class EstudioCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudio
         fields = (u'id',u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
-            u'medico_solicitante', u'anestesista', u'motivo', u'informe',)
+            u'medico_solicitante', u'anestesista', u'motivo', u'informe', u'sucursal')
 
 class EstudioDePresetancionRetrieveSerializer(serializers.ModelSerializer):
     paciente = PacienteSerializer()
