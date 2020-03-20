@@ -65,14 +65,6 @@ class EstudioDePresetancionRetrieveSerializer(serializers.ModelSerializer):
             u'medico', u'importe_estudio', u'pension', u'diferencia_paciente',
             u'importe_medicacion', u'arancel_anestesia')
 
-class EstudioDePresetancionCreateUpdateSerializer(serializers.ModelSerializer):
-    def restore_object(self, attrs, instance=None):
-        return Estudio(**attrs)
-
-    class Meta:
-        model = Estudio
-        fields = (u'id', u'nro_de_orden', u'importe_estudio',
-            u'pension', u'diferencia_paciente', u'arancel_anestesia')
 
 class MedicacionSerializer(serializers.HyperlinkedModelSerializer):
     medicamento = MedicamentoSerializer()

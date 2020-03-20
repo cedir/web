@@ -66,7 +66,17 @@ class TestCrearPresentacion(TestCase):
             "obra_social_id": 1,
             "periodo": "SEPTIEMBRE 2019",
             "fecha": "2019-12-25",
-            "estudios": [9]
+            "estudios": [
+                {
+                    "id": 9,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ],
         }
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
@@ -84,12 +94,23 @@ class TestCrearPresentacion(TestCase):
             "obra_social_id": 1,
             "periodo": "SEPTIEMBRE 2019",
             "fecha": "2019-12-25",
-            "estudios": [9]
+            "estudios": [
+                {
+                    "id": 9,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ],
         }
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
         estudio = Estudio.objects.get(pk=9)
         assert estudio.presentacion_id != 0
+        assert estudio.importe_estudio == 5
 
     def test_crear_presentacion_con_estudio_ya_presentado_falla(self):
         estudio_ya_presentado = Estudio.objects.get(pk=1)
@@ -98,7 +119,17 @@ class TestCrearPresentacion(TestCase):
             "obra_social_id": 1,
             "periodo": "perio2",
             "fecha": "2019-12-25",
-            "estudios": [1]
+            "estudios": [
+                {
+                    "id": 1,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ],
         }
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
@@ -112,7 +143,17 @@ class TestCrearPresentacion(TestCase):
             "obra_social_id": 5,
             "periodo": "perio2",
             "fecha": "2019-12-25",
-            "estudios": [1]
+            "estudios": [
+                {
+                    "id": 9,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ],
         }
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
@@ -144,7 +185,26 @@ class TestUpdatePresentacion(TestCase):
         datos = {
             "periodo": "perio3",
             "fecha": "2019-12-25",
-            "estudios": [11, 12]
+            "estudios": [
+                {
+                    "id": 11,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                },
+                {
+                    "id": 12,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ]
         }
 
         response = self.client.patch('/api/presentacion/8/', data=json.dumps(datos),
@@ -161,6 +221,34 @@ class TestUpdatePresentacion(TestCase):
         assert estudio_3.presentacion == presentacion
         assert presentacion.estudios.count() == 2
 
+    def test_update_presentacion_actualiza_estudios(self):
+        presentacion = Presentacion.objects.get(pk=8)
+        estudio = Estudio.objects.get(pk=9)
+        assert estudio.obra_social_id == 1
+        assert estudio.presentacion_id == 0
+        assert estudio.importe_estudio == Decimal("10000.00")
+        datos = {
+            "obra_social_id": 1,
+            "periodo": "SEPTIEMBRE 2019",
+            "fecha": "2019-12-25",
+            "estudios": [
+                {
+                    "id": 12,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                },
+            ],
+        }
+        response = self.client.patch('/api/presentacion/8/', data=json.dumps(datos),
+                                content_type='application/json')
+        estudio = Estudio.objects.get(pk=12)
+        assert estudio.presentacion_id != 0
+        assert estudio.importe_estudio == 5
+
     def test_update_presentacion_cerrada_falla(self):
         # Tomamos una presentacion con dos estudios, quitamos uno y agregamos otro.
         # Tambien cambiamos valores.
@@ -169,7 +257,26 @@ class TestUpdatePresentacion(TestCase):
         datos = {
             "periodo": "perio3",
             "fecha": "2019-12-25",
-            "estudios": [11, 12]
+            "estudios": [
+                {
+                    "id": 11,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                },
+                {
+                    "id": 12,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ]
         }
 
         response = self.client.patch('/api/presentacion/1/', data=json.dumps(datos),
@@ -181,7 +288,26 @@ class TestUpdatePresentacion(TestCase):
         datos = {
             "periodo": "perio3",
             "fecha": "2019-12-25",
-            "estudios": [11, 12]
+            "estudios": [
+                {
+                    "id": 11,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                },
+                {
+                    "id": 12,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ]
         }
 
         response = self.client.patch('/api/presentacion/2/', data=json.dumps(datos),
@@ -197,7 +323,17 @@ class TestUpdatePresentacion(TestCase):
         datos = {
             "periodo": "perio3",
             "fecha": "2019-12-25",
-            "estudios": [9]
+            "estudios": [
+                {
+                    "id": 9,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                },
+            ]
         }
         response = self.client.patch('/api/presentacion/9/', data=json.dumps(datos),
                                 content_type='application/json')
@@ -209,7 +345,17 @@ class TestUpdatePresentacion(TestCase):
         datos = {
             "periodo": "perio3",
             "fecha": "2019-12-25",
-            "estudios": [1]
+            "estudios": [
+                {
+                    "id": 1,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                },
+            ]
         }
         response = self.client.patch('/api/presentacion/8/', data=json.dumps(datos),
                                 content_type='application/json')

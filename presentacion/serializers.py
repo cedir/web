@@ -7,7 +7,7 @@ from presentacion.models import Presentacion
 from obra_social.models import ObraSocial
 from comprobante.models import Comprobante, TipoComprobante, Gravado, LineaDeComprobante, ID_TIPO_COMPROBANTE_LIQUIDACION
 from estudio.models import Estudio
-from estudio.serializers import EstudioDePresetancionRetrieveSerializer, EstudioDePresetancionCreateUpdateSerializer
+from estudio.serializers import EstudioDePresetancionRetrieveSerializer
 from obra_social.serializers import ObraSocialSerializer
 from comprobante.serializers import ComprobanteSerializer
 
@@ -50,26 +50,33 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if ObraSocial.objects.get(pk=data['obra_social_id']).is_particular_or_especial():
             raise serializers.ValidationError('La Obra Social no puede ser Particular o Particular Especial')
-        for estudio_id in data['estudios']:
-            estudio = Estudio.objects.get(pk=estudio_id)
+        for estudio_data in data['estudios']:
+            estudio = Estudio.objects.get(pk=estudio_data['id'])
             if estudio.obra_social_id != data['obra_social_id']:
-                raise serializers.ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio_id))
+                raise serializers.ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio.id))
             if estudio.presentacion_id != 0:
-                raise serializers.ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio_id))
+                raise serializers.ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
         return data
 
     def create(self, validated_data):
-        estudios = Estudio.objects.filter(id__in=validated_data['estudios'])
+        estudios_data = validated_data['estudios']
         del validated_data['estudios']
         presentacion = Presentacion.objects.create(
             comprobante=None,
             iva=0,
-            total=sum([e.importe_estudio for e in estudios]),
+            total=sum([e["importe_estudio"] for e in estudios_data]),
             estado=Presentacion.ABIERTO,
             **validated_data
         )
-        for estudio in estudios:
+        for estudio_data in estudios_data:
+            estudio = Estudio.objects.get(pk=estudio_data['id'])
             estudio.presentacion = presentacion
+            estudio.nro_de_orden = estudio_data.get("nro_de_orden", estudio.nro_de_orden)
+            estudio.importe_estudio = estudio_data.get("importe_estudio", estudio.importe_estudio)
+            estudio.pension = estudio_data.get("pension", estudio.pension)
+            estudio.diferencia_paciente = estudio_data.get("diferencia_paciente", estudio.diferencia_paciente)
+            estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
+            estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
         return presentacion
 
@@ -95,27 +102,32 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
-        if self.instance.estado != Presentacion.ABIERTO:
-            raise serializers.ValidationError('La presentacion no se encuentra abierta')
-        for estudio_id in data['estudios']:
-            estudio = Estudio.objects.get(pk=estudio_id)
+        for estudio_data in data['estudios']:
+            estudio = Estudio.objects.get(pk=estudio_data['id'])
             if estudio.obra_social_id != self.instance.obra_social_id:
-                raise serializers.ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio_id))
+                raise serializers.ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio.id))
             if estudio.presentacion_id != 0 and estudio.presentacion_id != self.instance.id:
-                raise serializers.ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio_id))
+                raise serializers.ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
         return data
 
     def update(self, instance, validated_data):
         instance.periodo = validated_data.get("periodo", instance.periodo)
         instance.fecha = validated_data.get("fecha", instance.fecha)
-        estudios_data = Estudio.objects.filter(id__in=validated_data['estudios'])
-        instance.total = sum([e.importe_estudio for e in estudios_data])
+        estudios_data = validated_data['estudios']
+        instance.total = sum([e["importe_estudio"] for e in estudios_data])
         instance.save()
         for estudio in instance.estudios.all():
             estudio.presentacion_id = 0
             estudio.save()
-        for estudio in estudios_data:
+        for estudio_data in estudios_data:
+            estudio = Estudio.objects.get(pk=estudio_data['id'])
             estudio.presentacion = instance
+            estudio.nro_de_orden = estudio_data.get("nro_de_orden", estudio.nro_de_orden)
+            estudio.importe_estudio = estudio_data.get("importe_estudio", estudio.importe_estudio)
+            estudio.pension = estudio_data.get("pension", estudio.pension)
+            estudio.diferencia_paciente = estudio_data.get("diferencia_paciente", estudio.diferencia_paciente)
+            estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
+            estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
         return instance
     class Meta:
