@@ -31,7 +31,7 @@
     "model": "presentacion.presentacion",
     "pk": 2,
     "fields": {
-        "obra_social": 2,
+        "obra_social": 5,
         "comprobante": 2,
         "fecha": "2012-07-06",
         "estado": 1,
@@ -56,7 +56,7 @@
     "model": "presentacion.presentacion",
     "pk": 4,
     "fields": {
-        "obra_social": 2,
+        "obra_social": 5,
         "comprobante": 4,
         "fecha": "2012-07-06",
         "estado": 0,
@@ -70,7 +70,7 @@
     "model": "presentacion.presentacion",
     "pk": 5,
     "fields": {
-        "obra_social": 2,
+        "obra_social": 5,
         "fecha": "2012-07-06",
         "estado": 0,
         "iva": "21.00",
@@ -81,7 +81,7 @@
     "model": "presentacion.presentacion",
     "pk": 6,
     "fields": {
-        "obra_social": 2,
+        "obra_social": 5,
         "fecha": "2012-07-06",
         "estado": 0,
         "iva": "21.00",
@@ -92,9 +92,33 @@
     "model": "presentacion.presentacion",
     "pk": 7,
     "fields": {
-        "obra_social": 2,
+        "obra_social": 5,
         "fecha": "2012-07-06",
         "estado": 0,
+        "iva": "21.00",
+        "comprobante": 7
+    }
+},
+{
+    "model": "presentacion.presentacion",
+    "pk": 8,
+    "fields": {
+        "obra_social": 1,
+        "fecha": "2012-07-06",
+        "periodo": "perio2",
+        "estado": 2,
+        "iva": "21.00",
+        "comprobante": 7
+    }
+},
+{
+    "model": "presentacion.presentacion",
+    "pk": 9,
+    "fields": {
+        "obra_social": 5,
+        "fecha": "2012-07-06",
+        "periodo": "perio2",
+        "estado": 2,
         "iva": "21.00",
         "comprobante": 7
     }

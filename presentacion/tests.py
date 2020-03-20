@@ -1,6 +1,7 @@
 import json
 from decimal import Decimal
 from mock import patch
+from datetime import date
 
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
@@ -65,11 +66,7 @@ class TestCrearPresentacion(TestCase):
             "obra_social_id": 1,
             "periodo": "SEPTIEMBRE 2019",
             "fecha": "2019-12-25",
-            "estudios": [
-                {
-                    "id": 9,
-                }
-            ]
+            "estudios": [9]
         }
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
@@ -87,16 +84,136 @@ class TestCrearPresentacion(TestCase):
             "obra_social_id": 1,
             "periodo": "SEPTIEMBRE 2019",
             "fecha": "2019-12-25",
-            "estudios": [
-                {
-                    "id": 9,
-                }
-            ]
+            "estudios": [9]
         }
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
         estudio = Estudio.objects.get(pk=9)
         assert estudio.presentacion_id != 0
+
+    def test_crear_presentacion_con_estudio_ya_presentado_falla(self):
+        estudio_ya_presentado = Estudio.objects.get(pk=1)
+        assert estudio_ya_presentado.presentacion_id != 0
+        datos = {
+            "obra_social_id": 1,
+            "periodo": "perio2",
+            "fecha": "2019-12-25",
+            "estudios": [1]
+        }
+        response = self.client.post('/api/presentacion/', data=json.dumps(datos),
+                                content_type='application/json')
+        assert response.status_code == 400
+
+    def test_crear_presentacion_con_estudio_obra_social_distinta_falla(self):
+        estudio = Estudio.objects.get(pk=9)
+        assert estudio.presentacion_id == 0
+        assert estudio.obra_social_id == 1
+        datos = {
+            "obra_social_id": 5,
+            "periodo": "perio2",
+            "fecha": "2019-12-25",
+            "estudios": [1]
+        }
+        response = self.client.post('/api/presentacion/', data=json.dumps(datos),
+                                content_type='application/json')
+        assert response.status_code == 400
+
+class TestUpdatePresentacion(TestCase):
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
+        self.client = Client(HTTP_GET='localhost')
+        self.client.login(username='test', password='test')
+
+    def test_update_presentacion_ok(self):
+        # Tomamos una presentacion con dos estudios, quitamos uno y agregamos otro.
+        # Tambien cambiamos valores.
+        presentacion = Presentacion.objects.get(pk=8)
+        estudio_1 = Estudio.objects.get(pk=10)
+        estudio_2 = Estudio.objects.get(pk=11)
+        estudio_3 = Estudio.objects.get(pk=12)
+        assert presentacion.estado == Presentacion.ABIERTO
+        assert presentacion.fecha == date(2012, 7, 6)
+        assert presentacion.periodo == "perio2"
+        assert estudio_1.presentacion == presentacion
+        assert estudio_2.presentacion == presentacion
+        assert estudio_3.presentacion_id == 0
+        assert presentacion.estudios.count() == 2
+
+        datos = {
+            "periodo": "perio3",
+            "fecha": "2019-12-25",
+            "estudios": [11, 12]
+        }
+
+        response = self.client.patch('/api/presentacion/8/', data=json.dumps(datos),
+                                content_type='application/json')
+        assert response.status_code == 200
+        presentacion = Presentacion.objects.get(pk=8)
+        estudio_1 = Estudio.objects.get(pk=10)
+        estudio_2 = Estudio.objects.get(pk=11)
+        estudio_3 = Estudio.objects.get(pk=12)
+        assert presentacion.fecha == date(2019, 12, 25)
+        assert presentacion.periodo == "perio3"
+        assert estudio_1.presentacion_id == 0
+        assert estudio_2.presentacion == presentacion
+        assert estudio_3.presentacion == presentacion
+        assert presentacion.estudios.count() == 2
+
+    def test_update_presentacion_cerrada_falla(self):
+        # Tomamos una presentacion con dos estudios, quitamos uno y agregamos otro.
+        # Tambien cambiamos valores.
+        presentacion = Presentacion.objects.get(pk=1)
+        assert presentacion.estado == Presentacion.PENDIENTE
+        datos = {
+            "periodo": "perio3",
+            "fecha": "2019-12-25",
+            "estudios": [11, 12]
+        }
+
+        response = self.client.patch('/api/presentacion/1/', data=json.dumps(datos),
+                                content_type='application/json')
+        assert response.status_code == 400
+
+        presentacion = Presentacion.objects.get(pk=2)
+        assert presentacion.estado == Presentacion.COBRADO
+        datos = {
+            "periodo": "perio3",
+            "fecha": "2019-12-25",
+            "estudios": [11, 12]
+        }
+
+        response = self.client.patch('/api/presentacion/2/', data=json.dumps(datos),
+                                content_type='application/json')
+        assert response.status_code == 400
+
+    def test_update_presentacion_con_estudio_obra_social_distinta_falla(self):
+        estudio = Estudio.objects.get(pk=12)
+        presentacion = Presentacion.objects.get(pk=9)
+        assert estudio.presentacion_id == 0
+        assert estudio.obra_social_id == 1
+        assert presentacion.obra_social_id == 5
+        datos = {
+            "periodo": "perio3",
+            "fecha": "2019-12-25",
+            "estudios": [9]
+        }
+        response = self.client.patch('/api/presentacion/9/', data=json.dumps(datos),
+                                content_type='application/json')
+        assert response.status_code == 400
+
+    def test_update_presentacion_con_estudio_ya_presentado_falla(self):
+        estudio_ya_presentado = Estudio.objects.get(pk=1)
+        assert estudio_ya_presentado.presentacion_id != 0
+        datos = {
+            "periodo": "perio3",
+            "fecha": "2019-12-25",
+            "estudios": [1]
+        }
+        response = self.client.patch('/api/presentacion/8/', data=json.dumps(datos),
+                                content_type='application/json')
+        assert response.status_code == 400
 
 class TestAbrirPresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']

@@ -10,7 +10,7 @@ from rest_framework.decorators import detail_route
 from common.drf.views import StandardResultsSetPagination
 
 from presentacion.models import Presentacion
-from presentacion.serializers import PresentacionSerializer, PresentacionRetrieveSerializer, PresentacionCreateUpdateSerializer, PresentacionCreateUpdateSerializer
+from presentacion.serializers import PresentacionSerializer, PresentacionRetrieveSerializer, PresentacionCreateSerializer, PresentacionUpdateSerializer
 from presentacion.obra_social_custom_code.osde_presentacion_digital import \
     OsdeRowEstudio, OsdeRowMedicacion, OsdeRowPension, OsdeRowMaterialEspecifico
 from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowEstudio
@@ -31,25 +31,13 @@ class PresentacionViewSet(viewsets.ModelViewSet):
 
     serializers = {
         'retrieve': PresentacionRetrieveSerializer,
-        'create': PresentacionCreateUpdateSerializer,
-        'update': PresentacionCreateUpdateSerializer
+        'create': PresentacionCreateSerializer,
+        'update': PresentacionUpdateSerializer,
+        'partial_update': PresentacionUpdateSerializer,
     }
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializer_class)
-
-    def create(self, request, *args, **kwargs):
-        try:
-            return super(PresentacionViewSet, self).create(request, *args, **kwargs)
-        except AfipErrorRed as e:
-            content = u'No se pudo realizar la conexion con Afip, intente mas tarde.\nError: ' + unicode(e)
-            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except AfipErrorValidacion as e:
-            content = u'Afip rechazo el comprobante. \nError: ' + unicode(e)
-            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except AfipError as e:
-            content = u'Error no especificado de Afip. \nError: ' + unicode(e)
-            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @detail_route(methods=['get'])
     def get_detalle_osde(self, request, pk=None):
