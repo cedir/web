@@ -113,6 +113,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             comprobante = comprobante_serializer.save()
             linea = comprobante.lineas.first()
             presentacion.estado = Presentacion.PENDIENTE
+            presentacion.comprobante = comprobante
             presentacion.total = linea.importe_neto
             presentacion.iva = linea.iva
             presentacion.total_facturado = linea.sub_total

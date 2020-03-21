@@ -419,6 +419,7 @@ class TestCerrarPresentacion(TestCase):
         afip.consultar_proximo_numero.return_value = 10
         presentacion = Presentacion.objects.get(pk=1)
         presentacion.estado = Presentacion.ABIERTO
+        presentacion.comprobante = None
         presentacion.save()
         datos = {
             "tipo_comprobante_id": 1,
