@@ -217,7 +217,7 @@ def send_mail(request):
             smtpserver.close()
 
             data = { u'sent': u'yes' }
-    except:
-        pass
+    except Exception as e:
+        data = {e}
 
     return HttpResponse(json.dumps(data), content_type = "application/json")
