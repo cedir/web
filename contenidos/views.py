@@ -187,7 +187,7 @@ def send_mail(request):
         gmail_pwd = settings.EMAIL_ACCOUNT_PSW
 
         #valida captcha
-        captcha = request.POST['captcha']
+        captcha = request.POST['g-recaptcha-response']
 
 
         greq = urllib2.Request('https://www.google.com/recaptcha/api/siteverify')
@@ -218,6 +218,6 @@ def send_mail(request):
 
             data = { u'sent': u'yes' }
     except Exception as e:
-        data = {e}
+        data['err'] = str(e)
 
     return HttpResponse(json.dumps(data), content_type = "application/json")

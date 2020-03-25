@@ -45,3 +45,30 @@
 	}); // End document ready
 
 })(this.jQuery);
+
+function ContactFormHandler(){
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+	  if (this.readyState == 4 && this.status == 200) {
+	   respuesta = JSON.parse(this.responseText)
+	   if(respuesta['sent'] == 'no'){
+		   document.getElementById("MessageNotSent2").classList.remove("hidden")
+	   }else{
+		   document.getElementById("MessageSent2").classList.remove("hidden")
+		}
+	  }
+	};
+	
+	name = document.getElementById("name").value
+	email = document.getElementById("email").value
+	tel = document.getElementById("tel").value
+	message = document.getElementById("message").value
+	captcha = document.getElementById("g-recaptcha-response").value
+	
+	data = `name=${name}&email=${email}&tel=${tel}&message=${message}&g-recaptcha-response=${captcha}`
+	
+	
+	xhttp.open("POST", "/sendMail/", true);
+	xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xhttp.send(data);
+}

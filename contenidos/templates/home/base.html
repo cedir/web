@@ -389,7 +389,7 @@
 										<div class="alert alert-danger hidden" id="MessageNotSent2">
 											Algo no salió bien. Por favor recargue la página y vuelva a intentar. Recuerde completar la verificación de identidad.
 										</div>
-										<form method="post" action="/sendMail/" role="form" id="footer-form" class="margin-clear">
+										<form role="form" id="footer-form" class="margin-clear" onsubmit="ContactFormHandler();return false">
 											<div class="form-group has-feedback">
 												<label class="sr-only" for="name">Nombre</label>
 												<input type="text" class="form-control" id="name" placeholder="Nombre" name="name">
