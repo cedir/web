@@ -159,6 +159,54 @@ class TestCrearPresentacion(TestCase):
                                 content_type='application/json')
         assert response.status_code == 400
 
+    def test_crear_presentacion_estudio_queda_asociado(self):
+        estudio = Estudio.objects.get(pk=9)
+        assert estudio.obra_social_id == 1
+        assert estudio.presentacion_id == 0
+        datos = {
+            "obra_social_id": 1,
+            "periodo": "SEPTIEMBRE 2019",
+            "fecha": "2019-12-25",
+            "estudios": [
+                {
+                    "id": 9,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 5,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ],
+        }
+        response = self.client.post('/api/presentacion/', data=json.dumps(datos),
+                                content_type='application/json')
+        estudio = Estudio.objects.get(pk=9)
+        assert estudio.presentacion_id == response.data['id']
+
+    def test_crear_presentacion_total_es_suma_importes_estudios(self):
+        datos = {
+            "obra_social_id": 1,
+            "periodo": "perio3",
+            "fecha": "2019-12-25",
+            "estudios": [
+                {
+                    "id": 12,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 1,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ]
+        }
+
+        response = self.client.post('/api/presentacion/', data=json.dumps(datos),
+                                content_type='application/json')
+        presentacion = Presentacion.objects.get(pk=response.data['id'])
+        assert presentacion.total == 3
+
 class TestUpdatePresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
 
@@ -361,6 +409,28 @@ class TestUpdatePresentacion(TestCase):
                                 content_type='application/json')
         assert response.status_code == 400
 
+    def test_update_presentacion_total_es_suma_importes_estudios(self):
+        datos = {
+            "periodo": "perio3",
+            "fecha": "2019-12-25",
+            "estudios": [
+                {
+                    "id": 12,
+                    "nro_de_orden": "FE003450603",
+                    "importe_estudio": 1,
+                    "pension": 1,
+                    "diferencia_paciente": 1,
+                    "medicacion": 1,
+                    "arancel_anestesia": 1
+                }
+            ]
+        }
+
+        response = self.client.patch('/api/presentacion/8/', data=json.dumps(datos),
+                                content_type='application/json')
+        presentacion = Presentacion.objects.get(pk=8)
+        assert presentacion.total == 3
+
 class TestAbrirPresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
 
@@ -502,3 +572,26 @@ class TestCerrarPresentacion(TestCase):
         comprobantes_despues = Comprobante.objects.all().count()
         assert response.status_code == 500
         assert comprobantes_antes == comprobantes_despues
+
+    @patch('comprobante.serializers.Afip')
+    def test_cerrar_presentacion_total_coincide_con_comprobante(self, afip_mock):
+        afip = afip_mock()
+        afip.consultar_proximo_numero.return_value = 10
+        presentacion = Presentacion.objects.get(pk=1)
+        presentacion.estado = Presentacion.ABIERTO
+        presentacion.comprobante = None
+        presentacion.save()
+        datos = {
+            "tipo_comprobante_id": 1,
+            "nro_terminal": 99,
+            "sub_tipo": "A",
+            "responsable": "Cedir",
+            "gravado_id": 1,
+            "periodo": "Mayo 1968"
+        }
+        response = self.client.patch('/api/presentacion/1/cerrar/', json.dumps(datos),
+                                content_type='application/json')
+
+        assert response.status_code == 200
+        presentacion = Presentacion.objects.get(pk=1)
+        assert presentacion.total_facturado == presentacion.comprobante.total_facturado

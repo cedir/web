@@ -60,11 +60,11 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         estudios_data = validated_data['estudios']
+        estudios = Estudio.objects.filter(id__in=[e["id"] for e in estudios_data])
         del validated_data['estudios']
         presentacion = Presentacion.objects.create(
             comprobante=None,
             iva=0,
-            total=sum([e["importe_estudio"] for e in estudios_data]),
             estado=Presentacion.ABIERTO,
             **validated_data
         )
@@ -78,6 +78,8 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
             estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
             estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
+        presentacion.total = sum([e.get_importe_total() for e in estudios])
+        presentacion.save()
         return presentacion
 
     class Meta:
@@ -114,8 +116,7 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
         instance.periodo = validated_data.get("periodo", instance.periodo)
         instance.fecha = validated_data.get("fecha", instance.fecha)
         estudios_data = validated_data['estudios']
-        instance.total = sum([e["importe_estudio"] for e in estudios_data])
-        instance.save()
+        estudios = Estudio.objects.filter(id__in=[e["id"] for e in estudios_data])
         for estudio in instance.estudios.all():
             estudio.presentacion_id = 0
             estudio.save()
@@ -129,6 +130,8 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
             estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
             estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
+        instance.total = sum([e.get_importe_total() for e in estudios])
+        instance.save()
         return instance
     class Meta:
         model = Presentacion

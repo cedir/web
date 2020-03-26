@@ -103,7 +103,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
                 raise ValidationError("La presentacion debe estar en estado ABIERTO")
             obra_social = presentacion.obra_social
             comprobante_data = request.data
-            comprobante_data["neto"] = sum([Decimal(e.importe_estudio) for e in presentacion.estudios.all()])
+            comprobante_data["neto"] = presentacion.total
             comprobante_data["nombre_cliente"] = obra_social.nombre
             comprobante_data["domicilio_cliente"] = obra_social.direccion
             comprobante_data["nro_cuit"] = obra_social.nro_cuit
