@@ -20,7 +20,7 @@ from obra_social.models import ObraSocial
 from comprobante.models import Comprobante, LineaDeComprobante, Gravado, TipoComprobante, \
     ID_TIPO_COMPROBANTE_LIQUIDACION
 from comprobante.afip import Afip, AfipErrorRed, AfipErrorValidacion, AfipError
-from comprobante.serializers import comprobante_cerrar_presentacion_serializer_factory
+from comprobante.serializers import crear_comprobante_serializer_factory
 
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
@@ -108,7 +108,8 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             comprobante_data["domicilio_cliente"] = obra_social.direccion
             comprobante_data["nro_cuit"] = obra_social.nro_cuit
             comprobante_data["condicion_fiscal"] = obra_social.condicion_fiscal
-            comprobante_serializer = comprobante_cerrar_presentacion_serializer_factory(data=comprobante_data)
+            comprobante_data["concepto"] = "FACTURACION CORRESPONDIENTE A " + presentacion.periodo
+            comprobante_serializer = crear_comprobante_serializer_factory(data=comprobante_data)
             comprobante_serializer.is_valid(raise_exception=True)
             comprobante = comprobante_serializer.save()
             linea = comprobante.lineas.first()

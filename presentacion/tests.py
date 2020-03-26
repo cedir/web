@@ -497,7 +497,6 @@ class TestCerrarPresentacion(TestCase):
             "sub_tipo": "A",
             "responsable": "Cedir",
             "gravado_id": 1,
-            "periodo": "Mayo 1968"
         }
         response = self.client.patch('/api/presentacion/1/cerrar/', json.dumps(datos),
                                 content_type='application/json')
@@ -517,7 +516,6 @@ class TestCerrarPresentacion(TestCase):
         presentacion.save()
         datos = {
             "tipo_comprobante_id": 2,
-            "periodo": "Mayo 1968"
         }
         response = self.client.patch('/api/presentacion/1/cerrar/', json.dumps(datos),
                                 content_type='application/json')
@@ -542,7 +540,6 @@ class TestCerrarPresentacion(TestCase):
             "sub_tipo": "A",
             "responsable": "Cedir",
             "gravado_id": 1,
-            "periodo": "Mayo 1968"
         }
         response = self.client.patch('/api/presentacion/1/cerrar/', json.dumps(datos),
                                 content_type='application/json')
@@ -565,7 +562,6 @@ class TestCerrarPresentacion(TestCase):
             "numero": 40,
             "responsable": "Cedir",
             "gravado_id": 1,
-            "periodo": "Mayo 1968"
         }
         response = self.client.patch('/api/presentacion/1/cerrar/', json.dumps(datos),
                                 content_type='application/json')
@@ -587,7 +583,6 @@ class TestCerrarPresentacion(TestCase):
             "sub_tipo": "A",
             "responsable": "Cedir",
             "gravado_id": 1,
-            "periodo": "Mayo 1968"
         }
         response = self.client.patch('/api/presentacion/1/cerrar/', json.dumps(datos),
                                 content_type='application/json')

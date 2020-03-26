@@ -128,19 +128,19 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
     def get_total_material_especifico(self, comprobante):
         return Decimal(self.context["calculador"].total_material_especifico).quantize(Decimal('.01'), ROUND_UP)
 
-class ComprobanteCerrarPresentacionLiquidacionSerializer(serializers.ModelSerializer):
+class CrearComprobanteLiquidacionSerializer(serializers.ModelSerializer):
     neto = serializers.DecimalField(16, 2)
-    periodo = serializers.CharField()
+    concepto = serializers.CharField()
     class Meta(object):
         model = Comprobante
         fields = ('neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', \
-            'condicion_fiscal', 'periodo')
+            'condicion_fiscal', 'concepto')
 
     def create(self, validated_data):
         neto = validated_data["neto"]
-        periodo = validated_data["periodo"]
+        concepto = validated_data["concepto"]
         del validated_data["neto"]
-        del validated_data["periodo"]
+        del validated_data["concepto"]
         comprobante = Comprobante.objects.create(
                 estado=Comprobante.NO_COBRADO,
                 tipo_comprobante=TipoComprobante.objects.get(pk=ID_TIPO_COMPROBANTE_LIQUIDACION),
@@ -157,15 +157,15 @@ class ComprobanteCerrarPresentacionLiquidacionSerializer(serializers.ModelSerial
             )
         linea = LineaDeComprobante.objects.create(
             comprobante=comprobante,
-            concepto='FACTURACION CORRESPONDIENTE A ' + periodo,
+            concepto=concepto,
             importe_neto=neto,
             iva=0,
             sub_total=neto
         )
         return comprobante
-class ComprobanteCerrarPresentacionSerializer(serializers.ModelSerializer):
+class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
     neto = serializers.DecimalField(16, 2)
-    periodo = serializers.CharField()
+    concepto = serializers.CharField()
     # Traigo las ids como campos numericos para no tener que mandar un diccionario con todo el gravado
     # Debe haber una forma estandar y ya hecha de hacer esto en django, pero no la encontre
     tipo_comprobante_id = serializers.IntegerField()
@@ -173,7 +173,7 @@ class ComprobanteCerrarPresentacionSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Comprobante
         fields = ('tipo_comprobante_id', 'nro_terminal', 'sub_tipo', 'responsable', 'gravado_id', \
-            'neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', 'condicion_fiscal', 'periodo')
+            'neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', 'condicion_fiscal', 'concepto')
 
     def validate_gravado_id(self, value):
         try:
@@ -205,9 +205,9 @@ class ComprobanteCerrarPresentacionSerializer(serializers.ModelSerializer):
         tipo_comprobante = TipoComprobante.objects.get(pk=validated_data['tipo_comprobante_id'])
         iva = neto * gravado.porcentaje / Decimal("100.00")
         total = neto + iva
-        periodo = validated_data["periodo"]
+        concepto = validated_data["concepto"]
         del validated_data["neto"]
-        del validated_data["periodo"]
+        del validated_data["concepto"]
         comprobante = Comprobante(
                 estado=Comprobante.NO_COBRADO,
                 numero=0, # el numero nos lo va a dar la afip cuando emitamos
@@ -217,7 +217,7 @@ class ComprobanteCerrarPresentacionSerializer(serializers.ModelSerializer):
             )
         linea = LineaDeComprobante(
             comprobante=comprobante,
-            concepto='FACTURACION CORRESPONDIENTE A ' + periodo,
+            concepto=concepto,
             importe_neto=neto,
             iva=iva,
             sub_total=total
@@ -228,8 +228,8 @@ class ComprobanteCerrarPresentacionSerializer(serializers.ModelSerializer):
         linea.save()
         return comprobante
 
-def comprobante_cerrar_presentacion_serializer_factory(data):
+def crear_comprobante_serializer_factory(data):
     if data["tipo_comprobante_id"] == ID_TIPO_COMPROBANTE_LIQUIDACION:
-        return ComprobanteCerrarPresentacionLiquidacionSerializer(data=data)
+        return CrearComprobanteLiquidacionSerializer(data=data)
     else:
-        return ComprobanteCerrarPresentacionSerializer(data=data)
+        return CrearComprobanteAFIPSerializer(data=data)
