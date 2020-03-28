@@ -1,9 +1,12 @@
 # pylint: disable=unused-argument
 from decimal import Decimal, ROUND_UP
+from datetime import date
 from rest_framework import serializers
+from rest_framework.serializers import ValidationError
 
-from .models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado
-
+from comprobante.models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado, \
+    ID_TIPO_COMPROBANTE_LIQUIDACION
+from comprobante.afip import Afip
 
 class TipoComprobanteSerializer(serializers.ModelSerializer):
     class Meta(object):
@@ -45,7 +48,6 @@ class ComprobanteSmallSerializer(serializers.ModelSerializer):
 
 class ComprobanteListadoSerializer(serializers.ModelSerializer):
     tipo_comprobante = TipoComprobanteSerializer()
-    # Nro
     gravado = GravadoSerializer()
     honorarios_medicos = serializers.SerializerMethodField()
     honorarios_solicitantes = serializers.SerializerMethodField()
@@ -125,3 +127,109 @@ class ComprobanteListadoSerializer(serializers.ModelSerializer):
 
     def get_total_material_especifico(self, comprobante):
         return Decimal(self.context["calculador"].total_material_especifico).quantize(Decimal('.01'), ROUND_UP)
+
+class CrearComprobanteLiquidacionSerializer(serializers.ModelSerializer):
+    neto = serializers.DecimalField(16, 2)
+    concepto = serializers.CharField()
+    class Meta(object):
+        model = Comprobante
+        fields = ('neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', \
+            'condicion_fiscal', 'concepto')
+
+    def create(self, validated_data):
+        neto = validated_data["neto"]
+        concepto = validated_data["concepto"]
+        del validated_data["neto"]
+        del validated_data["concepto"]
+        comprobante = Comprobante.objects.create(
+                estado=Comprobante.NO_COBRADO,
+                tipo_comprobante=TipoComprobante.objects.get(pk=ID_TIPO_COMPROBANTE_LIQUIDACION),
+                nro_terminal=0,
+                sub_tipo="",
+                responsable="",
+                gravado=None,
+                numero=Comprobante.objects.filter(
+                    tipo_comprobante=ID_TIPO_COMPROBANTE_LIQUIDACION
+                ).order_by("-numero")[0].numero + 1,
+                fecha_emision=date.today(),
+                total_facturado=neto,
+                **validated_data
+            )
+        linea = LineaDeComprobante.objects.create(
+            comprobante=comprobante,
+            concepto=concepto,
+            importe_neto=neto,
+            iva=0,
+            sub_total=neto
+        )
+        return comprobante
+class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
+    neto = serializers.DecimalField(16, 2)
+    concepto = serializers.CharField()
+    # Traigo las ids como campos numericos para no tener que mandar un diccionario con todo el gravado
+    # Debe haber una forma estandar y ya hecha de hacer esto en django, pero no la encontre
+    tipo_comprobante_id = serializers.IntegerField()
+    gravado_id = serializers.IntegerField()
+    class Meta(object):
+        model = Comprobante
+        fields = ('tipo_comprobante_id', 'nro_terminal', 'sub_tipo', 'responsable', 'gravado_id', \
+            'neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', 'condicion_fiscal', 'concepto')
+
+    def validate_gravado_id(self, value):
+        try:
+            Gravado.objects.get(pk=value)
+        except Gravado.DoesNotExist:
+            raise ValidationError("id de gravado invalida")
+        return value
+
+    def validate_tipo_comprobante_id(self, value):
+        try:
+            TipoComprobante.objects.get(pk=value)
+        except Gravado.DoesNotExist:
+            raise ValidationError("id de tipo_comprobante invalida")
+        return value
+
+    def validate_sub_tipo(self, value):
+        if value not in ('A', 'B'):
+            raise serializers.ValidationError('"sub_tipo" debe ser "A" o B"')
+        return value
+
+    def validate_responsable(self, value):
+        if value not in ('Cedir', 'Brunetti'):
+            raise serializers.ValidationError('"responsable" debe ser "Cedir" o Brunetti"')
+        return value
+
+    def create(self, validated_data):
+        neto = validated_data["neto"]
+        gravado = Gravado.objects.get(pk=validated_data['gravado_id'])
+        tipo_comprobante = TipoComprobante.objects.get(pk=validated_data['tipo_comprobante_id'])
+        iva = neto * gravado.porcentaje / Decimal("100.00")
+        total = neto + iva
+        concepto = validated_data["concepto"]
+        del validated_data["neto"]
+        del validated_data["concepto"]
+        comprobante = Comprobante(
+                estado=Comprobante.NO_COBRADO,
+                numero=0, # el numero nos lo va a dar la afip cuando emitamos
+                fecha_emision=date.today(),
+                total_facturado=total,
+                **validated_data
+            )
+        linea = LineaDeComprobante(
+            comprobante=comprobante,
+            concepto=concepto,
+            importe_neto=neto,
+            iva=iva,
+            sub_total=total
+        )
+        Afip().emitir_comprobante(comprobante, [linea])
+        comprobante.save()
+        linea.comprobante = comprobante
+        linea.save()
+        return comprobante
+
+def crear_comprobante_serializer_factory(data):
+    if data["tipo_comprobante_id"] == ID_TIPO_COMPROBANTE_LIQUIDACION:
+        return CrearComprobanteLiquidacionSerializer(data=data)
+    else:
+        return CrearComprobanteAFIPSerializer(data=data)
