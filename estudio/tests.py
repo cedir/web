@@ -207,7 +207,7 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
 
 class RetreiveEstudiosTest(TestCase):
     fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
-                'anestesistas.json', 'presentaciones.json', 'estudios.json']
+                'anestesistas.json', 'presentaciones.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)

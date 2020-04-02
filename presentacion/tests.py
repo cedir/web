@@ -13,7 +13,8 @@ from comprobante.models import Comprobante, ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO
 from comprobante.afip import AfipError
 
 class TestDetallesObrasSociales(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -35,7 +36,8 @@ class TestDetallesObrasSociales(TestCase):
         assert response.content != ''
 
 class TestEstudiosDePresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+    'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -51,7 +53,8 @@ class TestEstudiosDePresentacion(TestCase):
         assert len(estudios_response) == n_estudios
 
 class TestCrearPresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -208,7 +211,8 @@ class TestCrearPresentacion(TestCase):
         assert presentacion.total == 3
 
 class TestUpdatePresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -432,7 +436,8 @@ class TestUpdatePresentacion(TestCase):
         assert presentacion.total == 3
 
 class TestAbrirPresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -476,7 +481,9 @@ class TestAbrirPresentacion(TestCase):
         assert not afip.emitir_comprobante.called
 
 class TestCerrarPresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json',
+                'obras_sociales.json', 'anestesistas.json', 'presentaciones.json',
+                'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
