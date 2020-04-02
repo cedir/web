@@ -43,13 +43,13 @@ def add_default_medicacion(request):
         medicacion.medicamento = Medicamento.objects.get(pk=medicamento_id)
         medicacion.importe = medicacion.medicamento.importe
         medicacion.save()
-    
+
     response_dict = {
         'status': 200,
         'estudio': estudio.id,
         'message': "default medicacion added"
     }
-    
+
     return HttpResponse(simplejson.dumps(response_dict))
 
 
@@ -130,7 +130,7 @@ class SucursalFilterBackend(filters.BaseFilterBackend):
         sucursal = request.query_params.get(u'sucursal')
         if sucursal:
             queryset = queryset.filter(sucursal=sucursal)
-        else: 
+        else:
             queryset = queryset.filter(sucursal=ID_SUCURSAL_CEDIR)
 
         return queryset
@@ -220,11 +220,11 @@ class MedicacionViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializer_class)
-    
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response({"estudio": instance.estudio.id})
-    
+
     def perform_destroy(self, instance):
         instance.delete()
