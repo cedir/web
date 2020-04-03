@@ -9,8 +9,11 @@ from django.contrib.auth.models import User
 from presentacion.models import Presentacion
 from obra_social.models import ObraSocial
 from estudio.models import Estudio
+from medico.models import Medico
 from comprobante.models import Comprobante, ID_TIPO_COMPROBANTE_FACTURA, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO
 from comprobante.afip import AfipError
+from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowBase
+from presentacion.obra_social_custom_code.osde_presentacion_digital import OsdeRowBase
 
 class TestDetallesObrasSociales(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
@@ -206,6 +209,33 @@ class TestCrearPresentacion(TestCase):
                                 content_type='application/json')
         presentacion = Presentacion.objects.get(pk=response.data['id'])
         assert presentacion.total == 3
+
+    def test_cobrar_osde_en_nombre_de_otro_medico(self):
+        estudio_osde = Estudio.objects.get(pk=1)
+        presentacion_osde = OsdeRowBase(estudio_osde)
+
+        medico = Medico.objects.get(pk=2)
+        
+        assert presentacion_osde.format_nro_matricula(medico) == '0000000333'
+
+        medico_para_facturar_osde = Medico.objects.get(pk=1)
+
+        medico.facturar_osde_en_nombre_de_medico = medico_para_facturar_osde
+        assert presentacion_osde.format_nro_matricula(medico) == '0000000222'
+
+    def test_cobrar_amr_en_nombre_de_otro_medico(self):
+        estudio_amr = Estudio.objects.get(pk=1)
+        comp = Comprobante.objects.get(pk=1)
+        presentacion_amr = AmrRowBase(estudio_amr, comp)
+
+        medico = Medico.objects.get(pk=2)
+        
+        assert presentacion_amr.format_nro_matricula(medico) == 333
+
+        medico_para_facturar_amr = Medico.objects.get(pk=1)
+
+        medico.facturar_amr_en_nombre_de_medico = medico_para_facturar_amr
+        assert presentacion_amr.format_nro_matricula(medico) == 222
 
 class TestUpdatePresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']

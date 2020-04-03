@@ -66,7 +66,7 @@ class OsdeRowBase(object):
             raise Exception('Nro de Afiliado debe ser 11 caracteres numericos para {}({}) - Nro Afiliado: {}'.format(paciente, paciente.id, nro_afiliado))
 
     def format_nro_matricula(self, medico):
-        nro_matricula = medico.matricula if medico.facturar_amr_en_nombre_de_medico == None else medico.facturar_amr_en_nombre_de_medico.matricula
+        nro_matricula = medico.matricula if medico.facturar_osde_en_nombre_de_medico == None else medico.facturar_osde_en_nombre_de_medico.matricula
         try:
             nro_matricula = nro_matricula.split(u' ')[0]
             nro_matricula = int(nro_matricula)
