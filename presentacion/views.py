@@ -109,6 +109,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             comprobante_data["nro_cuit"] = obra_social.nro_cuit
             comprobante_data["condicion_fiscal"] = obra_social.condicion_fiscal
             comprobante_data["concepto"] = "FACTURACION CORRESPONDIENTE A " + presentacion.periodo
+            comprobante_data["fecha_emision"] = presentacion.fecha
             comprobante_serializer = crear_comprobante_serializer_factory(data=comprobante_data)
             comprobante_serializer.is_valid(raise_exception=True)
             comprobante = comprobante_serializer.save()
