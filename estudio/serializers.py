@@ -69,7 +69,10 @@ class EstudioDePresetancionRetrieveSerializer(serializers.ModelSerializer):
             u'importe_medicacion', u'arancel_anestesia')
 
     def get_importe_estudio(self, estudio):
-        arancel = ArancelObraSocial.objects.get(obra_social_id=estudio.obra_social_id, practica_id=estudio.practica_id)
+        try:
+            arancel = ArancelObraSocial.objects.get(obra_social_id=estudio.obra_social_id, practica_id=estudio.practica_id)
+        except Estudio.DoesNotExist:
+            arancel = 0
         return arancel.precio
 
     def get_importe_medicacion(self, estudio):
