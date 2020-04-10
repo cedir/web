@@ -104,6 +104,7 @@ def buscar_form(request):
 
 
 def create(request):
+    nroAfiliado = request.POST.get(u'nro_afiliado', u'')
     domicilio = request.POST.get(u'domicilio', u'')
     sexo = request.POST.get(u'sexo', u'')
     dni = request.POST.get(u'dni')
@@ -121,6 +122,10 @@ def create(request):
             response_dict = {'status': 0, 'message': "Error, ya existe un paciente con DNI " + str(dni)}
             return HttpResponse(simplejson.dumps(response_dict))
 
+    if not nroAfiliado.isalnum():
+        response_dict = {'status': 0, 'message': 'Error, el numero de afiliado debe contener solo letras y numeros'}
+        return HttpResponse(simplejson.dumps(response_dict))
+        
     try:
         paciente = Paciente()
         paciente.nombre = request.POST['nombre']
@@ -130,7 +135,7 @@ def create(request):
         paciente.telefono = request.POST['telefono']
         paciente.sexo = sexo
         paciente.fechaNacimiento = fecha_nacimiento
-        paciente.nroAfiliado = request.POST.get(u'nro_afiliado', u'')
+        paciente.nroAfiliado = nroAfiliado
         paciente.email = request.POST.get(u'email')
         paciente.save()
 
@@ -147,6 +152,7 @@ def create(request):
 
 
 def update(request, id_paciente):
+    nroAfiliado = request.POST.get(u'nro_afiliado', u'')
     domicilio = request.POST.get(u'domicilio', u'')
     sexo = request.POST.get(u'sexo', u'')
     dni = request.POST.get(u'dni')
@@ -164,6 +170,10 @@ def update(request, id_paciente):
             response_dict = {'status': 0, 'message': "Error, ya existe un paciente con DNI " + str(dni)}
             return HttpResponse(simplejson.dumps(response_dict))
 
+    if not nroAfiliado.isalnum():
+        response_dict = {'status': 0, 'message': 'Error, el numero de afiliado debe contener solo letras y numeros'}
+        return HttpResponse(simplejson.dumps(response_dict))
+        
     try:
         paciente.dni = dni
         paciente.nombre = request.POST['nombre']
@@ -172,7 +182,7 @@ def update(request, id_paciente):
         paciente.telefono = request.POST['telefono']
         paciente.sexo = sexo
         paciente.fechaNacimiento = fecha_nacimiento
-        paciente.nroAfiliado = request.POST.get(u'nro_afiliado', u'')
+        paciente.nroAfiliado = nroAfiliado
         paciente.email = request.POST.get(u'email')
         paciente.save()
 

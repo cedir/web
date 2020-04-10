@@ -73,7 +73,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             comprobante = presentacion.comprobante
 
             for estudio in estudios:
-                csv_string = '{}\n{}'.format(csv_string, AmrRowEstudio(estudio, comprobante).get_row())
+                csv_string = '{}{}\n'.format(csv_string, AmrRowEstudio(estudio, comprobante).get_row())
 
             response = HttpResponse(csv_string, content_type='text/plain')
         except Exception as ex:
