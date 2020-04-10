@@ -164,32 +164,48 @@ class EstudioViewSet(viewsets.ModelViewSet):
         estudio = serializer.save()
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA')
 
+    @detail_route(methods=['put'])
+    def anular_pago_contra_factura(self, request, pk=None):
+        try:
+            estudio = Estudio.objects.get(pk=pk)
+            estudio.anular_pago_contra_factura()
+            estudio.save()
+            add_log_entry(estudio, self.request.user, CHANGE, 'ANULA PAGO CONTRA FACTURA')
+        except Exception as e:
+            return Response({u'success': False, u'message': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({u'success': True})
+
+    @detail_route(methods=['put'])
+    def realizar_pago_contra_factura(self, request, pk=None):
+        importe = Decimal(request.data.get('pago_contra_factura'))
+
+        if importe < 0:
+            return Response({u'success': False, u'message': 'No estan permitidos valores negativos'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            estudio = Estudio.objects.get(pk=pk)
+            estudio.set_pago_contra_factura(importe)
+            estudio.save()
+            add_log_entry(estudio, self.request.user, CHANGE, 'PAGO CONTRA FACTURA')
+        except Exception as ex:
+            return Response({u'success': False, u'message': ex.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({u'success': True})
+
     @detail_route(methods=['patch'])
-    def update_importes_y_pago_contra_factura(self, request, pk=None):
+    def update_importes(self, request, pk=None):
         pension = request.data.get('pension')
         diferencia_paciente = request.data.get('diferencia_paciente')
         arancel_anestesia = request.data.get('arancel_anestesia')
-        pago_contra_factura = request.data.get('pago_contra_factura')
 
         estudio = Estudio.objects.get(pk=pk)
         estudio.pension = Decimal(pension)
         estudio.diferencia_paciente = Decimal(diferencia_paciente)
         estudio.arancel_anestesia = Decimal(arancel_anestesia)
-        pago_contra_factura = Decimal(pago_contra_factura)
 
         if estudio.presentacion_id:
             return Response({u'success': False, u'message': 'El estudio esta presentado/pcf y no se puede modificar'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if pago_contra_factura != estudio.pago_contra_factura:
-            try:
-                if pago_contra_factura > Decimal(0):
-                    estudio.set_pago_contra_factura(pago_contra_factura)
-                elif pago_contra_factura == Decimal(0):
-                    estudio.anular_pago_contra_factura()
-                else:
-                    return Response({u'success': False, u'message': 'No estan permitidos valores negativos'}, status=status.HTTP_400_BAD_REQUEST)
-            except Exception as ex:
-                return Response({u'success': False, u'message': ex.message}, status=status.HTTP_400_BAD_REQUEST)
 
         estudio.save()
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA IMPORTES')
