@@ -134,7 +134,7 @@ class CrearComprobanteLiquidacionSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Comprobante
         fields = ('neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', \
-            'condicion_fiscal', 'concepto')
+            'condicion_fiscal', 'concepto', 'fecha_emision')
 
     def create(self, validated_data):
         neto = validated_data["neto"]
@@ -151,7 +151,6 @@ class CrearComprobanteLiquidacionSerializer(serializers.ModelSerializer):
                 numero=Comprobante.objects.filter(
                     tipo_comprobante=ID_TIPO_COMPROBANTE_LIQUIDACION
                 ).order_by("-numero")[0].numero + 1,
-                fecha_emision=date.today(),
                 total_facturado=neto,
                 **validated_data
             )

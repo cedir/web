@@ -1,0 +1,42 @@
+[
+    {
+        "model": "medicamento.medicamento",
+        "pk": 1,
+        "fields": {
+            "descripcion": "ibuprofeno",
+            "importe": "1.00",
+            "stock": 9001,
+            "tipo": "Medicación"
+        }
+    },
+    {
+        "model": "medicamento.medicamento",
+        "pk": 2,
+        "fields": {
+            "descripcion": "paracetamol",
+            "importe": "1.00",
+            "stock": 9001,
+            "tipo": "Medicación"
+        }
+    },
+    {
+        "model": "medicamento.medicamento",
+        "pk": 3,
+        "fields": {
+            "descripcion": "material muy especifico",
+            "importe": "1.00",
+            "stock": 9001,
+            "tipo": "Material Especifico"
+        }
+    },
+    {
+        "model": "medicamento.medicamento",
+        "pk": 4,
+        "fields": {
+            "descripcion": "material inespecifico",
+            "importe": "1.00",
+            "stock": 9001,
+            "tipo": "Material Especifico"
+        }
+    }
+]

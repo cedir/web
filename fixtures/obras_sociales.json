@@ -93,5 +93,27 @@
         "se_presenta_por_ARA": 1,
         "nombre": "U N R"
     }
+},
+{
+    "pk": 1,
+    "model": "obra_social.arancelobrasocial",
+    "fields": {
+        "practica": 1,
+        "obra_social": 1,
+        "precio": "1.00",
+        "precio_anestesia": "1.00",
+        "fecha": "2019-12-25"
+    }
+},
+{
+    "pk": 2,
+    "model": "obra_social.arancelobrasocial",
+    "fields": {
+        "practica": 18,
+        "obra_social": 1,
+        "precio": "1.00",
+        "precio_anestesia": "1.00",
+        "fecha": "2019-12-25"
+    }
 }
 ]
