@@ -9,6 +9,7 @@ from anestesista.serializers import AnestesistaSerializer
 from practica.serializers import PracticaSerializer
 from medicamento.serializers import MedicamentoSerializer
 from comprobante.serializers import ComprobanteSmallSerializer
+from decimal import Decimal
 
 class EstadoField(serializers.Field):
     def to_representation(self, value):
@@ -70,10 +71,10 @@ class EstudioDePresetancionRetrieveSerializer(serializers.ModelSerializer):
 
     def get_importe_estudio(self, estudio):
         try:
-            arancel = ArancelObraSocial.objects.get(obra_social_id=estudio.obra_social_id, practica_id=estudio.practica_id)
-        except Estudio.DoesNotExist:
-            arancel = 0
-        return arancel.precio
+            arancel = ArancelObraSocial.objects.get(obra_social_id=estudio.obra_social_id, practica_id=estudio.practica_id).precio
+        except ArancelObraSocial.DoesNotExist:
+            arancel = Decimal('0.00')
+        return arancel
 
     def get_importe_medicacion(self, estudio):
         return estudio.get_total_medicacion()

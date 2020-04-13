@@ -45,5 +45,5 @@ class ObraSocialViewSet(viewsets.ModelViewSet):
                 safe=False
             )
         except Exception as ex:
-            response = JsonResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+            response = JsonResponse(simplejson.dumps({'error': ex.message}), safe=False, status=500, content_type='application/json')
         return response
