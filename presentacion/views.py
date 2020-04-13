@@ -75,7 +75,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             for estudio in estudios:
                 csv_string = '{}{}\n'.format(csv_string, AmrRowEstudio(estudio, comprobante).get_row())
 
-            response = HttpResponse(csv_string, content_type='text/plain')
+            response = HttpResponse(csv_string[:-1], content_type='text/plain')
         except Exception as ex:
             response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
         return response
