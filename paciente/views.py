@@ -8,7 +8,7 @@ from paciente.models import Paciente
 from datetime import datetime
 import simplejson
 from models import Paciente
-from serializers import PacienteSerializer
+from serializers import PacienteSerializer, PacienteFormSerializer
 
 
 def create_form(request):
@@ -104,52 +104,30 @@ def buscar_form(request):
 
 
 def create(request):
-    nroAfiliado = request.POST.get(u'nro_afiliado', u'')
-    domicilio = request.POST.get(u'domicilio', u'')
-    sexo = request.POST.get(u'sexo', u'')
     dni = request.POST.get(u'dni')
-    dni = int(dni) if dni else 0
+    data = {
+        'nombre': request.POST.get('nombre'),
+        'apellido': request.POST.get('apellido'),
+        'nroAfiliado': request.POST.get(u'nro_afiliado', u''),
+        'domicilio': request.POST.get(u'domicilio', u''),
+        'sexo': request.POST.get(u'sexo', u''),
+        'telefono': request.POST.get(u'telefono', u''),
+        'dni': int(dni) if dni else 0,
+        'fechaNacimiento': request.POST.get('fecha_nacimiento'),
+        'email':request.POST.get(u'email'),
+    }
 
-    fecha_nacimiento = request.POST.get('fecha_nacimiento')
-    if fecha_nacimiento:
-        fecha_nacimiento = datetime.strptime(fecha_nacimiento, settings.FORMAT_DATE)
-    else:
-        fecha_nacimiento = None
+    paciente = PacienteFormSerializer(data = data)
 
-    if dni > 0:  # revisar que el DNI no este duplicado, a menos que sea 0
-        pacientes = Paciente.objects.filter(dni=dni)
-        if pacientes:
-            response_dict = {'status': 0, 'message': "Error, ya existe un paciente con DNI " + str(dni)}
-            return HttpResponse(simplejson.dumps(response_dict))
+    response_dict = {
+        'status': 1,
+        'message': 'El paciente se ha creado correctamente.'
+    }
 
-    if not nroAfiliado.isalnum():
-        response_dict = {'status': 0, 'message': 'Error, el numero de afiliado debe contener solo letras y numeros'}
-        return HttpResponse(simplejson.dumps(response_dict))
-        
-    try:
-        paciente = Paciente()
-        paciente.nombre = request.POST['nombre']
-        paciente.apellido = request.POST['apellido']
-        paciente.dni = dni
-        paciente.domicilio = domicilio
-        paciente.telefono = request.POST['telefono']
-        paciente.sexo = sexo
-        paciente.fechaNacimiento = fecha_nacimiento
-        paciente.nroAfiliado = nroAfiliado
-        paciente.email = request.POST.get(u'email')
-        paciente.save()
-
-        response_dict = {
-            'idPaciente': paciente.id,
-            'status': 1,
-            'message': "El paciente se ha creado correctamente."
-        }
-        return HttpResponse(simplejson.dumps(response_dict))
-
-    except Exception:
-        response_dict = {'status': 0, 'message': "Ocurrio un error. Revise los datos y vuelva a intentarlo."}
-        return HttpResponse(simplejson.dumps(response_dict))
-
+    if not paciente.is_valid():
+        response_dict = {'status': 0, 'message': paciente.errors}
+    
+    return HttpResponse(simplejson.dumps(response_dict))
 
 def update(request, id_paciente):
     nroAfiliado = request.POST.get(u'nro_afiliado', u'')

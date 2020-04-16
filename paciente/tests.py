@@ -16,7 +16,7 @@ class TestFormularioPaciente(TestCase):
             'dni': 12312313,
             'domicilio': 'Calle Falsa 123',
             'telefono': '123456789',
-            'sexo': 'M',
+            'sexo': 'Femenino',
             'fechaNacimiento': '01/01/1976',
             'nro_afiliado': '12345',
             'email': 'lalala123@gmail.com',
