@@ -78,7 +78,7 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
             estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
             estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
-        presentacion.total = sum([e.get_importe_total() for e in estudios])
+        presentacion.total_facturado = sum([e.get_importe_total() for e in estudios])
         presentacion.save()
         return presentacion
 
@@ -130,7 +130,7 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
             estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
             estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
-        instance.total = sum([e.get_importe_total() for e in estudios])
+        instance.total_facturado = sum([e.get_importe_total() for e in estudios])
         instance.save()
         return instance
     class Meta:
