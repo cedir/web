@@ -2,7 +2,6 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from paciente.models import Paciente
 import json
-# Create your tests here.
 
 class TestFormularioPaciente(TestCase):
     fixtures = ['pacientes.json']

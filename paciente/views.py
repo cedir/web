@@ -104,29 +104,18 @@ def buscar_form(request):
 
 
 def create(request):
-    dni = request.POST.get(u'dni')
-    data = {
-        'nombre': request.POST.get('nombre'),
-        'apellido': request.POST.get('apellido'),
-        'nroAfiliado': request.POST.get(u'nro_afiliado', u''),
-        'domicilio': request.POST.get(u'domicilio', u''),
-        'sexo': request.POST.get(u'sexo', u''),
-        'telefono': request.POST.get(u'telefono', u''),
-        'dni': int(dni) if dni else 0,
-        'fechaNacimiento': request.POST.get('fecha_nacimiento'),
-        'email':request.POST.get(u'email'),
-    }
-
-    paciente = PacienteFormSerializer(data = data)
+    paciente = PacienteFormSerializer(data = request.POST)
 
     response_dict = {
         'status': 1,
         'message': 'El paciente se ha creado correctamente.'
     }
 
-    if not paciente.is_valid():
+    if paciente.is_valid():
+        paciente.save()
+    else:
         response_dict = {'status': 0, 'message': paciente.errors}
-    
+
     return HttpResponse(simplejson.dumps(response_dict))
 
 def update(request, id_paciente):

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from paciente.models import Paciente
-from datetime import datetime
+from datetime import date, datetime
 from django.conf import settings
 
 
@@ -15,9 +15,30 @@ class PacienteFormSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paciente
         fields = ['dni', 'nombre', 'apellido', 'domicilio', 'telefono', 'sexo', 'fechaNacimiento', 'nroAfiliado', 'email']
-    
+
+    def to_internal_value(self, data):
+        dni = data.get(u'dni')
+        fecha_nacimiento = data.get(u'fechaNacimiento')
+
+        if fecha_nacimiento:
+            fecha_nacimiento = datetime.strptime(fecha_nacimiento, settings.FORMAT_DATE)
+
+        datos = {
+            'nombre': data.get('nombre'),
+            'apellido': data.get('apellido'),
+            'nroAfiliado': data.get(u'nro_afiliado', u''),
+            'domicilio': data.get(u'domicilio', u''),
+            'sexo': data.get(u'sexo', u''),
+            'telefono': data.get(u'telefono', u''),
+            'dni': int(dni) if dni else 0,
+            'fechaNacimiento': fecha_nacimiento.date(),
+            'email': data.get(u'email'),
+        }
+
+        return super(PacienteFormSerializer, self).to_internal_value(datos)
+
     def validate_dni(self, dni):
-        if Paciente.objects.filter(dni=dni).count() > 0:
+        if Paciente.objects.filter(dni=dni).exists():
             raise serializers.ValidationError('Error, ya existe un paciente con DNI ' + str(dni))
         return dni
 
@@ -25,6 +46,3 @@ class PacienteFormSerializer(serializers.ModelSerializer):
         if not nroAfiliado.isalnum():
             raise serializers.ValidationError('Error, el numero de afiliado debe contener solo letras y numeros')
         return nroAfiliado
-
-    def validate_fechaNacimiento(self, fechaNacimiento):
-        return datetime.strptime(fechaNacimiento, settings.FORMAT_DATE) if fechaNacimiento else None
