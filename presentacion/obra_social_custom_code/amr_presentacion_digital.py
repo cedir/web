@@ -50,7 +50,7 @@ class AmrRowBase(object):
         self.nombre_de_nomenclador_prestacional = u'{:<30}'.format(unicode(estudio.practica)[:30])
         self.cantidad = u'00001'
         self.matricula_del_efector = '{0:06}'.format(self.format_nro_matricula(estudio.medico))
-        self.nombre_del_efector = u'{:<30}'.format(remove_non_ascii_character(unicode(get_nombre_medico(estudio.medico)))[:30])
+        self.nombre_del_efector = u'{:<30}'.format(remove_non_ascii_character(unicode(self.get_nombre_medico(estudio.medico)))[:30])
         self.honorarios = '0{0:013}'.format(importe).replace('.', '')
         self.derechos = '0{0:013}'.format(importe_pension).replace('.', '')
         self.tipo_de_honorario = u'0'
