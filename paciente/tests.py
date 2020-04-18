@@ -16,7 +16,7 @@ class TestFormularioPaciente(TestCase):
             'domicilio': 'Calle Falsa 123',
             'telefono': '123456789',
             'sexo': 'Femenino',
-            'fechaNacimiento': '01/01/1976',
+            'fecha_nacimiento': '01/01/1976',
             'nro_afiliado': '12345',
             'email': 'lalala123@gmail.com',
         }

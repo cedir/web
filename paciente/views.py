@@ -114,7 +114,7 @@ def create(request):
         paciente.save()
         response_dict['idPaciente'] = paciente['id'].value
     else:
-        response_dict = {'status': 0, 'message': paciente.errors}
+        response_dict = {'status': 0, 'message': paciente.errors[next(iter(paciente.errors))]}
 
     return HttpResponse(simplejson.dumps(response_dict))
 

@@ -18,7 +18,7 @@ class PacienteFormSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         dni = data.get(u'dni')
-        fecha_nacimiento = data.get(u'fechaNacimiento')
+        fecha_nacimiento = data.get(u'fecha_nacimiento')
 
         if fecha_nacimiento:
             fecha_nacimiento = datetime.strptime(fecha_nacimiento, settings.FORMAT_DATE)
