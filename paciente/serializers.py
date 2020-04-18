@@ -14,7 +14,7 @@ class PacienteFormSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Paciente
-        fields = ['dni', 'nombre', 'apellido', 'domicilio', 'telefono', 'sexo', 'fechaNacimiento', 'nroAfiliado', 'email']
+        fields = ['id', 'dni', 'nombre', 'apellido', 'domicilio', 'telefono', 'sexo', 'fechaNacimiento', 'nroAfiliado', 'email']
 
     def to_internal_value(self, data):
         dni = data.get(u'dni')
@@ -43,6 +43,6 @@ class PacienteFormSerializer(serializers.ModelSerializer):
         return dni
 
     def validate_nroAfiliado(self, nroAfiliado):
-        if not nroAfiliado.isalnum():
+        if not all(x.isalnum() or x.isspace() for x in nroAfiliado):
             raise serializers.ValidationError('Error, el numero de afiliado debe contener solo letras y numeros')
         return nroAfiliado

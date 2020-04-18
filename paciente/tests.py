@@ -103,3 +103,23 @@ class TestFormularioPaciente(TestCase):
         paciente['nro_afiliado'] = '12345 abcd'
         response = json.loads(self.client.post('/paciente/1/actualizar/', paciente).content)
         assert response['status'] == 1
+    
+    def test_update_actualiza_paciente_en_db(self):
+        paciente = self.paciente_prueba
+
+        response = json.loads(self.client.post('/paciente/nuevo/', paciente).content)
+        assert response['status'] == 1
+
+        paciente['nro_afiliado'] = '12345'
+        paciente['nombre'] = 'Jorge'
+        paciente['dni'] = 5248624
+
+        id_paciente = response['idPaciente']
+
+        response = json.loads(self.client.post('/paciente/{}/actualizar/'.format(id_paciente), paciente).content)
+
+        paciente_act = Paciente.objects.get(pk=id_paciente)
+
+        assert paciente_act.nroAfiliado == '12345'
+        assert paciente_act.nombre == 'Jorge'
+        assert paciente_act.dni == 5248624
