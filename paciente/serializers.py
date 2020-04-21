@@ -37,11 +37,6 @@ class PacienteFormSerializer(serializers.ModelSerializer):
 
         return super(PacienteFormSerializer, self).to_internal_value(datos)
 
-    def validate_dni(self, dni):
-        if Paciente.objects.filter(dni=dni).exists():
-            raise serializers.ValidationError('Error, ya existe un paciente con DNI ' + str(dni))
-        return dni
-
     def validate_nroAfiliado(self, nroAfiliado):
         if not all(x.isalnum() or x.isspace() for x in nroAfiliado):
             raise serializers.ValidationError('Error, el numero de afiliado debe contener solo letras y numeros')

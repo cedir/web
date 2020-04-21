@@ -123,7 +123,7 @@ def update(request, id_paciente):
 
     response_dict = {
         'status': 1,
-        'message': 'El paciente se ha creado correctamente.'
+        'message': 'El paciente se ha actualizado correctamente.'
     }
 
     if paciente.is_valid():
