@@ -30,8 +30,8 @@ class Medico(models.Model):
                                               max_length=200, choices=RESPONSABILIDADES_FISCALES, \
                                               default='MONOTRIBUTO')
 
-    facturar_amr_en_nombre_de_medico = models.ForeignKey('self', models.SET_NULL, related_name='facturar_amr_medico', blank=False, null=True)
-    facturar_osde_en_nombre_de_medico = models.ForeignKey('self', models.SET_NULL, related_name='facturar_osde_medico', blank=False, null=True)
+    facturar_amr_en_nombre_de_medico = models.ForeignKey('self', models.SET_NULL, related_name='facturar_amr_medico', blank=True, null=True)
+    facturar_osde_en_nombre_de_medico = models.ForeignKey('self', models.SET_NULL, related_name='facturar_osde_medico', blank=True, null=True)
 
     def __unicode__(self):
         return u'%s, %s' % (self.apellido, self.nombre, )

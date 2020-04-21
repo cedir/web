@@ -37,6 +37,14 @@ class TestDetallesObrasSociales(TestCase):
         response = self.client.get('/api/presentacion/1/get_detalle_amr/')
         assert response.content != ''
 
+    def test_detalle_amr_no_posee_caracter_de_nueva_linea_y_barra_invertida_al_final(self):
+        presentacion = Presentacion.objects.get(pk=1)
+        presentacion.fecha_cobro = None
+        presentacion.save()
+        response = self.client.get('/api/presentacion/1/get_detalle_amr/')
+        assert response.content[-1] != '\\'
+        assert response.content[-1] != '\n'
+
 class TestEstudiosDePresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
 
