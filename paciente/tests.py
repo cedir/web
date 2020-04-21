@@ -110,16 +110,27 @@ class TestFormularioPaciente(TestCase):
         response = json.loads(self.client.post('/paciente/nuevo/', paciente).content)
         assert response['status'] == 1
 
-        paciente['nro_afiliado'] = '12345'
-        paciente['nombre'] = 'Jorge'
+        paciente['nombre'] = 'Bonnie'
+        paciente['apellido'] = 'Clyde'
         paciente['dni'] = 5248624
+        paciente['domicilio'] = 'Direccion prueba 456'
+        paciente['telefono'] = '789456123'
+        paciente['sexo'] = 'Masculino'
+        paciente['fecha_nacimiento'] = '02/02/1985'
+        paciente['nro_afiliado'] = '12345'
+        paciente['email'] = 'maildeprueba@gmail.com'
 
         id_paciente = response['idPaciente']
 
         response = json.loads(self.client.post('/paciente/{}/actualizar/'.format(id_paciente), paciente).content)
 
         paciente_act = Paciente.objects.get(pk=id_paciente)
-
-        assert paciente_act.nroAfiliado == '12345'
-        assert paciente_act.nombre == 'Jorge'
+        assert paciente_act.nombre == 'Bonnie'
+        assert paciente_act.apellido == 'Clyde'
         assert paciente_act.dni == 5248624
+        assert paciente_act.domicilio == 'Direccion prueba 456'
+        assert paciente_act.telefono == '789456123'
+        assert paciente_act.sexo == 'Masculino'
+        assert paciente_act.fechaNacimiento.strftime('%d/%m/%Y') == '02/02/1985'
+        assert paciente_act.nroAfiliado == '12345'
+        assert paciente_act.email == 'maildeprueba@gmail.com'
