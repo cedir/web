@@ -129,7 +129,7 @@ def update(request, id_paciente):
     if paciente.is_valid():
         paciente.save()
     else:
-        response_dict = {'status': 0, 'message': paciente.errors}
+        response_dict = {'status': 0, 'message': paciente.errors[next(iter(paciente.errors))]}
 
     return HttpResponse(simplejson.dumps(response_dict))
 
