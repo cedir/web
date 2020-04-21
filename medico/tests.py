@@ -25,7 +25,7 @@ OSPAC = 19
 
 class TestDescuentosCalculadorHonorarios(TestCase):
     fixtures = ["medicos.json", "estudios.json", "obras_sociales.json", "practicas.json", "pacientes.json", "presentaciones.json", "comprobantes",
-                "anestesistas.json"]
+                "anestesistas.json", "medicamentos.json"]
 
     def test_descuento_por_colangios(self):
         estudios_aplica = Estudio.objects.filter(practica__id=COLANGIO_ID)
@@ -65,7 +65,7 @@ class TestDescuentosCalculadorHonorarios(TestCase):
 
 class TestPorcentajesCalculadorHonorarios(TestCase):
     fixtures = ["medicos.json", "estudios.json", "obras_sociales.json", "practicas.json", "pacientes.json", "presentaciones.json", "comprobantes",
-                "anestesistas.json"]
+                "anestesistas.json", "medicamentos.json"]
     def test_porcentajes_honorarios_medicos_suman_siempre_100(self):
         estudios = Estudio.objects.all()
         for e in estudios:
