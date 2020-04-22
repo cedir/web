@@ -21,7 +21,7 @@ class PacienteFormSerializer(serializers.ModelSerializer):
         fecha_nacimiento = data.get(u'fecha_nacimiento')
 
         if fecha_nacimiento:
-            fecha_nacimiento = datetime.strptime(fecha_nacimiento, settings.FORMAT_DATE)
+            fecha_nacimiento = datetime.strptime(fecha_nacimiento, settings.FORMAT_DATE).date()
 
         datos = {
             'nombre': data.get('nombre'),
@@ -31,7 +31,7 @@ class PacienteFormSerializer(serializers.ModelSerializer):
             'sexo': data.get(u'sexo', u''),
             'telefono': data.get(u'telefono', u''),
             'dni': int(dni) if dni else 0,
-            'fechaNacimiento': fecha_nacimiento.date(),
+            'fechaNacimiento': fecha_nacimiento or None,
             'email': data.get(u'email'),
         }
 
