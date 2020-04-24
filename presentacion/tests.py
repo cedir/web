@@ -16,7 +16,8 @@ from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRow
 from presentacion.obra_social_custom_code.osde_presentacion_digital import OsdeRowBase
 
 class TestDetallesObrasSociales(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -46,7 +47,8 @@ class TestDetallesObrasSociales(TestCase):
         assert response.content[-1] != '\n'
 
 class TestEstudiosDePresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+    'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -62,7 +64,8 @@ class TestEstudiosDePresentacion(TestCase):
         assert len(estudios_response) == n_estudios
 
 class TestCrearPresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -246,7 +249,8 @@ class TestCrearPresentacion(TestCase):
         assert presentacion_amr.format_nro_matricula(medico) == 222
 
 class TestUpdatePresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -470,7 +474,8 @@ class TestUpdatePresentacion(TestCase):
         assert presentacion.total == 3
 
 class TestAbrirPresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -514,7 +519,9 @@ class TestAbrirPresentacion(TestCase):
         assert not afip.emitir_comprobante.called
 
 class TestCerrarPresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json',
+                'obras_sociales.json', 'anestesistas.json', 'presentaciones.json',
+                'comprobantes.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
@@ -522,7 +529,7 @@ class TestCerrarPresentacion(TestCase):
         self.client.login(username='test', password='test')
 
     @patch('comprobante.serializers.Afip')
-    def test_cerrar_presentacion_ok(self, afip_mock):
+    def test_cerrar_presentacion_con_factura_ok(self, afip_mock):
         afip = afip_mock()
         afip.consultar_proximo_numero.return_value = 10
         presentacion = Presentacion.objects.get(pk=1)
@@ -543,9 +550,10 @@ class TestCerrarPresentacion(TestCase):
         presentacion = Presentacion.objects.get(pk=1)
         assert presentacion.estado == Presentacion.PENDIENTE
         assert presentacion.comprobante is not None
+        assert presentacion.comprobante.fecha_emision == date.today()
 
     @patch('comprobante.serializers.Afip')
-    def test_cerrar_presentacion_cerrada_con_liquidacion(self, afip_mock):
+    def test_cerrar_presentacion_con_liquidacion_ok(self, afip_mock):
         afip = afip_mock()
         afip.emitir_comprobante.return_value = None
         afip.consultar_proximo_numero.return_value = 10
@@ -563,6 +571,7 @@ class TestCerrarPresentacion(TestCase):
         assert presentacion.estado == Presentacion.PENDIENTE
         assert presentacion.comprobante is not None
         assert not afip.emitir_comprobante.called
+        assert presentacion.comprobante.fecha_emision == presentacion.fecha
 
     @patch('comprobante.serializers.Afip')
     def cerrar_presentacion_no_abierta_da_400(self, afip_mock):

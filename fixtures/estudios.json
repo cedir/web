@@ -220,7 +220,7 @@
     "pk": 12,
     "fields": {
         "paciente": 1,
-        "practica": 18,
+        "practica_id": 1,
         "medico": 2,
         "obra_social": 1,
         "presentacion_id": 0,
@@ -229,6 +229,24 @@
         "fecha": "2019-11-19",
         "anestesista": 1,
         "sucursal": 1
+    }
+},
+{
+    "model": "estudio.medicacion",
+    "pk": 1,
+    "fields": {
+        "medicamento": 1,
+        "estudio": 9,
+        "importe": "1.00"
+    }
+},
+{
+    "model": "estudio.medicacion",
+    "pk": 2,
+    "fields": {
+        "medicamento": 2,
+        "estudio": 9,
+        "importe": "1.00"
     }
 }
 ]
