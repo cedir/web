@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import User
 
-from estudio.models import Estudio
+from estudio.models import Estudio, ID_SUCURSAL_CEDIR
 from obra_social.models import ArancelObraSocial, ObraSocial
 
 class TestDetallesObrasSociales(TestCase):
@@ -20,9 +20,9 @@ class TestDetallesObrasSociales(TestCase):
         estudio = Estudio.objects.get(pk=12)
         assert estudio.presentacion_id == 0
         assert estudio.obra_social.pk == 1
-        response = self.client.get('/api/obra_social/1/estudios_sin_presentar/')
+        response = self.client.get('/api/obra_social/1/estudios_sin_presentar/?sucursal={}'.format(ID_SUCURSAL_CEDIR), content_type='application/json')
         estudios_response = json.loads(response.content)
-        assert any([e["id"] == 9 for e in estudios_response])
+        assert any([e["id"] == 12 for e in estudios_response])
 
     def test_estudios_sin_presentar_sugiere_importes(self):
         estudio = Estudio.objects.get(pk=12)
@@ -30,8 +30,8 @@ class TestDetallesObrasSociales(TestCase):
         assert estudio.presentacion_id == 0
         assert estudio.obra_social.pk == 1
         assert estudio.practica.pk == 1
-        response = self.client.get('/api/obra_social/1/estudios_sin_presentar/')
-        estudio_response = filter(lambda e: e["id"] == 9, json.loads(response.content))[0]
+        response = self.client.get('/api/obra_social/1/estudios_sin_presentar/?sucursal={}'.format(ID_SUCURSAL_CEDIR), content_type='application/json')
+        estudio_response = filter(lambda e: e["id"] == 12, json.loads(response.content))[0]
         estudio_response["importe_estudio"] == arancel.precio
         estudio_response["importe_medicacion"] == estudio.get_total_medicacion()
 
