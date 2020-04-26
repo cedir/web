@@ -32,7 +32,7 @@ class ObraSocialViewSet(viewsets.ModelViewSet):
         # El legacy le pone id=0
         # Como aca presentacion es FK (como corresponde), esto esta bastante DUDOSO por ahora y complica despues el serializer
         # Cuando el legacy arregle eso (o lo tiremos) esto deberia cambiar para buscar presentacion=None
-        sucursal = request.query_params.get(u'sucursal')
+        sucursal = request.query_params.get(u'sucursal', default='Cedir')
         estudios = Estudio.objects.filter(
             obra_social__pk=pk,
             es_pago_contra_factura=0,
@@ -41,11 +41,7 @@ class ObraSocialViewSet(viewsets.ModelViewSet):
             sucursal=sucursal,
         ).order_by('fecha', 'id')
         try:
-            response = JsonResponse(
-                EstudioDePresetancionRetrieveSerializer(estudios, many=True).data,
-                status=200,
-                safe=False
-            )
+            response = JsonResponse(EstudioDePresetancionRetrieveSerializer(estudios, many=True).data, status=200, safe=False)
         except Exception as ex:
-            response = JsonResponse(simplejson.dumps({'error': ex.message}), safe=False, status=500, content_type='application/json')
+            response = JsonResponse({'error': ex.message}, status=500)
         return response
