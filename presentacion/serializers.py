@@ -43,6 +43,7 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
         return {
             u'id': instance.id,
             u'obra_social_id': instance.obra_social_id,
+            u'sucursal': instance.sucursal,
             u'periodo': instance.periodo,
             u'fecha': instance.fecha,
         }
@@ -56,6 +57,8 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio.id))
             if estudio.presentacion_id != 0:
                 raise serializers.ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
+            if estudio.sucursal != data['sucursal']:
+                raise serializers.ValidationError('El estudio id = {0} no es de esta sucursal'.format(estudio.id))
         return data
 
     def create(self, validated_data):
@@ -87,6 +90,7 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
         fields = (
             u'id',
             u'obra_social_id',
+            u'sucursal',
             u'periodo',
             u'fecha',
             u'estudios',
@@ -99,6 +103,7 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
         return {
             u'id': instance.id,
             u'obra_social_id': instance.obra_social_id,
+            u'sucursal': instance.sucursal,
             u'periodo': instance.periodo,
             u'fecha': instance.fecha,
         }
@@ -110,6 +115,8 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio.id))
             if estudio.presentacion_id != 0 and estudio.presentacion_id != self.instance.id:
                 raise serializers.ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
+            if estudio.sucursal != self.instance.sucursal:
+                raise serializers.ValidationError('El estudio id = {0} no es de esta sucursal'.format(estudio.id))
         return data
 
     def update(self, instance, validated_data):

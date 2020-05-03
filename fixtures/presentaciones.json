@@ -10,7 +10,8 @@
         "periodo": "PARCHE",
         "iva": "0.00",
         "total": "2800.00",
-        "total_facturado": "2800.00"
+        "total_facturado": "2800.00",
+        "sucursal": 1
     }
 },
 {
@@ -24,7 +25,8 @@
         "periodo": "g",
         "iva": "0.00",
         "total": "2800.00",
-        "total_facturado": "2800.00"
+        "total_facturado": "2800.00",
+        "sucursal": 1
     }
 },
 {
@@ -38,7 +40,8 @@
         "periodo": "JUNIO 2012",
         "iva": "21.00",
         "total": "1368.36",
-        "total_facturado": "1368.36"
+        "total_facturado": "1368.36",
+        "sucursal": 1
     }
 },
 {
@@ -63,7 +66,8 @@
         "periodo": "JUNIO 2012",
         "iva": "21.00",
         "total": "4444.44",
-        "total_facturado": "4444.44"
+        "total_facturado": "4444.44",
+        "sucursal": 1
     }
 },
 {
@@ -74,7 +78,8 @@
         "fecha": "2012-07-06",
         "estado": 0,
         "iva": "21.00",
-        "comprobante": 5
+        "comprobante": 5,
+        "sucursal": 1
     }
 },
 {
@@ -85,7 +90,8 @@
         "fecha": "2012-07-06",
         "estado": 0,
         "iva": "21.00",
-        "comprobante": 6
+        "comprobante": 6,
+        "sucursal": 1
     }
 },
 {
@@ -96,7 +102,8 @@
         "fecha": "2012-07-06",
         "estado": 0,
         "iva": "21.00",
-        "comprobante": 7
+        "comprobante": 7,
+        "sucursal": 1
     }
 },
 {
@@ -108,7 +115,8 @@
         "periodo": "perio2",
         "estado": 2,
         "iva": "21.00",
-        "comprobante": 7
+        "comprobante": 7,
+        "sucursal": 1
     }
 },
 {
@@ -120,7 +128,8 @@
         "periodo": "perio2",
         "estado": 2,
         "iva": "21.00",
-        "comprobante": 7
+        "comprobante": 7,
+        "sucursal": 1
     }
 }
 ]

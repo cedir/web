@@ -4,8 +4,8 @@ from datetime import date
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
-from comprobante.models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado, \
-    ID_TIPO_COMPROBANTE_LIQUIDACION
+from comprobante.models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado, ID_TIPO_COMPROBANTE_LIQUIDACION
+from settings import CEDIR_PTO_VENTA, BRUNETTI_PTO_VENTA
 from comprobante.afip import Afip
 
 class TipoComprobanteSerializer(serializers.ModelSerializer):
@@ -171,7 +171,7 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
     gravado_id = serializers.IntegerField()
     class Meta(object):
         model = Comprobante
-        fields = ('tipo_comprobante_id', 'nro_terminal', 'sub_tipo', 'responsable', 'gravado_id', \
+        fields = ('tipo_comprobante_id', 'sub_tipo', 'responsable', 'gravado_id', \
             'neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', 'condicion_fiscal', 'concepto')
 
     def validate_gravado_id(self, value):
@@ -201,6 +201,7 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         neto = validated_data["neto"]
         gravado = Gravado.objects.get(pk=validated_data['gravado_id'])
+        responsable = validated_data['responsable']
         tipo_comprobante = TipoComprobante.objects.get(pk=validated_data['tipo_comprobante_id'])
         iva = neto * gravado.porcentaje / Decimal("100.00")
         total = neto + iva
@@ -212,6 +213,7 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
                 numero=0, # el numero nos lo va a dar la afip cuando emitamos
                 fecha_emision=date.today(),
                 total_facturado=total,
+                nro_terminal=CEDIR_PTO_VENTA if responsable == "Cedir" else BRUNETTI_PTO_VENTA,
                 **validated_data
             )
         linea = LineaDeComprobante(

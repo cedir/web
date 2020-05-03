@@ -83,11 +83,12 @@ class PresentacionViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def estudios(self, request, pk=None):
         presentacion = Presentacion.objects.get(pk=pk)
+        sucursal = request
         estudios = presentacion.estudios.all().order_by('fecha', 'id')
         try:
             response = JsonResponse(EstudioDePresetancionRetrieveSerializer(estudios, many=True).data, safe=False)
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+            response = JsonResponse({'error': ex.message}, status=500)
         return response
 
     @detail_route(methods=['patch'])
@@ -95,8 +96,6 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         # Validar que esta ABIERTO.
         # Pasar a PENDIENTE.
         # Generar comprobante.
-
-        # Pasar cosas de Comprobante a un serializer?
         try:
             presentacion = Presentacion.objects.get(pk=pk)
             if presentacion.estado != Presentacion.ABIERTO:
@@ -123,39 +122,60 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
 
         except ValidationError as ex:
-            response = Response(ex.message, status.HTTP_400_BAD_REQUEST)
+            response = JsonResponse({'error': ex.message}, status=400)
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+            response = JsonResponse({'error': ex.message}, status=500)
         return response
 
     @detail_route(methods=['patch'])
     def abrir(self, request, pk=None):
         # Validar que esta PENDIENTE
         # Pasar a ABIERTA.
-        # Anular comprobante y generar una nota?
+        # Anular comprobante y generar una nota
         try:
             presentacion = Presentacion.objects.get(pk=pk)
             if presentacion.estado != Presentacion.PENDIENTE:
-                return HttpResponse(simplejson.dumps({'error': "La presentacion debe estar en estado PENDIENTE"}), status=400, content_type='application/json')
+                return JsonResponse({'error': "La presentacion debe estar en estado PENDIENTE"}, status=400)
             presentacion.comprobante.anular()
             presentacion.comprobante = None
             presentacion.estado = Presentacion.ABIERTO
             presentacion.save()
             return JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
         except Exception as ex:
-            return HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+            return JsonResponse({'error': ex.message}, status=500)
 
     @detail_route(methods=['patch'])
     def cobrar(self, request, pk=None):
         # Verificar que esta PENDIENTE
         # Pasar a COBRADA
         # Setear valores cobrados de estudios
-        # Generar un PagoPresentacion
         try:
-            response = HttpResponse(simplejson.dumps({'error': "Not Implemented"}), status=500, content_type='application/json')
             presentacion = Presentacion.objects.get(pk=pk)
             if presentacion.estado != Presentacion.PENDIENTE:
-                return HttpResponse(simplejson.dumps({'error': "La presentacion debe estar en estado PENDIENTE"}), status=400, content_type='application/json')
+                return JsonResponse({'error': "La presentacion debe estar en estado PENDIENTE"}, status=400)
+            if 'estudios' not in request.data:
+                return JsonResponse({'error': "El campo 'estudios' es necesario"}, status=400)
+            estudios_data = request.data.get('estudios')
+            if len(estudios_data) < presentacion.estudios.count():
+                return JsonResponse({'error': "Faltan datos de estudios"}, status=400)
+            for e in estudios_data:
+                estudio = Estudio.objects.get(pk=e['id'])
+                if estudio.presentacion != presentacion:
+                    return JsonResponse({'error': "El estudio {0} no corresponde a esta presentacion".format(e['id'])}, status=400)
+                estudio.importe_cobrado_pension = e['importe_cobrado_pension']
+                estudio.importe_cobrado_arancel_anestesia = e['importe_cobrado_arancel_anestesia']
+                estudio.importe_estudio_cobrado = e['importe_estudio_cobrado']
+                estudio.importe_medicacion_cobrado = e['importe_medicacion_cobrado']
+                estudio.save()
+            presentacion.estado = Presentacion.COBRADO
+            presentacion.comprobante.estado = Comprobante.COBRADO
+            presentacion.comprobante.save()
+            presentacion.save()
+            response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
+        except Presentacion.DoesNotExist:
+                response = JsonResponse({'error': "No existe una presentacion con esa id"}, status=400)
+        except Estudio.DoesNotExist:
+                response = JsonResponse({'error': "No existe un estudio con esa id"}, status=400)
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+            response = JsonResponse({'error': ex.message}, status=500)
         return response

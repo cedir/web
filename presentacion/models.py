@@ -4,6 +4,8 @@ from django.db import models
 from comprobante.models import Comprobante
 from obra_social.models import ObraSocial
 
+ID_SUCURSAL_CEDIR = 1
+ID_SUCURSAL_HOSPITAL_ITALIANO = 2
 
 class Presentacion(models.Model):
 
@@ -19,6 +21,7 @@ class Presentacion(models.Model):
 
     id = models.AutoField(primary_key=True, db_column=u'idFacturacion')
     obra_social = models.ForeignKey(ObraSocial, db_column=u'idObraSocial')
+    sucursal = models.IntegerField(u'Sucursal', default=ID_SUCURSAL_CEDIR, choices=[(ID_SUCURSAL_CEDIR, "Cedir"), (ID_SUCURSAL_HOSPITAL_ITALIANO, "Hospital Italiano")])
     comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'presentacion', null=True)
     fecha = models.DateField(u'Fecha', db_column=u'fechaFacturacion')
     estado = models.SmallIntegerField(db_column=u'pagado', choices=ESTADOS)
