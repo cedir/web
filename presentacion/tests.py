@@ -46,23 +46,6 @@ class TestDetallesObrasSociales(TestCase):
         assert response.content[-1] != '\\'
         assert response.content[-1] != '\n'
 
-class TestRetrievePresentacion(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
-                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
-
-    def setUp(self):
-        self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
-        self.client = Client(HTTP_GET='localhost')
-        self.client.login(username='test', password='test')
-
-    def test_listar_presentaciones_ok(self):
-        response = self.client.get('/api/presentacion/')
-        assert response.status_code == 200
-
-    def test_detalles_presentacion_ok(self):
-        response = self.client.get('/api/presentacion/1/')
-        assert response.status_code == 200
-
     def test_cobrar_osde_en_nombre_de_otro_medico(self):
         estudio_osde = Estudio.objects.get(pk=1)
         presentacion_osde = OsdeRowBase(estudio_osde)
@@ -90,6 +73,23 @@ class TestRetrievePresentacion(TestCase):
         medico.facturar_amr_en_nombre_de_medico = medico_para_facturar_amr
         assert presentacion_amr.format_nro_matricula(medico) == 222
 
+class TestRetrievePresentacion(TestCase):
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
+        self.client = Client(HTTP_GET='localhost')
+        self.client.login(username='test', password='test')
+
+    def test_listar_presentaciones_ok(self):
+        response = self.client.get('/api/presentacion/')
+        assert response.status_code == 200
+
+    def test_detalles_presentacion_ok(self):
+        response = self.client.get('/api/presentacion/1/')
+        assert response.status_code == 200
+
 class TestCobrarPresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
                 'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', "medicamentos.json"]
@@ -113,7 +113,9 @@ class TestCobrarPresentacion(TestCase):
                     "importe_estudio_cobrado": "1.00",
                     "importe_medicacion_cobrado": "1.00",
                 },
-            ]
+            ],
+            "retencion_impositiva": "32.00",
+            "nro_recibo": 1,
         }
         response = self.client.patch('/api/presentacion/7/cobrar/', data=json.dumps(datos),
                                      content_type='application/json')
@@ -121,6 +123,74 @@ class TestCobrarPresentacion(TestCase):
         presentacion = Presentacion.objects.get(pk=7)
         assert presentacion.estado == Presentacion.COBRADO
         assert presentacion.comprobante.estado == Comprobante.COBRADO
+        assert presentacion.pago != None
+
+    def test_cobrar_presentacion_devuelve_diferencia_con_facturado(self):
+        # diferencia facturada: cobrados - (facturados - diferencia_paciente)
+        presentacion = Presentacion.objects.get(pk=7)
+        estudio = Estudio.objects.get(pk=8)
+        estudio.importe_estudio = Decimal(2)
+        estudio.importe_medicacion = Decimal(2)
+        estudio.pension = Decimal(2)
+        estudio.arancel_anestesia = Decimal(2)
+        estudio.diferencia_paciente = Decimal(1)
+        estudio.save()
+        datos = {
+            "estudios": [
+                {
+                    "id": 8,
+                    "importe_cobrado_pension": "1.00",
+                    "importe_cobrado_arancel_anestesia": "1.00",
+                    "importe_estudio_cobrado": "1.00",
+                    "importe_medicacion_cobrado": "1.00",
+                },
+            ],
+            "retencion_impositiva": "32.00",
+            "nro_recibo": 1,
+        }
+        response = self.client.patch('/api/presentacion/7/cobrar/', data=json.dumps(datos),
+                                     content_type='application/json')
+        assert response.status_code == 200
+        presentacion = Presentacion.objects.get(pk=7)
+        assert Decimal(json.loads(response.content)["diferencia_facturada"]) == Decimal(3)
+
+    def test_cobrar_presentacion_setea_valores(self):
+        # diferencia facturada: cobrados - (facturados - diferencia_paciente)
+        presentacion = Presentacion.objects.get(pk=7)
+        estudio = Estudio.objects.get(pk=8)
+        assert estudio.importe_estudio_cobrado == Decimal(0)
+        assert estudio.importe_medicacion_cobrado == Decimal(0)
+        assert estudio.importe_cobrado_pension == Decimal(0)
+        assert estudio.importe_cobrado_arancel_anestesia == Decimal(0)
+        estudio.importe_cobrado_arancel_anestesia = Decimal(1)
+        datos = {
+            "estudios": [
+                {
+                    "id": 8,
+                    "importe_cobrado_pension": "1.00",
+                    "importe_cobrado_arancel_anestesia": "1.00",
+                    "importe_estudio_cobrado": "1.00",
+                    "importe_medicacion_cobrado": "1.00",
+                },
+            ],
+            "retencion_impositiva": "32.00",
+            "nro_recibo": 1,
+        }
+        response = self.client.patch('/api/presentacion/7/cobrar/', data=json.dumps(datos),
+                                     content_type='application/json')
+        assert response.status_code == 200
+        estudio = Estudio.objects.get(pk=8)
+        presentacion = Presentacion.objects.get(pk=7)
+        assert estudio.importe_estudio_cobrado == Decimal(1)
+        assert estudio.importe_medicacion_cobrado == Decimal(1)
+        assert estudio.importe_cobrado_pension == Decimal(1)
+        assert estudio.importe_cobrado_arancel_anestesia == Decimal(1)
+        presentacion = Presentacion.objects.get(pk=7)
+        assert presentacion.total == Decimal(4)
+        assert presentacion.pago.get().importe == presentacion.total
+        assert presentacion.pago.get().numero_recibo == presentacion.comprobante.numero
+        assert presentacion.pago.get().fecha == date.today()
+        assert presentacion.pago.get().retencion_impositiva == Decimal("32.00")
 
     def test_cobrar_presentacion_abierta_falla(self):
         presentacion = Presentacion.objects.get(pk=8)
@@ -135,7 +205,9 @@ class TestCobrarPresentacion(TestCase):
                     "importe_estudio_cobrado": "1.00",
                     "importe_medicacion_cobrado": "1.00",
                 },
-            ]
+            ],
+            "retencion_impositiva": "32.00",
+            "nro_recibo": 1,
         }
         response = self.client.patch('/api/presentacion/8/cobrar/', data=json.dumps(datos),
                                      content_type='application/json')
@@ -157,7 +229,9 @@ class TestCobrarPresentacion(TestCase):
                     "importe_estudio_cobrado": "1.00",
                     "importe_medicacion_cobrado": "1.00",
                 },
-            ]
+            ],
+            "retencion_impositiva": "32.00",
+            "nro_recibo": 1,
         }
         response = self.client.patch('/api/presentacion/2/cobrar/', data=json.dumps(datos),
                                      content_type='application/json')
@@ -181,7 +255,9 @@ class TestCobrarPresentacion(TestCase):
                     "importe_estudio_cobrado": "1.00",
                     "importe_medicacion_cobrado": "1.00",
                 },
-            ]
+            ],
+            "retencion_impositiva": "32.00",
+            "nro_recibo": 1,
         }
         response = self.client.patch('/api/presentacion/7/cobrar/', data=json.dumps(datos),
                                      content_type='application/json')
@@ -196,7 +272,9 @@ class TestCobrarPresentacion(TestCase):
         assert presentacion.estado == Presentacion.PENDIENTE
         datos = {
             "estudios": [
-            ]
+            ],
+            "retencion_impositiva": "32.00",
+            "nro_recibo": 1,
         }
         response = self.client.patch('/api/presentacion/7/cobrar/', data=json.dumps(datos),
                                      content_type='application/json')

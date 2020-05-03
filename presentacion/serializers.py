@@ -3,7 +3,7 @@ from datetime import date
 
 from rest_framework import serializers
 from rest_framework import status
-from presentacion.models import Presentacion
+from presentacion.models import PagoPresentacion, Presentacion
 from obra_social.models import ObraSocial
 from comprobante.models import Comprobante, TipoComprobante, Gravado, LineaDeComprobante, ID_TIPO_COMPROBANTE_LIQUIDACION
 from estudio.models import Estudio
@@ -147,4 +147,16 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
             u'periodo',
             u'fecha',
             u'estudios',
+        )
+
+class PagoPresentacionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PagoPresentacion
+        fields = (
+            u'fecha',
+            u'retencion_impositiva',
+            u'fecha',
+            u'nro_recibo',
+            u'importe',
+            u'presentacion',
         )
