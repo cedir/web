@@ -4,8 +4,8 @@ from datetime import date
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
-from comprobante.models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado, \
-    ID_TIPO_COMPROBANTE_LIQUIDACION, CEDIR_PTO_VENTA, BRUNETTI_PTO_VENTA
+from comprobante.models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado, ID_TIPO_COMPROBANTE_LIQUIDACION
+from settings import CEDIR_PTO_VENTA, BRUNETTI_PTO_VENTA
 from comprobante.afip import Afip
 
 class TipoComprobanteSerializer(serializers.ModelSerializer):
