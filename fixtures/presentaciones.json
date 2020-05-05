@@ -9,7 +9,7 @@
         "estado": 0,
         "periodo": "PARCHE",
         "iva": "0.00",
-        "total": "2800.00",
+        "total_cobrado": "2800.00",
         "total_facturado": "2800.00",
         "sucursal": 1
     }
@@ -24,7 +24,7 @@
         "estado": 0,
         "periodo": "g",
         "iva": "0.00",
-        "total": "2800.00",
+        "total_cobrado": "2800.00",
         "total_facturado": "2800.00",
         "sucursal": 1
     }
@@ -39,7 +39,7 @@
         "estado": 1,
         "periodo": "JUNIO 2012",
         "iva": "21.00",
-        "total": "1368.36",
+        "total_cobrado": "1368.36",
         "total_facturado": "1368.36",
         "sucursal": 1
     }
@@ -65,7 +65,7 @@
         "estado": 0,
         "periodo": "JUNIO 2012",
         "iva": "21.00",
-        "total": "4444.44",
+        "total_cobrado": "4444.44",
         "total_facturado": "4444.44",
         "sucursal": 1
     }

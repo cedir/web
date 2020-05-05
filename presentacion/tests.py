@@ -128,13 +128,8 @@ class TestCobrarPresentacion(TestCase):
     def test_cobrar_presentacion_devuelve_diferencia_con_facturado(self):
         # diferencia facturada: cobrados - (facturados - diferencia_paciente)
         presentacion = Presentacion.objects.get(pk=7)
-        estudio = Estudio.objects.get(pk=8)
-        estudio.importe_estudio = Decimal(2)
-        estudio.importe_medicacion = Decimal(2)
-        estudio.pension = Decimal(2)
-        estudio.arancel_anestesia = Decimal(2)
-        estudio.diferencia_paciente = Decimal(1)
-        estudio.save()
+        presentacion.total_facturado = Decimal(5)
+        presentacion.save()
         datos = {
             "estudios": [
                 {
@@ -152,7 +147,7 @@ class TestCobrarPresentacion(TestCase):
                                      content_type='application/json')
         assert response.status_code == 200
         presentacion = Presentacion.objects.get(pk=7)
-        assert Decimal(json.loads(response.content)["diferencia_facturada"]) == Decimal(3)
+        assert Decimal(json.loads(response.content)["diferencia_facturada"]) == Decimal(1)
 
     def test_cobrar_presentacion_setea_valores(self):
         # diferencia facturada: cobrados - (facturados - diferencia_paciente)
@@ -181,16 +176,16 @@ class TestCobrarPresentacion(TestCase):
         assert response.status_code == 200
         estudio = Estudio.objects.get(pk=8)
         presentacion = Presentacion.objects.get(pk=7)
+        pago = presentacion.pago.get()
         assert estudio.importe_estudio_cobrado == Decimal(1)
         assert estudio.importe_medicacion_cobrado == Decimal(1)
         assert estudio.importe_cobrado_pension == Decimal(1)
         assert estudio.importe_cobrado_arancel_anestesia == Decimal(1)
-        presentacion = Presentacion.objects.get(pk=7)
-        assert presentacion.total == Decimal(4)
-        assert presentacion.pago.get().importe == presentacion.total
-        assert presentacion.pago.get().numero_recibo == presentacion.comprobante.numero
-        assert presentacion.pago.get().fecha == date.today()
-        assert presentacion.pago.get().retencion_impositiva == Decimal("32.00")
+        assert presentacion.total_cobrado == Decimal(4)
+        assert pago.importe == presentacion.total_cobrado
+        assert pago.nro_recibo == "1"
+        assert pago.fecha == date.today()
+        assert pago.retencion_impositiva == Decimal("32.00")
 
     def test_cobrar_presentacion_abierta_falla(self):
         presentacion = Presentacion.objects.get(pk=8)

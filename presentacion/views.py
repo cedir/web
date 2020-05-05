@@ -102,7 +102,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
                 raise ValidationError("La presentacion debe estar en estado ABIERTO")
             obra_social = presentacion.obra_social
             comprobante_data = request.data
-            comprobante_data["neto"] = presentacion.total
+            comprobante_data["neto"] = presentacion.total_facturado
             comprobante_data["nombre_cliente"] = obra_social.nombre
             comprobante_data["domicilio_cliente"] = obra_social.direccion
             comprobante_data["nro_cuit"] = obra_social.nro_cuit
@@ -115,9 +115,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             linea = comprobante.lineas.first()
             presentacion.estado = Presentacion.PENDIENTE
             presentacion.comprobante = comprobante
-            presentacion.total = linea.importe_neto
             presentacion.iva = linea.iva
-            presentacion.total_facturado = linea.sub_total
             presentacion.save()
             response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
 
@@ -151,48 +149,13 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         # Setear valores cobrados de estudios, total de presentacion
         # Armar un PagoPresentacion
         try:
-            presentacion = Presentacion.objects.get(pk=pk)
-            if presentacion.estado != Presentacion.PENDIENTE:
-                raise ValidationError("La presentacion debe estar en estado PENDIENTE")
-            if 'estudios' not in request.data:
-                raise ValidationError("El campo 'estudios' es necesario")
-            if 'nro_recibo' not in request.data:
-                raise ValidationError("El campo 'nro_recibo' es necesario")
-            if 'retencion_impositiva' not in request.data:
-                raise ValidationError("El campo 'retencion_impositiva' es necesario")
-            estudios_data = request.data.get('estudios')
-            if len(estudios_data) < presentacion.estudios.count():
-                raise ValidationError("Faltan datos de estudios")
-            for e in estudios_data:
-                estudio = Estudio.objects.get(pk=e['id'])
-                if estudio.presentacion != presentacion:
-                    raise ValidationError("El estudio {0} no corresponde a esta presentacion".format(e['id']))
-                estudio.importe_cobrado_pension = e['importe_cobrado_pension']
-                estudio.importe_cobrado_arancel_anestesia = e['importe_cobrado_arancel_anestesia']
-                estudio.importe_estudio_cobrado = e['importe_estudio_cobrado']
-                estudio.importe_medicacion_cobrado = e['importe_medicacion_cobrado']
-                estudio.save()
-            presentacion.total = sum([
-                e.importe_cobrado_pension
-                + e.importe_cobrado_arancel_anestesia
-                + e.importe_estudio_cobrado
-                + e.importe_medicacion_cobrado
-                # - e.diferencia_paciente
-                for e in presentacion.estudios.all()])
-            pago = PagoPresentacionSerializer(data={
-                "fecha": date.today(),
-                "presentacion": presentacion.pk,
-                "nro_recibo": request.data.get('nro_recibo'),
-                "retencion_impositiva": Decimal(request.data.get('retencion_impositiva')),
-                "importe": presentacion.total
-            })
-            pago.is_valid(raise_exception=True)
-            pago.save()
-            presentacion.estado = Presentacion.COBRADO
-            presentacion.comprobante.estado = Comprobante.COBRADO
-            presentacion.comprobante.save()
-            presentacion.save()
-            diferencia_facturada = presentacion.total_facturado - presentacion.total
+            pago_data = request.data
+            pago_data['presentacion_id'] = pk
+            pago_data['fecha'] = date.today()
+            pago_serializer = PagoPresentacionSerializer(data=pago_data)
+            pago_serializer.is_valid(raise_exception=True)
+            pago = pago_serializer.save()
+            diferencia_facturada = pago.presentacion.total_facturado - pago.importe
             response = JsonResponse({"diferencia_facturada": diferencia_facturada})
         except Presentacion.DoesNotExist:
                 response = JsonResponse({'error': "No existe una presentacion con esa id"}, status=400)

@@ -27,7 +27,7 @@ class Presentacion(models.Model):
     estado = models.SmallIntegerField(db_column=u'pagado', choices=ESTADOS)
     periodo = models.CharField(max_length=128)
     iva = models.DecimalField(max_digits=16, decimal_places=2)
-    total = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'))
+    total_cobrado = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'))
     total_facturado = models.DecimalField(db_column=u'totalFacturado', max_digits=16, decimal_places=2, default=Decimal('0.00'))
 
     class Meta:

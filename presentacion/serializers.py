@@ -150,13 +150,68 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
         )
 
 class PagoPresentacionSerializer(serializers.ModelSerializer):
+    presentacion_id = serializers.IntegerField()
+    estudios = serializers.ListField()
     class Meta:
         model = PagoPresentacion
         fields = (
+            u'presentacion_id',
+            u'estudios',
             u'fecha',
             u'retencion_impositiva',
-            u'fecha',
             u'nro_recibo',
-            u'importe',
-            u'presentacion',
+        )
+
+    def validate_presentacion_id(self, value):
+        presentacion = Presentacion.objects.get(pk=value)
+        if presentacion.estado != Presentacion.PENDIENTE:
+            raise serializers.ValidationError("La presentacion debe estar en estado PENDIENTE")
+        return value
+
+    def validate_estudios(self, value):
+        presentacion = Presentacion.objects.get(pk=self.initial_data['presentacion_id'])
+        estudios_data = value
+        if len(estudios_data) < presentacion.estudios.count():
+            raise serializers.ValidationError("Faltan datos de estudios")
+        required_props = ['id', 'importe_cobrado_pension',
+                'importe_cobrado_arancel_anestesia', 'importe_estudio_cobrado', 'importe_medicacion_cobrado']
+        for e in estudios_data:
+            if not all([prop in e.keys() for prop in required_props]):
+                raise serializers.ValidationError("Cada estudio debe tener los campos 'id', \
+                    'importe_cobrado_pension', 'importe_cobrado_arancel_anestesia', \
+                    'importe_estudio_cobrado', 'importe_medicacion_cobrado'")
+            estudio = Estudio.objects.get(pk=e['id'])
+            if estudio.presentacion != presentacion:
+                raise serializers.ValidationError("El estudio {0} no corresponde a esta presentacion".format(e['id']))
+        return value
+
+    def create(self, validated_data):
+        presentacion = Presentacion.objects.get(pk=validated_data['presentacion_id'])
+        estudios_data = validated_data['estudios']
+        for e in estudios_data:
+            estudio = Estudio.objects.get(pk=e['id'])
+            if estudio.presentacion != presentacion:
+                raise serializers.ValidationError("El estudio {0} no corresponde a esta presentacion".format(e['id']))
+            estudio.importe_estudio_cobrado = e['importe_estudio_cobrado']
+            estudio.importe_medicacion_cobrado = e['importe_medicacion_cobrado']
+            estudio.importe_cobrado_pension = e['importe_cobrado_pension']
+            estudio.importe_cobrado_arancel_anestesia = e['importe_cobrado_arancel_anestesia']
+            estudio.save()
+        total = sum([
+            e.importe_cobrado_pension
+            + e.importe_cobrado_arancel_anestesia
+            + e.importe_estudio_cobrado
+            + e.importe_medicacion_cobrado
+            for e in presentacion.estudios.all()])
+        presentacion.total_cobrado = total
+        presentacion.estado = Presentacion.COBRADO
+        presentacion.comprobante.estado = Comprobante.COBRADO
+        presentacion.comprobante.save()
+        presentacion.save()
+        return PagoPresentacion.objects.create(
+            presentacion_id=validated_data['presentacion_id'],
+            fecha=validated_data['fecha'],
+            nro_recibo=validated_data['nro_recibo'],
+            importe=total,
+            retencion_impositiva=validated_data['retencion_impositiva'],
         )
