@@ -10,12 +10,14 @@ ULI_URL = 'https://localhost:3000'
 # Afip
 AFIP_WSDL_URL = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL"
 AFIP_WSAA_URL = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl"
-CEDIR_CERT_PATH = "certificados/1.crt"
-CEDIR_PV_PATH = "certificados/1.csr"
-CEDIR_CUIT = 1
-BRUNETTI_CERT_PATH = "certificados/2.crt"
-BRUNETTI_PV_PATH = "certificados/2.csr"
-BRUNETTI_CUIT = 2
+CEDIR_CERT_PATH = "certificados/cedir_homologacion.crt"
+CEDIR_PV_PATH = "certificados/cedir_homologacion.csr"
+CEDIR_CUIT = "30709300152"
+CEDIR_PTO_VENTA = 91
+BRUNETTI_CERT_PATH = "certificados/brunetti_homologacion.crt"
+BRUNETTI_PV_PATH = "certificados/brunetti_homologacion.csr"
+BRUNETTI_CUIT = "20118070659"
+BRUNETTI_PTO_VENTA = 6
 CACHE_PATH = "comprobante/cache/tickets/"
 
 DEBUG = True
