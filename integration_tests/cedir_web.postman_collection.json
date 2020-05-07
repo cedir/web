@@ -736,7 +736,7 @@
 											"pm.test(\"Presentacion incluye estudio\", function () {",
 											"    pm.expect(res.json().some((e) => e.id == pm.collectionVariables.get(\"idEstudio\")));",
 											"});",
-											"postman.setNextRequest(null)"
+											"postman.setNextRequest('Cerrar Presentacion')"
 										],
 										"type": "text/javascript"
 									}
@@ -1390,7 +1390,7 @@
 											"pm.test(\"Cobrar presentacion status test\", function () {",
 											"    pm.expect(res).to.have.status(200);",
 											"});",
-											"postman.setNextRequest(null)"
+											"postman.setNextRequest(\"Informe mensual de Comprobantes.\")"
 										],
 										"type": "text/javascript"
 									}
@@ -1409,7 +1409,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"estudios\": [\n\t    {\n\t        \"id\": {{idEstudio}},\n\t        \"importe_cobrado_pension\": \"1.00\",\n\t        \"importe_cobrado_arancel_anestesia\": \"1.00\",\n\t        \"importe_estudio_cobrado\": \"1.00\",\n\t        \"importe_medicacion_cobrado\": \"1.00\"\n\t    }\n\t]\n}",
+									"raw": "{\n\t\"estudios\": [\n\t    {\n\t        \"id\": {{idEstudio}},\n\t        \"importe_cobrado_pension\": \"1.00\",\n\t        \"importe_cobrado_arancel_anestesia\": \"1.00\",\n\t        \"importe_estudio_cobrado\": \"1.00\",\n\t        \"importe_medicacion_cobrado\": \"1.00\"\n\t    }\n\t],\n    \"retencion_impositiva\": \"32.00\",\n    \"nro_recibo\": 1\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2556,7 +2556,8 @@
 							"res = pm.response;",
 							"pm.test(\"Retrieve anestesista status test\", function () {",
 							"    pm.expect(res).to.have.status(200);",
-							"});"
+							"});",
+							"postman.setNextRequest(null)"
 						],
 						"type": "text/javascript"
 					}
@@ -2791,49 +2792,49 @@
 	],
 	"variable": [
 		{
-			"id": "6e92fe9f-b24c-4f7a-8e98-569103870cc9",
+			"id": "b6b9c95a-d4ec-4e58-9a5d-82ee6aabca8c",
 			"key": "baseUrl",
 			"value": "localhost:8000/api",
 			"type": "string"
 		},
 		{
-			"id": "fd379849-2562-479a-80a1-24375228edda",
+			"id": "539800d7-7de9-4055-9965-b56e8dd515ba",
 			"key": "idEstudio",
-			"value": 215856,
+			"value": 215874,
 			"type": "number"
 		},
 		{
-			"id": "ff2866d6-46f9-4f23-856a-f1012eac8e80",
+			"id": "b2b5e812-7211-412a-986d-7f1b14c6dc4f",
 			"key": "idObraSocial",
 			"value": "5",
 			"type": "string"
 		},
 		{
-			"id": "ee001e15-b670-4357-8a30-6bc93e7cc9d7",
+			"id": "e40e984a-f435-4854-85f1-d2770d43f748",
 			"key": "idPresentacion",
-			"value": 16200,
+			"value": 16218,
 			"type": "number"
 		},
 		{
-			"id": "168972b9-c8d1-48b0-a587-a59eb32d3a51",
+			"id": "c07ed2bb-b91e-4991-b4f9-f5809bce561c",
 			"key": "idMedico",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "e957382a-5973-49c2-8941-fc5331c1a52e",
+			"id": "c861af1b-7552-46f8-b2c7-ff73c37bca21",
 			"key": "idPaciente",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "8a7613d5-fe0e-404f-916e-267ed134aac2",
+			"id": "34bad16f-2c5f-47e5-9f1e-c1d75326f5a8",
 			"key": "idAnestesista",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "33aaa2db-0792-491c-b020-794280bfa2e9",
+			"id": "eda9cf69-5eeb-4b98-9e5a-a76bf2e98b23",
 			"key": "idPractica",
 			"value": "1",
 			"type": "string"
