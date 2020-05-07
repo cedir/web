@@ -37,7 +37,9 @@
     "fields": {
         "se_presenta_por_AMR": 0,
         "se_presenta_por_ARA": 1,
-        "nombre": "ACA SALUD"
+        "nombre": "ACA SALUD",
+        "direccion": "asd",
+        "nro_cuit": "30604958640"
     }
 },
 {
