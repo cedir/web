@@ -3,7 +3,8 @@ from datetime import date
 
 from rest_framework import serializers
 from rest_framework import status
-from presentacion.models import Presentacion
+from rest_framework.serializers import ValidationError
+from presentacion.models import PagoPresentacion, Presentacion
 from obra_social.models import ObraSocial
 from comprobante.models import Comprobante, TipoComprobante, Gravado, LineaDeComprobante, ID_TIPO_COMPROBANTE_LIQUIDACION
 from estudio.models import Estudio
@@ -43,19 +44,22 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
         return {
             u'id': instance.id,
             u'obra_social_id': instance.obra_social_id,
+            u'sucursal': instance.sucursal,
             u'periodo': instance.periodo,
             u'fecha': instance.fecha,
         }
 
     def validate(self, data):
         if ObraSocial.objects.get(pk=data['obra_social_id']).is_particular_or_especial():
-            raise serializers.ValidationError('La Obra Social no puede ser Particular o Particular Especial')
+            raise ValidationError('La Obra Social no puede ser Particular o Particular Especial')
         for estudio_data in data['estudios']:
             estudio = Estudio.objects.get(pk=estudio_data['id'])
             if estudio.obra_social_id != data['obra_social_id']:
-                raise serializers.ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio.id))
+                raise ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio.id))
             if estudio.presentacion_id != 0:
-                raise serializers.ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
+                raise ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
+            if estudio.sucursal != data['sucursal']:
+                raise ValidationError('El estudio id = {0} no es de esta sucursal'.format(estudio.id))
         return data
 
     def create(self, validated_data):
@@ -78,7 +82,7 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
             estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
             estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
-        presentacion.total = sum([e.get_importe_total() for e in estudios])
+        presentacion.total_facturado = sum([e.get_importe_total() for e in estudios])
         presentacion.save()
         return presentacion
 
@@ -87,6 +91,7 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
         fields = (
             u'id',
             u'obra_social_id',
+            u'sucursal',
             u'periodo',
             u'fecha',
             u'estudios',
@@ -99,6 +104,7 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
         return {
             u'id': instance.id,
             u'obra_social_id': instance.obra_social_id,
+            u'sucursal': instance.sucursal,
             u'periodo': instance.periodo,
             u'fecha': instance.fecha,
         }
@@ -107,9 +113,11 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
         for estudio_data in data['estudios']:
             estudio = Estudio.objects.get(pk=estudio_data['id'])
             if estudio.obra_social_id != self.instance.obra_social_id:
-                raise serializers.ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio.id))
+                raise ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio.id))
             if estudio.presentacion_id != 0 and estudio.presentacion_id != self.instance.id:
-                raise serializers.ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
+                raise ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
+            if estudio.sucursal != self.instance.sucursal:
+                raise ValidationError('El estudio id = {0} no es de esta sucursal'.format(estudio.id))
         return data
 
     def update(self, instance, validated_data):
@@ -130,7 +138,7 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
             estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
             estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
-        instance.total = sum([e.get_importe_total() for e in estudios])
+        instance.total_facturado = sum([e.get_importe_total() for e in estudios])
         instance.save()
         return instance
     class Meta:
@@ -140,4 +148,71 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
             u'periodo',
             u'fecha',
             u'estudios',
+        )
+
+class PagoPresentacionSerializer(serializers.ModelSerializer):
+    presentacion_id = serializers.IntegerField()
+    estudios = serializers.ListField()
+    class Meta:
+        model = PagoPresentacion
+        fields = (
+            u'presentacion_id',
+            u'estudios',
+            u'fecha',
+            u'retencion_impositiva',
+            u'nro_recibo',
+        )
+
+    def validate_presentacion_id(self, value):
+        presentacion = Presentacion.objects.get(pk=value)
+        if presentacion.estado != Presentacion.PENDIENTE:
+            raise ValidationError("La presentacion debe estar en estado PENDIENTE")
+        return value
+
+    def validate_estudios(self, value):
+        presentacion = Presentacion.objects.get(pk=self.initial_data['presentacion_id'])
+        estudios_data = value
+        if len(estudios_data) < presentacion.estudios.count():
+            raise ValidationError("Faltan datos de estudios")
+        required_props = ['id', 'importe_cobrado_pension',
+                'importe_cobrado_arancel_anestesia', 'importe_estudio_cobrado', 'importe_medicacion_cobrado']
+        for e in estudios_data:
+            if not all([prop in e.keys() for prop in required_props]):
+                raise ValidationError("Cada estudio debe tener los campos 'id', \
+                    'importe_cobrado_pension', 'importe_cobrado_arancel_anestesia', \
+                    'importe_estudio_cobrado', 'importe_medicacion_cobrado'")
+            estudio = Estudio.objects.get(pk=e['id'])
+            if estudio.presentacion != presentacion:
+                raise ValidationError("El estudio {0} no corresponde a esta presentacion".format(e['id']))
+        return value
+
+    def create(self, validated_data):
+        presentacion = Presentacion.objects.get(pk=validated_data['presentacion_id'])
+        estudios_data = validated_data['estudios']
+        for e in estudios_data:
+            estudio = Estudio.objects.get(pk=e['id'])
+            if estudio.presentacion != presentacion:
+                raise ValidationError("El estudio {0} no corresponde a esta presentacion".format(e['id']))
+            estudio.importe_estudio_cobrado = e['importe_estudio_cobrado']
+            estudio.importe_medicacion_cobrado = e['importe_medicacion_cobrado']
+            estudio.importe_cobrado_pension = e['importe_cobrado_pension']
+            estudio.importe_cobrado_arancel_anestesia = e['importe_cobrado_arancel_anestesia']
+            estudio.save()
+        total = sum([
+            e.importe_cobrado_pension
+            + e.importe_cobrado_arancel_anestesia
+            + e.importe_estudio_cobrado
+            + e.importe_medicacion_cobrado
+            for e in presentacion.estudios.all()])
+        presentacion.total_cobrado = total
+        presentacion.estado = Presentacion.COBRADO
+        presentacion.comprobante.estado = Comprobante.COBRADO
+        presentacion.comprobante.save()
+        presentacion.save()
+        return PagoPresentacion.objects.create(
+            presentacion_id=validated_data['presentacion_id'],
+            fecha=validated_data['fecha'],
+            nro_recibo=validated_data['nro_recibo'],
+            importe=total,
+            retencion_impositiva=validated_data['retencion_impositiva'],
         )

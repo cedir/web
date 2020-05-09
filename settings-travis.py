@@ -1,6 +1,6 @@
 # Django settings for apps project.
 
-import os
+import os, sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -10,12 +10,14 @@ ULI_URL = 'https://localhost:3000'
 # Afip
 AFIP_WSDL_URL = "https://wswhomo.afip.gov.ar/wsfev1/service.asmx?WSDL"
 AFIP_WSAA_URL = "https://wsaahomo.afip.gov.ar/ws/services/LoginCms?wsdl"
-CEDIR_CERT_PATH = "certificados/1.crt"
-CEDIR_PV_PATH = "certificados/1.csr"
-CEDIR_CUIT = 1
-BRUNETTI_CERT_PATH = "certificados/2.crt"
-BRUNETTI_PV_PATH = "certificados/2.csr"
-BRUNETTI_CUIT = 2
+CEDIR_CERT_PATH = "certificados/cedir_homologacion.crt"
+CEDIR_PV_PATH = "certificados/cedir_homologacion.csr"
+CEDIR_CUIT = "30709300152"
+CEDIR_PTO_VENTA = 91
+BRUNETTI_CERT_PATH = "certificados/brunetti_homologacion.crt"
+BRUNETTI_PV_PATH = "certificados/brunetti_homologacion.csr"
+BRUNETTI_CUIT = "20118070659"
+BRUNETTI_PTO_VENTA = 6
 CACHE_PATH = "comprobante/cache/tickets/"
 
 DEBUG = True
@@ -32,14 +34,15 @@ LOGIN_URL = '/usuario/entrar/'
 DATABASES = {
     'default': {
         'ENGINE':'django.db.backends.postgresql_psycopg2',           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME':'a',             # Or path to database file if using sqlite3.
-        'USER':'a',             # Not used with sqlite3.
-        'PASSWORD':'a',         # Not used with sqlite3.
-        'HOST':'a',           # Set to empty string for localhost. Not used with sqlite3.
+        'NAME':'test_db',             # Or path to database file if using sqlite3.
+        'USER':'postgres',             # Not used with sqlite3.
+        'PASSWORD':'',         # Not used with sqlite3.
+        'HOST':'',           # Set to empty string for localhost. Not used with sqlite3.
         'PORT':'5432',             # Set to empty string for default. Not used with sqlite3.
     }
 }
-DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
+if 'test' in sys.argv or 'test_coverage' in sys.argv:  # Covers regular testing and django-coverage
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
 FIXTURE_DIRS = (
     os.path.join(os.getcwd(), "fixtures"),

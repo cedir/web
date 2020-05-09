@@ -6,7 +6,7 @@ from estudio.models import Estudio
 
 class PagoContraFacturaTest(TestCase):
     fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', "anestesistas.json", 'practicas.json',
-                'obras_sociales.json', 'presentaciones.json', 'estudios.json']
+                'obras_sociales.json', 'presentaciones.json', 'estudios.json', "medicamentos.json"]
 
     def setUp(self):
         self.estudio = Estudio.objects.get(pk=1)

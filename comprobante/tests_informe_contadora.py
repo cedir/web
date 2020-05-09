@@ -18,7 +18,8 @@ class TestHerramientaInformeComprobantesContadora(TestCase):
     Estos para la herramienta que genera el informe de comprobantes.
     """
     fixtures = ["comprobantes.json", "practicas.json", "anestesistas.json",
-                "presentaciones.json", "obras_sociales.json", "estudios.json", "medicos.json", "pacientes.json"]
+                "presentaciones.json", "obras_sociales.json", "estudios.json",
+                "medicos.json", "pacientes.json", "medicamentos.json"]
     def setUp(self):
         self.lineas_informe = [calculador_informe_factory(c) for c in Comprobante.objects.all()]
 
@@ -102,7 +103,8 @@ class TestCaluloRetencionImpositiva(TestCase):
     que cambia segun si la presentacion va por AMR o no.
     """
     fixtures = ["comprobantes.json", "practicas.json", "anestesistas.json",
-                "presentaciones.json", "obras_sociales.json", "estudios.json", "medicos.json", "pacientes.json"]
+                "presentaciones.json", "obras_sociales.json", "estudios.json",
+                "medicos.json", "pacientes.json", "medicamentos.json"]
 
     def test_retencion_impositiva_es_cero_si_no_hay_presentacion(self):
         comprobante = Comprobante.objects.get(pk=3)
@@ -119,7 +121,7 @@ class TestCaluloRetencionImpositiva(TestCase):
         self.assertIsNotNone(presentacion)
         pago = presentacion.pago.first()
         self.assertIsNotNone(pago)
-        retencion_esperada = pago.gasto_administrativo * \
+        retencion_esperada = pago.retencion_impositiva * \
             presentacion.total_facturado / Decimal(100)
         calculador = calculador_informe_factory(comprobante)
         self.assertEquals(calculador.retencion_impositiva, retencion_esperada)
@@ -146,7 +148,8 @@ class TestCaluloRetencionImpositiva(TestCase):
 
 class TestEndpoint(TestCase):
     fixtures = ["comprobantes.json", "practicas.json", "anestesistas.json",
-                "presentaciones.json", "obras_sociales.json", "estudios.json", "medicos.json", "pacientes.json"]
+                "presentaciones.json", "obras_sociales.json", "estudios.json",
+                "medicos.json", "pacientes.json", "medicamentos.json"]
 
     def test_endpoint_informe_comprobantes(self):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
