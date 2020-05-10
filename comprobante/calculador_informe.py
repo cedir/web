@@ -143,10 +143,6 @@ class CalculadorInformeFactura(CalculadorInforme):
     @property
     # gasto administrativo
     def retencion_impositiva(self):
-        '''
-        La retencion impositiva se guarda en el pago de la presentacion y en esos casos conviene sacarla de ahi.
-        Pero si no hay pago, es segun Mariana, "un valor fijo que no cambia seguido" y se puede decidir aca.
-        '''
         if not self.presentacion:
             return Decimal("0.00")
         if self.presentacion.obra_social.se_presenta_por_AMR == "1" or self.presentacion.obra_social.se_presenta_por_AMR == 1:

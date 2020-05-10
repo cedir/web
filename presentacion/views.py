@@ -10,7 +10,7 @@ from rest_framework.decorators import detail_route
 from common.drf.views import StandardResultsSetPagination
 
 from presentacion.models import Presentacion
-from presentacion.serializers import PresentacionSerializer, PresentacionRetrieveSerializer, PresentacionCreateSerializer, PresentacionUpdateSerializer
+from presentacion.serializers import PagoPresentacionSerializer, PresentacionCreateSerializer, PresentacionRetrieveSerializer, PresentacionSerializer, PresentacionUpdateSerializer
 from presentacion.obra_social_custom_code.osde_presentacion_digital import \
     OsdeRowEstudio, OsdeRowMedicacion, OsdeRowPension, OsdeRowMaterialEspecifico
 from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowEstudio
@@ -60,7 +60,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
 
             response = HttpResponse(csv_string, content_type='text/plain')
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+            response = HttpResponse(simplejson.dumps({'error': str(ex)}), status=500, content_type='application/json')
 
         return response
 
@@ -77,7 +77,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
 
             response = HttpResponse(csv_string[:-1], content_type='text/plain')
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': ex.message}), status=500, content_type='application/json')
+            response = HttpResponse(simplejson.dumps({'error': str(ex)}), status=500, content_type='application/json')
         return response
 
     @detail_route(methods=['get'])
@@ -88,7 +88,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         try:
             response = JsonResponse(EstudioDePresetancionRetrieveSerializer(estudios, many=True).data, safe=False)
         except Exception as ex:
-            response = JsonResponse({'error': ex.message}, status=500)
+            response = JsonResponse({'error': str(ex)}, status=500)
         return response
 
     @detail_route(methods=['patch'])
@@ -102,7 +102,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
                 raise ValidationError("La presentacion debe estar en estado ABIERTO")
             obra_social = presentacion.obra_social
             comprobante_data = request.data
-            comprobante_data["neto"] = presentacion.total
+            comprobante_data["neto"] = presentacion.total_facturado
             comprobante_data["nombre_cliente"] = obra_social.nombre
             comprobante_data["domicilio_cliente"] = obra_social.direccion
             comprobante_data["nro_cuit"] = obra_social.nro_cuit
@@ -115,16 +115,14 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             linea = comprobante.lineas.first()
             presentacion.estado = Presentacion.PENDIENTE
             presentacion.comprobante = comprobante
-            presentacion.total = linea.importe_neto
             presentacion.iva = linea.iva
-            presentacion.total_facturado = linea.sub_total
             presentacion.save()
             response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
 
         except ValidationError as ex:
-            response = JsonResponse({'error': ex.message}, status=400)
+            response = JsonResponse({'error': str(ex)}, status=400)
         except Exception as ex:
-            response = JsonResponse({'error': ex.message}, status=500)
+            response = JsonResponse({'error': str(ex)}, status=500)
         return response
 
     @detail_route(methods=['patch'])
@@ -142,40 +140,29 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             presentacion.save()
             return JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
         except Exception as ex:
-            return JsonResponse({'error': ex.message}, status=500)
+            return JsonResponse({'error': str(ex)}, status=500)
 
     @detail_route(methods=['patch'])
     def cobrar(self, request, pk=None):
         # Verificar que esta PENDIENTE
         # Pasar a COBRADA
-        # Setear valores cobrados de estudios
+        # Setear valores cobrados de estudios, total de presentacion
+        # Armar un PagoPresentacion
         try:
-            presentacion = Presentacion.objects.get(pk=pk)
-            if presentacion.estado != Presentacion.PENDIENTE:
-                return JsonResponse({'error': "La presentacion debe estar en estado PENDIENTE"}, status=400)
-            if 'estudios' not in request.data:
-                return JsonResponse({'error': "El campo 'estudios' es necesario"}, status=400)
-            estudios_data = request.data.get('estudios')
-            if len(estudios_data) < presentacion.estudios.count():
-                return JsonResponse({'error': "Faltan datos de estudios"}, status=400)
-            for e in estudios_data:
-                estudio = Estudio.objects.get(pk=e['id'])
-                if estudio.presentacion != presentacion:
-                    return JsonResponse({'error': "El estudio {0} no corresponde a esta presentacion".format(e['id'])}, status=400)
-                estudio.importe_cobrado_pension = e['importe_cobrado_pension']
-                estudio.importe_cobrado_arancel_anestesia = e['importe_cobrado_arancel_anestesia']
-                estudio.importe_estudio_cobrado = e['importe_estudio_cobrado']
-                estudio.importe_medicacion_cobrado = e['importe_medicacion_cobrado']
-                estudio.save()
-            presentacion.estado = Presentacion.COBRADO
-            presentacion.comprobante.estado = Comprobante.COBRADO
-            presentacion.comprobante.save()
-            presentacion.save()
-            response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
+            pago_data = request.data
+            pago_data['presentacion_id'] = pk
+            pago_data['fecha'] = date.today()
+            pago_serializer = PagoPresentacionSerializer(data=pago_data)
+            pago_serializer.is_valid(raise_exception=True)
+            pago = pago_serializer.save()
+            diferencia_facturada = pago.presentacion.total_facturado - pago.importe
+            response = JsonResponse({"diferencia_facturada": diferencia_facturada})
         except Presentacion.DoesNotExist:
                 response = JsonResponse({'error': "No existe una presentacion con esa id"}, status=400)
         except Estudio.DoesNotExist:
                 response = JsonResponse({'error': "No existe un estudio con esa id"}, status=400)
+        except ValidationError as ex:
+            response = JsonResponse({'error': str(ex)}, status=400)
         except Exception as ex:
-            response = JsonResponse({'error': ex.message}, status=500)
+            response = JsonResponse({'error': str(ex)}, status=500)
         return response

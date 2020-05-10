@@ -121,7 +121,7 @@ class TestCaluloRetencionImpositiva(TestCase):
         self.assertIsNotNone(presentacion)
         pago = presentacion.pago.first()
         self.assertIsNotNone(pago)
-        retencion_esperada = pago.gasto_administrativo * \
+        retencion_esperada = pago.retencion_impositiva * \
             presentacion.total_facturado / Decimal(100)
         calculador = calculador_informe_factory(comprobante)
         self.assertEquals(calculador.retencion_impositiva, retencion_esperada)

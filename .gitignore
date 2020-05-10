@@ -12,8 +12,8 @@ static/templates/bower_components/
 static/templates/npm_deps/
 .idea
 ENV/
-certificados/
 comprobante/cache
 
 informes_comprobantes_ejemplos/
 .pytest_cache/
+cache/
