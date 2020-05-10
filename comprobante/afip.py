@@ -120,8 +120,8 @@ class _Afip(object):
         try:
             self.ticket_autenticacion = self.wsaa.Autenticar(
                 "wsfe", self.cert, self.clave, self.wsaa_url, cache=CACHE_PATH, debug=True)
-        except SoapFault:
-            raise AfipErrorRed("Error autenticando en la Afip.")
+        except SoapFault as e:
+            raise AfipErrorRed("Error autenticando en la Afip: " + str(e))
         if not self.ticket_autenticacion and self.wsaa.Excepcion:
             raise AfipError("Error WSAA: %s" % self.wsaa.Excepcion)
 

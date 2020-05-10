@@ -20,6 +20,9 @@
 									"pm.test(\"Retrieve OS status test\", function () {",
 									"    pm.expect(res).to.have.status(200);",
 									"});",
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}",
 									"postman.setNextRequest('Consultar una Practica')"
 								],
 								"type": "text/javascript"
@@ -290,21 +293,6 @@
 						}
 					],
 					"request": {
-						"auth": {
-							"type": "apikey",
-							"apikey": [
-								{
-									"key": "value",
-									"value": "Token {{token}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
-									"type": "string"
-								}
-							]
-						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -438,6 +426,9 @@
 									"pm.test(\"estudios_sin_presentar tiene el estudio creado\", function () {",
 									"    pm.expect(estudios.some((e) => e.id == pm.collectionVariables.get(\"idEstudio\")))",
 									"});",
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}",
 									"postman.setNextRequest('Crear una nueva Presentacion')"
 								],
 								"type": "text/javascript"
@@ -575,6 +566,9 @@
 											"pm.test(\"Retrieve presentacion status test\", function () {",
 											"    pm.expect(res).to.have.status(200);",
 											"});",
+											"if (\"error\" in pm.response.json()) {",
+											"    console.error(pm.response.json().error)",
+											"}",
 											"postman.setNextRequest('Detalle para OSDE')"
 										],
 										"type": "text/javascript"
@@ -736,7 +730,10 @@
 											"pm.test(\"Presentacion incluye estudio\", function () {",
 											"    pm.expect(res.json().some((e) => e.id == pm.collectionVariables.get(\"idEstudio\")));",
 											"});",
-											"postman.setNextRequest(null)"
+											"if (\"error\" in pm.response.json()) {",
+											"    console.error(pm.response.json().error)",
+											"}",
+											"postman.setNextRequest('Cerrar Presentacion')"
 										],
 										"type": "text/javascript"
 									}
@@ -892,6 +889,9 @@
 											"pm.test(\"Cerrar presentacion status test\", function () {",
 											"    pm.expect(res).to.have.status(200);",
 											"});",
+											"if (\"error\" in pm.response.json()) {",
+											"    console.error(pm.response.json().error)",
+											"}",
 											"postman.setNextRequest('Abrir Presentacion')"
 										],
 										"type": "text/javascript"
@@ -1064,6 +1064,9 @@
 											"pm.test(\"Cerrar presentacion liquidacion status test\", function () {",
 											"    pm.expect(res).to.have.status(200);",
 											"});",
+											"if (\"error\" in pm.response.json()) {",
+											"    console.error(pm.response.json().error)",
+											"}",
 											"postman.setNextRequest('Cobrar Presentacion')"
 										],
 										"type": "text/javascript"
@@ -1236,6 +1239,9 @@
 											"pm.test(\"Abrrir presentacion status test\", function () {",
 											"    pm.expect(res).to.have.status(200);",
 											"});",
+											"if (\"error\" in pm.response.json()) {",
+											"    console.error(pm.response.json().error)",
+											"}",
 											"postman.setNextRequest('Update Presentacion')"
 										],
 										"type": "text/javascript"
@@ -1390,16 +1396,16 @@
 											"pm.test(\"Cobrar presentacion status test\", function () {",
 											"    pm.expect(res).to.have.status(200);",
 											"});",
-											"postman.setNextRequest(null)"
+											"if (\"error\" in pm.response.json()) {",
+											"    console.error(pm.response.json().error)",
+											"}",
+											"postman.setNextRequest(\"Informe mensual de Comprobantes.\")"
 										],
 										"type": "text/javascript"
 									}
 								}
 							],
 							"request": {
-								"auth": {
-									"type": "noauth"
-								},
 								"method": "PATCH",
 								"header": [
 									{
@@ -1409,7 +1415,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"estudios\": [\n\t    {\n\t        \"id\": {{idEstudio}},\n\t        \"importe_cobrado_pension\": \"1.00\",\n\t        \"importe_cobrado_arancel_anestesia\": \"1.00\",\n\t        \"importe_estudio_cobrado\": \"1.00\",\n\t        \"importe_medicacion_cobrado\": \"1.00\"\n\t    }\n\t]\n}",
+									"raw": "{\n\t\"estudios\": [\n\t    {\n\t        \"id\": {{idEstudio}},\n\t        \"importe_cobrado_pension\": \"1.00\",\n\t        \"importe_cobrado_arancel_anestesia\": \"1.00\",\n\t        \"importe_estudio_cobrado\": \"1.00\",\n\t        \"importe_medicacion_cobrado\": \"1.00\"\n\t    }\n\t],\n    \"retencion_impositiva\": \"32.00\",\n    \"nro_recibo\": 1\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1494,6 +1500,9 @@
 									"pm.test(\"Create presentacion status test\", function () {",
 									"    pm.expect(res).to.have.status(201);",
 									"});",
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}",
 									"idPresentacion = res.json().id",
 									"pm.collectionVariables.set(\"idPresentacion\", res.json().id);",
 									"postman.setNextRequest('Listar Presentaciones')",
@@ -1638,6 +1647,9 @@
 									"pm.test(\"Update presentacion status test\", function () {",
 									"    pm.expect(res).to.have.status(200);",
 									"});",
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}",
 									"postman.setNextRequest('Cerrar Presentacion (Liquidacion)')"
 								],
 								"type": "text/javascript"
@@ -1796,6 +1808,9 @@
 									"pm.test(\"listar presentaciones tiene la presentacion creada\", function () {",
 									"    pm.expect(presentaciones.results.some((e) => e.id == idPresentacion))",
 									"});",
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}",
 									"postman.setNextRequest('Consultar una Presentacion')"
 								],
 								"type": "text/javascript"
@@ -1882,6 +1897,20 @@
 			"item": [
 				{
 					"name": "Consultar un Comprobante",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "75bfa4ad-7a96-48f9-a03f-565ea1f702a0",
+								"exec": [
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -1953,6 +1982,20 @@
 				},
 				{
 					"name": "Crear Combrobante dado un asociado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fbd7729b-addc-46da-8973-3f7bad9d5415",
+								"exec": [
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "apikey",
@@ -2077,6 +2120,9 @@
 							"pm.test(\"Retrieve paciente status test\", function () {",
 							"    pm.expect(res).to.have.status(200);",
 							"});",
+							"if (\"error\" in pm.response.json()) {",
+							"    console.error(pm.response.json().error)",
+							"}",
 							"postman.setNextRequest('Consultar un Anestesista')"
 						],
 						"type": "text/javascript"
@@ -2181,6 +2227,9 @@
 							"pm.test(\"Retrieve practica status test\", function () {",
 							"    pm.expect(res).to.have.status(200);",
 							"});",
+							"if (\"error\" in pm.response.json()) {",
+							"    console.error(pm.response.json().error)",
+							"}",
 							"postman.setNextRequest('Consultar un Paciente')"
 						],
 						"type": "text/javascript"
@@ -2275,6 +2324,9 @@
 							"pm.test(\"Retrieve medico status test\", function () {",
 							"    pm.expect(res).to.have.status(200);",
 							"});",
+							"if (\"error\" in pm.response.json()) {",
+							"    console.error(pm.response.json().error)",
+							"}",
 							"postman.setNextRequest('Consultar un Medicamento')"
 						],
 						"type": "text/javascript"
@@ -2369,6 +2421,9 @@
 							"pm.test(\"Retrieve anestesista status test\", function () {",
 							"    pm.expect(res).to.have.status(200);",
 							"});",
+							"if (\"error\" in pm.response.json()) {",
+							"    console.error(pm.response.json().error)",
+							"}",
 							"postman.setNextRequest('Crear Estudio')"
 						],
 						"type": "text/javascript"
@@ -2463,6 +2518,9 @@
 							"pm.test(\"Retrieve anestesista status test\", function () {",
 							"    pm.expect(res).to.have.status(200);",
 							"});",
+							"if (\"error\" in pm.response.json()) {",
+							"    console.error(pm.response.json().error)",
+							"}",
 							"postman.setNextRequest('Consultar un Medico')"
 						],
 						"type": "text/javascript"
@@ -2556,7 +2614,11 @@
 							"res = pm.response;",
 							"pm.test(\"Retrieve anestesista status test\", function () {",
 							"    pm.expect(res).to.have.status(200);",
-							"});"
+							"});",
+							"if (\"error\" in pm.response.json()) {",
+							"    console.error(pm.response.json().error)",
+							"}",
+							"postman.setNextRequest(null)"
 						],
 						"type": "text/javascript"
 					}
@@ -2719,6 +2781,9 @@
 							"pm.test(\"Create estudio status test\", function () {",
 							"    pm.expect(res).to.have.status(201);",
 							"});",
+							"if (\"error\" in pm.response.json()) {",
+							"    console.error(pm.response.json().error)",
+							"}",
 							"pm.collectionVariables.set(\"idEstudio\", res.json().id);",
 							"postman.setNextRequest('Estudios sin presentar de una Obra Social')"
 						],
@@ -2791,49 +2856,49 @@
 	],
 	"variable": [
 		{
-			"id": "6e92fe9f-b24c-4f7a-8e98-569103870cc9",
+			"id": "a7958fd0-878a-4ccb-a898-7a74ffeb0c77",
 			"key": "baseUrl",
 			"value": "localhost:8000/api",
 			"type": "string"
 		},
 		{
-			"id": "fd379849-2562-479a-80a1-24375228edda",
+			"id": "fcb306ca-4dba-45ba-993d-abdfc5be409f",
 			"key": "idEstudio",
-			"value": 215856,
+			"value": 29,
 			"type": "number"
 		},
 		{
-			"id": "ff2866d6-46f9-4f23-856a-f1012eac8e80",
+			"id": "dc291cc6-c1f1-4b1c-aede-19abe6ad237e",
 			"key": "idObraSocial",
 			"value": "5",
 			"type": "string"
 		},
 		{
-			"id": "ee001e15-b670-4357-8a30-6bc93e7cc9d7",
+			"id": "0a5c70ce-5cd4-4ccc-9715-9813106d80b4",
 			"key": "idPresentacion",
-			"value": 16200,
+			"value": 26,
 			"type": "number"
 		},
 		{
-			"id": "168972b9-c8d1-48b0-a587-a59eb32d3a51",
+			"id": "5691f8df-4b5c-4894-bcbf-d18d7c48fb67",
 			"key": "idMedico",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "e957382a-5973-49c2-8941-fc5331c1a52e",
+			"id": "2f50fd83-dcf9-4f14-b998-3f1c618d594d",
 			"key": "idPaciente",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "8a7613d5-fe0e-404f-916e-267ed134aac2",
+			"id": "2982f3f0-afb8-468a-9619-77db8ed283b1",
 			"key": "idAnestesista",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "33aaa2db-0792-491c-b020-794280bfa2e9",
+			"id": "10bf3a91-cd66-49e1-8143-4a578cdb6dbe",
 			"key": "idPractica",
 			"value": "1",
 			"type": "string"

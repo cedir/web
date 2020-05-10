@@ -1,6 +1,6 @@
 # CEDIR WEB
 
-### AFIP
+## AFIP
 
 Para la pylib de la afip, pip clonará el repo correspondiente desde git. Solo instalamos las dependencias necesarias para los modulos que vamos a usar, para no inflar las dependencias.
 Para poder usarla, es necesario agregar al directorio de trabajo un certificado y su clave privada. En entornos de desarrollo será un certificado emitido para la api de homologacion y en produccion será uno de la api de produccion de producción.
@@ -47,13 +47,13 @@ https://groups.google.com/forum/#!forum/pyafipws
  - Install dependencies: `npm install`
  - Run server: `python manage.py runserver`
 
-### Troubleshooting:
+### Troubleshooting
 
- - Permision denied: '.../debug.log':
+- Permision denied: '.../debug.log':
 
       Give permision to write on the logs directory.
 
- - OperationalError: Problem installing fixtures: no such table: name_table__old:
+- OperationalError: Problem installing fixtures: no such table: name_table__old:
 
       In the directory where the virtual environment is, go to 
 
@@ -69,3 +69,20 @@ https://groups.google.com/forum/#!forum/pyafipws
 
          c.execute('PRAGMA legacy_alter_table = ON')
 
+## Testing
+
+Con el virtualenv activado, podes:
+
+- Correr los Unit Tests con  `python manage.py test`
+- Correr los Integration Tests con Postman: abrri el servidor de testing con `python manage.py runserver` y abrí el botón "Runner" de Postman. Setea el enviroment a `Local` y tickea el box de `Save responses`. Seleccciona la coleccion y apretá "Run CEDIR Collection".
+  - Los tests corren en un orden especifico. Para agregar tests a una request nueva, anda a la última y agregale una linea de `postman.setNextRequest('nombre de tu request')`. En tu request, anda ala pestaña "test" y agregalo ahí. Los tests se escriben en javascript y usan una API de Postman. Basate en los otros. La ultima tiene que quedar con `postman.setNextRequest(null)` para que no entre en un loop.
+  - Los tests van guardando estado. El POST de /presentacion por ejemplo guarda la id para usarla despues en el PATCH de cerrar
+
+## CI
+
+El repo usa Travis para correr varias pruebas en el codigo cada vez que pusheamos:
+
+- Corre pylint en modo solo errores.
+- Corre los unit tests.
+- Corre los integration tests con Newman (la version CLI de Postman) segun lo que esté especificado en los dumps de la colección en la carpeta `integration_tests`. Para exportar, en Postman dale click derecho a la colección -> export -> 2.1 -> reemplazas el `cedir_web.postman_collection.json`. Si tuviste que agregar algo al enviroment, fijate de ponerlo tambien en el enviroment `staging` y exportá `local` con ⚙️ -> Local -> ⬇️ -> reemplaza el `local.postman_environment.json`.
+- El informe mensual de comprobantes tarda muchisimo en correr, asi que tratá de dejarlo último para acelerar el testing manual.
