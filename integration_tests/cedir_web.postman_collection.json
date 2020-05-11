@@ -72,7 +72,8 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{idObraSocial}}"
+									"value": "{{idObraSocial}}",
+									"type": "string"
 								}
 							]
 						}
@@ -167,7 +168,8 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{idObraSocial}}"
+									"value": "{{idObraSocial}}",
+									"type": "string"
 								}
 							]
 						}
@@ -308,7 +310,8 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{idPresentacion}}"
+									"value": "{{idPresentacion}}",
+									"type": "string"
 								}
 							]
 						}
@@ -482,7 +485,8 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{idObraSocial}}"
+									"value": "{{idObraSocial}}",
+									"type": "string"
 								}
 							]
 						}
@@ -605,7 +609,8 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "{{idPresentacion}}"
+											"value": "{{idPresentacion}}",
+											"type": "string"
 										}
 									]
 								}
@@ -770,7 +775,8 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "{{idPresentacion}}"
+											"value": "{{idPresentacion}}",
+											"type": "string"
 										}
 									]
 								}
@@ -939,7 +945,8 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "{{idPresentacion}}"
+											"value": "{{idPresentacion}}",
+											"type": "string"
 										}
 									]
 								},
@@ -1114,7 +1121,8 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "{{idPresentacion}}"
+											"value": "{{idPresentacion}}",
+											"type": "string"
 										}
 									]
 								},
@@ -1280,7 +1288,8 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "{{idPresentacion}}"
+											"value": "{{idPresentacion}}",
+											"type": "string"
 										}
 									]
 								},
@@ -1436,7 +1445,8 @@
 									"variable": [
 										{
 											"key": "id",
-											"value": "{{idPresentacion}}"
+											"value": "{{idPresentacion}}",
+											"type": "string"
 										}
 									]
 								},
@@ -1524,21 +1534,6 @@
 						}
 					],
 					"request": {
-						"auth": {
-							"type": "apikey",
-							"apikey": [
-								{
-									"key": "value",
-									"value": "Token {{token}}",
-									"type": "string"
-								},
-								{
-									"key": "key",
-									"value": "Authorization",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [
 							{
@@ -1713,7 +1708,8 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "{{idPresentacion}}"
+									"value": "{{idPresentacion}}",
+									"type": "string"
 								}
 							]
 						}
@@ -1934,7 +1930,8 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "1"
+									"value": "1",
+									"type": "string"
 								}
 							]
 						}
@@ -2034,7 +2031,10 @@
 									"key": "id-tipo",
 									"value": 3
 								}
-							]
+							],
+							"options": {
+								"formdata": {}
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/comprobante/crear_comprobante_asociado",
@@ -2109,6 +2109,167 @@
 			"protocolProfileBehavior": {}
 		},
 		{
+			"name": "estudios",
+			"item": [
+				{
+					"name": "Crear Estudio",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8b7660e6-182d-4cc5-9417-a9d3754d051a",
+								"exec": [
+									"res = pm.response;",
+									"pm.test(\"Create estudio status test\", function () {",
+									"    pm.expect(res).to.have.status(201);",
+									"});",
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}",
+									"pm.collectionVariables.set(\"idEstudio\", res.json().id);",
+									"postman.setNextRequest('Realizar pago contra factura')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"paciente\": {{idPaciente}},\n    \"practica\": {{idPractica}},\n    \"medico\": {{idMedico}},\n    \"obra_social\": {{idObraSocial}},\n    \"medico_solicitante\": {{idMedico}},\n    \"importe_estudio\": \"1.00\",\n    \"fecha\": \"2019-11-19\",\n    \"anestesista\": {{idAnestesista}},\n    \"sucursal\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/estudio/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"estudio",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Realizar pago contra factura",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "71a3b1b4-f346-4fb3-8840-cc1dfa210235",
+								"exec": [
+									"res = pm.response;",
+									"pm.test(\"Realizar pago contra factura status test\", function () {",
+									"    pm.expect(res).to.have.status(200);",
+									"});",
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}",
+									"postman.setNextRequest('Anular pago contra factura')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "pago_contra_factura",
+									"value": "1000",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/estudio/:id/realizar_pago_contra_factura/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"estudio",
+								":id",
+								"realizar_pago_contra_factura",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{idEstudio}}"
+								}
+							]
+						},
+						"description": "Realiza el pago contra factura de un estudio creado anteriormente"
+					},
+					"response": []
+				},
+				{
+					"name": "Anular pago contra factura",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9f90d9be-1842-45c8-88c0-3e91035a05ec",
+								"exec": [
+									"res = pm.response;",
+									"pm.test(\"Anular pago contra factura status test\", function () {",
+									"    pm.expect(res).to.have.status(200);",
+									"});",
+									"if (\"error\" in pm.response.json()) {",
+									"    console.error(pm.response.json().error)",
+									"}",
+									"postman.setNextRequest('Estudios sin presentar de una Obra Social')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/estudio/:id/anular_pago_contra_factura/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"estudio",
+								":id",
+								"anular_pago_contra_factura",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{idEstudio}}"
+								}
+							]
+						},
+						"description": "Anula el pago contra factura de una factura pagada contra factura anteriormente"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "Consultar un Paciente",
 			"event": [
 				{
@@ -2169,7 +2330,8 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "{{idPaciente}}"
+							"value": "{{idPaciente}}",
+							"type": "string"
 						}
 					]
 				}
@@ -2266,7 +2428,8 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "{{idPractica}}"
+							"value": "{{idPractica}}",
+							"type": "string"
 						}
 					]
 				}
@@ -2363,7 +2526,8 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "{{idMedico}}"
+							"value": "{{idMedico}}",
+							"type": "string"
 						}
 					]
 				}
@@ -2460,7 +2624,8 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "1"
+							"value": "1",
+							"type": "string"
 						}
 					]
 				}
@@ -2557,7 +2722,8 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "{{idAnestesista}}"
+							"value": "{{idAnestesista}}",
+							"type": "string"
 						}
 					]
 				}
@@ -2768,53 +2934,6 @@
 					"body": "{\n \"id\": 1,\n \"nombre_cliente\": \"Obra Social de los Trabajadores de la Obra Social de Springfield\",\n \"sub_tipo\": \"A\",\n \"numero\": 1,\n \"nro_terminal\": 17,\n \"total_facturado\": 5,\n \"total_cobrado\": 5,\n \"fecha_emision\": \"2019-08-22\",\n \"tipo_comprobante\": {\n  \"id\": 1,\n  \"nombre\": \"Factura\"\n },\n \"gravado\": {\n  \"id\": 1,\n  \"descripcion\": \"IVA Inscripto 21\",\n  \"porcentaje\": 21\n },\n \"lineas\": {\n  \"id\": 1,\n  \"concepto\": \"varios\",\n  \"sub_total\": 5,\n  \"iva\": 1,\n  \"importe_neto\": 4\n },\n \"responsable\": \"CEDIR\",\n \"nro_cuit\": 3030303030,\n \"neto\": 10,\n \"iva\": 2,\n \"honorarios_medicos\": 1,\n \"honorarios_solicitantes\": 1,\n \"uso_de_materiales\": 1,\n \"retencion_cedir\": 1,\n \"retencion_impositiva\": 1,\n \"sala_recuperacion\": 1,\n \"honorarios_anestesistas\": 1,\n \"retencion_anestesia\": 1,\n \"total_medicamentos\": 1,\n \"total_material_especifico\": 1\n}"
 				}
 			]
-		},
-		{
-			"name": "Crear Estudio",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "8b7660e6-182d-4cc5-9417-a9d3754d051a",
-						"exec": [
-							"res = pm.response;",
-							"pm.test(\"Create estudio status test\", function () {",
-							"    pm.expect(res).to.have.status(201);",
-							"});",
-							"if (\"error\" in pm.response.json()) {",
-							"    console.error(pm.response.json().error)",
-							"}",
-							"pm.collectionVariables.set(\"idEstudio\", res.json().id);",
-							"postman.setNextRequest('Estudios sin presentar de una Obra Social')"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"paciente\": {{idPaciente}},\n    \"practica\": {{idPractica}},\n    \"medico\": {{idMedico}},\n    \"obra_social\": {{idObraSocial}},\n    \"medico_solicitante\": {{idMedico}},\n    \"importe_estudio\": \"1.00\",\n    \"fecha\": \"2019-11-19\",\n    \"anestesista\": {{idAnestesista}},\n    \"sucursal\": 1\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/estudio/",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"estudio",
-						""
-					]
-				}
-			},
-			"response": []
 		}
 	],
 	"auth": {
@@ -2856,49 +2975,49 @@
 	],
 	"variable": [
 		{
-			"id": "a7958fd0-878a-4ccb-a898-7a74ffeb0c77",
+			"id": "aaad6f72-a1c8-44ea-92da-80c00ce0b66e",
 			"key": "baseUrl",
 			"value": "localhost:8000/api",
 			"type": "string"
 		},
 		{
-			"id": "fcb306ca-4dba-45ba-993d-abdfc5be409f",
+			"id": "20867c7c-98da-455f-8239-15e7cfe0ecd9",
 			"key": "idEstudio",
-			"value": 29,
+			"value": 224741,
 			"type": "number"
 		},
 		{
-			"id": "dc291cc6-c1f1-4b1c-aede-19abe6ad237e",
+			"id": "78d543d9-6c5c-4e38-bf23-a8c6be1f3e6c",
 			"key": "idObraSocial",
 			"value": "5",
 			"type": "string"
 		},
 		{
-			"id": "0a5c70ce-5cd4-4ccc-9715-9813106d80b4",
+			"id": "eb22c0b3-de42-4222-84a5-f381257c4432",
 			"key": "idPresentacion",
-			"value": 26,
+			"value": 16836,
 			"type": "number"
 		},
 		{
-			"id": "5691f8df-4b5c-4894-bcbf-d18d7c48fb67",
+			"id": "8f7175b5-01ae-401e-9c93-73a411484ecd",
 			"key": "idMedico",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "2f50fd83-dcf9-4f14-b998-3f1c618d594d",
+			"id": "fa4d5ad3-fcc0-4c90-9288-6241a41995b7",
 			"key": "idPaciente",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "2982f3f0-afb8-468a-9619-77db8ed283b1",
+			"id": "3d53acec-210e-4b9a-a857-22dd3361fd32",
 			"key": "idAnestesista",
 			"value": "1",
 			"type": "string"
 		},
 		{
-			"id": "10bf3a91-cd66-49e1-8143-4a578cdb6dbe",
+			"id": "b6d6cf12-2e1a-4246-9dca-78fa0d16b484",
 			"key": "idPractica",
 			"value": "1",
 			"type": "string"

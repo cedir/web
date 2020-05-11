@@ -201,6 +201,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
             response = JsonResponse({'error': ex.message}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
         return response
 
     @detail_route(methods=['patch'])
