@@ -1,7 +1,8 @@
 import simplejson
 from decimal import Decimal
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.core.validators import ValidationError
 from rest_framework import filters
 from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
@@ -164,32 +165,58 @@ class EstudioViewSet(viewsets.ModelViewSet):
         estudio = serializer.save()
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA')
 
+    @detail_route(methods=['put'])
+    def anular_pago_contra_factura(self, request, pk=None):
+        try:
+            estudio = Estudio.objects.get(pk=pk)
+            if not estudio.es_pago_contra_factura:
+                raise ValidationError('No se puede anular un estudio que no fue dado de pago contra factura')
+            estudio.anular_pago_contra_factura()
+            estudio.save()
+            add_log_entry(estudio, self.request.user, CHANGE, 'ANULA PAGO CONTRA FACTURA')
+            response = JsonResponse({}, status=status.HTTP_200_OK)
+        except ValidationError as e:
+            response = JsonResponse({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            response = JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return response
+
+    @detail_route(methods=['put'])
+    def realizar_pago_contra_factura(self, request, pk=None):
+        try:
+            importe = Decimal(request.data.get('pago_contra_factura'))
+            if importe < 0:
+                raise ValidationError('No se permiten valores negativos en el campo importe')
+
+            estudio = Estudio.objects.get(pk=pk)
+            if estudio.es_pago_contra_factura and importe == estudio.pago_contra_factura:
+                raise ValidationError('El importe ingresado debe ser distinto al importe anterior')
+
+            estudio.set_pago_contra_factura(importe)
+            estudio.save()
+            add_log_entry(estudio, self.request.user, CHANGE, 'PAGO CONTRA FACTURA')
+            response = JsonResponse({}, status=status.HTTP_200_OK)
+        except ValidationError as ex:
+            response = JsonResponse({'error': ex.message}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as ex:
+            response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return response
+
     @detail_route(methods=['patch'])
-    def update_importes_y_pago_contra_factura(self, request, pk=None):
+    def update_importes(self, request, pk=None):
         pension = request.data.get('pension')
         diferencia_paciente = request.data.get('diferencia_paciente')
         arancel_anestesia = request.data.get('arancel_anestesia')
-        pago_contra_factura = request.data.get('pago_contra_factura')
 
         estudio = Estudio.objects.get(pk=pk)
         estudio.pension = Decimal(pension)
         estudio.diferencia_paciente = Decimal(diferencia_paciente)
         estudio.arancel_anestesia = Decimal(arancel_anestesia)
-        pago_contra_factura = Decimal(pago_contra_factura)
 
         if estudio.presentacion_id:
             return Response({u'success': False, u'message': 'El estudio esta presentado/pcf y no se puede modificar'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if pago_contra_factura != estudio.pago_contra_factura:
-            try:
-                if pago_contra_factura > Decimal(0):
-                    estudio.set_pago_contra_factura(pago_contra_factura)
-                elif pago_contra_factura == Decimal(0):
-                    estudio.anular_pago_contra_factura()
-                else:
-                    return Response({u'success': False, u'message': 'No estan permitidos valores negativos'}, status=status.HTTP_400_BAD_REQUEST)
-            except Exception as ex:
-                return Response({u'success': False, u'message': ex.message}, status=status.HTTP_400_BAD_REQUEST)
 
         estudio.save()
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA IMPORTES')
