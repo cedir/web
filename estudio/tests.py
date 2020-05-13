@@ -93,21 +93,21 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
         self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
         self.client = Client(HTTP_POST='localhost')
         self.client.login(username='walter', password='xx11')
-        self.url = '/api/estudio/{}/update_importes_y_pago_contra_factura/'
+        self.url = '/api/estudio/{}'
         self.estudio = Estudio.objects.create(fecha=datetime.today().date(), paciente_id=1, practica_id=1, medico_id=1,
                                               obra_social_id=1, medico_solicitante_id=1, anestesista_id=1,
                                               pension=0, diferencia_paciente=0, arancel_anestesia=0)
 
     def test_importes_son_actualizados_correctamente(self):
-        data = {'pension': '123', 'diferencia_paciente': '234', 'arancel_anestesia': '4543',
-                'pago_contra_factura': '0'}
+        data = {'pension': '123', 'diferencia_paciente': '234', 'arancel_anestesia': '4543'}
 
         self.assertFalse(bool(self.estudio.presentacion_id))
         self.assertIsNone(self.estudio.fecha_cobro)
         self.assertFalse(self.estudio.es_pago_contra_factura)
         self.assertEqual(self.estudio.pago_contra_factura, Decimal(0))
 
-        response = self.client.patch(self.url.format(self.estudio.id),
+        url = self.url + '/update_importes/'
+        response = self.client.patch(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
         self.assertEquals(response.status_code, 200)
@@ -123,15 +123,15 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
     @patch('estudio.views.Estudio.set_pago_contra_factura')
     def test_pago_contra_factura_se_actualiza_si_el_importe_enviado_es_mayor_a_cero(self, set_pago_contra_factura_mock,
                                                                                     anular_pago_contra_factura_mock):
-        data = {'pension': '0', 'diferencia_paciente': '0', 'arancel_anestesia': '0',
-                'pago_contra_factura': '5656'}
+        data = {'pago_contra_factura': '5656'}
 
         self.assertFalse(bool(self.estudio.presentacion_id))
         self.assertIsNone(self.estudio.fecha_cobro)
         self.assertFalse(self.estudio.es_pago_contra_factura)
         self.assertEqual(self.estudio.pago_contra_factura, Decimal(0))
 
-        response = self.client.patch(self.url.format(self.estudio.id),
+        url = self.url + '/realizar_pago_contra_factura/'
+        response = self.client.put(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
         self.assertEquals(response.status_code, 200)
@@ -143,8 +143,7 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
     def test_pago_contra_factura_no_se_llama_si_el_importe_no_cambia(self, set_pago_contra_factura_mock,
                                                                      anular_pago_contra_factura_mock):
         importe_pcf = '200'
-        data = {'pension': '0', 'diferencia_paciente': '0', 'arancel_anestesia': '0',
-                'pago_contra_factura': importe_pcf}
+        data = {'pago_contra_factura': importe_pcf}
 
         self.assertFalse(bool(self.estudio.presentacion_id))
         self.estudio.es_pago_contra_factura = 1
@@ -152,54 +151,52 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
         self.estudio.fecha_cobro = datetime.today()
         self.estudio.save()
 
-        response = self.client.patch(self.url.format(self.estudio.id),
+        url = self.url + '/realizar_pago_contra_factura/'
+        response = self.client.put(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 400)
         self.assertFalse(set_pago_contra_factura_mock.called)
         self.assertFalse(anular_pago_contra_factura_mock.called)
 
     @patch('estudio.views.Estudio.anular_pago_contra_factura')
     @patch('estudio.views.Estudio.set_pago_contra_factura')
-    def test_pago_contra_factura_se_anula_si_el_importe_enviado_es_cero(self, set_pago_contra_factura_mock,
+    def test_pago_contra_factura_se_anula(self, set_pago_contra_factura_mock,
                                                                         anular_pago_contra_factura_mock):
-        data = {'pension': '0', 'diferencia_paciente': '0', 'arancel_anestesia': '0',
-                'pago_contra_factura': '0'}
-
         self.assertFalse(bool(self.estudio.presentacion_id))
         self.estudio.es_pago_contra_factura = 1
         self.estudio.pago_contra_factura = Decimal('200')
         self.estudio.fecha_cobro = datetime.today()
         self.estudio.save()
 
-        response = self.client.patch(self.url.format(self.estudio.id),
-                                     data=json.dumps(data), content_type='application/json')
+        url = self.url + '/anular_pago_contra_factura/'
+        response = self.client.put(url.format(self.estudio.id), content_type='application/json')
 
         self.assertEquals(response.status_code, 200)
         self.assertFalse(set_pago_contra_factura_mock.called)
         self.assertTrue(anular_pago_contra_factura_mock.called)
 
     def test_pago_contra_factura_devuelve_bad_request_si_falla_la_validacion(self):
-        data = {'pension': '0', 'diferencia_paciente': '0', 'arancel_anestesia': '0',
-                'pago_contra_factura': '200'}
+        data = {'pago_contra_factura': '200'}
 
         self.estudio.presentacion = Presentacion.objects.get(pk=1)  # no se puede dar de pago contra factura si esta presentado
         self.estudio.save()
 
-        response = self.client.patch(self.url.format(self.estudio.id),
+        url = self.url + '/realizar_pago_contra_factura/'
+        response = self.client.put(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
         self.assertEquals(response.status_code, 400)
 
     def test_pago_contra_factura_devuelve_bad_request_si_el_importe_es_negativo(self):
-        data = {'pension': '0', 'diferencia_paciente': '0', 'arancel_anestesia': '0',
-                'pago_contra_factura': '-200'}
+        data = {'pago_contra_factura': '-200'}
         self.assertFalse(bool(self.estudio.presentacion_id))
         self.assertIsNone(self.estudio.fecha_cobro)
         self.assertFalse(self.estudio.es_pago_contra_factura)
         self.assertEqual(self.estudio.pago_contra_factura, Decimal(0))
 
-        response = self.client.patch(self.url.format(self.estudio.id),
+        url = self.url + '/realizar_pago_contra_factura/'
+        response = self.client.put(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
         self.assertEquals(response.status_code, 400)
