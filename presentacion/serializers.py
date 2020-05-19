@@ -66,12 +66,10 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
         estudios_data = validated_data['estudios']
         estudios = Estudio.objects.filter(id__in=[e["id"] for e in estudios_data])
         del validated_data['estudios']
-        presentacion = Presentacion.objects.create(
-            comprobante=None,
-            iva=0,
-            estado=Presentacion.ABIERTO,
-            **validated_data
-        )
+        validated_data['comprobante'] = None
+        validated_data['iva'] = 0
+        validated_data['estado'] = Presentacion.ABIERTO
+        presentacion = Presentacion.objects.create(**validated_data)
         for estudio_data in estudios_data:
             estudio = Estudio.objects.get(pk=estudio_data['id'])
             estudio.presentacion = presentacion
