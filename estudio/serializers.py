@@ -71,7 +71,10 @@ class EstudioDePresetancionRetrieveSerializer(serializers.ModelSerializer):
 
     def get_importe_estudio(self, estudio):
         try:
-            arancel = ArancelObraSocial.objects.get(obra_social_id=estudio.obra_social_id, practica_id=estudio.practica_id).precio
+            if estudio.importe_estudio != Decimal('0.00'):
+                arancel = estudio.importe_estudio
+            else:
+                arancel = ArancelObraSocial.objects.get(obra_social_id=estudio.obra_social_id, practica_id=estudio.practica_id).precio
         except ArancelObraSocial.DoesNotExist:
             arancel = Decimal('0.00')
         return arancel
