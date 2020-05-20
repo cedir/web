@@ -2,7 +2,7 @@ import simplejson
 from django.http import JsonResponse
 from rest_framework import filters, viewsets, generics
 from rest_framework.decorators import detail_route
-from estudio.models import Estudio
+from estudio.models import Estudio, ID_SUCURSAL_CEDIR
 from obra_social.models import ObraSocial
 from estudio.serializers import EstudioDePresetancionRetrieveSerializer
 from obra_social.serializers import ObraSocialSerializer
@@ -32,7 +32,7 @@ class ObraSocialViewSet(viewsets.ModelViewSet):
         # El legacy le pone id=0
         # Como aca presentacion es FK (como corresponde), esto esta bastante DUDOSO por ahora y complica despues el serializer
         # Cuando el legacy arregle eso (o lo tiremos) esto deberia cambiar para buscar presentacion=None
-        sucursal = request.query_params.get(u'sucursal', default='Cedir')
+        sucursal = request.query_params.get(u'sucursal', default=ID_SUCURSAL_CEDIR)
         estudios = Estudio.objects.filter(
             obra_social__pk=pk,
             es_pago_contra_factura=0,
