@@ -289,11 +289,19 @@ class TestEstudiosDePresentacion(TestCase):
 
     def test_get_estudios_de_presentacion(self):
         presentacion = Presentacion.objects.get(pk=1)
-        n_estudios = len(presentacion.estudios.all())
-        assert n_estudios != 0
+        estudio = Estudio.objects.get(pk=1)
+        assert estudio.presentacion_id == 1
+        estudio.importe_estudio = 4
+        estudio.pension = 6
+        estudio.arancel_anestesia = 7
+        estudio.save()
         response = self.client.get('/api/presentacion/1/estudios/')
         estudios_response = json.loads(response.content)
-        assert len(estudios_response) == n_estudios
+        estudio_data = [e for e in estudios_response if e["id"] == 1][0]
+        assert Decimal(estudio_data["importe_estudio"]) == 4
+        assert Decimal(estudio_data["pension"]) == 6
+        assert Decimal(estudio_data["arancel_anestesia"]) == 7
+
 
 class TestCrearPresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',

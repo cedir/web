@@ -8,7 +8,7 @@ from presentacion.models import PagoPresentacion, Presentacion
 from obra_social.models import ObraSocial
 from comprobante.models import Comprobante, TipoComprobante, Gravado, LineaDeComprobante, ID_TIPO_COMPROBANTE_LIQUIDACION
 from estudio.models import Estudio
-from estudio.serializers import EstudioDePresetancionRetrieveSerializer
+from estudio.serializers import EstudioDePresentacionRetrieveSerializer
 from obra_social.serializers import ObraSocialSerializer
 from comprobante.serializers import ComprobanteSerializer
 
@@ -31,7 +31,7 @@ class PresentacionRetrieveSerializer(serializers.ModelSerializer):
     obra_social = ObraSocialSerializer()
     comprobante = ComprobanteSerializer()
     estado = EstadoField()
-    estudios = EstudioDePresetancionRetrieveSerializer(many=True)
+    estudios = EstudioDePresentacionRetrieveSerializer(many=True)
 
     class Meta:
         model = Presentacion

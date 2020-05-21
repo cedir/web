@@ -4,7 +4,7 @@ from rest_framework import filters, viewsets, generics
 from rest_framework.decorators import detail_route
 from estudio.models import Estudio, ID_SUCURSAL_CEDIR
 from obra_social.models import ObraSocial
-from estudio.serializers import EstudioDePresetancionRetrieveSerializer
+from estudio.serializers import EstudioSinPresentarSerializer
 from obra_social.serializers import ObraSocialSerializer
 
 class ObraSocialNombreFilterBackend(filters.BaseFilterBackend):
@@ -41,7 +41,7 @@ class ObraSocialViewSet(viewsets.ModelViewSet):
             sucursal=sucursal,
         ).order_by('fecha', 'id')
         try:
-            response = JsonResponse(EstudioDePresetancionRetrieveSerializer(estudios, many=True).data, status=200, safe=False)
+            response = JsonResponse(EstudioSinPresentarSerializer(estudios, many=True).data, status=200, safe=False)
         except Exception as ex:
             response = JsonResponse({'error': ex.message}, status=500)
         return response
