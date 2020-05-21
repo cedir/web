@@ -15,7 +15,7 @@ from presentacion.obra_social_custom_code.osde_presentacion_digital import \
     OsdeRowEstudio, OsdeRowMedicacion, OsdeRowPension, OsdeRowMaterialEspecifico
 from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowEstudio
 from estudio.models import Estudio
-from estudio.serializers import EstudioDePresetancionRetrieveSerializer
+from estudio.serializers import EstudioDePresentacionRetrieveSerializer
 from obra_social.models import ObraSocial
 from comprobante.models import Comprobante, LineaDeComprobante, Gravado, TipoComprobante, \
     ID_TIPO_COMPROBANTE_LIQUIDACION

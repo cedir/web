@@ -3,6 +3,7 @@
 Modulo encargado de la comunicacion con el Webservice de la AFIP.
 '''
 from datetime import date, datetime, timedelta
+from decimal import Decimal, ROUND_UP
 from xml.parsers.expat import ExpatError
 from httplib2 import ServerNotFoundError
 
@@ -158,10 +159,10 @@ class _Afip(object):
             punto_vta=comprobante_cedir.nro_terminal,
             cbt_desde=nro,
             cbt_hasta=nro,
-            imp_total=comprobante_cedir.total_facturado,
-            imp_neto=imp_neto,
-            imp_iva=imp_iva,
-            imp_op_ex=imp_op_ex,
+            imp_total=comprobante_cedir.total_facturado.quantize(Decimal('.01'), ROUND_UP),
+            imp_neto=imp_neto.quantize(Decimal('.01'), ROUND_UP),
+            imp_iva=imp_iva.quantize(Decimal('.01'), ROUND_UP),
+            imp_op_ex=imp_op_ex.quantize(Decimal('.01'), ROUND_UP),
             fecha_cbte=fecha, # Estas fechas no cambian nunca, pero son requisito de la AFIP para el concepto=2
             fecha_serv_desde=fecha,
             fecha_serv_hasta=fecha,
@@ -169,9 +170,15 @@ class _Afip(object):
 
         # Agregar el IVA
         if comprobante_cedir.gravado.id == IVA_10_5:
-            self.webservice.AgregarIva(iva_id=4, base_imp=imp_neto, importe=imp_iva)
+            self.webservice.AgregarIva(
+                iva_id=4,
+                base_imp=imp_neto.quantize(Decimal('.01'), ROUND_UP),
+                importe=imp_iva.quantize(Decimal('.01'), ROUND_UP))
         elif comprobante_cedir.gravado.id == IVA_21:
-            self.webservice.AgregarIva(iva_id=5, base_imp=imp_neto, importe=imp_iva)
+            self.webservice.AgregarIva(
+                iva_id=5,
+                base_imp=imp_neto.quantize(Decimal('.01'), ROUND_UP),
+                importe=imp_iva.quantize(Decimal('.01'), ROUND_UP))
 
         # Si hay comprobantes asociados, los agregamos.
         if comprobante_cedir.tipo_comprobante.id in [

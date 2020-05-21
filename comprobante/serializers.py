@@ -204,9 +204,7 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
         responsable = validated_data['responsable']
         tipo_comprobante = TipoComprobante.objects.get(pk=validated_data['tipo_comprobante_id'])
         iva = neto * gravado.porcentaje / Decimal("100.00")
-        iva = iva.quantize(Decimal('.01'), ROUND_UP)
         total = neto + iva
-        total = total.quantize(Decimal('.01'), ROUND_UP)
         concepto = validated_data["concepto"]
         del validated_data["neto"]
         del validated_data["concepto"]
