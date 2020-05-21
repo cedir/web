@@ -86,7 +86,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         sucursal = request
         estudios = presentacion.estudios.all().order_by('fecha', 'id')
         try:
-            response = JsonResponse(EstudioDePresetancionRetrieveSerializer(estudios, many=True).data, safe=False)
+            response = JsonResponse(EstudioDePresentacionRetrieveSerializer(estudios, many=True).data, safe=False)
         except Exception as ex:
             response = JsonResponse({'error': unicode(ex)}, status=500)
         return response
