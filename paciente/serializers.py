@@ -14,7 +14,7 @@ class PacienteFormSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Paciente
-        fields = ['id', 'dni', 'nombre', 'apellido', 'domicilio', 'telefono', 'sexo', 'fechaNacimiento', 'nroAfiliado', 'email']
+        fields = ['id', 'dni', 'nombre', 'apellido', 'domicilio', 'telefono', 'sexo', 'fechaNacimiento', 'nroAfiliado', 'infExtra', 'email']
 
     def to_internal_value(self, data):
         dni = data.get(u'dni')
@@ -27,6 +27,7 @@ class PacienteFormSerializer(serializers.ModelSerializer):
             'nombre': data.get('nombre'),
             'apellido': data.get('apellido'),
             'nroAfiliado': data.get(u'nro_afiliado', u''),
+            'infExtra': data.get(u'inf_extra', u''),
             'domicilio': data.get(u'domicilio', u''),
             'sexo': data.get(u'sexo', u''),
             'telefono': data.get(u'telefono', u''),

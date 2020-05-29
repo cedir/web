@@ -44,6 +44,9 @@ $(document).ready(function() {
 	    <label>Nro de afiliado:</label><input type="text" id="txtNroAfiliado" name="txtNroAfiliado" value="{{nro_afiliado}}"><span> Formato debe ser el nroAfiliado + espacio + otra informacion. Ej 1652357 PLAN 3</span>
       </div>
       <div class="form-row">
+	    <label>Informacion extra:</label><input type="text" id="txtInfExtra" name="txtInfExtra" value="{{inf_extra}}">
+      </div>
+      <div class="form-row">
 	    <label>Email:</label><input type="text" id="txtEmail" name="txtEmail" value="{{email}}">
       </div>
       {% if isCreate %}

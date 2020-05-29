@@ -46,6 +46,7 @@ def update_form(request, id_paciente):
         u'fecha_nacimiento': fecha_nacimiento,
         u'sexo': paciente.sexo,
         u'nro_afiliado': paciente.nroAfiliado,
+        u'inf_extra': paciente.infExtra,
         u'email': paciente.email or u'',
         u'logged_user_name': request.user.username,
     })

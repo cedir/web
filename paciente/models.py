@@ -20,6 +20,7 @@ class Paciente(models.Model):
     telefono = models.CharField(u"Telefono", max_length=200, db_column=u"tel", blank=True)
     sexo = models.CharField(max_length=50, choices=SEXOS, blank=True)
     nroAfiliado = models.CharField(u"Nro Afiliado", max_length=200, blank=True)
+    infExtra = models.CharField(u"Inf Extra", max_length=200, blank=True, null=True)
     email = models.CharField(u'Email', max_length=200, db_column=u"e_mail", blank=True, null=True)
 
     @property

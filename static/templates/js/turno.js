@@ -429,6 +429,7 @@ function createPaciente(createTurno) {
   var sexo = $("#txtSexo").val();
   var domicilio = $("#txtDomicilio").val();
   var nroAfiliado = $("#txtNroAfiliado").val();
+  var infExtra = $("#txtInfExtra").val();
   var email = $("#txtEmail").val();
 
   if (!nombre) {
@@ -455,7 +456,7 @@ function createPaciente(createTurno) {
     type: 'POST',
     data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
       "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
-      "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
+      "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&inf_extra=" + infExtra + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
@@ -484,6 +485,7 @@ function createAndAsignPaciente(createTurno) { //TODO: aca llamar a createPacien
   var sexo = $("#txtSexo").val();
   var domicilio = $("#txtDomicilio").val();
   var nroAfiliado = $("#txtNroAfiliado").val();
+  var infExtra = $("#txtInfExtra").val();
   var email = $("#txtEmail").val();
 
   if (!nombre) {
@@ -510,7 +512,7 @@ function createAndAsignPaciente(createTurno) { //TODO: aca llamar a createPacien
     type: 'POST',
     data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
       "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
-      "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
+      "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&inf_extra=" + infExtra + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         setPaciente(data.idPaciente, $("#txtNombre").val(), $("#txtApellido").val());
@@ -536,6 +538,7 @@ function updatePaciente() { //TODO: aca llamar a createPaciente para no repetir 
   var sexo = $("#txtSexo").val();
   var domicilio = $("#txtDomicilio").val();
   var nroAfiliado = $("#txtNroAfiliado").val();
+  var infExtra = $("#txtInfExtra").val();
   var email = $("#txtEmail").val();
 
   if (!nombre) {
@@ -562,7 +565,7 @@ function updatePaciente() { //TODO: aca llamar a createPaciente para no repetir 
     type: 'POST',
     data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
       "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
-      "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
+      "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&inf_extra=" + infExtra + "&_nocache=" + rand,
     success: function(data) {
       if (data.status) {
         alert(data.message);
