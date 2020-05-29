@@ -443,6 +443,8 @@ function verificarPaciente(paciente){
     alert("Error, el campo Telefono debe completarse.");
   else if(!isEmail(paciente.email))
     alert("Error, email no esta bien formado.");
+  else if(isNaN(paciente.nroAfiliado))
+    alert("Error, el numero de afiliado debe ser numerico. Si se quiere escribir otra informacion (por ejemplo, el plan) deben ser escritos en 'Informacion Extra'.");
   else
     return true;
   
@@ -455,7 +457,7 @@ function pacienteToPost(paciente){
     "&email=" + paciente.email + "&nro_afiliado=" + paciente.nroAfiliado + "&inf_extra=" + paciente.infExtra + "&_nocache=" + Math.round(100 * Math.random());
 }
 
-function pacienteToApi(paciente, successFunction, url, errorMessage, createTurno = false){
+function pacienteToApi(paciente, successFunction, url, errorMessage){
   $.ajax({
     url: url,
     dataType: 'json',
@@ -463,7 +465,7 @@ function pacienteToApi(paciente, successFunction, url, errorMessage, createTurno
     data: pacienteToPost(paciente),
     success: function(data) {
       if (data.status) {
-        successFunction(data, createTurno);
+        successFunction(data);
       } else {
         alert(data.message);
       }
@@ -480,9 +482,9 @@ function createPaciente(createTurno) {
   if(!verificarPaciente(paciente))
     return false;
 
-  function successFunction(data, crearTurno){
+  function successFunction(data){
     alert(data.message);
-    if (crearTurno) {
+    if (createTurno) {
       window.location.href = "/turno/disponibles/?id-paciente=" + data.idPaciente;
     } else {
       window.location.href = "/paciente/buscar/?dni=" + paciente.dni;
@@ -494,7 +496,7 @@ function createPaciente(createTurno) {
   pacienteToApi(paciente, successFunction, '/paciente/nuevo/', errorMessage, createTurno);
 }
 
-function createAndAsignPaciente(createTurno) {
+function createAndAsignPaciente() {
   var paciente = getPaciente();
 
   if(!verificarPaciente(paciente))
@@ -508,7 +510,6 @@ function createAndAsignPaciente(createTurno) {
   errorMessage = "Error, puede que ya exista un paciente con ese DNI. Verifique que se trate del mismo paciente y vuelva a intentarlo";
 
   pacienteToApi(paciente, successFunction, '/paciente/nuevo/', errorMessage);
-
 }
 
 function updatePaciente() {
