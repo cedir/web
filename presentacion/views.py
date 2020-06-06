@@ -25,7 +25,7 @@ from comprobante.serializers import crear_comprobante_serializer_factory
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
     serializer_class = PresentacionSerializer
-    filter_fields = ('obra_social',)
+    filter_fields = ('obra_social', 'sucursal')
     pagination_class = StandardResultsSetPagination
     page_size = 50
 
