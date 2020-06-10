@@ -36,40 +36,13 @@ class TestFormularioPaciente(TestCase):
         response = json.loads(self.client.post('/paciente/nuevo/', paciente).content)
 
         assert response['status'] == 1
-
-    def test_crear_paciente_falla_si_nro_afiliado_no_es_alfanumerico(self):
-        paciente = self.paciente_prueba
-        paciente['nro_afiliado'] = '12345.'
-
-        response = json.loads(self.client.post('/paciente/nuevo/', paciente).content)
-        assert response['status'] == 0
-
-        paciente['nro_afiliado'] = '12345 ab,cd'
-        response = json.loads(self.client.post('/paciente/nuevo/', paciente).content)
-        assert response['status'] == 0
-
-        paciente['nro_afiliado'] = '12345 abcd!'
-        response = json.loads(self.client.post('/paciente/nuevo/', paciente).content)
-        assert response['status'] == 0
-
-        paciente['nro_afiliado'] = '12345 abcd'
-        response = json.loads(self.client.post('/paciente/nuevo/', paciente).content)
-        assert response['status'] == 1
-
+        
     def test_crear_paciente_guarda_paciente_en_db(self):
         cantidad_inicial = Paciente.objects.count()
         response = json.loads(self.client.post('/paciente/nuevo/', self.paciente_prueba).content)
 
         assert response['status'] == 1
         assert Paciente.objects.count() == cantidad_inicial + 1
-
-    def test_crear_paciente_no_guarda_paciente_en_db_si_falla(self):
-        cantidad_inicial = Paciente.objects.count()
-        self.paciente_prueba['nro_afiliado'] = '12345!'
-        response = json.loads(self.client.post('/paciente/nuevo/', self.paciente_prueba).content)
-
-        assert response['status'] == 0
-        assert Paciente.objects.count() == cantidad_inicial
 
     def test_crear_paciente_guarda_informacion_extra(self):
         response = json.loads(self.client.post('/paciente/nuevo/', self.paciente_prueba).content)
@@ -107,25 +80,6 @@ class TestFormularioPaciente(TestCase):
 
         response = json.loads(self.client.post('/paciente/2/actualizar/', paciente).content)
 
-        assert response['status'] == 1
-
-    def test_update_paciente_falla_si_nro_afiliado_no_es_alfanumerico(self):
-        paciente = self.paciente_prueba
-        paciente['nro_afiliado'] = '12345.'
-
-        response = json.loads(self.client.post('/paciente/1/actualizar/', paciente).content)
-        assert response['status'] == 0
-
-        paciente['nro_afiliado'] = '12345 ab,cd'
-        response = json.loads(self.client.post('/paciente/1/actualizar/', paciente).content)
-        assert response['status'] == 0
-
-        paciente['nro_afiliado'] = '12345 abcd!'
-        response = json.loads(self.client.post('/paciente/1/actualizar/', paciente).content)
-        assert response['status'] == 0
-
-        paciente['nro_afiliado'] = '12345 abcd'
-        response = json.loads(self.client.post('/paciente/1/actualizar/', paciente).content)
         assert response['status'] == 1
     
     def test_update_actualiza_paciente_en_db(self):

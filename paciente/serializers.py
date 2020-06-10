@@ -37,8 +37,3 @@ class PacienteFormSerializer(serializers.ModelSerializer):
         }
 
         return super(PacienteFormSerializer, self).to_internal_value(datos)
-
-    def validate_nroAfiliado(self, nroAfiliado):
-        if not all(x.isalnum() or x.isspace() for x in nroAfiliado):
-            raise serializers.ValidationError('Error, el numero de afiliado debe contener solo letras y numeros')
-        return nroAfiliado

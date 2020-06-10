@@ -443,8 +443,6 @@ function verificarPaciente(paciente){
     alert("Error, el campo Telefono debe completarse.");
   else if(!isEmail(paciente.email))
     alert("Error, email no esta bien formado.");
-  else if(isNaN(paciente.nroAfiliado))
-    alert("Error, el numero de afiliado debe ser numerico. Si se quiere escribir otra informacion (por ejemplo, el plan) deben ser escritos en 'Informacion Extra'.");
   else
     return true;
   
