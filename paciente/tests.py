@@ -18,6 +18,7 @@ class TestFormularioPaciente(TestCase):
             'sexo': 'Femenino',
             'fecha_nacimiento': '01/01/1976',
             'nro_afiliado': '12345',
+            'informacion_extra': 'Plan 5',
             'email': 'lalala123@gmail.com',
         }
 
@@ -69,6 +70,29 @@ class TestFormularioPaciente(TestCase):
 
         assert response['status'] == 0
         assert Paciente.objects.count() == cantidad_inicial
+
+    def test_crear_paciente_guarda_informacion_extra(self):
+        response = json.loads(self.client.post('/paciente/nuevo/', self.paciente_prueba).content)
+        paciente = Paciente.objects.get(dni = self.paciente_prueba['dni'])
+
+        assert response['status'] == 1
+        assert paciente.informacion_extra == self.paciente_prueba['informacion_extra']
+
+    def test_update_paciente_actualiza_informacion_extra(self):
+        paciente_prueba = self.paciente_prueba
+        response = json.loads(self.client.post('/paciente/nuevo/', paciente_prueba).content)
+        paciente = Paciente.objects.get(dni = self.paciente_prueba['dni'])
+
+        assert response['status'] == 1
+        assert paciente.informacion_extra == paciente_prueba['informacion_extra']
+        
+        paciente_prueba['informacion_extra'] = "OSDE PLAN 1"
+
+        response = json.loads(self.client.post('/paciente/{}/actualizar/'.format(paciente.id), paciente_prueba).content)
+        paciente = Paciente.objects.get(dni = self.paciente_prueba['dni'])
+
+        assert response['status'] == 1
+        assert paciente.informacion_extra == "OSDE PLAN 1"
 
     def test_update_paciente_falla_si_dni_existe_en_db(self):
         paciente_db = Paciente.objects.get(pk=1)
