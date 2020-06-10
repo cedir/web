@@ -429,7 +429,7 @@ function getPaciente(){
     sexo: $("#txtSexo").val(),
     domicilio: $("#txtDomicilio").val(),
     nroAfiliado: $("#txtNroAfiliado").val(),
-    infExtra: $("#txtInfExtra").val(),
+    informacion_extra: $("#txtInformacionExtra").val(),
     email: $("#txtEmail").val(),
   }
 }
@@ -454,7 +454,7 @@ function verificarPaciente(paciente){
 function pacienteToPost(paciente){
   return "nombre=" + paciente.nombre + "&apellido=" + paciente.apellido + "&dni=" + paciente.dni +
     "&telefono=" + paciente.telefono + "&fecha_nacimiento=" + paciente.fechaNacimiento + "&sexo=" + paciente.sexo + "&domicilio=" + paciente.domicilio +
-    "&email=" + paciente.email + "&nro_afiliado=" + paciente.nroAfiliado + "&inf_extra=" + paciente.infExtra + "&_nocache=" + Math.round(100 * Math.random());
+    "&email=" + paciente.email + "&nro_afiliado=" + paciente.nroAfiliado + "&informacion_extra=" + paciente.informacion_extra + "&_nocache=" + Math.round(100 * Math.random());
 }
 
 function pacienteToApi(paciente, successFunction, url, errorMessage){
