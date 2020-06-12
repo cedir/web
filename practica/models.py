@@ -8,6 +8,7 @@ class Practica(models.Model):
     codigo_medico_osde = models.CharField(max_length=50, db_column="codigoMedicoOSDE", blank=True)
     abreviatura = models.CharField(max_length=20, blank=True)
     usedLevel = models.IntegerField(default=0)
+    porcentaje_medico = models.IntegerField(db_column="porcentajeMedico", default=0)
 
     class Meta:
         db_table = u'AlmacenEstudios'
