@@ -73,7 +73,7 @@ class AmrRowBase(object):
                self.medicamentos_y_descartables
 
     def format_nro_afiliado(self, paciente):
-        nro_afiliado = paciente.nroAfiliado.replace(' ', '')
+        nro_afiliado = paciente.nroAfiliado.split(u' ')[0]
         nro_afiliado = nro_afiliado.replace('-', '')
         nro_afiliado = nro_afiliado[:15]  # corto en 15
         return nro_afiliado

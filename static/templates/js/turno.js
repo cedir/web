@@ -419,162 +419,112 @@ function getInfoTurno() {
 }
 
 /********** PACIENTES **********/
+function getPaciente(){
+  return {
+    nombre: $("#txtNombre").val(),
+    apellido: $("#txtApellido").val(),
+    dni: $("#txtDni").val(),
+    telefono: $("#txtTelefono").val(),
+    fechaNacimiento: $("#txtFechaNacimiento").val(),
+    sexo: $("#txtSexo").val(),
+    domicilio: $("#txtDomicilio").val(),
+    nroAfiliado: $("#txtNroAfiliado").val(),
+    informacion_extra: $("#txtInformacionExtra").val(),
+    email: $("#txtEmail").val(),
+  }
+}
+
+function verificarPaciente(paciente){
+  if(!paciente.nombre)
+    alert("Error, el campo Nombre debe completarse.");
+  else if(!paciente.apellido)
+    alert("Error, el campo Apellido debe completarse.");
+  else if(!paciente.telefono)
+    alert("Error, el campo Telefono debe completarse.");
+  else if(!isEmail(paciente.email))
+    alert("Error, email no esta bien formado.");
+  else
+    return true;
+  
+  return false;
+}
+
+function pacienteToPost(paciente){
+  return "nombre=" + paciente.nombre + "&apellido=" + paciente.apellido + "&dni=" + paciente.dni +
+    "&telefono=" + paciente.telefono + "&fecha_nacimiento=" + paciente.fechaNacimiento + "&sexo=" + paciente.sexo + "&domicilio=" + paciente.domicilio +
+    "&email=" + paciente.email + "&nro_afiliado=" + paciente.nroAfiliado + "&informacion_extra=" + paciente.informacion_extra + "&_nocache=" + Math.round(100 * Math.random());
+}
+
+function pacienteToApi(paciente, successFunction, url, errorMessage){
+  $.ajax({
+    url: url,
+    dataType: 'json',
+    type: 'POST',
+    data: pacienteToPost(paciente),
+    success: function(data) {
+      if (data.status) {
+        successFunction(data);
+      } else {
+        alert(data.message);
+      }
+    },
+    error: function(XMLHttpRequest, textStatus, errorThrown) {
+      alert(errorMessage);
+    }
+  });
+}
+
 function createPaciente(createTurno) {
-  var rand = Math.round(100 * Math.random());
-  var nombre = $("#txtNombre").val();
-  var apellido = $("#txtApellido").val();
-  var dni = $("#txtDni").val();
-  var telefono = $("#txtTelefono").val();
-  var fechaNacimiento = $("#txtFechaNacimiento").val();
-  var sexo = $("#txtSexo").val();
-  var domicilio = $("#txtDomicilio").val();
-  var nroAfiliado = $("#txtNroAfiliado").val();
-  var email = $("#txtEmail").val();
+  var paciente = getPaciente();
+  
+  if(!verificarPaciente(paciente))
+    return false;
 
-  if (!nombre) {
-    alert("Error, el campo Nombre debe completarse.");
-    return false;
-  }
-  if (!apellido) {
-    alert("Error, el campo Apellido debe completarse.");
-    return false;
-  }
-  if (!telefono) {
-    alert("Error, el campo Telefono debe completarse.");
-    return false;
-  }
-
-  if (!isEmail(email)) {
-    alert("Error, email no esta bien formado.");
-    return false;
-  }
-
-  $.ajax({
-    url: '/paciente/nuevo/',
-    dataType: 'json',
-    type: 'POST',
-    data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
-      "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
-      "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
-    success: function(data) {
-      if (data.status) {
-        alert(data.message);
-        if (createTurno) {
-          window.location.href = "/turno/disponibles/?id-paciente=" + data.idPaciente;
-        } else {
-          window.location.href = "/paciente/buscar/?dni=" + dni;
-        }
-      } else { //error
-        alert(data.message);
-      }
-    },
-    error: function(XMLHttpRequest, textStatus, errorThrown) {
-      alert("Error, puede que ya exista un paciente con DNI " + dni + ". Verifique que se trate del mismo paciente y vuelva a intentarlo");
+  function successFunction(data){
+    alert(data.message);
+    if (createTurno) {
+      window.location.href = "/turno/disponibles/?id-paciente=" + data.idPaciente;
+    } else {
+      window.location.href = "/paciente/buscar/?dni=" + paciente.dni;
     }
-  });
+  }
+
+  errorMessage = "Error, puede que ya exista un paciente con ese DNI. Verifique que se trate del mismo paciente y vuelva a intentarlo";
+
+  pacienteToApi(paciente, successFunction, '/paciente/nuevo/', errorMessage, createTurno);
 }
 
-function createAndAsignPaciente(createTurno) { //TODO: aca llamar a createPaciente para no repetir codigo
-  var rand = Math.round(100 * Math.random());
-  var nombre = $("#txtNombre").val();
-  var apellido = $("#txtApellido").val();
-  var dni = $("#txtDni").val();
-  var telefono = $("#txtTelefono").val();
-  var fechaNacimiento = $("#txtFechaNacimiento").val();
-  var sexo = $("#txtSexo").val();
-  var domicilio = $("#txtDomicilio").val();
-  var nroAfiliado = $("#txtNroAfiliado").val();
-  var email = $("#txtEmail").val();
+function createAndAsignPaciente() {
+  var paciente = getPaciente();
 
-  if (!nombre) {
-    alert("Error, el campo Nombre debe completarse.");
+  if(!verificarPaciente(paciente))
     return false;
-  }
-  if (!apellido) {
-    alert("Error, el campo Apellido debe completarse.");
-    return false;
-  }
-  if (!telefono) {
-    alert("Error, el campo Telefono debe completarse.");
-    return false;
+
+  function successFunction(data){
+    setPaciente(data.idPaciente, $("#txtNombre").val(), $("#txtApellido").val());
+    $('#formCrearPaciente').clearForm();
   }
 
-  if (!isEmail(email)) {
-    alert("Error, email no esta bien formado.");
-    return false;
-  }
+  errorMessage = "Error, puede que ya exista un paciente con ese DNI. Verifique que se trate del mismo paciente y vuelva a intentarlo";
 
-  $.ajax({
-    url: '/paciente/nuevo/',
-    dataType: 'json',
-    type: 'POST',
-    data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
-      "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
-      "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
-    success: function(data) {
-      if (data.status) {
-        setPaciente(data.idPaciente, $("#txtNombre").val(), $("#txtApellido").val());
-        $('#formCrearPaciente').clearForm();
-      } else { //error
-        alert(data.message);
-      }
-    },
-    error: function(XMLHttpRequest, textStatus, errorThrown) {
-      alert("Error, puede que ya exista un paciente con DNI " + dni + ". Verifique que se trate del mismo paciente y vuelva a intentarlo");
-    }
-  });
+  pacienteToApi(paciente, successFunction, '/paciente/nuevo/', errorMessage);
 }
 
-function updatePaciente() { //TODO: aca llamar a createPaciente para no repetir codigo
-  var rand = Math.round(100 * Math.random());
+function updatePaciente() {
   var form = $("#form1");
-  var nombre = $("#txtNombre").val();
-  var apellido = $("#txtApellido").val();
-  var dni = $("#txtDni").val();
-  var telefono = $("#txtTelefono").val();
-  var fechaNacimiento = $("#txtFechaNacimiento").val();
-  var sexo = $("#txtSexo").val();
-  var domicilio = $("#txtDomicilio").val();
-  var nroAfiliado = $("#txtNroAfiliado").val();
-  var email = $("#txtEmail").val();
+  var paciente = getPaciente();
 
-  if (!nombre) {
-    alert("Error, el campo Nombre debe completarse.");
+  if(!verificarPaciente(paciente))
     return false;
-  }
-  if (!apellido) {
-    alert("Error, el campo Apellido debe completarse.");
-    return false;
-  }
-  if (!telefono) {
-    alert("Error, el campo Telefono debe completarse.");
-    return false;
+
+  function successFunction(data){
+    alert(data.message);
+    window.location.href = "/paciente/buscar/?dni=" + paciente.dni;
   }
 
-  if (!isEmail(email)) {
-    alert("Error, email no esta bien formado.");
-    return false;
-  }
+  errorMessage = "Se ha producido un error al intentar guardar. Salga y vuelva a intentarlo, si el error persiste, informe al administrador.";
 
-  $.ajax({
-    url: form.attr('action'),
-    dataType: 'json',
-    type: 'POST',
-    data: "nombre=" + nombre + "&apellido=" + apellido + "&dni=" + dni +
-      "&telefono=" + telefono + "&fecha_nacimiento=" + fechaNacimiento + "&sexo=" + sexo + "&domicilio=" + domicilio +
-      "&email=" + email + "&nro_afiliado=" + nroAfiliado + "&_nocache=" + rand,
-    success: function(data) {
-      if (data.status) {
-        alert(data.message);
-        window.location.href = "/paciente/buscar/?dni=" + dni;
-      } else { //error
-        alert(data.message);
-      }
-    },
-    error: function(XMLHttpRequest, textStatus, errorThrown) {
-      alert("Se ha producido un error al intentar guardar. Salga y vuelva a intentarlo, si el error persiste, informe al administrador.");
-    }
-  });
+  pacienteToApi(paciente, successFunction, form.attr('action'), errorMessage);
 }
 
 function buscarPacientes() {
