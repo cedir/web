@@ -105,7 +105,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             comprobante_data["neto"] = presentacion.total_facturado
             comprobante_data["nombre_cliente"] = obra_social.nombre
             comprobante_data["domicilio_cliente"] = obra_social.direccion
-            comprobante_data["nro_cuit"] = obra_social.nro_cuit
+            comprobante_data["nro_cuit"] = obra_social.nro_cuit.replace('-', '')
             comprobante_data["condicion_fiscal"] = obra_social.condicion_fiscal
             comprobante_data["concepto"] = "FACTURACION CORRESPONDIENTE A " + presentacion.periodo
             comprobante_data["fecha_emision"] = presentacion.fecha
