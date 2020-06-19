@@ -64,7 +64,6 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         estudios_data = validated_data['estudios']
-        estudios = Estudio.objects.filter(id__in=[e["id"] for e in estudios_data])
         del validated_data['estudios']
         validated_data['comprobante'] = None
         validated_data['iva'] = 0
@@ -77,10 +76,11 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
             estudio.importe_estudio = estudio_data.get("importe_estudio", estudio.importe_estudio)
             estudio.pension = estudio_data.get("pension", estudio.pension)
             estudio.diferencia_paciente = estudio_data.get("diferencia_paciente", estudio.diferencia_paciente)
-            estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
+            estudio.importe_medicacion = estudio.get_total_medicacion() + estudio.get_total_material_especifico()
             estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
-        presentacion.total_facturado = sum([e.get_importe_total() for e in estudios])
+        estudios = Estudio.objects.filter(id__in=[e["id"] for e in estudios_data])
+        presentacion.total_facturado = sum([e.get_importe_total_facturado() for e in estudios])
         presentacion.save()
         return presentacion
 
@@ -122,7 +122,6 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
         instance.periodo = validated_data.get("periodo", instance.periodo)
         instance.fecha = validated_data.get("fecha", instance.fecha)
         estudios_data = validated_data['estudios']
-        estudios = Estudio.objects.filter(id__in=[e["id"] for e in estudios_data])
         for estudio in instance.estudios.all():
             estudio.presentacion_id = 0
             estudio.save()
@@ -133,10 +132,11 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
             estudio.importe_estudio = estudio_data.get("importe_estudio", estudio.importe_estudio)
             estudio.pension = estudio_data.get("pension", estudio.pension)
             estudio.diferencia_paciente = estudio_data.get("diferencia_paciente", estudio.diferencia_paciente)
-            estudio.importe_medicacion = estudio_data.get("medicacion", estudio.importe_medicacion)
+            estudio.importe_medicacion = estudio.get_total_medicacion() + estudio.get_total_material_especifico()
             estudio.arancel_anestesia = estudio_data.get("arancel_anestesia", estudio.arancel_anestesia)
             estudio.save()
-        instance.total_facturado = sum([e.get_importe_total() for e in estudios])
+        estudios = Estudio.objects.filter(id__in=[e["id"] for e in estudios_data])
+        instance.total_facturado = sum([e.get_importe_total_facturado() for e in estudios])
         instance.save()
         return instance
     class Meta:

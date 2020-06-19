@@ -248,5 +248,14 @@
         "estudio": 9,
         "importe": "1.00"
     }
+},
+{
+    "model": "estudio.medicacion",
+    "pk": 3,
+    "fields": {
+        "medicamento": 2,
+        "estudio": 12,
+        "importe": "1.00"
+    }
 }
 ]
