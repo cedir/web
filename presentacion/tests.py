@@ -289,11 +289,19 @@ class TestEstudiosDePresentacion(TestCase):
 
     def test_get_estudios_de_presentacion(self):
         presentacion = Presentacion.objects.get(pk=1)
-        n_estudios = len(presentacion.estudios.all())
-        assert n_estudios != 0
+        estudio = Estudio.objects.get(pk=1)
+        assert estudio.presentacion_id == 1
+        estudio.importe_estudio = 4
+        estudio.pension = 6
+        estudio.arancel_anestesia = 7
+        estudio.save()
         response = self.client.get('/api/presentacion/1/estudios/')
         estudios_response = json.loads(response.content)
-        assert len(estudios_response) == n_estudios
+        estudio_data = [e for e in estudios_response if e["id"] == 1][0]
+        assert Decimal(estudio_data["importe_estudio"]) == 4
+        assert Decimal(estudio_data["pension"]) == 6
+        assert Decimal(estudio_data["arancel_anestesia"]) == 7
+
 
 class TestCrearPresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
@@ -320,7 +328,6 @@ class TestCrearPresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ],
@@ -337,6 +344,7 @@ class TestCrearPresentacion(TestCase):
         assert estudio.obra_social_id == 1
         assert estudio.presentacion_id == 0
         assert estudio.importe_estudio == Decimal("10000.00")
+        assert estudio.get_total_medicacion() + estudio.get_total_material_especifico() == 2
         datos = {
             "obra_social_id": 1,
             "periodo": "SEPTIEMBRE 2019",
@@ -349,7 +357,6 @@ class TestCrearPresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ],
@@ -359,6 +366,11 @@ class TestCrearPresentacion(TestCase):
         estudio = Estudio.objects.get(pk=9)
         assert estudio.presentacion_id != 0
         assert estudio.importe_estudio == 5
+        assert estudio.importe_medicacion == 2
+        assert estudio.diferencia_paciente == 1
+        assert estudio.pension == 1
+        assert estudio.arancel_anestesia == 1
+        assert estudio.get_importe_total_facturado() == 8 # 9 - 1
 
     def test_crear_presentacion_con_estudio_ya_presentado_falla(self):
         estudio_ya_presentado = Estudio.objects.get(pk=1)
@@ -375,7 +387,6 @@ class TestCrearPresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ],
@@ -400,7 +411,6 @@ class TestCrearPresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ],
@@ -425,7 +435,6 @@ class TestCrearPresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ],
@@ -436,6 +445,8 @@ class TestCrearPresentacion(TestCase):
         assert estudio.presentacion_id == response.data['id']
 
     def test_crear_presentacion_total_es_suma_importes_estudios(self):
+        estudio = Estudio.objects.get(pk=12)
+        assert estudio.get_total_medicacion() + estudio.get_total_material_especifico() == 1
         datos = {
             "obra_social_id": 1,
             "periodo": "perio3",
@@ -448,7 +459,6 @@ class TestCrearPresentacion(TestCase):
                     "importe_estudio": 1,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ]
@@ -457,7 +467,7 @@ class TestCrearPresentacion(TestCase):
         response = self.client.post('/api/presentacion/', data=json.dumps(datos),
                                 content_type='application/json')
         presentacion = Presentacion.objects.get(pk=response.data['id'])
-        assert presentacion.total_facturado == 3
+        assert presentacion.total_facturado == 3 # 4 - 1
 
     def test_crear_presentacion_falla_si_estudio_es_de_otra_sucursal(self):
         estudio = Estudio.objects.get(pk=9)
@@ -476,7 +486,6 @@ class TestCrearPresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ],
@@ -519,7 +528,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 },
                 {
@@ -528,7 +536,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ]
@@ -554,6 +561,7 @@ class TestUpdatePresentacion(TestCase):
         assert estudio.obra_social_id == 1
         assert estudio.presentacion_id == 0
         assert estudio.importe_estudio == Decimal("10000.00")
+        assert estudio.get_total_medicacion() + estudio.get_total_material_especifico() == 1
         datos = {
             "obra_social_id": 1,
             "periodo": "SEPTIEMBRE 2019",
@@ -565,7 +573,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 },
             ],
@@ -575,6 +582,11 @@ class TestUpdatePresentacion(TestCase):
         estudio = Estudio.objects.get(pk=12)
         assert estudio.presentacion_id != 0
         assert estudio.importe_estudio == 5
+        assert estudio.importe_medicacion == 1
+        assert estudio.diferencia_paciente == 1
+        assert estudio.pension == 1
+        assert estudio.arancel_anestesia == 1
+        assert estudio.get_importe_total_facturado() == 7 # 8 - 1
 
     def test_update_presentacion_cerrada_falla(self):
         # Tomamos una presentacion con dos estudios, quitamos uno y agregamos otro.
@@ -591,7 +603,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 },
                 {
@@ -600,7 +611,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ]
@@ -622,7 +632,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 },
                 {
@@ -631,7 +640,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ]
@@ -657,7 +665,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 },
             ]
@@ -679,7 +686,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 },
             ]
@@ -689,6 +695,8 @@ class TestUpdatePresentacion(TestCase):
         assert response.status_code == 400
 
     def test_update_presentacion_total_es_suma_importes_estudios(self):
+        estudio = Estudio.objects.get(pk=12)
+        assert estudio.get_total_medicacion() + estudio.get_total_material_especifico() == 1
         datos = {
             "periodo": "perio3",
             "fecha": "2019-12-25",
@@ -699,7 +707,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 1,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 }
             ]
@@ -708,7 +715,7 @@ class TestUpdatePresentacion(TestCase):
         response = self.client.patch('/api/presentacion/8/', data=json.dumps(datos),
                                 content_type='application/json')
         presentacion = Presentacion.objects.get(pk=8)
-        assert presentacion.total_facturado == 3
+        assert presentacion.total_facturado == 3 # 4 - 1
 
     def test_update_presentacion_con_estudio_de_otra_sucursal_falla(self):
         estudio = Estudio.objects.get(pk=12)
@@ -727,7 +734,6 @@ class TestUpdatePresentacion(TestCase):
                     "importe_estudio": 5,
                     "pension": 1,
                     "diferencia_paciente": 1,
-                    "medicacion": 1,
                     "arancel_anestesia": 1
                 },
             ]

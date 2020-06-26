@@ -15,7 +15,7 @@ from presentacion.obra_social_custom_code.osde_presentacion_digital import \
     OsdeRowEstudio, OsdeRowMedicacion, OsdeRowPension, OsdeRowMaterialEspecifico
 from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowEstudio
 from estudio.models import Estudio
-from estudio.serializers import EstudioDePresetancionRetrieveSerializer
+from estudio.serializers import EstudioDePresentacionRetrieveSerializer
 from obra_social.models import ObraSocial
 from comprobante.models import Comprobante, LineaDeComprobante, Gravado, TipoComprobante, \
     ID_TIPO_COMPROBANTE_LIQUIDACION
@@ -25,7 +25,7 @@ from comprobante.serializers import crear_comprobante_serializer_factory
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
     serializer_class = PresentacionSerializer
-    filter_fields = ('obra_social',)
+    filter_fields = ('obra_social', 'sucursal')
     pagination_class = StandardResultsSetPagination
     page_size = 50
 
@@ -60,7 +60,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
 
             response = HttpResponse(csv_string, content_type='text/plain')
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': str(ex)}), status=500, content_type='application/json')
+            response = HttpResponse(simplejson.dumps({'error': unicode(ex)}), status=500, content_type='application/json')
 
         return response
 
@@ -77,7 +77,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
 
             response = HttpResponse(csv_string[:-1], content_type='text/plain')
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': str(ex)}), status=500, content_type='application/json')
+            response = HttpResponse(simplejson.dumps({'error': unicode(ex)}), status=500, content_type='application/json')
         return response
 
     @detail_route(methods=['get'])
@@ -86,9 +86,9 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         sucursal = request
         estudios = presentacion.estudios.all().order_by('fecha', 'id')
         try:
-            response = JsonResponse(EstudioDePresetancionRetrieveSerializer(estudios, many=True).data, safe=False)
+            response = JsonResponse(EstudioDePresentacionRetrieveSerializer(estudios, many=True).data, safe=False)
         except Exception as ex:
-            response = JsonResponse({'error': str(ex)}, status=500)
+            response = JsonResponse({'error': unicode(ex)}, status=500)
         return response
 
     @detail_route(methods=['patch'])
@@ -105,7 +105,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             comprobante_data["neto"] = presentacion.total_facturado
             comprobante_data["nombre_cliente"] = obra_social.nombre
             comprobante_data["domicilio_cliente"] = obra_social.direccion
-            comprobante_data["nro_cuit"] = obra_social.nro_cuit
+            comprobante_data["nro_cuit"] = obra_social.nro_cuit.replace('-', '')
             comprobante_data["condicion_fiscal"] = obra_social.condicion_fiscal
             comprobante_data["concepto"] = "FACTURACION CORRESPONDIENTE A " + presentacion.periodo
             comprobante_data["fecha_emision"] = presentacion.fecha
@@ -120,9 +120,9 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
 
         except ValidationError as ex:
-            response = JsonResponse({'error': str(ex)}, status=400)
+            response = JsonResponse({'error': unicode(ex)}, status=400)
         except Exception as ex:
-            response = JsonResponse({'error': str(ex)}, status=500)
+            response = JsonResponse({'error': unicode(ex)}, status=500)
         return response
 
     @detail_route(methods=['patch'])
@@ -140,7 +140,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             presentacion.save()
             return JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
         except Exception as ex:
-            return JsonResponse({'error': str(ex)}, status=500)
+            return JsonResponse({'error': unicode(ex)}, status=500)
 
     @detail_route(methods=['patch'])
     def cobrar(self, request, pk=None):
@@ -162,7 +162,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         except Estudio.DoesNotExist:
                 response = JsonResponse({'error': "No existe un estudio con esa id"}, status=400)
         except ValidationError as ex:
-            response = JsonResponse({'error': str(ex)}, status=400)
+            response = JsonResponse({'error': unicode(ex)}, status=400)
         except Exception as ex:
-            response = JsonResponse({'error': str(ex)}, status=500)
+            response = JsonResponse({'error': unicode(ex)}, status=500)
         return response

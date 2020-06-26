@@ -109,16 +109,12 @@ class Estudio(models.Model):
         else:
             return Decimal("0.25")
 
-    def get_importe_total(self):
-        # TODO: escribir unit tests para este metodo, no se esta usando por ahora.
-        if self.fecha_cobro:
-            # TODO: ver bien como se calcula el total en caso de estar cobrado.
-            # hago raise por el momento, no tengo tiempo de verlo ahora
-            raise NotImplementedError
+    def get_importe_total_facturado(self):
         return Decimal(self.importe_estudio).quantize(Decimal('.01'), ROUND_UP) - \
                Decimal(self.diferencia_paciente).quantize(Decimal('.01'), ROUND_UP) + \
-               self.arancel_anestesia + Decimal(self.pension).quantize(Decimal('.01'), ROUND_UP) + \
-               self.importe_medicacion
+               Decimal(self.arancel_anestesia).quantize(Decimal('.01'), ROUND_UP) + \
+               Decimal(self.pension).quantize(Decimal('.01'), ROUND_UP) + \
+               Decimal(self.importe_medicacion).quantize(Decimal('.01'), ROUND_UP)
 
     def get_total_medicacion(self):
         """

@@ -56,7 +56,7 @@ class EstudioCreateUpdateSerializer(serializers.ModelSerializer):
         fields = (u'id',u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
             u'medico_solicitante', u'anestesista', u'motivo', u'informe', u'sucursal')
 
-class EstudioDePresetancionRetrieveSerializer(serializers.ModelSerializer):
+class EstudioSinPresentarSerializer(serializers.ModelSerializer):
     paciente = PacienteSerializer()
     practica = PracticaSerializer()
     medico = MedicoSerializer()
@@ -79,6 +79,10 @@ class EstudioDePresetancionRetrieveSerializer(serializers.ModelSerializer):
     def get_importe_medicacion(self, estudio):
         return estudio.get_total_medicacion()
 
+
+class EstudioDePresentacionRetrieveSerializer(EstudioSinPresentarSerializer):
+   def get_importe_estudio(self, estudio):
+        return estudio.importe_estudio
 
 class MedicacionSerializer(serializers.HyperlinkedModelSerializer):
     medicamento = MedicamentoSerializer()
