@@ -4,7 +4,8 @@ from httplib2 import ServerNotFoundError
 from mock import patch
 
 from django.test import TestCase
-from comprobante.models import Comprobante, TipoComprobante, Gravado, LineaDeComprobante
+from comprobante.models import Comprobante, TipoComprobante, Gravado, LineaDeComprobante, \
+    ID_DOCUMENTO_AFIP_TIPO_CUIT, ID_DOCUMENTO_AFIP_TIPO_CUIL, ID_DOCUMENTO_AFIP_TIPO_DNI
 from comprobante.afip import Afip, AfipErrorValidacion, AfipErrorRed
 
 
@@ -645,3 +646,28 @@ class TestAfipAPI(TestCase):
         })]
         afip.emitir_comprobante(nota_de_credito_electronica, lineas_nota_de_credito_electronica)
         assert nota_de_credito_electronica.cae == 1
+
+class TestTipoIdAfip(TestCase):
+    fixtures = ["comprobantes.json"]
+
+    def test_dni(self):
+        comprobante = Comprobante.objects.get(pk=1)
+        comprobante.nro_cuit = "38905723"
+        comprobante.save()
+        comprobante = Comprobante.objects.get(pk=1)
+        assert comprobante.tipo_id_afip == ID_DOCUMENTO_AFIP_TIPO_DNI
+
+    def test_cuil(self):
+        comprobante = Comprobante.objects.get(pk=1)
+        comprobante.nro_cuit = "20-38905723-7"
+        comprobante.save()
+        comprobante = Comprobante.objects.get(pk=1)
+        assert comprobante.tipo_id_afip == ID_DOCUMENTO_AFIP_TIPO_CUIL
+
+    def test_cuit(self):
+        comprobante = Comprobante.objects.get(pk=1)
+        comprobante.nro_cuit = "30-38905723-7"
+        comprobante.save()
+        comprobante = Comprobante.objects.get(pk=1)
+        assert comprobante.tipo_id_afip == ID_DOCUMENTO_AFIP_TIPO_CUIT
+

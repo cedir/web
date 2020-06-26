@@ -9,6 +9,10 @@ ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA = 5
 ID_TIPO_COMPROBANTE_NOTA_DE_DEBITO_ELECTRONICA = 6
 ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO_ELECTRONICA = 7
 
+ID_DOCUMENTO_AFIP_TIPO_CUIT = 80
+ID_DOCUMENTO_AFIP_TIPO_CUIL = 86
+ID_DOCUMENTO_AFIP_TIPO_DNI = 96
+
 class TipoComprobante(models.Model):
     nombre = models.CharField(max_length=128, db_column=u'tipoComprobante')
 
@@ -85,7 +89,12 @@ class Comprobante(models.Model):
 
     @property
     def tipo_id_afip(self):
-        return 80 if len(self.nro_cuit.replace('-', '')) > 10 else 96
+        if len(self.nro_cuit.replace('-', '')) <= 9:
+            return ID_DOCUMENTO_AFIP_TIPO_DNI
+        elif self.nro_cuit[0] == '2':
+            return ID_DOCUMENTO_AFIP_TIPO_CUIL
+        else:
+            return ID_DOCUMENTO_AFIP_TIPO_CUIT
 
     @property
     def nro_id_afip(self):
