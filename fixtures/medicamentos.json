@@ -26,7 +26,7 @@
             "descripcion": "material muy especifico",
             "importe": "1.00",
             "stock": 9001,
-            "tipo": "Material Especifico"
+            "tipo": "Mat Esp"
         }
     },
     {
@@ -36,7 +36,7 @@
             "descripcion": "material inespecifico",
             "importe": "1.00",
             "stock": 9001,
-            "tipo": "Material Especifico"
+            "tipo": "Mat Esp"
         }
     }
 ]

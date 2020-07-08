@@ -77,7 +77,7 @@ class EstudioSinPresentarSerializer(serializers.ModelSerializer):
         return arancel
 
     def get_importe_medicacion(self, estudio):
-        return estudio.get_total_medicacion()
+        return estudio.get_total_medicacion() + estudio.get_total_material_especifico()
 
 
 class EstudioDePresentacionRetrieveSerializer(EstudioSinPresentarSerializer):
