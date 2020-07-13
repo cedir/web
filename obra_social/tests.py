@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 import json
 
 from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import User
 
-from estudio.models import Estudio, ID_SUCURSAL_CEDIR
+from estudio.models import Estudio, Medicacion, ID_SUCURSAL_CEDIR
 from obra_social.models import ArancelObraSocial, ObraSocial
 
 class TestDetallesObrasSociales(TestCase):
@@ -27,11 +28,21 @@ class TestDetallesObrasSociales(TestCase):
     def test_estudios_sin_presentar_sugiere_importes(self):
         estudio = Estudio.objects.get(pk=12)
         arancel = ArancelObraSocial.objects.get(obra_social=1, practica=1)
+        medicacion = Medicacion.objects.get(pk=3)
+        mat_esp = Medicacion.objects.get(pk=4)
         assert estudio.presentacion_id == 0
         assert estudio.obra_social.pk == 1
         assert estudio.practica.pk == 1
+
+        assert medicacion.estudio.id == 12
+        assert medicacion.medicamento.tipo == u'Medicaci\xf3n'
+        assert medicacion.importe == 1
+        assert mat_esp.estudio.id == 12
+        assert mat_esp.medicamento.tipo == "Mat Esp"
+        assert mat_esp.importe == 1
+        assert len(estudio.estudioXmedicamento.all()) == 2
         response = self.client.get('/api/obra_social/1/estudios_sin_presentar/?sucursal={}'.format(ID_SUCURSAL_CEDIR), content_type='application/json')
         estudio_response = filter(lambda e: e["id"] == 12, json.loads(response.content))[0]
         estudio_response["importe_estudio"] == arancel.precio
-        estudio_response["importe_medicacion"] == estudio.get_total_medicacion()
+        estudio_response["importe_medicacion"] == 2
 
