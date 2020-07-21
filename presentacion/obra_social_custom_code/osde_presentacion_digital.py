@@ -88,7 +88,7 @@ class OsdeRowMedicacion(OsdeRowBase):
     def __init__(self, estudio, *args, **kwargs):
         super(OsdeRowMedicacion, self).__init__(estudio, *args, **kwargs)
         self.codigo_medico_osde = '925525'
-        self.importe = '{0:015}'.format(estudio.get_total_medicacion())
+        self.importe = '{0:015}'.format(estudio.get_total_medicacion_tipo_medicamentos())
         self.importe = '0{}'.format(self.importe.replace('.', ''))  # remuevo punto decimal, y agrego cero para complementar
 
 

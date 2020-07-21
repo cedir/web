@@ -164,7 +164,7 @@ class CalculadorInformeFactura(CalculadorInforme):
         '''
         def aux(est):
             try:
-                return est.get_total_medicacion()
+                return est.get_total_medicacion_tipo_medicamentos()
             except NotImplementedError:
                 return est.importe_medicacion
         if not self.presentacion:
@@ -175,7 +175,7 @@ class CalculadorInformeFactura(CalculadorInforme):
     def total_material_especifico(self):
         def aux(est):
             try:
-                return est.get_total_material_especifico()
+                return est.get_total_medicacion_tipo_material_especifico()
             except NotImplementedError:
                 return Decimal("0.00")
         if not self.presentacion:

@@ -344,7 +344,7 @@ class TestCrearPresentacion(TestCase):
         assert estudio.obra_social_id == 1
         assert estudio.presentacion_id == 0
         assert estudio.importe_estudio == Decimal("10000.00")
-        assert estudio.get_total_medicacion() + estudio.get_total_material_especifico() == 2
+        assert estudio.get_total_medicacion() == 2
         datos = {
             "obra_social_id": 1,
             "periodo": "SEPTIEMBRE 2019",
@@ -446,7 +446,7 @@ class TestCrearPresentacion(TestCase):
 
     def test_crear_presentacion_total_es_suma_importes_estudios(self):
         estudio = Estudio.objects.get(pk=12)
-        assert estudio.get_total_medicacion() + estudio.get_total_material_especifico() == 2
+        assert estudio.get_total_medicacion() == 2
         datos = {
             "obra_social_id": 1,
             "periodo": "perio3",
@@ -561,7 +561,7 @@ class TestUpdatePresentacion(TestCase):
         assert estudio.obra_social_id == 1
         assert estudio.presentacion_id == 0
         assert estudio.importe_estudio == Decimal("10000.00")
-        assert estudio.get_total_medicacion() + estudio.get_total_material_especifico() == 2
+        assert estudio.get_total_medicacion() == 2
         datos = {
             "obra_social_id": 1,
             "periodo": "SEPTIEMBRE 2019",
@@ -696,7 +696,7 @@ class TestUpdatePresentacion(TestCase):
 
     def test_update_presentacion_total_es_suma_importes_estudios(self):
         estudio = Estudio.objects.get(pk=12)
-        assert estudio.get_total_medicacion() + estudio.get_total_material_especifico() == 2
+        assert estudio.get_total_medicacion() == 2
         datos = {
             "periodo": "perio3",
             "fecha": "2019-12-25",
