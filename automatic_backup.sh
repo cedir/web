@@ -15,7 +15,15 @@
 # 3- Create directory of backups and give permissions to write (chmod a+w backup_file)
 # 4- Install mailutils (sudo apt install mailutils)
 # 5- Set up ssmtp https://wiki.archlinux.org/index.php/SSMTP
-# 4- Set up cron 
+# 4- Set up cron:
+# Format of cron:
+# MINUTE HOUR DAY MONTH DAY_OF_THE_WEEK
+# Example:
+#
+# crontab -e
+# 30 8 * * * /home/apps/scripts/automatic_backup.sh
+#
+# (Every day at 8:30)
 
 FILENAME_OUTPUT=db.out
 DIRECTORY_BACKUP=/home/dani/Trabajo
