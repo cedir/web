@@ -51,7 +51,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             for estudio in estudios:
                 csv_string = '{}\n{}'.format(csv_string, OsdeRowEstudio(estudio).get_row_osde())
 
-                if estudio.get_total_medicacion():
+                if estudio.get_total_medicacion_tipo_medicamentos():
                     csv_string = '{}\n{}'.format(csv_string, OsdeRowMedicacion(estudio).get_row_osde())
                 if estudio.pension:
                     csv_string = '{}\n{}'.format(csv_string, OsdeRowPension(estudio).get_row_osde())
