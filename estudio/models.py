@@ -116,7 +116,7 @@ class Estudio(models.Model):
                Decimal(self.pension).quantize(Decimal('.01'), ROUND_UP) + \
                Decimal(self.importe_medicacion).quantize(Decimal('.01'), ROUND_UP)
 
-    def get_total_medicacion(self):
+    def get_total_medicacion_tipo_medicamentos(self):
         """
         Return: total medicacion sin material especifico
         NOTA: si la presentacion esta cobrada, los registros estudioXmedicamento se borran,
@@ -134,11 +134,18 @@ class Estudio(models.Model):
 
         return Decimal(total_medicacion).quantize(Decimal('.01'), ROUND_UP)
 
-    def get_total_material_especifico(self):
+    def get_total_medicacion_tipo_material_especifico(self):
         if self.fecha_cobro:
             raise NotImplementedError('Imposible saber el total de material especifico ya que los registros'
                                       'estudioXmedicamento se han borrado')
         total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Mat Esp')])
+        return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
+
+    def get_total_medicacion(self):
+        if self.fecha_cobro:
+            raise NotImplementedError('Imposible saber el total de material especifico ya que los registros'
+                                      'estudioXmedicamento se han borrado')
+        total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.all()])
         return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
 
     def set_pago_contra_factura(self, importe):
