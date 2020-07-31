@@ -804,6 +804,7 @@ class TestCerrarPresentacion(TestCase):
         presentacion = Presentacion.objects.get(pk=1)
         presentacion.estado = Presentacion.ABIERTO
         presentacion.comprobante = None
+        assert presentacion.fecha != date.today()
         presentacion.save()
         datos = {
             "tipo_comprobante_id": 1,
@@ -819,6 +820,7 @@ class TestCerrarPresentacion(TestCase):
         assert presentacion.estado == Presentacion.PENDIENTE
         assert presentacion.comprobante is not None
         assert presentacion.comprobante.fecha_emision == date.today()
+        assert presentacion.comprobante.fecha_recepcion == date.today()
 
     @patch('comprobante.serializers.Afip')
     def test_cerrar_presentacion_con_liquidacion_ok(self, afip_mock):
@@ -827,6 +829,7 @@ class TestCerrarPresentacion(TestCase):
         afip.consultar_proximo_numero.return_value = 10
         presentacion = Presentacion.objects.get(pk=1)
         presentacion.estado = Presentacion.ABIERTO
+        presentacion.fecha = date.today()
         presentacion.save()
         datos = {
             "tipo_comprobante_id": 2,
@@ -839,7 +842,8 @@ class TestCerrarPresentacion(TestCase):
         assert presentacion.estado == Presentacion.PENDIENTE
         assert presentacion.comprobante is not None
         assert not afip.emitir_comprobante.called
-        assert presentacion.comprobante.fecha_emision == presentacion.fecha
+        assert presentacion.comprobante.fecha_emision == date.today()
+        assert presentacion.comprobante.fecha_recepcion == date.today()
 
     @patch('comprobante.serializers.Afip')
     def cerrar_presentacion_no_abierta_da_400(self, afip_mock):

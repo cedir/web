@@ -134,7 +134,7 @@ class CrearComprobanteLiquidacionSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Comprobante
         fields = ('neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', \
-            'condicion_fiscal', 'concepto', 'fecha_emision')
+            'condicion_fiscal', 'concepto', 'fecha_emision', 'fecha_recepcion')
 
     def create(self, validated_data):
         neto = validated_data["neto"]
@@ -152,6 +152,7 @@ class CrearComprobanteLiquidacionSerializer(serializers.ModelSerializer):
                     tipo_comprobante=ID_TIPO_COMPROBANTE_LIQUIDACION
                 ).order_by("-numero")[0].numero + 1,
                 total_facturado=neto,
+                total_cobrado=0,
                 **validated_data
             )
         linea = LineaDeComprobante.objects.create(
@@ -212,7 +213,9 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
                 estado=Comprobante.NO_COBRADO,
                 numero=0, # el numero nos lo va a dar la afip cuando emitamos
                 fecha_emision=date.today(),
+                fecha_recepcion=date.today(),
                 total_facturado=total,
+                total_cobrado=0, # Para que no explote el azul
                 nro_terminal=CEDIR_PTO_VENTA if responsable == "Cedir" else BRUNETTI_PTO_VENTA,
                 **validated_data
             )

@@ -205,6 +205,7 @@ class PagoPresentacionSerializer(serializers.ModelSerializer):
         presentacion.total_cobrado = total
         presentacion.estado = Presentacion.COBRADO
         presentacion.comprobante.estado = Comprobante.COBRADO
+        presentacion.comprobante.total_cobrado = total
         presentacion.comprobante.save()
         presentacion.save()
         return PagoPresentacion.objects.create(
