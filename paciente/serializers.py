@@ -5,13 +5,13 @@ from django.conf import settings
 
 
 class PacienteSerializer(serializers.HyperlinkedModelSerializer):
-    
+
     class Meta:
         model = Paciente
-        fields = (u'id', u'dni', u'nombre', u'apellido', u'_edad')
+        fields = (u'id', u'dni', u'nombre', u'apellido', u'_edad', 'nroAfiliado', 'informacion_extra')
 
 class PacienteFormSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Paciente
         fields = ['id', 'dni', 'nombre', 'apellido', 'domicilio', 'telefono', 'sexo', 'fechaNacimiento', 'nroAfiliado', 'informacion_extra', 'email']
