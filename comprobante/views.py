@@ -68,7 +68,7 @@ class InformeMensualView(generics.ListAPIView):
     serializer_class = ComprobanteListadoSerializer
 
     def list(self, request):
-        comprobantes = Comprobante.objects.exclude(estado=Comprobante.ANULADO)
+        comprobantes = Comprobante.objects.all()
         queryset = comprobantes.filter(fecha_emision__month=request.query_params["mes"],
                                        fecha_emision__year=request.query_params["anio"])
         data = [ComprobanteListadoSerializer(q, context={'calculador': calculador_informe_factory(q)}).data
