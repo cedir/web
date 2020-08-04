@@ -4,7 +4,7 @@ from caja.models import MovimientoCaja
 # Register your models here.
 class MovimientoCajaAdmin(admin.ModelAdmin):
     actions = None
-    fields = (u'fecha', u'hora', u'monto', u'concepto', u'estudio')
+    fields = (u'fecha', u'hora', u'monto', u'concepto', u'estudio', u'tipo', u'medico', u'estado')
     search_fields = [u'tipo', u'concepto']
     list_display = (u'fecha', u'hora', u'monto', u'monto_acumulado', u'concepto', u'estudio')
     raw_id_fields = (u'estudio', )
@@ -14,6 +14,8 @@ class MovimientoCajaAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
+            if obj.monto == None:
+                obj.monto = 0
             obj.monto_acumulado = obj.monto + MovimientoCaja.objects.last().monto_acumulado
         super(MovimientoCajaAdmin, self).save_model(request, obj, form, change)
 
