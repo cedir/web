@@ -32,9 +32,23 @@ class CajaFechaFilterBackend(BaseFilterBackend):
 
 class CajaEstadoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        pagado = request.query_params.get(u'pagado')
-        if pagado:
-            queryset = queryset.filter(estado=pagado)
+        estado = request.query_params.get(u'estado')
+        if estado:
+            queryset = queryset.filter(estado=estado)
+        return queryset
+
+class CajaTipoMovimientoFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        tipo = request.query_params.get(u'tipo_movimiento')
+        if tipo:
+            queryset = queryset.filter(tipo__descripcion__contains=tipo)
+        return queryset
+
+class CajaIncluirEstudioFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        estudio = request.query_params.get(u'incluir_estudio')
+        if estudio:
+            queryset = queryset.exclude(estudio__isnull=True)
         return queryset
 
 class MovimientoCajaViewSet(viewsets.ModelViewSet):
@@ -43,4 +57,5 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
     serializer_class = MovimientoCajaFullSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = (CajaEstadoFilterBackend, CajaConceptoFilterBackend,
-        CajaMedicoFilterBackend, CajaFechaFilterBackend)
+        CajaMedicoFilterBackend, CajaFechaFilterBackend, CajaTipoMovimientoFilterBackend,
+        CajaIncluirEstudioFilterBackend)
