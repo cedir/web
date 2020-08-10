@@ -34,7 +34,12 @@ class CajaEstadoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         estado = request.query_params.get(u'estado')
         if estado:
-            queryset = queryset.filter(estado=estado)
+            if estado.lower() == 'true':
+                queryset = queryset.filter(estado=True)
+            if estado.lower() == 'false':
+                queryset = queryset.filter(estado=False)
+            if estado.lower() == 'none' or estado.lower() == 'null':
+                queryset = queryset.filter(estado__isnull=True)
         return queryset
 
 class CajaTipoMovimientoFilterBackend(BaseFilterBackend):
