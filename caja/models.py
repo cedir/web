@@ -3,7 +3,6 @@ from medico.models import Medico
 from estudio.models import Estudio
 
 ESTADO_CHOICES = (
-    (None, "-"),
     (True, "Si"),
     (False, "No")
 )
@@ -26,7 +25,7 @@ class MovimientoCaja(models.Model):
     medico = models.ForeignKey(Medico, db_column='idMedico', blank=True, null=True)
     monto = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True)
     monto_acumulado = models.DecimalField(db_column='montoAcumulado', max_digits=14, decimal_places=2, blank=True, null=True)
-    estado = models.NullBooleanField("Pagado", choices=ESTADO_CHOICES)
+    estado = models.BooleanField("Pagado", choices=ESTADO_CHOICES, default=False)
 
     class Meta:
         db_table = 'tblCajaMovimientos'
