@@ -51,7 +51,10 @@ class CajaIncluirEstudioFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         estudio = request.query_params.get(u'incluir_estudio')
         if estudio:
-            queryset = queryset.exclude(estudio__isnull=True)
+            if estudio.lower() == 'true':
+                queryset = queryset.exclude(estudio__isnull=True)
+            if estudio.lower() == 'false':
+                queryset = queryset.exclude(estudio__isnull=False)
         return queryset
 
 class MovimientoCajaViewSet(viewsets.ModelViewSet):
