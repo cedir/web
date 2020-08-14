@@ -30,16 +30,6 @@ class CajaFechaFilterBackend(BaseFilterBackend):
             queryset = queryset.filter(fecha__lte=fecha_hasta)
         return queryset
 
-class CajaEstadoFilterBackend(BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        estado = request.query_params.get(u'estado')
-        if estado:
-            if estado.lower() == 'true':
-                queryset = queryset.filter(estado=True)
-            if estado.lower() == 'false':
-                queryset = queryset.filter(estado=False)
-        return queryset
-
 class CajaTipoMovimientoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         tipo = request.query_params.get(u'tipo_movimiento')
@@ -62,6 +52,6 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
     queryset = MovimientoCaja.objects.all().order_by('-id')
     serializer_class = MovimientoCajaFullSerializer
     pagination_class = StandardResultsSetPagination
-    filter_backends = (CajaEstadoFilterBackend, CajaConceptoFilterBackend,
-        CajaMedicoFilterBackend, CajaFechaFilterBackend, CajaTipoMovimientoFilterBackend,
+    filter_backends = (CajaConceptoFilterBackend, CajaMedicoFilterBackend,
+        CajaFechaFilterBackend, CajaTipoMovimientoFilterBackend,
         CajaIncluirEstudioFilterBackend)

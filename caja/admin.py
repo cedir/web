@@ -4,8 +4,7 @@ from caja.models import MovimientoCaja
 # Register your models here.
 class MovimientoCajaAdmin(admin.ModelAdmin):
     actions = None
-    fields = (u'fecha', u'hora', u'monto', u'concepto', u'estudio', u'tipo', u'medico', u'estado')
-    search_fields = [u'tipo', u'concepto']
+    fields = (u'fecha', u'hora', u'monto', u'concepto', u'tipo', u'estudio', u'medico')
     list_display = (u'fecha', u'hora', u'monto', u'monto_acumulado', u'concepto', u'estudio')
     raw_id_fields = (u'estudio', )
 
