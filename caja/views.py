@@ -3,6 +3,7 @@ from caja.models import MovimientoCaja
 from caja.serializers import MovimientoCajaFullSerializer
 from common.drf.views import StandardResultsSetPagination
 from rest_framework.filters import BaseFilterBackend
+from distutils.util import strtobool
 
 class CajaConceptoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -41,10 +42,7 @@ class CajaIncluirEstudioFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         estudio = request.query_params.get(u'incluir_estudio')
         if estudio:
-            if estudio.lower() == 'true':
-                queryset = queryset.exclude(estudio__isnull=True)
-            if estudio.lower() == 'false':
-                queryset = queryset.exclude(estudio__isnull=False)
+            queryset = queryset.exclude(estudio__isnull=strtobool(estudio))
         return queryset
 
 class MovimientoCajaViewSet(viewsets.ModelViewSet):
