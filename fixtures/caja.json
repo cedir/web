@@ -4,29 +4,27 @@
     "pk": 1,
     "fields": {
         "concepto": "ingreso X",
-        "fecha": "2019-02-07",
+        "fecha": "2019-02-03",
         "hora": "11:00",
         "tipo": 1,
         "estudio": null,
         "medico": null,
         "monto": 100,
-        "monto_acumulado": 100,
-        "estado": false
+        "monto_acumulado": 100
     }
 },
 {
     "model": "caja.movimientocaja",
     "pk": 2,
     "fields": {
-        "concepto": "ingreso X 1",
-        "fecha": "2019-02-07",
+        "concepto": "Arreglo error del personal",
+        "fecha": "2019-02-10",
         "hora": "12:00",
         "tipo": 2,
-        "estudio": null,
-        "medico": null,
+        "estudio": 1,
+        "medico": 2,
         "monto": 88.99,
-        "monto_acumulado": 100,
-        "estado": false
+        "monto_acumulado": 100
     }
 },
 {
@@ -37,11 +35,10 @@
         "fecha": "2019-02-07",
         "hora": "13:00",
         "tipo": 3,
-        "estudio": null,
-        "medico": null,
+        "estudio": 3,
+        "medico": 1,
         "monto": 999,
-        "monto_acumulado": 999,
-        "estado": false
+        "monto_acumulado": 999
     }
 },
 {
