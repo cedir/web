@@ -128,7 +128,7 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
 
 class SucursalFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        sucursal = request.query_params.get(u'sucursal')
+        sucursal = request.query_params.get(u'sucursal') or request.POST.get('sucursal', None)
         if sucursal:
             queryset = queryset.filter(sucursal=sucursal)
         else:
