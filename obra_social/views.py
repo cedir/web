@@ -43,5 +43,5 @@ class ObraSocialViewSet(viewsets.ModelViewSet):
         try:
             response = JsonResponse(EstudioSinPresentarSerializer(estudios, many=True).data, status=200, safe=False)
         except Exception as ex:
-            response = JsonResponse({'error': ex.message}, status=500)
+            response = JsonResponse({'error': str(ex)}, status=500)
         return response

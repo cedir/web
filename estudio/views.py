@@ -198,7 +198,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
             add_log_entry(estudio, self.request.user, CHANGE, 'PAGO CONTRA FACTURA')
             response = JsonResponse({}, status=status.HTTP_200_OK)
         except ValidationError as ex:
-            response = JsonResponse({'error': ex.message}, status=status.HTTP_400_BAD_REQUEST)
+            response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
