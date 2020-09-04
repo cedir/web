@@ -4,7 +4,7 @@ import random
 
 
 def encode(key):
-    random_letter = random.choice(string.letters)
+    random_letter = random.choice(string.ascii_letters)
     return random_letter + base64.urlsafe_b64encode(str(key))
 
 
