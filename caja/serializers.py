@@ -19,7 +19,7 @@ class MovimientoCajaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MovimientoCaja
-        fields = (u'id', u'concepto', u'monto', u'fecha', u'hora', u'tipo', u'estado')
+        fields = (u'id', u'concepto', u'monto', u'fecha', u'hora', u'tipo')
 
 
 class EstudioCajaSerializer(serializers.ModelSerializer):
@@ -40,5 +40,4 @@ class MovimientoCajaFullSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MovimientoCaja
-        fields = (u'id', u'concepto', u'estudio', u'monto', u'monto_acumulado', u'fecha', u'hora', u'tipo', u'estado',
-                  'medico')
+        fields = (u'id', u'concepto', u'estudio', u'monto', u'monto_acumulado', u'fecha', u'hora', u'tipo', 'medico')
