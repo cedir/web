@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-import simplejson
 
 from django.conf import settings
 from django.shortcuts import redirect
 from django.template import Template, Context, loader
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework import generics, status
@@ -75,7 +74,7 @@ def get_disponibilidad_medico(request, id_medico):
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
         }
-        return simplejson.dumps(response_dict)
+        return JsonResponse(response_dict)
 
     cond = {}
 
@@ -89,7 +88,7 @@ def get_disponibilidad_medico(request, id_medico):
         response_dict['horario'] += "<br />" + disp.dia + " de " + str(disp.horaInicio) + "hs a " + str(
             disp.horaFin) + "hs - " + disp.sala.nombre
 
-    return HttpResponse(simplejson.dumps(response_dict))
+    return JsonResponse(response_dict)
 
 
 def get_disponibilidad(request, id_disponibilidad):
@@ -99,7 +98,7 @@ def get_disponibilidad(request, id_disponibilidad):
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
         }
-        return simplejson.dumps(response_dict)
+        return JsonResponse(response_dict)
 
     disponibilidad = Disponibilidad.objects.get(id=id_disponibilidad)
 
@@ -109,7 +108,7 @@ def get_disponibilidad(request, id_disponibilidad):
         "dia": disponibilidad.dia, "sala": disponibilidad.sala.id
     }
 
-    return HttpResponse(simplejson.dumps(response_dict))
+    return JsonResponse(response_dict)
 
 
 def create_disponibilidad(request):
@@ -119,7 +118,7 @@ def create_disponibilidad(request):
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
         }
-        return simplejson.dumps(response_dict)
+        return JsonResponse(response_dict)
 
     disponibilidad = Disponibilidad()
     disponibilidad.dia = request.POST['id-dia']
@@ -135,7 +134,7 @@ def create_disponibilidad(request):
         'message': "El horario se ha creado correctamente."
     }
 
-    return HttpResponse(simplejson.dumps(response_dict))
+    return JsonResponse(response_dict)
 
 
 def update_disponibilidad(request, id_disponibilidad):
@@ -145,7 +144,7 @@ def update_disponibilidad(request, id_disponibilidad):
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
         }
-        return simplejson.dumps(response_dict)
+        return JsonResponse(response_dict)
 
     disponibilidad = Disponibilidad.objects.get(id=id_disponibilidad)
     disponibilidad.dia = request.POST['id-dia']
@@ -160,7 +159,7 @@ def update_disponibilidad(request, id_disponibilidad):
         'status': 1,
         'message': "El horario se ha actualizado correctamente."
     }
-    return HttpResponse(simplejson.dumps(response_dict))
+    return JsonResponse(response_dict)
 
 
 def delete_disponibilidad(request, id_disponibilidad):
@@ -170,7 +169,7 @@ def delete_disponibilidad(request, id_disponibilidad):
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
         }
-        return simplejson.dumps(response_dict)
+        return JsonResponse(response_dict)
 
     disponibilidad = Disponibilidad.objects.get(id=id_disponibilidad)
     disponibilidad.delete()
@@ -179,7 +178,7 @@ def delete_disponibilidad(request, id_disponibilidad):
         'status': 1,
         'message': "El horario ha sido eliminado correctamente."
     }
-    return HttpResponse(simplejson.dumps(response_dict))
+    return JsonResponse(response_dict)
 
 
 class MedicoNombreApellidoOMatriculaFilterBackend(filters.BaseFilterBackend):

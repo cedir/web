@@ -1,11 +1,10 @@
 # pylint: disable=no-name-in-module, import-error
-import simplejson
+import json
 from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import User
 
 from caja.models import MovimientoCaja
-from estudio.models import Estudio
 from distutils.util import strtobool
 
 
@@ -20,13 +19,13 @@ class ListadoCajaTest(TestCase):
 
     def test_listado(self):
         response = self.client.get('/api/caja/', {})
-        results = simplejson.loads(response.content).get('results')
+        results = json.loads(response.content).get('results')
         self.assertEquals(len(results), MovimientoCaja.objects.all().count())
 
     def test_filtro_concepto_funciona(self):
         parametro_busqueda = 'ingreso'
         response = self.client.get('/api/caja/?concepto={0}'.format(parametro_busqueda))
-        results = simplejson.loads(response.content).get('results')
+        results = json.loads(response.content).get('results')
 
         for result in results:
             assert parametro_busqueda in result['concepto']
@@ -36,7 +35,7 @@ class ListadoCajaTest(TestCase):
     def test_filtro_medico_funciona(self):
         parametro_busqueda = '1'
         response = self.client.get('/api/caja/?medico={0}'.format(parametro_busqueda))
-        results = simplejson.loads(response.content).get('results')
+        results = json.loads(response.content).get('results')
 
         for result in results:
             assert result['medico']['id'] == int(parametro_busqueda)
@@ -47,7 +46,7 @@ class ListadoCajaTest(TestCase):
         fecha_inicial = '2019-02-01'
         fecha_final = '2019-02-08'
         response = self.client.get('/api/caja/?fecha_desde={0}&fecha_hasta={1}'.format(fecha_inicial, fecha_final))
-        results = simplejson.loads(response.content).get('results')
+        results = json.loads(response.content).get('results')
 
         for result in results:
             fecha = map(int, result['fecha'].split('-'))
@@ -58,7 +57,7 @@ class ListadoCajaTest(TestCase):
     def test_filtro_tipo_movimiento_funciona(self):
         parametro_busqueda = 'General'
         response = self.client.get('/api/caja/?tipo_movimiento={0}'.format(parametro_busqueda))
-        results = simplejson.loads(response.content).get('results')
+        results = json.loads(response.content).get('results')
 
         for result in results:
             assert parametro_busqueda == result['tipo']['descripcion']
@@ -68,16 +67,16 @@ class ListadoCajaTest(TestCase):
     def test_filtro_estudio_funciona(self):
         parametro_busqueda = 'True'
         response = self.client.get('/api/caja/?incluir_estudio={0}'.format(parametro_busqueda))
-        results = simplejson.loads(response.content).get('results')
+        results = json.loads(response.content).get('results')
 
         for result in results:
             assert result['estudio'] is not None
 
         assert MovimientoCaja.objects.count() - MovimientoCaja.objects.filter(estudio__isnull=strtobool(parametro_busqueda)).count() == len(results)
-        
+
         parametro_busqueda = 'False'
         response = self.client.get('/api/caja/?incluir_estudio={0}'.format(parametro_busqueda))
-        results = simplejson.loads(response.content).get('results')
+        results = json.loads(response.content).get('results')
 
         for result in results:
             assert result['estudio'] is None

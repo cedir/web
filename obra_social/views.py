@@ -1,4 +1,3 @@
-import simplejson
 from django.http import JsonResponse
 from rest_framework import filters, viewsets, generics
 from rest_framework.decorators import detail_route

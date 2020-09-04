@@ -1,4 +1,3 @@
-import simplejson
 from decimal import Decimal
 
 from django.http import HttpResponse, JsonResponse
@@ -51,7 +50,7 @@ def add_default_medicacion(request):
         'message': "default medicacion added"
     }
 
-    return HttpResponse(simplejson.dumps(response_dict))
+    return JsonResponse(response_dict)
 
 
 class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
