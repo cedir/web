@@ -109,7 +109,7 @@ class TestAfipAPI(TestCase):
         assert mock_afip.call_count == 2
         afip.emitir_comprobante(comprobante, [])
         assert mock_afip.call_count == 3
-        mock_wsfev1.return_value.CAESolicitar.assert_is_called()
+        mock_wsfev1.return_value.CAESolicitar.assert_called()
 
     @patch("comprobante.afip._Afip.autenticar")
     @patch("comprobante.afip.WSAA")
@@ -136,7 +136,7 @@ class TestAfipAPI(TestCase):
         assert mock_afip.call_count == 2
         afip.emitir_comprobante(comprobante, [])
         assert mock_afip.call_count == 2
-        mock_wsfev1.return_value.CAESolicitar.assert_is_called()
+        mock_wsfev1.return_value.CAESolicitar.assert_called()
 
     @patch("comprobante.afip.WSAA")
     @patch("comprobante.afip.WSFEv1")

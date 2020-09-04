@@ -49,7 +49,8 @@ class CrearEstudioTest(TestCase):
         response = self.client.post('/api/estudio/', self.estudio_data)
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEquals(response.content, '{"practica":["This field is required."]}')
+        content = json.loads(response.content)
+        assert content["practica"] == ["This field is required."]
 
     def test_create_estudio_sucess_crea_un_log(self):
         ct = ContentType.objects.get_for_model(Estudio)
