@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
+import json
+
 from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import User
@@ -24,15 +27,18 @@ class TurnosTest(TestCase):
                            'fecha_turno': datetime.today().date(), 'id-sala': 1, 'id-paciente': 1, 'id-medico': 1,
                            'id-obra-social': 1, 'observacion_turno': 'test'}
 
-    def test_anunciar_truno(self):
+    def test_anunciar_turno(self):
         """
         Deberia crear un estudio por cada practica del turno.
         """
         self.assertEqual(Estudio.objects.all().count(), 0)
         turno = Turno.objects.get(pk=1)
-        
+
         response = self.client.post('/turno/1/anunciar/', {})
-        self.assertContains(response, '{"status": true, "message": "Success"}')
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == True
+        assert content["message"] == "Success"
         self.assertEqual(Estudio.objects.all().count(), turno.practicas.all().count())
 
     def test_anunciar_crea_logs_por_cada_estudio_creado_y_uno_para_el_anunciar(self):
@@ -44,7 +50,10 @@ class TurnosTest(TestCase):
         turno = Turno.objects.get(pk=1)
 
         response = self.client.post('/turno/1/anunciar/', {})
-        self.assertContains(response, '{"status": true, "message": "Success"}')
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == True
+        assert content["message"] == "Success"
 
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE).count(), 1)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_estudio.pk, action_flag=ADDITION).count(), turno.practicas.all().count())
@@ -54,7 +63,10 @@ class TurnosTest(TestCase):
         turno = Turno.objects.get(pk=1)
 
         response = self.client.post('/turno/1/anunciar/', {})
-        self.assertContains(response, '{"status": true, "message": "Success"}')
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == True
+        assert content["message"] == "Success"
         self.assertEqual(Estudio.objects.all().count(), turno.practicas.all().count())
         estudio = Estudio.objects.all().first()
         self.assertNotEquals(estudio.public_id, u'')
@@ -66,7 +78,10 @@ class TurnosTest(TestCase):
 
         turnos_count_inicial = Turno.objects.all().count()
         response = self.client.get('/turno/guardar/', self.turno_data)
-        self.assertContains(response, '{"status": 1, "message": "El turno se ha creado correctamente."}')
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == 1
+        assert content["message"] == "El turno se ha creado correctamente."
         self.assertEqual(Turno.objects.all().count(), turnos_count_inicial + 1)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=ADDITION).count(), 1)
 
@@ -84,10 +99,10 @@ class TurnosTest(TestCase):
         data['fecha_turno'] = turno_existente.fechaTurno
 
         response = self.client.get('/turno/guardar/', data)
-        self.assertContains(
-            response,
-            '{"status": 0, "message": "Error, se ha detectado superposici\u00f3n de turnos. Por favor, haga click en Mostrar y vuelva a intentarlo."}'
-        )
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == 0
+        assert content["message"] == u'Error, se ha detectado superposici\xf3n de turnos. Por favor, haga click en Mostrar y vuelva a intentarlo.'
         self.assertEqual(Turno.objects.all().count(), turnos_count_inicial)
 
     def test_guardar_truno_error_medico_de_licencia(self):
@@ -102,8 +117,10 @@ class TurnosTest(TestCase):
         data['fecha_turno'] = datetime.today().date()
 
         response = self.client.get('/turno/guardar/', data)
-
-        self.assertContains(response, '{"status": 0, "message": "El medico no atiende en la fecha seleccionada"}')
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == 0
+        assert content["message"] == "El medico no atiende en la fecha seleccionada"
         self.assertEqual(Turno.objects.all().count(), turnos_count_inicial)
 
     def test_guardar_truno_error_fecha_turno_es_feriado(self):
@@ -118,8 +135,10 @@ class TurnosTest(TestCase):
         data['fecha_turno'] = datetime.today().date()
 
         response = self.client.get('/turno/guardar/', data)
-
-        self.assertContains(response, '{"status": 0, "message": "El medico no atiende en la fecha seleccionada"}')
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == 0
+        assert content["message"] == "El medico no atiende en la fecha seleccionada"
         self.assertEqual(Turno.objects.all().count(), turnos_count_inicial)
 
     def test_modificar_turno_existente_success(self):
@@ -132,7 +151,10 @@ class TurnosTest(TestCase):
         turno.save()
 
         response = self.client.get('/turno/1/actualizar/', {'observacion': 'otra cosa', 'id-obra-social': 2})
-        self.assertContains(response, '{"status": 1, "message": "El turno se ha guardado correctamente."}')
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == 1
+        assert content["message"] == "El turno se ha guardado correctamente."
 
         turno = Turno.objects.get(pk=1)
         self.assertEquals(turno.obraSocial.id, 2)
@@ -147,7 +169,10 @@ class TurnosTest(TestCase):
         self.assertEquals(turno.estado.id, Estado.PENDIENTE)
 
         response = self.client.get('/turno/1/anular/', {'observacion_turno': 'descripcion anulacion'})
-        self.assertContains(response, '{"status": 1, "message": "El turno se ha anulado correctamente."}')
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == 1
+        assert content["message"] == "El turno se ha anulado correctamente."
 
         turno = Turno.objects.get(pk=1)
         self.assertEquals(turno.estado.id, Estado.ANULADO)
@@ -176,7 +201,10 @@ class TurnosTest(TestCase):
         self.assertEquals(turno.estado.id, Estado.PENDIENTE)
 
         response = self.client.get('/turno/1/confirmar/', {})
-        self.assertContains(response, '{"status": 1, "message": "El turno se ha confirmado correctamente."}')
+        assert response.content
+        content = json.loads(response.content)
+        assert content["status"] == 1
+        assert content["message"] == "El turno se ha confirmado correctamente."
 
         turno = Turno.objects.get(pk=1)
         self.assertEquals(turno.estado.id, Estado.CONFIRMADO)
