@@ -1,11 +1,8 @@
-import simplejson
 from datetime import date
-from decimal import Decimal
 
 from django.http import HttpResponse, JsonResponse
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.serializers import ValidationError
-from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from common.drf.views import StandardResultsSetPagination
 
@@ -16,10 +13,6 @@ from presentacion.obra_social_custom_code.osde_presentacion_digital import \
 from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowEstudio
 from estudio.models import Estudio
 from estudio.serializers import EstudioDePresentacionRetrieveSerializer
-from obra_social.models import ObraSocial
-from comprobante.models import Comprobante, LineaDeComprobante, Gravado, TipoComprobante, \
-    ID_TIPO_COMPROBANTE_LIQUIDACION
-from comprobante.afip import Afip, AfipErrorRed, AfipErrorValidacion, AfipError
 from comprobante.serializers import crear_comprobante_serializer_factory
 
 class PresentacionViewSet(viewsets.ModelViewSet):
@@ -58,11 +51,10 @@ class PresentacionViewSet(viewsets.ModelViewSet):
                 for material_esp in estudio.estudioXmedicamento.filter(medicamento__tipo=u'Mat Esp'):
                     csv_string = '{}\n{}'.format(csv_string, OsdeRowMaterialEspecifico(estudio, material_esp).get_row_osde())
 
-            response = HttpResponse(csv_string, content_type='text/plain')
+            return HttpResponse(csv_string, content_type='text/plain')
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': unicode(ex)}), status=500, content_type='application/json')
-
-        return response
+            response_dict = {'error': unicode(ex)}
+            return JsonResponse(response_dict, status=500)
 
     @detail_route(methods=['get'])
     def get_detalle_amr(self, request, pk=None):
@@ -75,10 +67,10 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             for estudio in estudios:
                 csv_string = '{}{}\n'.format(csv_string, AmrRowEstudio(estudio, comprobante).get_row())
 
-            response = HttpResponse(csv_string[:-1], content_type='text/plain')
+            return HttpResponse(csv_string[:-1], content_type='text/plain')
         except Exception as ex:
-            response = HttpResponse(simplejson.dumps({'error': unicode(ex)}), status=500, content_type='application/json')
-        return response
+            response_dict = {'error': unicode(ex)}
+            return JsonResponse(response_dict, status=500)
 
     @detail_route(methods=['get'])
     def estudios(self, request, pk=None):

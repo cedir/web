@@ -1,12 +1,10 @@
 from django.conf import settings
 from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, filters
 from django.template import Context, loader
 from paciente.models import Paciente
-from datetime import datetime
-import simplejson
 from models import Paciente
 from serializers import PacienteSerializer, PacienteFormSerializer
 
@@ -117,7 +115,7 @@ def create(request):
     else:
         response_dict = {'status': 0, 'message': paciente.errors[next(iter(paciente.errors))]}
 
-    return HttpResponse(simplejson.dumps(response_dict))
+    return JsonResponse(response_dict)
 
 def update(request, id_paciente):
     paciente = PacienteFormSerializer(Paciente.objects.get(pk=id_paciente), data = request.POST)
@@ -132,7 +130,7 @@ def update(request, id_paciente):
     else:
         response_dict = {'status': 0, 'message': paciente.errors[next(iter(paciente.errors))]}
 
-    return HttpResponse(simplejson.dumps(response_dict))
+    return JsonResponse(response_dict)
 
 class PacienteNombreApellidoODniFilterBackend(filters.BaseFilterBackend):
     
