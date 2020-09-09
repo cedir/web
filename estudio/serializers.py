@@ -2,7 +2,7 @@ from rest_framework import serializers
 from estudio.models import Estudio, Medicacion
 from presentacion.models import Presentacion
 from obra_social.models import ArancelObraSocial
-from obra_social.serializers import ObraSocialSerializer
+from obra_social.serializers import ObraSocialPensionSerializer
 from paciente.serializers import PacienteSerializer
 from medico.serializers import MedicoSerializer
 from anestesista.serializers import AnestesistaSerializer
@@ -26,7 +26,7 @@ class PresentacionSmallSerializer(serializers.ModelSerializer):
         model = Presentacion
 
 class EstudioSerializer(serializers.ModelSerializer):
-    obra_social = ObraSocialSerializer()
+    obra_social = ObraSocialPensionSerializer()
     paciente = PacienteSerializer()
     practica = PracticaSerializer()
     medico = MedicoSerializer()
