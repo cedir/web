@@ -17,8 +17,6 @@ from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from imprimir import generar_informe
 
-from estudio.models import ID_SUCURSAL_CEDIR, ID_SUCURSAL_HOSPITAL_ITALIANO
-
 def imprimir(request, id_estudio):
 
     estudio = Estudio.objects.get(pk=id_estudio)
@@ -130,8 +128,6 @@ class SucursalFilterBackend(filters.BaseFilterBackend):
         sucursal = request.query_params.get(u'sucursal')
         if sucursal:
             queryset = queryset.filter(sucursal=sucursal)
-        else:
-            queryset = queryset.filter(sucursal=ID_SUCURSAL_CEDIR)
 
         return queryset
 

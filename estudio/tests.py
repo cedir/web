@@ -238,11 +238,3 @@ class RetreiveEstudiosTest(TestCase):
 
         for estudio in response:
             self.assertEqual(results[estudio['id'] - 1].sucursal, ID_SUCURSAL_HOSPITAL_ITALIANO)
-
-    def test_filtro_por_sucursal_devuelve_estudios_cedir_si_no_se_envia_sucursal(self):
-        results = Estudio.objects.all()
-
-        response = json.loads(self.client.get('/api/estudio/', content_type='application/json').content)['results']
-
-        for estudio in response:
-            self.assertEqual(results[estudio['id'] - 1].sucursal, ID_SUCURSAL_CEDIR)
