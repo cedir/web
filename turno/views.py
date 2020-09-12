@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
-import simplejson
 
 from django.core.exceptions import ValidationError
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.shortcuts import redirect
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, QueryDict, JsonResponse
 from django.conf import settings
 from django.template import Context, loader
 from django.utils.dateparse import parse_date
@@ -144,8 +143,7 @@ def get_turno(request, id_turno):
         turno = Turno.objects.get(id=id_turno)
     except Turno.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
 
     ct = ContentType.objects.get_for_model(Turno)
 
@@ -180,7 +178,7 @@ def get_turno(request, id_turno):
         # observacion_anulacion": ...
     }
 
-    return HttpResponse(simplejson.dumps(response_dict))
+    return JsonResponse(response_dict)
 
 
 def get_turnos_disponibles(request):
@@ -217,8 +215,8 @@ def guardar(request):
     err_sup = 'Error, se ha detectado superposición de turnos. Por favor, haga click en Mostrar y vuelva a intentarlo.'
     # session check
     if not request.user.is_authenticated():
-        resp_dict = {'status': 0, 'message': err_ses}
-        return HttpResponse(simplejson.dumps(resp_dict))
+        response_dict = {'status': 0, 'message': err_ses}
+        return JsonResponse(response_dict)
 
     hora_inicio = request.GET['hora_inicio']
     hora_fin_estimada = request.GET['hora_fin_estimada']
@@ -234,9 +232,9 @@ def guardar(request):
     )
 
     if len(arr_turnos) > 0:
-        resp_dict = {'status': 0, 'message': err_sup}
-        json = simplejson.dumps(resp_dict)
-        return HttpResponse(json)
+        response_dict = {'status': 0, 'message': err_sup}
+        return JsonResponse(response_dict)
+
 
     id_paciente = request.GET['id-paciente']
     id_practicas = request.GET.getlist('id-practicas[]')
@@ -246,9 +244,8 @@ def guardar(request):
 
     if (_is_feriado(fecha_turno) or _is_medico_con_licencia(fecha_turno, id_medico)):
         err_no_atiende = 'El medico no atiende en la fecha seleccionada'
-        resp_dict = {'status': 0, 'message': err_no_atiende}
-        json = simplejson.dumps(resp_dict)
-        return HttpResponse(json)
+        response_dict = {'status': 0, 'message': err_no_atiende}
+        return JsonResponse(response_dict)
 
     try:
         paciente = Paciente.objects.get(id=id_paciente)
@@ -274,24 +271,22 @@ def guardar(request):
 
         add_log_entry(turno, request.user, ADDITION, 'CREA')
 
-        resp_dict = {'status': 1, 'message': "El turno se ha creado correctamente."}
-        return HttpResponse(simplejson.dumps(resp_dict))
+        response_dict = {'status': 1, 'message': "El turno se ha creado correctamente."}
+        return JsonResponse(response_dict)
 
     except Paciente.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe el paciente"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
     except Exception as err:
         response_dict = {'status': 0, 'message': str(err)}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
 
 
 def update(request, id_turno):
     # session check
     if not request.user.is_authenticated():
-        resp_dict = {'status': 0, 'message': err_ses}
-        return HttpResponse(simplejson.dumps(resp_dict))
+        response_dict = {'status': 0, 'message': err_ses}
+        return JsonResponse(response_dict)
 
     id_obra_social = request.GET['id-obra-social']
     observacion = request.GET['observacion']
@@ -309,25 +304,22 @@ def update(request, id_turno):
         add_log_entry(turno, request.user, CHANGE, "MODIFICA")
 
         response_dict = {'status': 1, 'message': "El turno se ha guardado correctamente."}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
 
     except Turno.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
     except ValidationError as e:
         response_dict = {'status': 0, 'message': e.message}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
     except Exception as err:
         return str(err)
 
 
 def anunciar(request, id_turno):
     if not request.user.is_authenticated():
-        resp_dict = {'status': 0, 'message': err_ses}
-        return HttpResponse(simplejson.dumps(resp_dict))
+        response_dict = {'status': 0, 'message': err_ses}
+        return JsonResponse(response_dict)
 
     try:
         turno = Turno.objects.get(id=id_turno)
@@ -357,27 +349,23 @@ def anunciar(request, id_turno):
         add_log_entry(turno, request.user, CHANGE, "ANUNCIA")
 
         response_dict = {'status': True, 'message': "Success"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
 
     except Turno.DoesNotExist:
         response_dict = {'status': False, 'message': "Error, no existe turno"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
     except ValidationError as e:
         response_dict = {'status': 0, 'message': e.message}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
     except Exception as err:
         response_dict = {'status': False, 'message': str(err)}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
 
 
 def anular(request, id_turno):
     if not request.user.is_authenticated():
-        resp_dict = {'status': 0, 'message': err_ses}
-        return HttpResponse(simplejson.dumps(resp_dict))
+        response_dict = {'status': 0, 'message': err_ses}
+        return JsonResponse(response_dict)
 
     observacion_turno = request.GET['observacion_turno']
 
@@ -397,25 +385,22 @@ def anular(request, id_turno):
         add_log_entry(turno, request.user, CHANGE, "ANULA")
 
         response_dict = {'status': 1, 'message': "El turno se ha anulado correctamente."}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
 
     except Turno.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
     except ValidationError as e:
         response_dict = {'status': 0, 'message': e.message}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
     except Exception as err:
         return str(err)
 
 
 def reprogramar(request, id_turno):
     if not request.user.is_authenticated():
-        resp_dict = {'status': 0, 'message': err_ses}
-        return HttpResponse(simplejson.dumps(resp_dict))
+        response_dict = {'status': 0, 'message': err_ses}
+        return JsonResponse(response_dict)
 
     observacion_turno = request.GET['observacion_turno']
 
@@ -452,8 +437,8 @@ def reprogramar(request, id_turno):
 
 def confirmar(request, id_turno):
     if not request.user.is_authenticated():
-        resp_dict = {'status': 0, 'message': err_ses}
-        return HttpResponse(simplejson.dumps(resp_dict))
+        response_dict = {'status': 0, 'message': err_ses}
+        return JsonResponse(response_dict)
 
     try:
         turno = Turno.objects.get(id=id_turno)
@@ -466,17 +451,14 @@ def confirmar(request, id_turno):
         add_log_entry(turno, request.user, CHANGE, "CONFIRMA")
 
         response_dict = {'status': 1, 'message': "El turno se ha confirmado correctamente."}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
 
     except Turno.DoesNotExist:
         response_dict = {'status': 0, 'message': "Error, no existe turno"}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
     except ValidationError as e:
         response_dict = {'status': 0, 'message': e.message}
-        json = simplejson.dumps(response_dict)
-        return HttpResponse(json)
+        return JsonResponse(response_dict)
     except Exception as err:
         return str(err)
 
