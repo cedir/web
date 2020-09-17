@@ -14,7 +14,7 @@ ID_DOCUMENTO_AFIP_TIPO_CUIL = 86
 ID_DOCUMENTO_AFIP_TIPO_DNI = 96
 
 class TipoComprobante(models.Model):
-    nombre = models.CharField(max_length=128, db_column=u'tipoComprobante')
+    nombre = models.CharField(max_length=128, db_column='tipoComprobante')
 
     class Meta:
         db_table = 'tblComprobantesTipo'
@@ -24,8 +24,8 @@ class TipoComprobante(models.Model):
 
 
 class Gravado(models.Model):
-    descripcion = models.CharField(max_length=128, db_column=u'descripcionGravado')
-    porcentaje = models.DecimalField(db_column=u'porcentajeGravado', max_digits=4, decimal_places=2)
+    descripcion = models.CharField(max_length=128, db_column='descripcionGravado')
+    porcentaje = models.DecimalField(db_column='porcentajeGravado', max_digits=4, decimal_places=2)
 
     class Meta(object):
         db_table = 'tblGravado'
@@ -33,9 +33,9 @@ class Gravado(models.Model):
 
 class Comprobante(models.Model):
 
-    ANULADO = u'ANULADO'
-    NO_COBRADO = u'NO COBRADO'
-    COBRADO = u'COBRADO'
+    ANULADO = 'ANULADO'
+    NO_COBRADO = 'NO COBRADO'
+    COBRADO = 'COBRADO'
 
     ESTADOS = (
         (ANULADO, ANULADO),
@@ -43,26 +43,26 @@ class Comprobante(models.Model):
         (COBRADO, COBRADO),
     )
 
-    nombre_cliente = models.CharField(max_length=128, db_column=u'nombreCliente')
-    domicilio_cliente = models.CharField(max_length=128, db_column=u'domicilioCliente')
-    nro_cuit = models.CharField(max_length=128, db_column=u'nroCuit')
-    gravado_paciente = models.CharField(max_length=128, db_column=u'gravadoPaciente', null=True)
-    condicion_fiscal = models.CharField(max_length=128, db_column=u'condicionFiscal')
+    nombre_cliente = models.CharField(max_length=128, db_column='nombreCliente')
+    domicilio_cliente = models.CharField(max_length=128, db_column='domicilioCliente')
+    nro_cuit = models.CharField(max_length=128, db_column='nroCuit')
+    gravado_paciente = models.CharField(max_length=128, db_column='gravadoPaciente', null=True)
+    condicion_fiscal = models.CharField(max_length=128, db_column='condicionFiscal')
     responsable = models.CharField(max_length=128, )
-    sub_tipo = models.CharField(max_length=50, db_column=u'subTipo')
+    sub_tipo = models.CharField(max_length=50, db_column='subTipo')
     estado = models.CharField(max_length=50, choices=ESTADOS)
-    numero = models.IntegerField(db_column=u'nroComprobante', )
-    nro_terminal = models.SmallIntegerField(db_column=u'nroTerminal', default=1)
-    total_facturado = models.DecimalField(db_column=u'totalFacturado', max_digits=16, decimal_places=2, default=0)
-    total_cobrado = models.DecimalField(db_column=u'totalCobrado', max_digits=16, decimal_places=2, null=True)
-    fecha_emision = models.DateField(db_column=u'fechaEmision')
-    fecha_recepcion = models.DateField(db_column=u'fechaRecepcion', null=True)
+    numero = models.IntegerField(db_column='nroComprobante', )
+    nro_terminal = models.SmallIntegerField(db_column='nroTerminal', default=1)
+    total_facturado = models.DecimalField(db_column='totalFacturado', max_digits=16, decimal_places=2, default=0)
+    total_cobrado = models.DecimalField(db_column='totalCobrado', max_digits=16, decimal_places=2, null=True)
+    fecha_emision = models.DateField(db_column='fechaEmision')
+    fecha_recepcion = models.DateField(db_column='fechaRecepcion', null=True)
 
-    tipo_comprobante = models.ForeignKey(TipoComprobante, db_column=u'idTipoComprobante')
-    factura = models.ForeignKey(u'comprobante.Comprobante', db_column=u'idFactura', null=True, blank=True)
-    gravado = models.ForeignKey(Gravado, db_column=u'gravado', null=True, blank=True)
+    tipo_comprobante = models.ForeignKey(TipoComprobante, db_column='idTipoComprobante')
+    factura = models.ForeignKey('comprobante.Comprobante', db_column='idFactura', null=True, blank=True)
+    gravado = models.ForeignKey(Gravado, db_column='gravado', null=True, blank=True)
 
-    cae = models.CharField(max_length=128, db_column=u'CAE', null=True, blank=True)
+    cae = models.CharField(max_length=128, db_column='CAE', null=True, blank=True)
     vencimiento_cae = models.DateField(db_column='vencimientoCAE', blank=True, null=True)
 
     @property
@@ -143,17 +143,17 @@ class Comprobante(models.Model):
 
     class Meta(object):
         permissions = (
-            ("informe_ventas", u"Permite generar el informe de ventas."),
+            ("informe_ventas", "Permite generar el informe de ventas."),
         )
         db_table = 'tblComprobantes'
 
 
 class LineaDeComprobante(models.Model):
-    comprobante = models.ForeignKey(Comprobante, db_column=u'idComprobante', related_name=u'lineas')
+    comprobante = models.ForeignKey(Comprobante, db_column='idComprobante', related_name='lineas')
     concepto = models.CharField(max_length=128, )
-    sub_total = models.DecimalField(db_column=u'subtotal', max_digits=16, decimal_places=2)
-    iva = models.DecimalField(db_column=u'importeIVA', max_digits=16, decimal_places=2)
-    importe_neto = models.DecimalField(db_column=u'importeNeto', max_digits=16, decimal_places=2)
+    sub_total = models.DecimalField(db_column='subtotal', max_digits=16, decimal_places=2)
+    iva = models.DecimalField(db_column='importeIVA', max_digits=16, decimal_places=2)
+    importe_neto = models.DecimalField(db_column='importeNeto', max_digits=16, decimal_places=2)
 
     class Meta(object):
         db_table = 'tblComprobanteLineas'

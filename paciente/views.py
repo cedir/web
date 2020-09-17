@@ -5,13 +5,13 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, filters
 from django.template import Context, loader
 from paciente.models import Paciente
-from models import Paciente
-from serializers import PacienteSerializer, PacienteFormSerializer
+from .models import Paciente
+from .serializers import PacienteSerializer, PacienteFormSerializer
 
 
 def create_form(request):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     c = Context({
@@ -25,7 +25,7 @@ def create_form(request):
 
 def update_form(request, id_paciente):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     paciente = get_object_or_404(Paciente, pk=id_paciente)
@@ -35,18 +35,18 @@ def update_form(request, id_paciente):
         fecha_nacimiento = paciente.fechaNacimiento.strftime(settings.FORMAT_DATE)
 
     c = Context({
-        u'id': paciente.id,
-        u'dni': paciente.dni,
-        u'nombre': paciente.nombre,
-        u'apellido': paciente.apellido,
-        u'domicilio': paciente.domicilio,
-        u'telefono': paciente.telefono,
-        u'fecha_nacimiento': fecha_nacimiento,
-        u'sexo': paciente.sexo,
-        u'nro_afiliado': paciente.nroAfiliado,
-        u'informacion_extra': paciente.informacion_extra or u'',
-        u'email': paciente.email or u'',
-        u'logged_user_name': request.user.username,
+        'id': paciente.id,
+        'dni': paciente.dni,
+        'nombre': paciente.nombre,
+        'apellido': paciente.apellido,
+        'domicilio': paciente.domicilio,
+        'telefono': paciente.telefono,
+        'fecha_nacimiento': fecha_nacimiento,
+        'sexo': paciente.sexo,
+        'nro_afiliado': paciente.nroAfiliado,
+        'informacion_extra': paciente.informacion_extra or '',
+        'email': paciente.email or '',
+        'logged_user_name': request.user.username,
     })
 
     t = loader.get_template('turnos/ABMPaciente.html')
@@ -55,7 +55,7 @@ def update_form(request, id_paciente):
 
 def buscar_form(request):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     cond = {}
@@ -94,9 +94,9 @@ def buscar_form(request):
         'dni': dni,
     })
 
-    template_name = u'turnos/buscarPaciente.html'
-    if request_type == u'ajax':
-        template_name = u'turnos/buscarPacienteAjax.html'
+    template_name = 'turnos/buscarPaciente.html'
+    if request_type == 'ajax':
+        template_name = 'turnos/buscarPacienteAjax.html'
 
     t = loader.get_template(template_name)
     return HttpResponse(t.render(c))
@@ -138,11 +138,11 @@ class PacienteNombreApellidoODniFilterBackend(filters.BaseFilterBackend):
     Filtro de pacientes por nombre o apellido
     """
     def filter_queryset(self, request, queryset, view):
-        search_text = request.query_params.get(u'search_text')
+        search_text = request.query_params.get('search_text')
 
 
         if search_text:
-            if unicode.isdigit(search_text):
+            if str.isdigit(search_text):
                 queryset = queryset.filter(Q(dni__icontains=search_text))
             else:
                 search_params = [x.strip() for x in search_text.split(',')]

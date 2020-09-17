@@ -20,7 +20,7 @@ font_bld = 'Helvetica-Bold'
 max_char = 24
 
 mensajes = {
-    'mensaje_leyenda_honorarios': u'Este comprobante contiene honorarios por cuenta y órden de médicos.',
+    'mensaje_leyenda_honorarios': 'Este comprobante contiene honorarios por cuenta y órden de médicos.',
     'mensaje_legal_factura_electronica': ('Pasados 30 días corridos de recibida sin \n'
                         'haberse producido el rechazo total, aceptación\n'
                         'o pago de esta FACTURA DE CREDITO\n'
@@ -40,22 +40,22 @@ responsables = {
     'cedir': {
         'CBU': '0150506102000109564632',
         'CUIT': '30709300152',
-        'nombre': u'C.E.DI.R Centro de Endoscopia Digestiva',
-        'razon': u'C.E.D.I.R Sociedad Colectiva',
-        'direccion': u'Bv. Oroño 1564. - Rosario Sud, Santa Fe.',
-        'condicion_iva': u'IVA Responsable Inscripto',
+        'nombre': 'C.E.DI.R Centro de Endoscopia Digestiva',
+        'razon': 'C.E.D.I.R Sociedad Colectiva',
+        'direccion': 'Bv. Oroño 1564. - Rosario Sud, Santa Fe.',
+        'condicion_iva': 'IVA Responsable Inscripto',
         'condicion_ib': '021-335420-4',
         'inicio_actividades': '30/06/2005',
     },
     'brunetti': {
         'CUIT': '20118070659',
-        'nombre': u'Brunetti Jose Edgar Alberto',
-        'razon': u'Brunetti Jose Edgar Alberto',
-        'direccion': u'Bv. Oroño 1564. - Rosario Sud, Santa Fe.',
-        'condicion_iva': u'IVA Responsable Inscripto',
+        'nombre': 'Brunetti Jose Edgar Alberto',
+        'razon': 'Brunetti Jose Edgar Alberto',
+        'direccion': 'Bv. Oroño 1564. - Rosario Sud, Santa Fe.',
+        'condicion_iva': 'IVA Responsable Inscripto',
         'condicion_ib': 'Excento',
         'inicio_actividades': '02/01/1992',
-        'mensaje': u'"MÉDICO GASTROENTERÓLOGO Mat. Nro. 9314"',
+        'mensaje': '"MÉDICO GASTROENTERÓLOGO Mat. Nro. 9314"',
     }
 }
 
@@ -138,25 +138,25 @@ def zona_izquierda(p, responsable):
 
     # Nombre Grande
     t.setFont(font_bld, 16)
-    t.textLines(u'\n'.join(wrap(responsable['nombre'].upper(), 25)))
+    t.textLines('\n'.join(wrap(responsable['nombre'].upper(), 25)))
 
     # Nombre
     t.setFont(font_bld, th)
-    t.textOut(u'Razón Social: ')
+    t.textOut('Razón Social: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
     t.textLine(responsable['razon'])
 
     # Domicilio
     t.setFont(font_bld, th)
-    t.textOut(u'Domicilio Comercial: ')
+    t.textOut('Domicilio Comercial: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
     t.textLine(responsable['direccion'])
 
     # Condición IVA
     t.setFont(font_bld, th)
-    t.textOut(u'Condición frente al IVA: ')
+    t.textOut('Condición frente al IVA: ')
     t.setFont(font_std, th)
     t.setLeading(ld)
     t.textLine(responsable['condicion_iva'])
@@ -189,10 +189,10 @@ def zona_derecha(p, cabecera, responsable):
     # Punto y Numero
     t.setFont(font_bld, th)
     t.setLeading(fc*ld)
-    t.textLine(u'Punto de Venta: {punto_venta:04d}    Comp.Nro: {numero:08d}'.format(**cabecera))
+    t.textLine('Punto de Venta: {punto_venta:04d}    Comp.Nro: {numero:08d}'.format(**cabecera))
 
     # Fecha de emisión
-    t.textOut(u'Fecha de Emisión: ')
+    t.textOut('Fecha de Emisión: ')
     t.setFont(font_std, th)
     t.setLeading(sp)
     t.textLine(cabecera['fecha'])
@@ -200,28 +200,28 @@ def zona_derecha(p, cabecera, responsable):
     # CBU
     if cabecera['id_tipo_comprobante'] == ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA:
         t.setFont(font_bld, th)
-        t.textOut(u'CBU: ')
+        t.textOut('CBU: ')
         t.setFont(font_std, th)
         t.setLeading(fc*ld)
         t.textLine(responsable['CBU'])
 
     # CUIT
     t.setFont(font_bld, th)
-    t.textOut(u'CUIT: ')
+    t.textOut('CUIT: ')
     t.setFont(font_std, th)
     t.setLeading(fc*ld)
     t.textLine(responsable['CUIT'])
 
     # Ingresos Brutos
     t.setFont(font_bld, th)
-    t.textOut(u'Ingresos Brutos: ')
+    t.textOut('Ingresos Brutos: ')
     t.setFont(font_std, th)
     t.setLeading(fc*ld)
     t.textLine(responsable['condicion_ib'])
 
     # Inicio de actividades
     t.setFont(font_bld, th)
-    t.textOut(u'Inicio de Actividades: ')
+    t.textOut('Inicio de Actividades: ')
     t.setFont(font_std, th)
     t.setLeading(fc*ld)
     t.textLine(responsable['inicio_actividades'])
@@ -258,19 +258,19 @@ def post_encabezado(p, cabecera):
 
     # Período desde
     t.setFont(font_bld, th)
-    t.textOut(u'Período Facturado Desde: ')
+    t.textOut('Período Facturado Desde: ')
     t.setFont(font_std, th)
     t.textOut(cabecera['desde'])
 
     # ... hasta
     t.setFont(font_bld, th)
-    t.textOut(u'    Hasta: ')
+    t.textOut('    Hasta: ')
     t.setFont(font_std, th)
     t.textOut(cabecera['hasta'])
 
     #
     t.setFont(font_bld, th)
-    t.textOut(u'    Fecha Vencimiento Pago: ')
+    t.textOut('    Fecha Vencimiento Pago: ')
     t.setFont(font_std, th)
     t.textOut(cabecera['vencimiento'])
 
@@ -292,31 +292,31 @@ def datos_cliente(p, cliente):
 
     # Razón Social
     t.setFont(font_bld, th)
-    t.textOut(u'Apellido y Nombre / Razón Social: ')
+    t.textOut('Apellido y Nombre / Razón Social: ')
     t.setFont(font_std, th)
     t.textLine(cliente['nombre'])
 
     # Domicilio
     t.setFont(font_bld, th)
-    t.textOut(u'Domicilio Comercial: ')
+    t.textOut('Domicilio Comercial: ')
     t.setFont(font_std, th)
     t.textLine(cliente['direccion'])
 
     # CUIT
     t.setFont(font_bld, th)
-    t.textOut(u'CUIT: ' if len(cliente['CUIT']) > 10 else u'DNI: ')
+    t.textOut('CUIT: ' if len(cliente['CUIT']) > 10 else 'DNI: ')
     t.setFont(font_std, th)
     t.textLine(cliente['CUIT'])
 
     # Condición frente al IVA
     t.setFont(font_bld, th)
-    t.textOut(u'Condición frente al IVA: ')
+    t.textOut('Condición frente al IVA: ')
     t.setFont(font_std, th)
     t.textLine(cliente['condicion_iva'])
 
     # Condición de venta
     t.setFont(font_bld, th)
-    t.textOut(u'Condición de venta: ')
+    t.textOut('Condición de venta: ')
     t.setFont(font_std, th)
     t.textLine(cliente['condicion_venta'])
 
@@ -329,8 +329,8 @@ def detalle_lineas(p, header, sizes, lineas):
     tw = width - 2*margin
     table = Table(header + lineas, colWidths=[size * tw for size in sizes])
     table.setStyle([
-	    ('FONT', (0, 0), (-1, -1), font_std),
-	    ('FONT', (0, 0), (-1, 0), font_bld),
+        ('FONT', (0, 0), (-1, -1), font_std),
+        ('FONT', (0, 0), (-1, 0), font_bld),
         ('LEADING', (0, 1), (-1, -1), 5),
         ('GRID', (0, 0), (-1, 0), 0.5, black),
         ('BACKGROUND', (0, 0), (-1, 0), Color(0.8,0.8,0.8)),
@@ -358,7 +358,7 @@ def imprimir_mensaje(p, responsable, cabecera):
     p.rect( margin, y_pos , ew, eh, stroke=1, fill=0)
     p.setFont(font_std, 12)
 
-    for line, i in zip(mensaje, range(len(mensaje))):
+    for line, i in zip(mensaje, list(range(len(mensaje)))):
         p.drawString(margin * 2, y_pos + eh - margin - i*15 - 5, line)
 
     p.restoreState()
@@ -367,7 +367,7 @@ def imprimir_mensaje(p, responsable, cabecera):
 def detalle_iva(p, detalle):
     table = Table(detalle, [5*cm, 3*cm])
     table.setStyle([
-	    ('FONT', (0, 0), (-1, -1), font_bld),
+        ('FONT', (0, 0), (-1, -1), font_bld),
         ('LEADING', (0, 0), (-1, -1), 4),
         ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
         ('FONTSIZE',(0,0),(-1,-1),9),
@@ -377,7 +377,7 @@ def detalle_iva(p, detalle):
 
 
 def pie_de_pagina(p, responsable, imprimir_leyenda_honorarios):
-    mensaje = mensajes['mensaje_leyenda_honorarios'] if imprimir_leyenda_honorarios else u''
+    mensaje = mensajes['mensaje_leyenda_honorarios'] if imprimir_leyenda_honorarios else ''
     top = 250*mm
     ew = width - 2*margin
     eh = 7*mm if mensaje else 0
@@ -434,7 +434,7 @@ def generar_factura(response, comp, leyenda):
 
 def obtener_codigo_barras(c):
     r = responsables[c.responsable.lower()]
-    x = u'{0}{1:02d}{2:04d}{3}{4}'.format(
+    x = '{0}{1:02d}{2:04d}{3}{4}'.format(
         r['CUIT'].replace('-', ''),
         c.codigo_afip,
         c.nro_terminal,
@@ -445,15 +445,15 @@ def obtener_codigo_barras(c):
 
 
 def format_gravado_linea(grav):
-    return u'{0}%'.format(grav.porcentaje) if grav.porcentaje else grav.descripcion
+    return '{0}%'.format(grav.porcentaje) if grav.porcentaje else grav.descripcion
 
 
 def format_gravado_detalle(grav):
-    return u'Importe Neto Gravado: $' if grav.porcentaje else u'Importe Excento: $'
+    return 'Importe Neto Gravado: $' if grav.porcentaje else 'Importe Excento: $'
 
 
 def obtener_subtotal_comprobante(c):
-    return u'{0:.2f}'.format(c.importe_gravado_afip)
+    return '{0:.2f}'.format(c.importe_gravado_afip)
 
 
 def obtener_iva_comprobante(c, iva):
@@ -463,16 +463,16 @@ def obtener_iva_comprobante(c, iva):
 def obtener_lineas_comprobante(c):
     styles = styles=getSampleStyleSheet()
     if c.sub_tipo.upper() == 'A':
-        return [[Paragraph(l.concepto.replace(u'\r',u'').replace(u'\n',u'<br/>'), styles["Normal"]), u'{0:.2f}'.format(l.importe_neto), format_gravado_linea(c.gravado), u'{0:.2f}'.format(l.sub_total)] for l in c.lineas.all()]
+        return [[Paragraph(l.concepto.replace('\r','').replace('\n','<br/>'), styles["Normal"]), '{0:.2f}'.format(l.importe_neto), format_gravado_linea(c.gravado), '{0:.2f}'.format(l.sub_total)] for l in c.lineas.all()]
     else:
-        return [[Paragraph(l.concepto.replace(u'\r',u'').replace(u'\n',u'<br/>'), styles["Normal"]), u'{0:.2f}'.format(l.sub_total)] for l in c.lineas.all()]
+        return [[Paragraph(l.concepto.replace('\r','').replace('\n','<br/>'), styles["Normal"]), '{0:.2f}'.format(l.sub_total)] for l in c.lineas.all()]
 
 
 def obtener_headers_lineas(c):
     if c.sub_tipo.upper() == 'A':
-        return [[u'Producto / Servicio', u'Subtotal', u'Alícuota IVA', u'Subtotal c/IVA']]
+        return [['Producto / Servicio', 'Subtotal', 'Alícuota IVA', 'Subtotal c/IVA']]
     else:
-        return [[u'Producto / Servicio', u'Subtotal']]
+        return [['Producto / Servicio', 'Subtotal']]
 
 
 def obtener_headers_sizes(c):
@@ -487,24 +487,24 @@ def obtener_detalle_iva(c):
     if c.sub_tipo.upper() == 'A':
         result = [
             [format_gravado_detalle(c.gravado), obtener_subtotal_comprobante(c)],
-            [u'', u'']
+            ['', '']
         ]
 
         result += [
-            [u'IVA {0}%: $'.format(iva), u'{0:.2f}'.format(obtener_iva_comprobante(c, iva))]
+            ['IVA {0}%: $'.format(iva), '{0:.2f}'.format(obtener_iva_comprobante(c, iva))]
             for iva in ivas
             ]
     else:
         result = [
-            [u'Subtotal: $', u'{0:.2f}'.format(c.total_facturado)],
-            [u'', u'']
+            ['Subtotal: $', '{0:.2f}'.format(c.total_facturado)],
+            ['', '']
         ]
 
-        result += [[u'', u''] for _ in ivas]
+        result += [['', ''] for _ in ivas]
 
     result += [
-        [u'Importe Otros Tributos: $', u'0.00'],
-        [u'Importe Total: $', u'{0:.2f}'.format(c.total_facturado)],
+        ['Importe Otros Tributos: $', '0.00'],
+        ['Importe Total: $', '{0:.2f}'.format(c.total_facturado)],
     ]
     return result
 
@@ -530,15 +530,15 @@ def obtener_comprobante(cae):
 
     return {
         'cabecera': {
-            'codigo': u'{0:02d}'.format(c.codigo_afip),
+            'codigo': '{0:02d}'.format(c.codigo_afip),
             'tipo': format_tipo_comprobante(c.tipo_comprobante.nombre),
             'id_tipo_comprobante': c.tipo_comprobante.id,
             'letra': c.sub_tipo,
             'punto_venta': c.nro_terminal,
             'numero': c.numero,
             'fecha': c.fecha_emision.strftime('%d/%m/%Y'),
-            'desde': u'  /  /    ',
-            'hasta': u'  /  /    ',
+            'desde': '  /  /    ',
+            'hasta': '  /  /    ',
             'vencimiento': (c.fecha_vencimiento).strftime('%d/%m/%Y'),
             'CAE': c.cae,
             'CAE_vencimiento': c.vencimiento_cae.strftime('%d/%m/%Y'),
@@ -548,7 +548,7 @@ def obtener_comprobante(cae):
             'CUIT': c.nro_cuit,
             'nombre': c.nombre_cliente,
             'condicion_iva': c.condicion_fiscal,
-            'condicion_venta': u'Otra',
+            'condicion_venta': 'Otra',
             'direccion': c.domicilio_cliente,
         },
         'responsable': responsables[c.responsable.lower()],
@@ -560,7 +560,7 @@ def obtener_comprobante(cae):
 
 
 def obtener_filename(responsable, encabezado):
-    return u'{0}_{1}_{2:04d}_{3:08d}'.format(
+    return '{0}_{1}_{2:04d}_{3:08d}'.format(
         responsable['CUIT'],
         encabezado['codigo'],
         encabezado['punto_venta'],

@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.contrib import admin
-from models import Estudio, Medicacion
+from .models import Estudio, Medicacion
 
 
 class MedicacionInline(admin.TabularInline):
@@ -11,13 +11,13 @@ class MedicacionInline(admin.TabularInline):
 
 class EstudioAdmin(admin.ModelAdmin):
     actions = None
-    fields = (u'fecha', u'paciente', u'practica', u'medico', u'medico_solicitante', u'obra_social', u'anestesista', u'motivo', u'informe', u'public_id', u'enlace_video', u'sucursal')
-    search_fields = [u'paciente__apellido', u'paciente__dni', u'fecha', ]
-    list_display = (u'fecha', u'paciente', u'practica', u'medico', u'obra_social', u'sucursal')
-    raw_id_fields = (u'paciente', )
-    ordering = (u'-fecha', u'paciente__apellido')
-    list_filter = (u'fecha',)
-    readonly_fields = (u'public_id', )
+    fields = ('fecha', 'paciente', 'practica', 'medico', 'medico_solicitante', 'obra_social', 'anestesista', 'motivo', 'informe', 'public_id', 'enlace_video', 'sucursal')
+    search_fields = ['paciente__apellido', 'paciente__dni', 'fecha', ]
+    list_display = ('fecha', 'paciente', 'practica', 'medico', 'obra_social', 'sucursal')
+    raw_id_fields = ('paciente', )
+    ordering = ('-fecha', 'paciente__apellido')
+    list_filter = ('fecha',)
+    readonly_fields = ('public_id', )
     #inlines = (MedicacionInline,)  # permite modificar la medicacion en crear/editar estudio
 
     def has_add_permission(self, request):
@@ -39,8 +39,8 @@ class EstudioAdmin(admin.ModelAdmin):
         return super(EstudioAdmin, self).changeform_view(request, object_id, extra_context=extra_context)
 
     class Media:
-        js = (u'js/admin/estudio.js',)
-        css = {u'all': (u'css/admin/estudio.css', )}
+        js = ('js/admin/estudio.js',)
+        css = {'all': ('css/admin/estudio.css', )}
 
 admin.site.register(Estudio, EstudioAdmin)
 

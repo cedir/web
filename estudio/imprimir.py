@@ -37,39 +37,39 @@ def generar_informe(response, estudio):
 
 def _datos_estudio(elements, estudio):
     # Practica (titulo)
-    elements.append(Paragraph(u'<para align="CENTER" spaceAfter="15"><b>{}</b></para>'.format(estudio.practica.descripcion), font_std))
+    elements.append(Paragraph('<para align="CENTER" spaceAfter="15"><b>{}</b></para>'.format(estudio.practica.descripcion), font_std))
 
     # reducimos momentáneamente el tamaño de la fuente
     font_std.fontSize = 9
 
     # fecha estudio
-    fecha = u'<b>Fecha del estudio.....:</b> {0}'.format(unicode(estudio.fecha.strftime("%d/%m/%Y")))
+    fecha = '<b>Fecha del estudio.....:</b> {0}'.format(str(estudio.fecha.strftime("%d/%m/%Y")))
     elements.append(Paragraph(fecha, font_std))
 
     # Paciente
     edad = estudio.paciente.get_edad()
     if edad:
-        paciente = u'<b>Paciente ....................:</b> {} ({} años)'.format(estudio.paciente, edad)
+        paciente = '<b>Paciente ....................:</b> {} ({} años)'.format(estudio.paciente, edad)
     else:
-        paciente = u'<b>Paciente ....................:</b> {}'.format(estudio.paciente)
+        paciente = '<b>Paciente ....................:</b> {}'.format(estudio.paciente)
 
     elements.append(Paragraph(paciente, font_std))
 
     # Obra Social
-    obra_social = u'<b>Obra Social ...............:</b> {0}'.format(estudio.obra_social.nombre)
+    obra_social = '<b>Obra Social ...............:</b> {0}'.format(estudio.obra_social.nombre)
     elements.append(Paragraph(obra_social, font_std))
 
     # Nro de afiliado
     if estudio.paciente.nroAfiliado:
-        nro_afiliado = u'<b>Nro de afiliado ..........:</b> {0}'.format(unicode(estudio.paciente.nroAfiliado))
+        nro_afiliado = '<b>Nro de afiliado ..........:</b> {0}'.format(str(estudio.paciente.nroAfiliado))
         elements.append(Paragraph(nro_afiliado, font_std))
 
     # Medico Solicitante
-    medico_sol = u'<b>Medico Solicitante ...:</b> {0}'.format(unicode(estudio.medico_solicitante))
+    medico_sol = '<b>Medico Solicitante ...:</b> {0}'.format(str(estudio.medico_solicitante))
     elements.append(Paragraph(medico_sol, font_std))
 
     # Motivo del estudio
-    motivo = u'<para spaceAfter="43" ><b>Motivo del estudio ...:</b> {0}</para>'.format(estudio.motivo)
+    motivo = '<para spaceAfter="43" ><b>Motivo del estudio ...:</b> {0}</para>'.format(estudio.motivo)
     elements.append(Paragraph(motivo, font_std))
 
     # restauramos el tamaño de la fuente
@@ -77,8 +77,8 @@ def _datos_estudio(elements, estudio):
 
 
 def _informe(elements, estudio):
-    elements.append(Paragraph(u'<para alignment="CENTER" spaceAfter="10"><b>INFORME</b></para>', font_std))
-    elements.append(Paragraph(estudio.informe.replace(u'\r', u'').replace(u'\n', u'<br/>'), font_std))
+    elements.append(Paragraph('<para alignment="CENTER" spaceAfter="10"><b>INFORME</b></para>', font_std))
+    elements.append(Paragraph(estudio.informe.replace('\r', '').replace('\n', '<br/>'), font_std))
 
 
 def _draw_firstpage_frame(estudio, imprimeLinea=True):
@@ -111,7 +111,7 @@ def _draw_firstpage_frame(estudio, imprimeLinea=True):
         canvas.line(doc.leftMargin, linea_inferior, width - doc.rightMargin, linea_inferior)
 
         # dibujamos la imágen
-        filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), u'./savetheearth.jpg')
+        filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), './savetheearth.jpg')
         canvas.drawImage(
             filename,
             1.2 * doc.leftMargin,
@@ -124,14 +124,14 @@ def _draw_firstpage_frame(estudio, imprimeLinea=True):
         t = canvas.beginText(1.2 * doc.leftMargin, height - 680)
 
         t.setFont(font_std.fontName, font_std.fontSize - 1)
-        t.textLine(u'- El siguiente enlace web permitirá descargar el video del estudio a partir '
-                   u'de las próximas 48hs de realizado.')
+        t.textLine('- El siguiente enlace web permitirá descargar el video del estudio a partir '
+                   'de las próximas 48hs de realizado.')
 
-        t.textLine(u'- Recordar que sólo estará disponible para descarga durante los próximos 30 días '
-                   u'de realizado el mismo.')
+        t.textLine('- Recordar que sólo estará disponible para descarga durante los próximos 30 días '
+                   'de realizado el mismo.')
 
-        t.textLine(u'- Coloque el siguiente enlace en la barra de direcciones de su explorador web, '
-                   u'para proceder con la descarga del video.')
+        t.textLine('- Coloque el siguiente enlace en la barra de direcciones de su explorador web, '
+                   'para proceder con la descarga del video.')
 
         canvas.drawText(t)
 
@@ -139,26 +139,26 @@ def _draw_firstpage_frame(estudio, imprimeLinea=True):
         canvas.drawCentredString(
             width / 2,
             height - 735,
-            u'Al utilizar el link de descarga en vez de un DVD estas contribuyendo al cuidado'
+            'Al utilizar el link de descarga en vez de un DVD estas contribuyendo al cuidado'
             )
 
         canvas.drawCentredString(
             width / 2,
             height - 745,
-            u'del medio ambiente'
+            'del medio ambiente'
             )
 
         canvas.drawCentredString(
             width / 2,
             height - 755,
-            u'-------------------------------------------------------------------------------------------------------'
+            '-------------------------------------------------------------------------------------------------------'
             )
 
         canvas.setFont(font_std.fontName, 10)
         canvas.drawCentredString(
             width / 2,
             height - 770,
-            u'http://www.cedirsalud.com.ar/video/{0}'.format(str(estudio.public_id))
+            'http://www.cedirsalud.com.ar/video/{0}'.format(str(estudio.public_id))
             )
 
         canvas.restoreState()

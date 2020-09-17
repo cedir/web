@@ -10,17 +10,17 @@ import os
 def getList(request):
     
     flash_buttonId = ''
-    if (request.GET.has_key('buttonId') and request.GET['buttonId'] != ''):
+    if ('buttonId' in request.GET and request.GET['buttonId'] != ''):
 	flash_buttonId = request.GET['buttonId']
 
     categoryId = 1
-    if (request.GET.has_key('categoryId') and request.GET['categoryId'] != ''):
+    if ('categoryId' in request.GET and request.GET['categoryId'] != ''):
 	categoryId = request.GET['categoryId']
 
 
     #Parche para ordenar novedades for fecha, hacerlo bien
     order_by = 'title'
-    if (request.GET.has_key('template') and request.GET['template'] == 'novedades.html'):
+    if ('template' in request.GET and request.GET['template'] == 'novedades.html'):
       order_by = 'createdDate'
 
 
@@ -47,7 +47,7 @@ def getList(request):
     })
     
     templateName = 'getContentsList.html'
-    if (request.GET.has_key('template') and request.GET['template'] != ''):
+    if ('template' in request.GET and request.GET['template'] != ''):
 	templateName = request.GET['template']
     t = loader.get_template('pages/' + templateName)
 	

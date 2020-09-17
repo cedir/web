@@ -14,7 +14,7 @@
 
 
 # Correccion del path para importar desde el directorio padre
-from __future__ import print_function
+
 import os
 import sys
 import  inspect
@@ -84,7 +84,7 @@ def buscar_comprobantes(informe_ejemplo):
         "sub_tipo": "A" if "A" in inf["tipo"] else "B",
         "fecha_emision": inf["fecha"],
         "responsable": "Cedir" if "CEDIR" in inf["tipo"] else "Brunetti"
-    } for inf in informe_ejemplo.values()]
+    } for inf in list(informe_ejemplo.values())]
     return [Comprobante.objects.get(**f) for f in filtros]
 
 

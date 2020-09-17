@@ -48,12 +48,12 @@ class PresentacionViewSet(viewsets.ModelViewSet):
                     csv_string = '{}\n{}'.format(csv_string, OsdeRowMedicacion(estudio).get_row_osde())
                 if estudio.pension:
                     csv_string = '{}\n{}'.format(csv_string, OsdeRowPension(estudio).get_row_osde())
-                for material_esp in estudio.estudioXmedicamento.filter(medicamento__tipo=u'Mat Esp'):
+                for material_esp in estudio.estudioXmedicamento.filter(medicamento__tipo='Mat Esp'):
                     csv_string = '{}\n{}'.format(csv_string, OsdeRowMaterialEspecifico(estudio, material_esp).get_row_osde())
 
             return HttpResponse(csv_string, content_type='text/plain')
         except Exception as ex:
-            response_dict = {'error': unicode(ex)}
+            response_dict = {'error': str(ex)}
             return JsonResponse(response_dict, status=500)
 
     @detail_route(methods=['get'])
@@ -69,7 +69,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
 
             return HttpResponse(csv_string[:-1], content_type='text/plain')
         except Exception as ex:
-            response_dict = {'error': unicode(ex)}
+            response_dict = {'error': str(ex)}
             return JsonResponse(response_dict, status=500)
 
     @detail_route(methods=['get'])
@@ -80,7 +80,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         try:
             response = JsonResponse(EstudioDePresentacionRetrieveSerializer(estudios, many=True).data, safe=False)
         except Exception as ex:
-            response = JsonResponse({'error': unicode(ex)}, status=500)
+            response = JsonResponse({'error': str(ex)}, status=500)
         return response
 
     @detail_route(methods=['patch'])
@@ -113,9 +113,9 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             response = JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
 
         except ValidationError as ex:
-            response = JsonResponse({'error': unicode(ex)}, status=400)
+            response = JsonResponse({'error': str(ex)}, status=400)
         except Exception as ex:
-            response = JsonResponse({'error': unicode(ex)}, status=500)
+            response = JsonResponse({'error': str(ex)}, status=500)
         return response
 
     @detail_route(methods=['patch'])
@@ -133,7 +133,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             presentacion.save()
             return JsonResponse(PresentacionSerializer(presentacion).data, safe=False)
         except Exception as ex:
-            return JsonResponse({'error': unicode(ex)}, status=500)
+            return JsonResponse({'error': str(ex)}, status=500)
 
     @detail_route(methods=['patch'])
     def cobrar(self, request, pk=None):
@@ -155,7 +155,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         except Estudio.DoesNotExist:
                 response = JsonResponse({'error': "No existe un estudio con esa id"}, status=400)
         except ValidationError as ex:
-            response = JsonResponse({'error': unicode(ex)}, status=400)
+            response = JsonResponse({'error': str(ex)}, status=400)
         except Exception as ex:
-            response = JsonResponse({'error': unicode(ex)}, status=500)
+            response = JsonResponse({'error': str(ex)}, status=500)
         return response

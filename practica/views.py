@@ -8,9 +8,9 @@ class PracticaDescripcionOrCodigoMedicoFilterBackend(filters.BaseFilterBackend):
     Filtro de practicas por descripcion o codigo medico
     """
     def filter_queryset(self, request, queryset, view):
-        search_text = request.query_params.get(u'descripcion')
+        search_text = request.query_params.get('descripcion')
         if search_text:
-            if unicode.isdigit(search_text):
+            if str.isdigit(search_text):
                 queryset = queryset.filter(codigoMedico__icontains=search_text)
             else:
                 queryset = queryset.filter(descripcion__icontains=search_text)

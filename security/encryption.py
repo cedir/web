@@ -4,8 +4,8 @@ import random
 
 
 def encode(key):
-    random_letter = random.choice(string.ascii_letters)
-    return random_letter + base64.urlsafe_b64encode(str(key))
+    random_letter =  bytes(random.choice(string.ascii_letters), 'ascii')
+    return random_letter + base64.urlsafe_b64encode(bytes(str(key), 'ascii'))
 
 
 def decode(encoded):

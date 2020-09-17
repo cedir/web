@@ -68,7 +68,7 @@ class OsdeRowBase(object):
     def format_nro_matricula(self, medico):
         nro_matricula = medico.matricula if medico.facturar_osde_en_nombre_de_medico == None else medico.facturar_osde_en_nombre_de_medico.matricula
         try:
-            nro_matricula = nro_matricula.split(u' ')[0]
+            nro_matricula = nro_matricula.split(' ')[0]
             nro_matricula = int(nro_matricula)
             return '{0:010}'.format(nro_matricula)
         except ValueError:

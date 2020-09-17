@@ -2,7 +2,7 @@ from django.http import HttpResponse
 import datetime
 from django.template import Template, Context, loader
 
-from contenidos.models import *
+from .contenidos.models import *
 import os
 
 

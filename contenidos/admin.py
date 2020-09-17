@@ -14,7 +14,7 @@ class CategoriaFilter(admin.SimpleListFilter):
     parameter_name = 'categoria'
 
     def lookups(self, request, model_admin):
-        return [(c.id, c.name) for c in Categoria.objects.all().order_by(u'name')]
+        return [(c.id, c.name) for c in Categoria.objects.all().order_by('name')]
 
     def queryset(self, request, queryset):
         if self.value():

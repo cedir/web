@@ -15,7 +15,7 @@ from estudio.models import Medicacion
 from medicamento.models import Medicamento
 from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer, EstudioRetrieveSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
-from imprimir import generar_informe
+from .imprimir import generar_informe
 
 def imprimir(request, id_estudio):
 
@@ -23,7 +23,7 @@ def imprimir(request, id_estudio):
 
     # Create the HttpResponse object with the appropriate PDF headers.
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = u'filename="Estudio de {0}.pdf"'.format(estudio.paciente.apellido)
+    response['Content-Disposition'] = 'filename="Estudio de {0}.pdf"'.format(estudio.paciente.apellido)
 
     return generar_informe(response, estudio)
 
@@ -56,7 +56,7 @@ class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
     Filtro de estudios por obra social
     """
     def filter_queryset(self, request, queryset, view):
-        obra_social = request.query_params.get(u'obra_social')
+        obra_social = request.query_params.get('obra_social')
         if obra_social:
             queryset = queryset.filter(obra_social__nombre__icontains=obra_social)
         return queryset
@@ -67,8 +67,8 @@ class EstudioMedicoFilterBackend(filters.BaseFilterBackend):
     Filtro de estudios por medico actuante
     """
     def filter_queryset(self, request, queryset, view):
-        apellido = request.query_params.get(u'medico_apellido')
-        nombre = request.query_params.get(u'medico_nombre')
+        apellido = request.query_params.get('medico_apellido')
+        nombre = request.query_params.get('medico_nombre')
         if apellido:
             queryset = queryset.filter(medico__apellido__icontains=apellido)
         if nombre:
@@ -81,8 +81,8 @@ class EstudioMedicoSolicitanteFilterBackend(filters.BaseFilterBackend):
     Filtro de estudios por medico solicitante
     """
     def filter_queryset(self, request, queryset, view):
-        apellido = request.query_params.get(u'medico_solicitante_apellido')
-        nombre = request.query_params.get(u'medico_solicitante_nombre')
+        apellido = request.query_params.get('medico_solicitante_apellido')
+        nombre = request.query_params.get('medico_solicitante_nombre')
         if apellido:
             queryset = queryset.filter(medico_solicitante__apellido__icontains=apellido)
         if nombre:
@@ -95,10 +95,10 @@ class EstudioPacienteFilterBackend(filters.BaseFilterBackend):
     Filtro de estudios por paciente
     """
     def filter_queryset(self, request, queryset, view):
-        dni = request.query_params.get(u'paciente_dni')
-        apellido = request.query_params.get(u'paciente_apellido')
-        nombre = request.query_params.get(u'paciente_nombre')
-        paciente_id = request.query_params.get(u'paciente_id')
+        dni = request.query_params.get('paciente_dni')
+        apellido = request.query_params.get('paciente_apellido')
+        nombre = request.query_params.get('paciente_nombre')
+        paciente_id = request.query_params.get('paciente_id')
         if dni:
             queryset = queryset.filter(paciente__dni__icontains=dni)
         if apellido:
@@ -115,8 +115,8 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
     Filtro de estudios por fecha
     """
     def filter_queryset(self, request, queryset, view):
-        fecha_desde = request.query_params.get(u'fecha_desde')
-        fecha_hasta = request.query_params.get(u'fecha_hasta')
+        fecha_desde = request.query_params.get('fecha_desde')
+        fecha_hasta = request.query_params.get('fecha_hasta')
         if fecha_desde:
             queryset = queryset.filter(fecha__gte=fecha_desde)
         if fecha_hasta:
@@ -125,7 +125,7 @@ class EstudioFechaFilterBackend(filters.BaseFilterBackend):
 
 class SucursalFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        sucursal = request.query_params.get(u'sucursal')
+        sucursal = request.query_params.get('sucursal')
         if sucursal:
             queryset = queryset.filter(sucursal=sucursal)
 
@@ -211,11 +211,11 @@ class EstudioViewSet(viewsets.ModelViewSet):
         estudio.arancel_anestesia = Decimal(arancel_anestesia)
 
         if estudio.presentacion_id:
-            return Response({u'success': False, u'message': 'El estudio esta presentado/pcf y no se puede modificar'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'success': False, 'message': 'El estudio esta presentado/pcf y no se puede modificar'}, status=status.HTTP_400_BAD_REQUEST)
 
         estudio.save()
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA IMPORTES')
-        return Response({u'success': True})
+        return Response({'success': True})
 
 
 class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
@@ -223,7 +223,7 @@ class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
     Filtro de medicaciones por estudio
     """
     def filter_queryset(self, request, queryset, view):
-        estudio = request.query_params.get(u'estudio')
+        estudio = request.query_params.get('estudio')
         if estudio:
             queryset = queryset.filter(estudio__id=estudio)
         return queryset

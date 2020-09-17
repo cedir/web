@@ -87,11 +87,11 @@ class Contenido(models.Model):
 
     def clean(self):
 
-        if self.img1.name <> '':
+        if self.img1.name != '':
             self.validate_image(self.img1)
-        if self.img2.name <> '':
+        if self.img2.name != '':
             self.validate_image(self.img2)
-        if self.img3.name <> '':
+        if self.img3.name != '':
             self.validate_image(self.img3)
 
         validate_friendly_url(self.friendlyURL, self)
