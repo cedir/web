@@ -15,10 +15,11 @@ https://groups.google.com/forum/#!forum/pyafipws
 
 ## Steps to start with the project
 
-- Install virtualenv: `pip install virtualenv`
+- Install virtualenv: `pip install virtualenv -p python3.7`
 - Create virtual environment: `virtualenv cedir`
 - Activate virtual environment inside the directory created by virtualenv: `source bin/activate`
 - Clone git repository: `git clone https://github.com/cedir/web`
+- Install required dependencies `sudo apt install python3.7-dev`
 - Install libraries inside web directory: `pip install -r requeriments.txt`
 - Install postgres and pgadmin4 with your operative system's package manager
 - Start pgadmin4 and create the admin user
