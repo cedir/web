@@ -11,7 +11,7 @@ class TurnoSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Turno
-        fields = (u'id', u'fechaTurno', u'horaInicio', )
+        fields = ('id', 'fechaTurno', 'horaInicio', )
 
 
 class InfoTurnoSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,5 +22,5 @@ class InfoTurnoSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = InfoTurno
-        fields = (u'medico', u'obra_sociales', u'practicas', u'texto', )
+        fields = ('medico', 'obra_sociales', 'practicas', 'texto', )
 

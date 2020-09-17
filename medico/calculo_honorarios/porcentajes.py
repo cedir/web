@@ -1,4 +1,4 @@
-from constantes import *
+from .constantes import *
 
 
 class Porcentajes(object):

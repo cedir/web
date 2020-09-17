@@ -4,4 +4,4 @@ from medicamento.models import Medicamento
 class MedicamentoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Medicamento
-        fields = (u'id', u'descripcion', u'importe')
+        fields = ('id', 'descripcion', 'importe')

@@ -24,10 +24,10 @@ def entrar(request):
                     return HttpResponseRedirect(reverse('home'))
             else:
                 logout(request)
-                error_message = u'Usuario deshabilitado'
+                error_message = 'Usuario deshabilitado'
         else:
             logout(request)
-            error_message = u'Usuario/Contraseña inválidos'
+            error_message = 'Usuario/Contraseña inválidos'
 
     context.update({'user': request.user})
 

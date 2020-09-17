@@ -8,7 +8,7 @@ class MedicamentoNombreFilterBackend(filters.BaseFilterBackend):
     Filtro de medicamentos por descripcion
     """
     def filter_queryset(self, request, queryset, view):
-        nombre = request.query_params.get(u'nombre')
+        nombre = request.query_params.get('nombre')
         if nombre:
             queryset = queryset.filter(descripcion__icontains=nombre)
         return queryset

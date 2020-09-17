@@ -22,5 +22,5 @@ def run_sanity():
         print(total)
 
 
-if __name__ == u'__main__':
+if __name__ == '__main__':
     run_sanity()

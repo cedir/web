@@ -1,7 +1,7 @@
 language: python
 cache: pip
 python:
-    - "2.7"
+    - "3.7"
 env:
     -DJANGO=1.8 DB=postgresql
 services:
@@ -9,7 +9,7 @@ services:
 before_install:
   - sudo apt-get -y install libpq-dev libjpeg-dev
 install:
-    - pip install -r requirements-travis.txt
+    - pip install -r requirements.txt
     - mkdir logs
     - cp settings-travis.py settings.py
     - npm install newman@4.6.1

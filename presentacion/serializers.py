@@ -17,7 +17,7 @@ class EstadoField(serializers.Field):
         return Presentacion.ESTADOS[value][1]
 
     def to_internal_value(self, data):
-        return filter(lambda estado: estado[1] == data, Presentacion.ESTADOS)[0][0]
+        return [estado for estado in Presentacion.ESTADOS if estado[1] == data][0][0]
 
 class PresentacionSerializer(serializers.ModelSerializer):
     obra_social = ObraSocialSerializer()
@@ -42,11 +42,11 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return {
-            u'id': instance.id,
-            u'obra_social_id': instance.obra_social_id,
-            u'sucursal': instance.sucursal,
-            u'periodo': instance.periodo,
-            u'fecha': instance.fecha,
+            'id': instance.id,
+            'obra_social_id': instance.obra_social_id,
+            'sucursal': instance.sucursal,
+            'periodo': instance.periodo,
+            'fecha': instance.fecha,
         }
 
     def validate(self, data):
@@ -87,12 +87,12 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Presentacion
         fields = (
-            u'id',
-            u'obra_social_id',
-            u'sucursal',
-            u'periodo',
-            u'fecha',
-            u'estudios',
+            'id',
+            'obra_social_id',
+            'sucursal',
+            'periodo',
+            'fecha',
+            'estudios',
         )
 
 class PresentacionUpdateSerializer(serializers.ModelSerializer):
@@ -100,11 +100,11 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return {
-            u'id': instance.id,
-            u'obra_social_id': instance.obra_social_id,
-            u'sucursal': instance.sucursal,
-            u'periodo': instance.periodo,
-            u'fecha': instance.fecha,
+            'id': instance.id,
+            'obra_social_id': instance.obra_social_id,
+            'sucursal': instance.sucursal,
+            'periodo': instance.periodo,
+            'fecha': instance.fecha,
         }
 
     def validate(self, data):
@@ -142,10 +142,10 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Presentacion
         fields = (
-            u'id',
-            u'periodo',
-            u'fecha',
-            u'estudios',
+            'id',
+            'periodo',
+            'fecha',
+            'estudios',
         )
 
 class PagoPresentacionSerializer(serializers.ModelSerializer):
@@ -154,11 +154,11 @@ class PagoPresentacionSerializer(serializers.ModelSerializer):
     class Meta:
         model = PagoPresentacion
         fields = (
-            u'presentacion_id',
-            u'estudios',
-            u'fecha',
-            u'retencion_impositiva',
-            u'nro_recibo',
+            'presentacion_id',
+            'estudios',
+            'fecha',
+            'retencion_impositiva',
+            'nro_recibo',
         )
 
     def validate_presentacion_id(self, value):
@@ -175,7 +175,7 @@ class PagoPresentacionSerializer(serializers.ModelSerializer):
         required_props = ['id', 'importe_cobrado_pension',
                 'importe_cobrado_arancel_anestesia', 'importe_estudio_cobrado', 'importe_medicacion_cobrado']
         for e in estudios_data:
-            if not all([prop in e.keys() for prop in required_props]):
+            if not all([prop in list(e.keys()) for prop in required_props]):
                 raise ValidationError("Cada estudio debe tener los campos 'id', \
                     'importe_cobrado_pension', 'importe_cobrado_arancel_anestesia', \
                     'importe_estudio_cobrado', 'importe_medicacion_cobrado'")

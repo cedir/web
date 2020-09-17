@@ -6,10 +6,10 @@ class ObraSocialSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ObraSocial
-        fields = (u'id', u'nombre', )
+        fields = ('id', 'nombre', )
 
 class ObraSocialPensionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ObraSocial
-        fields = (u'id', u'nombre', 'valor_aproximado_pension', )
+        fields = ('id', 'nombre', 'valor_aproximado_pension', )

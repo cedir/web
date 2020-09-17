@@ -8,7 +8,7 @@ class PacienteSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Paciente
-        fields = (u'id', u'dni', u'nombre', u'apellido', u'_edad', 'nroAfiliado', 'informacion_extra')
+        fields = ('id', 'dni', 'nombre', 'apellido', '_edad', 'nroAfiliado', 'informacion_extra')
 
 class PacienteFormSerializer(serializers.ModelSerializer):
 
@@ -17,8 +17,8 @@ class PacienteFormSerializer(serializers.ModelSerializer):
         fields = ['id', 'dni', 'nombre', 'apellido', 'domicilio', 'telefono', 'sexo', 'fechaNacimiento', 'nroAfiliado', 'informacion_extra', 'email']
 
     def to_internal_value(self, data):
-        dni = data.get(u'dni')
-        fecha_nacimiento = data.get(u'fecha_nacimiento')
+        dni = data.get('dni')
+        fecha_nacimiento = data.get('fecha_nacimiento')
 
         if fecha_nacimiento:
             fecha_nacimiento = datetime.strptime(fecha_nacimiento, settings.FORMAT_DATE).date()
@@ -26,14 +26,14 @@ class PacienteFormSerializer(serializers.ModelSerializer):
         datos = {
             'nombre': data.get('nombre'),
             'apellido': data.get('apellido'),
-            'nroAfiliado': data.get(u'nro_afiliado', u''),
-            'informacion_extra': data.get(u'informacion_extra', u''),
-            'domicilio': data.get(u'domicilio', u''),
-            'sexo': data.get(u'sexo', u''),
-            'telefono': data.get(u'telefono', u''),
+            'nroAfiliado': data.get('nro_afiliado', ''),
+            'informacion_extra': data.get('informacion_extra', ''),
+            'domicilio': data.get('domicilio', ''),
+            'sexo': data.get('sexo', ''),
+            'telefono': data.get('telefono', ''),
             'dni': int(dni) if dni else 0,
             'fechaNacimiento': fecha_nacimiento or None,
-            'email': data.get(u'email'),
+            'email': data.get('email'),
         }
 
         return super(PacienteFormSerializer, self).to_internal_value(datos)

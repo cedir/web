@@ -12,10 +12,10 @@ django.setup()
 
 
 def migrate_comprobantes(apply_changes=False):
-    print u'------------------Starting process at {}------------------'.format(datetime.datetime.now())
+    print('------------------Starting process at {}------------------'.format(datetime.datetime.now()))
 
     if not apply_changes:
-        print u'Los cambios no se guardaran'
+        print('Los cambios no se guardaran')
 
     comprobantes = Comprobante.objects.all()
 
@@ -39,15 +39,15 @@ def migrate_comprobantes(apply_changes=False):
 
         ivaTotalCalculado = (comprobante.total_facturado * gravado) / (100 + gravado)
         if abs(ivaTotalCalculado - ivaTotal) > 0.1:
-            print("En {0} IVA {1}% difiere. {2} {3}".format(comprobante.id, gravado, comprobante.total_facturado, [(l.sub_total, l.importe_iva, l.concepto) for l in lineas ]))
+            print(("En {0} IVA {1}% difiere. {2} {3}".format(comprobante.id, gravado, comprobante.total_facturado, [(l.sub_total, l.importe_iva, l.concepto) for l in lineas ])))
 
-    print u'Done'
+    print('Done')
 
 
 
-if __name__ == u'__main__':
-    parser = argparse.ArgumentParser(description=u'Migrar comprobantes')
-    parser.add_argument(u'--apply-changes',  dest=u'apply_changes', action=u'store_true', help=u'Apply changes')
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Migrar comprobantes')
+    parser.add_argument('--apply-changes',  dest='apply_changes', action='store_true', help='Apply changes')
     args = parser.parse_args()
 
     migrate_comprobantes(args.apply_changes)

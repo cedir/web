@@ -18,7 +18,7 @@ from presentacion.models import Presentacion
 from estudio.models import ID_SUCURSAL_CEDIR, ID_SUCURSAL_HOSPITAL_ITALIANO
 
 class CrearEstudioTest(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'comprobantes.json', 'presentaciones.json']
 
     def setUp(self):
         self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
@@ -33,23 +33,23 @@ class CrearEstudioTest(TestCase):
         response = self.client.post('/api/estudio/', self.estudio_data)
 
         self.assertEqual(Estudio.objects.all().count(), 1)
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         content = json.loads(response.content)
         estudio = Estudio.objects.get(pk=content.get('id'))
-        self.assertEquals(estudio.paciente_id, self.estudio_data.get('paciente'))
-        self.assertEquals(estudio.fecha, self.estudio_data.get('fecha'))
-        self.assertEquals(estudio.obra_social_id, self.estudio_data.get('obra_social'))
-        self.assertEquals(estudio.medico_id, self.estudio_data.get('medico'))
+        self.assertEqual(estudio.paciente_id, self.estudio_data.get('paciente'))
+        self.assertEqual(estudio.fecha, self.estudio_data.get('fecha'))
+        self.assertEqual(estudio.obra_social_id, self.estudio_data.get('obra_social'))
+        self.assertEqual(estudio.medico_id, self.estudio_data.get('medico'))
         self.assertIsNotNone(estudio.public_id)
-        self.assertIsNot(estudio.public_id, u'')
-        self.assertEquals(len(estudio.public_id), 32)
+        self.assertIsNot(estudio.public_id, '')
+        self.assertEqual(len(estudio.public_id), 32)
 
     def test_create_estudio_returns_error_if_practica_is_empty(self):
         self.estudio_data.pop('practica')
         response = self.client.post('/api/estudio/', self.estudio_data)
 
-        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         content = json.loads(response.content)
         assert content["practica"] == ["This field is required."]
 
@@ -58,13 +58,13 @@ class CrearEstudioTest(TestCase):
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk).count(), 0)
         response = self.client.post('/api/estudio/', self.estudio_data)
 
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk).count(), 1)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk).first().action_flag, ADDITION)
 
 
 class ActualizarEstudiosTest(TestCase):
-    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json']
+    fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json', 'anestesistas.json', 'comprobantes.json', 'presentaciones.json']
 
     def setUp(self):
         self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
@@ -83,7 +83,7 @@ class ActualizarEstudiosTest(TestCase):
         self.estudio_data['fecha'] = '2019-03-07'
         response = self.client.put('/api/estudio/{}/'.format(estudio.id), data=json.dumps(self.estudio_data), content_type='application/json')
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk, object_id=estudio.id, action_flag=CHANGE).count(), 1)
 
 
@@ -112,7 +112,7 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
         response = self.client.patch(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         estudio = Estudio.objects.get(pk=self.estudio.id)
         self.assertEqual(estudio.pension, Decimal(data.get('pension')))
@@ -136,7 +136,7 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
         response = self.client.put(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(set_pago_contra_factura_mock.called)
         self.assertFalse(anular_pago_contra_factura_mock.called)
 
@@ -157,7 +157,7 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
         response = self.client.put(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         self.assertFalse(set_pago_contra_factura_mock.called)
         self.assertFalse(anular_pago_contra_factura_mock.called)
 
@@ -174,7 +174,7 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
         url = self.url + '/anular_pago_contra_factura/'
         response = self.client.put(url.format(self.estudio.id), content_type='application/json')
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(set_pago_contra_factura_mock.called)
         self.assertTrue(anular_pago_contra_factura_mock.called)
 
@@ -188,7 +188,7 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
         response = self.client.put(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_pago_contra_factura_devuelve_bad_request_si_el_importe_es_negativo(self):
         data = {'pago_contra_factura': '-200'}
@@ -201,7 +201,7 @@ class UpdateImportesYPagoContraFacturaTests(TestCase):
         response = self.client.put(url.format(self.estudio.id),
                                      data=json.dumps(data), content_type='application/json')
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
 
 class RetreiveEstudiosTest(TestCase):

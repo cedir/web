@@ -11,7 +11,7 @@ class MedicoSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Medico
-        fields = (u'id', u'nombre', u'apellido', u'matricula')
+        fields = ('id', 'nombre', 'apellido', 'matricula')
 
 
 class PagoMedicoSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class PagoMedicoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PagoMedico
-        fields = (u'id', u'fecha', u'medico', u'observacion')
+        fields = ('id', 'fecha', 'medico', 'observacion')
 
 
 class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):

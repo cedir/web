@@ -97,7 +97,7 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
             linea_no_ara.sub_total = no_ara.get('sub_total')
             linea_no_ara.retencion = no_ara.get('a_pagar')
 
-            iva_key = u'iva{}'.format(linea_no_ara.alicuota_iva).replace('.', '')  # TODO: warn! el FE esta esperando especificamente 0, 10.5 y 21. De existir otro IVA va a haber que agregarlo en ULI
+            iva_key = 'iva{}'.format(linea_no_ara.alicuota_iva).replace('.', '')  # TODO: warn! el FE esta esperando especificamente 0, 10.5 y 21. De existir otro IVA va a haber que agregarlo en ULI
             pago.subtotales_no_ara[iva_key] = linea_no_ara.retencion + pago.subtotales_no_ara.get(iva_key, Decimal(0))
 
             # calculo total a continuacion podria hacerse fuera del IF ya que solo el subtotal final sirve
@@ -125,11 +125,11 @@ class AnestesistaNombreApellidoFilterBackend(filters.BaseFilterBackend):
     Filtro de anestesista por nombre o apellido
     """
     def filter_queryset(self, request, queryset, view):
-        search_text = request.query_params.get(u'search_text')
+        search_text = request.query_params.get('search_text')
 
 
         if search_text:
-            if unicode.isdigit(search_text):
+            if str.isdigit(search_text):
                 queryset = queryset.filter(Q(matricula__icontains=search_text))
             else:
                 search_params = [x.strip() for x in search_text.split(',')]

@@ -28,7 +28,7 @@ TIPO_MOV_CAJA_HONORARIO_ANESTESISTA = 3
 TIPO_MOV_CAJA_COSEGURO = 10
 PORCENTAJE_DESCUENTO_CEDIR = Decimal('0.35')
 SIMARA_ID = 6
-SIMARA_IMPORTE_C2 = u'c1'  # c2 = c1 para Simara
+SIMARA_IMPORTE_C2 = 'c1'  # c2 = c1 para Simara
 
 
 class CalculadorHonorariosAnestesista(object):

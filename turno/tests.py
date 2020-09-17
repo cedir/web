@@ -16,8 +16,8 @@ from medico.models import Medico
 
 
 class TurnosTest(TestCase):
-    fixtures = ['turnos.json', 'pacientes.json', 'medicos.json',
-                'practicas.json', 'obras_sociales.json']
+    fixtures = ['anestesistas.json', 'turnos.json', 'pacientes.json', 'medicos.json',
+                'practicas.json', 'obras_sociales.json', 'comprobantes.json', 'presentaciones.json']
 
     def setUp(self):
         self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
@@ -69,7 +69,7 @@ class TurnosTest(TestCase):
         assert content["message"] == "Success"
         self.assertEqual(Estudio.objects.all().count(), turno.practicas.all().count())
         estudio = Estudio.objects.all().first()
-        self.assertNotEquals(estudio.public_id, u'')
+        self.assertNotEqual(estudio.public_id, '')
         self.assertTrue(len(estudio.public_id) < 10)  # universal is 32
 
     def test_guardar_truno_success(self):
@@ -102,7 +102,7 @@ class TurnosTest(TestCase):
         assert response.content
         content = json.loads(response.content)
         assert content["status"] == 0
-        assert content["message"] == u'Error, se ha detectado superposici\xf3n de turnos. Por favor, haga click en Mostrar y vuelva a intentarlo.'
+        assert content["message"] == 'Error, se ha detectado superposici\xf3n de turnos. Por favor, haga click en Mostrar y vuelva a intentarlo.'
         self.assertEqual(Turno.objects.all().count(), turnos_count_inicial)
 
     def test_guardar_truno_error_medico_de_licencia(self):
@@ -157,8 +157,8 @@ class TurnosTest(TestCase):
         assert content["message"] == "El turno se ha guardado correctamente."
 
         turno = Turno.objects.get(pk=1)
-        self.assertEquals(turno.obraSocial.id, 2)
-        self.assertEquals(turno.observacion, 'otra cosa')
+        self.assertEqual(turno.obraSocial.id, 2)
+        self.assertEqual(turno.observacion, 'otra cosa')
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
 
     def test_anular_turno_success(self):
@@ -166,7 +166,7 @@ class TurnosTest(TestCase):
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk).count(), 0)
 
         turno = Turno.objects.get(pk=1)
-        self.assertEquals(turno.estado.id, Estado.PENDIENTE)
+        self.assertEqual(turno.estado.id, Estado.PENDIENTE)
 
         response = self.client.get('/turno/1/anular/', {'observacion_turno': 'descripcion anulacion'})
         assert response.content
@@ -175,8 +175,8 @@ class TurnosTest(TestCase):
         assert content["message"] == "El turno se ha anulado correctamente."
 
         turno = Turno.objects.get(pk=1)
-        self.assertEquals(turno.estado.id, Estado.ANULADO)
-        self.assertEquals(turno.observacion, 'descripcion anulacion')
+        self.assertEqual(turno.estado.id, Estado.ANULADO)
+        self.assertEqual(turno.observacion, 'descripcion anulacion')
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
 
     def test_reprogramar_turno_success(self):
@@ -184,13 +184,13 @@ class TurnosTest(TestCase):
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk).count(), 0)
 
         turno = Turno.objects.get(pk=1)
-        self.assertEquals(turno.estado.id, Estado.PENDIENTE)
+        self.assertEqual(turno.estado.id, Estado.PENDIENTE)
 
         response = self.client.get('/turno/1/reprogramar/', {'observacion_turno': 'descripcion anulacion'})
 
         turno = Turno.objects.get(pk=1)
-        self.assertEquals(turno.estado.id, Estado.ANULADO)
-        self.assertEquals(turno.observacion, 'descripcion anulacion')
+        self.assertEqual(turno.estado.id, Estado.ANULADO)
+        self.assertEqual(turno.observacion, 'descripcion anulacion')
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
 
     def test_confirmar_turno_success(self):
@@ -198,7 +198,7 @@ class TurnosTest(TestCase):
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk).count(), 0)
 
         turno = Turno.objects.get(pk=1)
-        self.assertEquals(turno.estado.id, Estado.PENDIENTE)
+        self.assertEqual(turno.estado.id, Estado.PENDIENTE)
 
         response = self.client.get('/turno/1/confirmar/', {})
         assert response.content
@@ -207,7 +207,7 @@ class TurnosTest(TestCase):
         assert content["message"] == "El turno se ha confirmado correctamente."
 
         turno = Turno.objects.get(pk=1)
-        self.assertEquals(turno.estado.id, Estado.CONFIRMADO)
+        self.assertEqual(turno.estado.id, Estado.CONFIRMADO)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
 
 
@@ -277,5 +277,5 @@ class IsMedicoDeLicenciaTest(TestCase):
 
     def test_medico_no_esta_de_licencia_con_fecha_igual_licencia_de_otro_medico(self):
         otro_medico_id = 2
-        self.assertNotEquals(self.medico.id, otro_medico_id)
+        self.assertNotEqual(self.medico.id, otro_medico_id)
         self.assertFalse(_is_medico_con_licencia(self.fecha_inicio_licencia, otro_medico_id))

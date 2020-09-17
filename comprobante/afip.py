@@ -248,7 +248,7 @@ class _Afip(object):
     @requiere_ticket
     def consultar_proximo_numero(self, nro_terminal, tipo_comprobante, sub_tipo):
         codigo_afip = Comprobante(nro_terminal=nro_terminal, tipo_comprobante=tipo_comprobante, sub_tipo=sub_tipo).codigo_afip
-        return long(self.webservice.CompUltimoAutorizado(codigo_afip, nro_terminal) or 0) + 1
+        return int(self.webservice.CompUltimoAutorizado(codigo_afip, nro_terminal) or 0) + 1
 
 class Afip(AfipRouter):
     _instance = None
