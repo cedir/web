@@ -18,7 +18,7 @@ class Estado(models.Model):
     class Meta:
         db_table = 'turnos_estados'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.descripcion
 
 
@@ -42,7 +42,7 @@ class Turno(models.Model):
     def getDuracionEnMinutos(self):
         return (self.horaFinEstimada.hour * 60 + self.horaFinEstimada.minute) - (self.horaInicio.hour * 60 + self.horaInicio.minute)
 
-    def __unicode__(self):
+    def __str__(self):
         return "Turno: id={0}, fecha={1}, paciente={2}, OS={3}".format(self.id, self.fechaTurno, self.paciente, self.obraSocial)
 
 

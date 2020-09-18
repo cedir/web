@@ -23,7 +23,7 @@ class Medicamento(models.Model):
     class Meta:
         db_table = 'tblMedicamentos'
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s (%s)' % (self.descripcion, self.tipo)
 
 

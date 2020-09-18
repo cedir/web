@@ -21,7 +21,7 @@ class Anestesista(models.Model):
     email = models.EmailField("E-mail", max_length=200, db_column="mail", null=True, blank=True)
     porcentaje_anestesista = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.00'))
 
-    def __unicode__ (self):
+    def __str__ (self):
         return '%s, %s' % (self.apellido, self.nombre, )
 
     class Meta:

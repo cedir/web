@@ -33,7 +33,7 @@ class Presentacion(models.Model):
     class Meta:
         db_table = 'tblFacturacion'
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s %s' % (self.fecha, self.obra_social)
 
 
