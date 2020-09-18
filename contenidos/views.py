@@ -8,7 +8,6 @@ import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
 from datetime import date
 from django.http import HttpResponse, Http404
-from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
 from django.db.models import  Value
 from django.db.models.functions import Coalesce
@@ -37,7 +36,7 @@ def get_home(request):
         'preguntas_frecuentes_contents': preguntas_frecuentes_contents,
     }
     t = select_template(['home/index.html'])
-    return HttpResponse(t.render(RequestContext(request, context)))
+    return HttpResponse(t.render(context))
 
 def get_content_friendly_url(request, friendly_url):
     """
@@ -66,7 +65,7 @@ def get_content(request, id_content, templateName='detalle-contenido.html'):
             file_path_name + ext,
         ) for file_path_name, ext in non_empty_parts]
 
-    context = Context({
+    context = {
         'id':content.id,
         'title':content.title,
         'description':content.description,
@@ -81,10 +80,10 @@ def get_content(request, id_content, templateName='detalle-contenido.html'):
             'url': r.friendlyURL or r.id,
             'images': get_images(r)
         } for r in related]
-    })
+    }
 
     template = select_template(['home/{}'.format(templateName)])
-    return HttpResponse(template.render(RequestContext(request, context)))
+    return HttpResponse(template.render(context))
 
 def get_categoria_friendly_url(request, friendly_url):
     """
@@ -131,20 +130,19 @@ def get_categoria(request):
 
         return contents_dicc
 
-    context = Context({
+    context = {
         'title': categoria.name,
         'description': categoria.description,
         'friendly': categoria.friendlyURL,
         'contents': [create_content(content) for content in contents],
-        })
+        }
 
     template_name = 'listado-contenidos.html'
     if 'template' in request.GET and request.GET['template']:
         template_name = request.GET['template']
 
     template = select_template(['home/{}'.format(template_name)])
-    return HttpResponse(template.render(RequestContext(request, context)))
-
+    return HttpResponse(template.render(context))
 
 def get_video(request, public_id):
     """
@@ -176,7 +174,7 @@ def get_video(request, public_id):
         'estudio_does_not_exist': estudio_does_not_exist,
     }
     t = select_template(['pages/video_details.html'])
-    return HttpResponse(t.render(RequestContext(request, context)))
+    return HttpResponse(t.render(context))
 
 def send_mail(request):
     data = { 'sent': 'no' }
@@ -191,7 +189,7 @@ def send_mail(request):
 
 
         greq = urllib.request.Request('https://www.google.com/recaptcha/api/siteverify')
-        greq.add_data(urllib.parse.urlencode({ 'secret': settings.CAPTCHA_SECRET, 'response': captcha }))
+        greq.data = urllib.parse.urlencode({ 'secret': settings.CAPTCHA_SECRET, 'response': captcha })
 
         gres = urllib.request.urlopen(greq)
         gdata = json.load(gres)

@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.http import HttpResponse, QueryDict, JsonResponse
 from django.conf import settings
-from django.template import Context, loader
+from django.template import loader
 from django.utils.dateparse import parse_date
 from rest_framework import viewsets
 

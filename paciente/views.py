@@ -3,7 +3,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, filters
-from django.template import Context, loader
+from django.template import loader
 from paciente.models import Paciente
 from .models import Paciente
 from .serializers import PacienteSerializer, PacienteFormSerializer
@@ -14,10 +14,10 @@ def create_form(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
-    c = Context({
+    c = {
         'isCreate': 1,
         'logged_user_name': request.user.username,
-    })
+    }
 
     t = loader.get_template('turnos/ABMPaciente.html')
     return HttpResponse(t.render(c))
@@ -34,7 +34,7 @@ def update_form(request, id_paciente):
     if paciente.fechaNacimiento:
         fecha_nacimiento = paciente.fechaNacimiento.strftime(settings.FORMAT_DATE)
 
-    c = Context({
+    c = {
         'id': paciente.id,
         'dni': paciente.dni,
         'nombre': paciente.nombre,
@@ -47,7 +47,7 @@ def update_form(request, id_paciente):
         'informacion_extra': paciente.informacion_extra or '',
         'email': paciente.email or '',
         'logged_user_name': request.user.username,
-    })
+    }
 
     t = loader.get_template('turnos/ABMPaciente.html')
     return HttpResponse(t.render(c))
@@ -87,12 +87,12 @@ def buscar_form(request):
         "email": paciente.email
     } for paciente in pacientes]
 
-    c = Context({
+    c = {
         'logged_user_name': request.user.username,
         'pacientes': arr_hsh_pacientes,
         'apellido': apellido,
         'dni': dni,
-    })
+    }
 
     template_name = 'turnos/buscarPaciente.html'
     if request_type == 'ajax':

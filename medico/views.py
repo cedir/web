@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.shortcuts import redirect
-from django.template import Template, Context, loader
+from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
 from rest_framework.response import Response
@@ -54,13 +54,13 @@ def get_disponibilidad_medicos(request):
         "id": sala.id, "nombre": sala.nombre
     } for sala in salas]
 
-    c = Context({
+    c = {
       'logged_user_name': request.user.username,
       'medicos': arr_medicos,
       'disponibilidades':arr_disponibilidades,
       'salas': arr_salas,
       'dias': dias,
-    })
+    }
 
     t = loader.get_template('turnos/disponibilidadMedicosAMB.html')
 
