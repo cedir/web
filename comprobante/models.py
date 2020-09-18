@@ -19,7 +19,7 @@ class TipoComprobante(models.Model):
     class Meta:
         db_table = 'tblComprobantesTipo'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nombre
 
 

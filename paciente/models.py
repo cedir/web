@@ -37,6 +37,6 @@ class Paciente(models.Model):
     class Meta:
         db_table = 'tblPacientes'
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s, %s' % (self.apellido, self.nombre)
 

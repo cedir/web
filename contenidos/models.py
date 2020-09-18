@@ -35,7 +35,7 @@ class Categoria(models.Model):
     description = models.TextField("Descripcion",blank=True)
     friendlyURL = models.CharField("Friendly URL", max_length=100,null=True,blank=True)
 
-    def __unicode__ (self):
+    def __str__ (self):
         return self.name
 
     def clean(self):
@@ -96,5 +96,5 @@ class Contenido(models.Model):
 
         validate_friendly_url(self.friendlyURL, self)
 
-    def __unicode__ (self):
+    def __str__ (self):
         return self.title

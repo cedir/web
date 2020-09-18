@@ -38,7 +38,7 @@ class ObraSocial(models.Model):
         db_table = 'AlmacenObraSocial'
         ordering = ['nombre']
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.nombre
 
     def is_particular_or_especial(self):

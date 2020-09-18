@@ -8,7 +8,7 @@ class TipoMovimientoCaja(models.Model):
     class Meta:
         db_table = 'tblCajaTipoDeMovimientos'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.descripcion
 
 class MovimientoCaja(models.Model):

@@ -14,5 +14,5 @@ class Practica(models.Model):
         db_table = 'AlmacenEstudios'
         ordering = ['descripcion']
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % (self.abreviatura or self.descripcion)

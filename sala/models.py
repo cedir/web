@@ -9,5 +9,5 @@ class Sala(models.Model):
     class Meta:
         db_table = 'turnos_salas'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.nombre

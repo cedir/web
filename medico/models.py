@@ -33,7 +33,7 @@ class Medico(models.Model):
     facturar_amr_en_nombre_de_medico = models.ForeignKey('self', models.SET_NULL, related_name='facturar_amr_medico', blank=True, null=True)
     facturar_osde_en_nombre_de_medico = models.ForeignKey('self', models.SET_NULL, related_name='facturar_osde_medico', blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s, %s' % (self.apellido, self.nombre, )
 
     class Meta:
