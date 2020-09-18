@@ -2,7 +2,7 @@
 
 
 from django.http import HttpResponse
-from django.template import Template, Context, loader
+from django.template import loader
 from django.db.models import Q
 
 from contenidos.models import *
@@ -58,12 +58,12 @@ def getResults(request):
 
         arrContents.append(contents_dicc)
 
-    c = Context({
+    c = {
         'contents': arrContents,
         'contents_counted':len(arrContents),
         'words':keyWord,
         'category_id':categoryId,
-    })
+    }
 
     templateName = 'search_results.html'
     t = loader.get_template('pages/' + templateName)

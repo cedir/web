@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.template import Template, Context, loader
+from django.template import loader
 
 def getStatic(request, templateName = 'default.html'):
 
@@ -13,7 +13,7 @@ def getStatic(request, templateName = 'default.html'):
     t = loader.get_template('pages/' + templateName)
 
 
-    c = Context({
+    c = {
     'flash_button_id': flash_buttonId,
-    })
+    }
     return HttpResponse(t.render(c))
