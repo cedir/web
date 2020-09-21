@@ -23,5 +23,5 @@ before_script:
     - python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_user('asd', 'asd@asd.com', 'asd')"
 script:
     - python manage.py test
-    - pylint caja/ comprobante/ estudio/ medico/ medicamento/ obra_social/ paciente/ practica/ presentacion/ sala/ scripts/ security/ turno/ usuario/
+    - pylint anestesista/ caja/ comprobante/ estudio/ medico/ medicamento/ obra_social/ paciente/ practica/ presentacion/ sala/ scripts/ security/ turno/ usuario/
     - python manage.py runserver & node_modules/.bin/newman run integration_tests/cedir_web.postman_collection.json -e integration_tests/local.postman_environment.json --verbose

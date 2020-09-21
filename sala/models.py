@@ -10,4 +10,4 @@ class Sala(models.Model):
         db_table = 'turnos_salas'
 
     def __str__(self):
-        return self.nombre
+        return str(self.nombre)

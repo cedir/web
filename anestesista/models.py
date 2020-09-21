@@ -52,7 +52,7 @@ class ComplejidadEstudio(models.Model):
 
     def clean(self):
         """Para que el filtro de complefidadEstudio funcione, debe estar guardado en forma ascendente"""
-        if ' ' in self.estudios:
+        if ' ' in str(self.estudios):
             raise ValidationError("Los estudios (practicas IDs) deben estar separados por comas y sin espacios")
 
         practicas_ids = self.estudios.split(',')
