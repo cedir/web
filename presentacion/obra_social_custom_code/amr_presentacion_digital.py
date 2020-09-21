@@ -35,31 +35,31 @@ class AmrRowBase(object):
         importe_pension = Decimal(estudio.pension).quantize(Decimal('.01'), ROUND_UP)
         importe_medicacion = Decimal(estudio.importe_medicacion).quantize(Decimal('.01'), ROUND_UP)
 
-        self.codigo_de_prestador = u'{:<6}'.format('')
-        self.codigo_de_convenio = u'{:<5}'.format('')
-        self.numero_de_factura = u'{0:08}'.format(comprobante.numero)
-        self.numero_de_rendicion = u'{:<7}'.format('')
-        self.codigo_de_afiliado = u'{:<15}'.format(self.format_nro_afiliado(estudio.paciente))
-        self.nombre_de_afiliado = u'{:<30}'.format(remove_non_ascii_character(unicode(estudio.paciente))[:30])
-        self.tipo_documento = u'0'
-        self.numero_de_documento = u'{:<8}'.format(unicode(estudio.paciente.dni)[:8])
-        self.numero_de_bono = u'{:<7}'.format(estudio.nro_de_orden[:7])  # nro de orden
-        self.fecha = u'{}'.format(estudio.fecha.strftime('%Y%m%d'))  # AAAAMMDD
+        self.codigo_de_prestador = '{:<6}'.format('')
+        self.codigo_de_convenio = '{:<5}'.format('')
+        self.numero_de_factura = '{0:08}'.format(comprobante.numero)
+        self.numero_de_rendicion = '{:<7}'.format('')
+        self.codigo_de_afiliado = '{:<15}'.format(self.format_nro_afiliado(estudio.paciente))
+        self.nombre_de_afiliado = '{:<30}'.format(remove_non_ascii_character(str(estudio.paciente))[:30])
+        self.tipo_documento = '0'
+        self.numero_de_documento = '{:<8}'.format(str(estudio.paciente.dni)[:8])
+        self.numero_de_bono = '{:<7}'.format(estudio.nro_de_orden[:7])  # nro de orden
+        self.fecha = '{}'.format(estudio.fecha.strftime('%Y%m%d'))  # AAAAMMDD
         self.codigo_de_nomenclador_prestacional = '{0:<7}'.format(estudio.practica.codigoMedico[:7])
-        self.tipo_de_nomenclador_prestacional = u'M'
-        self.nombre_de_nomenclador_prestacional = u'{:<30}'.format(unicode(estudio.practica)[:30])
-        self.cantidad = u'00001'
+        self.tipo_de_nomenclador_prestacional = 'M'
+        self.nombre_de_nomenclador_prestacional = '{:<30}'.format(str(estudio.practica)[:30])
+        self.cantidad = '00001'
         self.matricula_del_efector = '{0:06}'.format(self.format_nro_matricula(estudio.medico))
-        self.nombre_del_efector = u'{:<30}'.format(remove_non_ascii_character(unicode(self.get_nombre_medico(estudio.medico)))[:30])
+        self.nombre_del_efector = '{:<30}'.format(remove_non_ascii_character(str(self.get_nombre_medico(estudio.medico)))[:30])
         self.honorarios = '0{0:013}'.format(importe).replace('.', '')
         self.derechos = '0{0:013}'.format(importe_pension).replace('.', '')
-        self.tipo_de_honorario = u'0'
-        self.porcentaje_honorario = u'100'
-        self.porcentaje_derechos = u'100'
-        self.urgencia = u'N'  # S=Si, N=No
+        self.tipo_de_honorario = '0'
+        self.porcentaje_honorario = '100'
+        self.porcentaje_derechos = '100'
+        self.urgencia = 'N'  # S=Si, N=No
         self.matricula_del_prescriptor = '{0:06}'.format(self.format_nro_matricula(estudio.medico_solicitante))
-        self.nombre_del_prescriptor = u'{:<30}'.format(remove_non_ascii_character(unicode(estudio.medico_solicitante))[:30])
-        self.codigo_de_autorizacion = u'{:<11}'.format('')  # no lo tenemos
+        self.nombre_del_prescriptor = '{:<30}'.format(remove_non_ascii_character(str(estudio.medico_solicitante))[:30])
+        self.codigo_de_autorizacion = '{:<11}'.format('')  # no lo tenemos
         self.medicamentos_y_descartables = '0{0:013}'.format(importe_medicacion).replace('.', '')
 
     def get_row(self):
@@ -73,7 +73,7 @@ class AmrRowBase(object):
                self.medicamentos_y_descartables
 
     def format_nro_afiliado(self, paciente):
-        nro_afiliado = paciente.nroAfiliado.split(u' ')[0]
+        nro_afiliado = paciente.nroAfiliado.split(' ')[0]
         nro_afiliado = nro_afiliado.replace('-', '')
         nro_afiliado = nro_afiliado[:15]  # corto en 15
         return nro_afiliado
@@ -81,7 +81,7 @@ class AmrRowBase(object):
     def format_nro_matricula(self, medico):
         nro_matricula = medico.matricula if medico.facturar_amr_en_nombre_de_medico == None else medico.facturar_amr_en_nombre_de_medico.matricula
         try:
-            nro_matricula = nro_matricula.split(u' ')[0]
+            nro_matricula = nro_matricula.split(' ')[0]
             nro_matricula = int(nro_matricula[:6])
             return nro_matricula
         except ValueError:
@@ -102,7 +102,7 @@ def remove_non_ascii_character(text):
     :return:
     """
     try:
-        text.encode(u'ascii')
+        text.encode('ascii')
     except UnicodeEncodeError:
-        text = text.encode(u'ascii', u'ignore').decode(u'ascii')
+        text = text.encode('ascii', 'ignore').decode('ascii')
     return text

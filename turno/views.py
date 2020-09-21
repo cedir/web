@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.http import HttpResponse, QueryDict, JsonResponse
 from django.conf import settings
-from django.template import Context, loader
+from django.template import loader
 from django.utils.dateparse import parse_date
 from rest_framework import viewsets
 
@@ -29,26 +29,26 @@ from common.utils import add_log_entry
 PIXELS_PER_MINUTE = 1.333
 err_ses = 'Error, la sesión se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo.'
 spaDayNumbers = dict(lunes=0, martes=1, miercoles=2, jueves=3, viernes=4, sabado=5, domingo=6)
-spaDays = [u'lunes', u'martes', u'miercoles', u'jueves', u'viernes', u'sabado', u'domingo']
-spaMonths = [None, u'enero', u'febrero', u'marzo', u'abril', u'mayo', u'junio', u'julio', u'agosto', u'setiembre',
-             u'octubre', u'noviembre', u'diciembre']
+spaDays = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo']
+spaMonths = [None, 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'setiembre',
+             'octubre', 'noviembre', 'diciembre']
 
 
 def get_home(request):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
-    c = Context({
+    c = {
         'logged_user_name': request.user.username,
-    })
+    }
     t = loader.get_template('turnos/home.html')
     return HttpResponse(t.render(c))
 
 
 def get_buscar_turnos(request):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     cond = {}
@@ -79,7 +79,7 @@ def get_buscar_turnos(request):
     rows_limit = 110
 
     # default filter if its empty
-    if not cond.keys():
+    if not list(cond.keys()):
         rows_limit = 50
 
     arr_turnos = Turno.objects.filter(**cond).order_by("-fechaTurno", 'horaInicio')[:rows_limit]
@@ -99,7 +99,7 @@ def get_buscar_turnos(request):
         "obra_social": turno.obraSocial.nombre,
         "observacion": turno.observacion,
         "img_estado": turno.estado.img,
-        "practica": " - ".join([practica.__unicode__() for practica in turno.practicas.all()])
+        "practica": " - ".join([practica.__str__() for practica in turno.practicas.all()])
     } for turno in arr_turnos]
 
     arr_medicos = [{
@@ -120,7 +120,7 @@ def get_buscar_turnos(request):
         "nombre": medico.nombre
     } for medico in obra_sociales]
 
-    c = Context({
+    c = {
         'turnos': arr_hsh_turnos,
         'medicos': arr_medicos,
         'fecha': _sql_date_to_normal_date(fecha),
@@ -130,7 +130,7 @@ def get_buscar_turnos(request):
         'ocultarAnuladosState': 'checked' if ocultar_anulados == 'true' else '',
         'logged_user_name': request.user.username,
         'uli_url': settings.ULI_URL
-    })
+    }
 
     t = loader.get_template('turnos/buscarTurnos.html')
 
@@ -172,7 +172,7 @@ def get_turno(request, id_turno):
         "creado_por": created_log[0].user.username if created_log else '-no disponible-',
         "ult_mod_por": last_modified_log[0].user.username if last_modified_log else '-no disponible-',
         "motivo_ult_mod": last_modified_log[0].change_message if last_modified_log else '-',
-        "practicas": ' - '.join(map(lambda p: p.__unicode__(), turno.practicas.all()))
+        "practicas": ' - '.join([p.__str__() for p in turno.practicas.all()])
         # TODO: registrar el usuario que anula el turno y una observación al respecto
         # "anulado_por": ...
         # observacion_anulacion": ...
@@ -183,7 +183,7 @@ def get_turno(request, id_turno):
 
 def get_turnos_disponibles(request):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     return _get_turnos_disponibles(request.user, request.GET)
@@ -214,7 +214,7 @@ def get_back_day_line(request):
 def guardar(request):
     err_sup = 'Error, se ha detectado superposición de turnos. Por favor, haga click en Mostrar y vuelva a intentarlo.'
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {'status': 0, 'message': err_ses}
         return JsonResponse(response_dict)
 
@@ -284,7 +284,7 @@ def guardar(request):
 
 def update(request, id_turno):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {'status': 0, 'message': err_ses}
         return JsonResponse(response_dict)
 
@@ -295,7 +295,7 @@ def update(request, id_turno):
         turno = Turno.objects.get(id=id_turno)
 
         if turno.estado.id == Estado.ANULADO:
-            raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
+            raise ValidationError('El turno esta anulado y no acepta modificaciones')
 
         turno.obraSocial = ObraSocial.objects.get(id=id_obra_social)
         turno.observacion = observacion
@@ -317,7 +317,7 @@ def update(request, id_turno):
 
 
 def anunciar(request, id_turno):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {'status': 0, 'message': err_ses}
         return JsonResponse(response_dict)
 
@@ -325,7 +325,7 @@ def anunciar(request, id_turno):
         turno = Turno.objects.get(id=id_turno)
 
         if turno.estado.id == Estado.ANULADO:
-            raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
+            raise ValidationError('El turno esta anulado y no acepta modificaciones')
 
         practicas = turno.practicas.all()
         for practica in practicas:
@@ -363,7 +363,7 @@ def anunciar(request, id_turno):
 
 
 def anular(request, id_turno):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {'status': 0, 'message': err_ses}
         return JsonResponse(response_dict)
 
@@ -373,7 +373,7 @@ def anular(request, id_turno):
         turno = Turno.objects.get(id=id_turno)
 
         if turno.estado.id == Estado.ANULADO:
-            raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
+            raise ValidationError('El turno esta anulado y no acepta modificaciones')
 
         turno.estado = Estado.objects.get(id=Estado.ANULADO)
 
@@ -398,7 +398,7 @@ def anular(request, id_turno):
 
 
 def reprogramar(request, id_turno):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {'status': 0, 'message': err_ses}
         return JsonResponse(response_dict)
 
@@ -425,7 +425,7 @@ def reprogramar(request, id_turno):
             'id-medico': turno.medico.id,
             'id-obra-social': turno.obraSocial.id
         })
-        data.setlist('id-practicas[]', [unicode(practica.id) for practica in practicas])
+        data.setlist('id-practicas[]', [str(practica.id) for practica in practicas])
 
         return _get_turnos_disponibles(request.user, data)
 
@@ -436,7 +436,7 @@ def reprogramar(request, id_turno):
 
 
 def confirmar(request, id_turno):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {'status': 0, 'message': err_ses}
         return JsonResponse(response_dict)
 
@@ -444,7 +444,7 @@ def confirmar(request, id_turno):
         turno = Turno.objects.get(id=id_turno)
 
         if turno.estado.id == Estado.ANULADO:
-            raise ValidationError(u'El turno esta anulado y no acepta modificaciones')
+            raise ValidationError('El turno esta anulado y no acepta modificaciones')
 
         turno.estado = Estado.objects.get(id=Estado.CONFIRMADO)
         turno.save()
@@ -501,7 +501,7 @@ def _get_day_line(fecha, id_sala):
           "duracionEnPixeles": turno.getDuracionEnMinutos() * PIXELS_PER_MINUTE - (1 * PIXELS_PER_MINUTE),
           "medico": turno.medico.nombre + ' ' + turno.medico.apellido,
           "obra_social": turno.obraSocial.nombre,
-          "practicas": u'-'.join([p.__unicode__() for p in turno.practicas.all()])
+          "practicas": '-'.join([p.__str__() for p in turno.practicas.all()])
       } for turno in turnos]
 
     arr_hsh_disponibilidad = [{
@@ -515,13 +515,13 @@ def _get_day_line(fecha, id_sala):
           "sala": disp.sala.nombre
       } for (index, disp) in enumerate(disponibilidades)]
 
-    day_line_context = Context({
+    day_line_context = {
         'lineDay': dia_format,
         'fechaTurno': fecha_format,
         'turnos': arr_hsh_turnos,
         'disponibilidades': arr_hsh_disponibilidad,
         'feriado': _is_feriado(fecha),
-    })
+    }
 
     return day_line_template.render(day_line_context)
 
@@ -625,7 +625,7 @@ def _get_turnos_disponibles(user, data):
         "selected": 1 if str(practica.id) in id_practicas else 0
     } for practica in practicas]
 
-    c = Context({
+    c = {
         'dayLines': day_lines,
         'nombrePaciente': paciente_seleccionado.nombre if paciente_seleccionado else "",
         'apellidoPaciente': paciente_seleccionado.apellido if paciente_seleccionado else "",
@@ -637,7 +637,7 @@ def _get_turnos_disponibles(user, data):
         'salas': arr_salas,
         'fecha': fecha,
         'logged_user_name': user.username,
-    })
+    }
 
     t = loader.get_template('turnos/buscarTurnosDisponibles.html')
 
@@ -666,21 +666,21 @@ class InfoTurnoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = InfoTurno.objects.all()
-        medico_id = self.request.query_params.get(u'medico')
-        practica_ids = self.request.query_params.get(u'practicas')
-        obra_social_ids = self.request.query_params.get(u'obras_sociales')
+        medico_id = self.request.query_params.get('medico')
+        practica_ids = self.request.query_params.get('practicas')
+        obra_social_ids = self.request.query_params.get('obras_sociales')
 
         if medico_id:
             queryset = queryset.filter(Q(medico=medico_id) | Q(medico__isnull=True))
 
         if obra_social_ids:
             queryset = queryset.filter(
-                Q(obra_sociales__id__in=obra_social_ids.split(u','))
+                Q(obra_sociales__id__in=obra_social_ids.split(','))
                 |
                 Q(obra_sociales__isnull=True)
             )
 
         if practica_ids:
-            queryset = queryset.filter(Q(practicas__id__in=practica_ids.split(u',')) | Q(practicas__isnull=True))
+            queryset = queryset.filter(Q(practicas__id__in=practica_ids.split(',')) | Q(practicas__isnull=True))
 
         return queryset.distinct()

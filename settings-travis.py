@@ -77,7 +77,7 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = PROJECT_ROOT + u'/static/templates/media_files/'
+MEDIA_ROOT = PROJECT_ROOT + '/static/templates/media_files/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -104,9 +104,9 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    PROJECT_ROOT + u'/static/templates',
+    PROJECT_ROOT + '/static/templates',
     #Alias /css /var/www/cedir/static/templates/css
-    PROJECT_ROOT + u'/static', # media_files
+    PROJECT_ROOT + '/static', # media_files
     #Alias /images /var/www/cedir/static/templates/images
     #Alias /js /var/www/cedir/static/templates/js
     #Alias /flash /var/www/cedir/static/templates/flash
@@ -150,7 +150,7 @@ WSGI_APPLICATION = 'wsgi.application'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.getcwd() + u'/static/templates', ],
+        'DIRS': [os.getcwd() + '/static/templates', ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -231,9 +231,9 @@ REST_FRAMEWORK = {
 }
 
 
-FORMAT_DATETIME = u'%d/%m/%Y %H:%M:%S'
-FORMAT_TIME = u'%H:%M:%S',
-FORMAT_DATE = u'%d/%m/%Y'
+FORMAT_DATETIME = '%d/%m/%Y %H:%M:%S'
+FORMAT_TIME = '%H:%M:%S',
+FORMAT_DATE = '%d/%m/%Y'
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
@@ -291,7 +291,7 @@ LOGGING = {
     }
 }
 
-EMAIL_NOTIFICATION_ACCOUNTS = [u'email@address.com']
+EMAIL_NOTIFICATION_ACCOUNTS = ['email@address.com']
 
 CAPTCHA_PUBLIC = '6LckIhUUAAAAAAsZYnp18fbeUoOPy6X5NOKFAVzf'
 CAPTCHA_SECRET = ''

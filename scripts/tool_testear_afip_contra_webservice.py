@@ -78,11 +78,11 @@ def main():
     # Si la emicion funciono correctamente, los datos se setean directamente en el comprobante.
     print("FACTURA")
     print("-------")
-    print(factura.cae)
-    print(factura.vencimiento_cae)
+    print((factura.cae))
+    print((factura.vencimiento_cae))
 
     # Le pedimos el comprobante a la AFIP y verificamos que los datos coincidan.
-    print(afip.consultar_comprobante(factura))
+    print((afip.consultar_comprobante(factura)))
 
     # Si la AFIP emitio bien, ahora se guardan.
     # Aca deberia haber codigo que hizo las verificaciones en realidad, pero esto es un PoC.
@@ -121,9 +121,9 @@ def main():
     afip.emitir_comprobante(nota_debito, lineas_nota_debito)
     print("NOTA DE DEBITO")
     print("--------------")
-    print(nota_debito.cae)
-    print(nota_debito.vencimiento_cae)
-    print(afip.consultar_comprobante(nota_debito))
+    print((nota_debito.cae))
+    print((nota_debito.vencimiento_cae))
+    print((afip.consultar_comprobante(nota_debito)))
     print("")
 
     #########
@@ -158,9 +158,9 @@ def main():
     print("NOTA DE CREDITO")
     print("---------------")
     afip.emitir_comprobante(nota_credito, lineas_nota_credito)
-    print(nota_credito.cae)
-    print(nota_credito.vencimiento_cae)
-    print(afip.consultar_comprobante(nota_credito))
+    print((nota_credito.cae))
+    print((nota_credito.vencimiento_cae))
+    print((afip.consultar_comprobante(nota_credito)))
     print("")
 
     #######################################
@@ -195,9 +195,9 @@ def main():
     print("FACTURA MIPYME")
     print("--------------")
     afip.emitir_comprobante(factura_electronica, lineas_factura_electronica)
-    print(factura_electronica.cae)
-    print(factura_electronica.vencimiento_cae)
-    print(afip.consultar_comprobante(factura_electronica))
+    print((factura_electronica.cae))
+    print((factura_electronica.vencimiento_cae))
+    print((afip.consultar_comprobante(factura_electronica)))
     print("")
 
     #######################################
@@ -233,9 +233,9 @@ def main():
     print("N DEBITO MIPYME")
     print("--------------")
     afip.emitir_comprobante(nota_de_debito_electronica, lineas_nota_de_debito_electronica)
-    print(nota_de_debito_electronica.cae)
-    print(nota_de_debito_electronica.vencimiento_cae)
-    print(afip.consultar_comprobante(nota_de_debito_electronica))
+    print((nota_de_debito_electronica.cae))
+    print((nota_de_debito_electronica.vencimiento_cae))
+    print((afip.consultar_comprobante(nota_de_debito_electronica)))
     print("")
 
     #######################################
@@ -271,9 +271,9 @@ def main():
     print("N CREDITO MIPYME")
     print("--------------")
     afip.emitir_comprobante(nota_de_credito_electronica, lineas_nota_de_credito_electronica)
-    print(nota_de_credito_electronica.cae)
-    print(nota_de_credito_electronica.vencimiento_cae)
-    print(afip.consultar_comprobante(nota_de_credito_electronica))
+    print((nota_de_credito_electronica.cae))
+    print((nota_de_credito_electronica.vencimiento_cae))
+    print((afip.consultar_comprobante(nota_de_credito_electronica)))
     print("")
 
 if __name__ == "__main__":

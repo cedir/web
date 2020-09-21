@@ -21,18 +21,18 @@ class TestViews(TestCase):
 
         comp = response.data['data']
 
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(comp['numero'], 14)
-        self.assertEquals(comp['tipo_comprobante']['nombre'], (TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)).nombre)
-        self.assertEquals(comp['tipo_comprobante']['id'], ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
-        self.assertEquals(comp['total_facturado'], '200.00')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(comp['numero'], 14)
+        self.assertEqual(comp['tipo_comprobante']['nombre'], (TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)).nombre)
+        self.assertEqual(comp['tipo_comprobante']['id'], ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+        self.assertEqual(comp['total_facturado'], '200.00')
 
         response = self.client.post('/api/comprobante/crear_comprobante_asociado', {'id-comprobante-asociado': 1, 'importe': 200, 'concepto': 'ajustes'})
 
         comp = response.data['data']
 
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(comp['numero'], 14)
-        self.assertEquals(comp['tipo_comprobante']['nombre'], (TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)).nombre)
-        self.assertEquals(comp['tipo_comprobante']['id'], ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
-        self.assertEquals(comp['total_facturado'], '200.00')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(comp['numero'], 14)
+        self.assertEqual(comp['tipo_comprobante']['nombre'], (TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)).nombre)
+        self.assertEqual(comp['tipo_comprobante']['id'], ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
+        self.assertEqual(comp['total_facturado'], '200.00')

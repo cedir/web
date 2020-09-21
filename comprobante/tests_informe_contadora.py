@@ -110,7 +110,7 @@ class TestCaluloRetencionImpositiva(TestCase):
         comprobante = Comprobante.objects.get(pk=3)
         self.assertIsNone(comprobante.presentacion.first())
         calculador = calculador_informe_factory(comprobante)
-        self.assertEquals(calculador.retencion_cedir, Decimal("0.00"))
+        self.assertEqual(calculador.retencion_cedir, Decimal("0.00"))
 
     def test_retencion_impositiva_presentacion_cobrada(self):
         """
@@ -124,7 +124,7 @@ class TestCaluloRetencionImpositiva(TestCase):
         retencion_esperada = pago.retencion_impositiva * \
             presentacion.total_facturado / Decimal(100)
         calculador = calculador_informe_factory(comprobante)
-        self.assertEquals(calculador.retencion_impositiva, retencion_esperada)
+        self.assertEqual(calculador.retencion_impositiva, retencion_esperada)
 
     def test_retencion_impositiva_para_presentacion_no_cobrada_que_va_por_AMR(self):
         comprobante = Comprobante.objects.get(pk=1)
@@ -134,7 +134,7 @@ class TestCaluloRetencionImpositiva(TestCase):
         calculador = calculador_informe_factory(comprobante)
         retencion_esperada = Decimal(
             "32.00") * presentacion.total_facturado / Decimal("100.00")
-        self.assertEquals(calculador.retencion_impositiva, retencion_esperada)
+        self.assertEqual(calculador.retencion_impositiva, retencion_esperada)
 
     def test_retencion_impositiva_para_presentacion_no_cobrada_que_no_va_por_AMR(self):
         comprobante = Comprobante.objects.get(pk=4)
@@ -144,7 +144,7 @@ class TestCaluloRetencionImpositiva(TestCase):
         calculador = calculador_informe_factory(comprobante)
         retencion_esperada = Decimal(
             "25.00") * presentacion.total_facturado / Decimal("100.00")
-        self.assertEquals(calculador.retencion_impositiva, retencion_esperada)
+        self.assertEqual(calculador.retencion_impositiva, retencion_esperada)
 
 class TestEndpoint(TestCase):
     fixtures = ["comprobantes.json", "practicas.json", "anestesistas.json",

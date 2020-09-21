@@ -16,7 +16,7 @@ class EstadoField(serializers.Field):
         return Presentacion.ESTADOS[value][1]
 
     def to_internal_value(self, data):
-        return filter(lambda estado: estado[1] == data, Presentacion.ESTADOS)[0][0]
+        return [estado for estado in Presentacion.ESTADOS if estado[1] == data][0][0]
 
 class PresentacionSmallSerializer(serializers.ModelSerializer):
     comprobante = ComprobanteSmallSerializer()
@@ -35,8 +35,8 @@ class EstudioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Estudio
-        fields = (u'id', u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
-                  u'medico_solicitante', u'anestesista', u'motivo', u'informe')
+        fields = ('id', 'fecha', 'paciente', 'practica', 'obra_social', 'medico',
+                  'medico_solicitante', 'anestesista', 'motivo', 'informe')
 
 
 class EstudioRetrieveSerializer(EstudioSerializer):
@@ -44,17 +44,17 @@ class EstudioRetrieveSerializer(EstudioSerializer):
 
     class Meta:
         model = Estudio
-        fields = (u'id', u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
-                  u'medico_solicitante', u'anestesista', u'motivo', u'informe', u'presentacion',
-                  u'fecha_cobro', u'importe_estudio', u'importe_medicacion', u'pension', u'diferencia_paciente', u'arancel_anestesia',
-                  u'es_pago_contra_factura', u'pago_contra_factura')
+        fields = ('id', 'fecha', 'paciente', 'practica', 'obra_social', 'medico',
+                  'medico_solicitante', 'anestesista', 'motivo', 'informe', 'presentacion',
+                  'fecha_cobro', 'importe_estudio', 'importe_medicacion', 'pension', 'diferencia_paciente', 'arancel_anestesia',
+                  'es_pago_contra_factura', 'pago_contra_factura')
 
 
 class EstudioCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Estudio
-        fields = (u'id',u'fecha', u'paciente', u'practica', u'obra_social', u'medico',
-            u'medico_solicitante', u'anestesista', u'motivo', u'informe', u'sucursal')
+        fields = ('id','fecha', 'paciente', 'practica', 'obra_social', 'medico',
+            'medico_solicitante', 'anestesista', 'motivo', 'informe', 'sucursal')
 
 class EstudioSinPresentarSerializer(serializers.ModelSerializer):
     paciente = PacienteSerializer()
@@ -65,9 +65,9 @@ class EstudioSinPresentarSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Estudio
-        fields = (u'id', u'fecha', u'nro_de_orden', u'paciente', u'practica',
-            u'medico', u'importe_estudio', u'pension', u'diferencia_paciente',
-            u'importe_medicacion', u'arancel_anestesia')
+        fields = ('id', 'fecha', 'nro_de_orden', 'paciente', 'practica',
+            'medico', 'importe_estudio', 'pension', 'diferencia_paciente',
+            'importe_medicacion', 'arancel_anestesia')
 
     def get_importe_estudio(self, estudio):
         try:
@@ -89,11 +89,11 @@ class MedicacionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Medicacion
-        fields = (u'id', u'medicamento', u'estudio_id', u'importe')
+        fields = ('id', 'medicamento', 'estudio_id', 'importe')
 
 
 class MedicacionCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Medicacion
-        fields = (u'id', u'medicamento', u'importe', u'estudio')
+        fields = ('id', 'medicamento', 'importe', 'estudio')

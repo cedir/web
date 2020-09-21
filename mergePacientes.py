@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from django.core.management import setup_environ
-import settings
+from . import settings
 setup_environ(settings)
 
 from managers.model.personas import *
@@ -32,13 +32,13 @@ rowCount = 0
 arrPaciente = Paciente.objects.all()[:20]
 for paciente in arrPaciente:
  b = calculate_borndate(int(paciente.edad))
- print "pac: " + str(paciente.id) + " edad: " + str(paciente.edad)
+ print(("pac: " + str(paciente.id) + " edad: " + str(paciente.edad)))
  if (b is not None): 
-  print "Fecha: " + str(b)
+  print(("Fecha: " + str(b)))
   paciente.fechaNacimiento = b
   paciente.save()
  else:
-  print "skipping.."
+  print("skipping..")
  rowCount +=1
 
-print "fin Cant de pacientes: " + str(rowCount)
+print(("fin Cant de pacientes: " + str(rowCount)))

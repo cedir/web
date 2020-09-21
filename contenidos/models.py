@@ -35,7 +35,7 @@ class Categoria(models.Model):
     description = models.TextField("Descripcion",blank=True)
     friendlyURL = models.CharField("Friendly URL", max_length=100,null=True,blank=True)
 
-    def __unicode__ (self):
+    def __str__ (self):
         return self.name
 
     def clean(self):
@@ -87,14 +87,14 @@ class Contenido(models.Model):
 
     def clean(self):
 
-        if self.img1.name <> '':
+        if self.img1.name != '':
             self.validate_image(self.img1)
-        if self.img2.name <> '':
+        if self.img2.name != '':
             self.validate_image(self.img2)
-        if self.img3.name <> '':
+        if self.img3.name != '':
             self.validate_image(self.img3)
 
         validate_friendly_url(self.friendlyURL, self)
 
-    def __unicode__ (self):
+    def __str__ (self):
         return self.title

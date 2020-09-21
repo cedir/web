@@ -44,7 +44,7 @@ class PagoContraFacturaTest(TestCase):
 
         with self.assertRaises(AssertionError) as context:
             self.estudio.set_pago_contra_factura(self.nuevo_importe_pago_contra_factura)
-            self.assertTrue(u'Estudio ya fue presentado y no puede modificarse' in context.exception)
+            self.assertTrue('Estudio ya fue presentado y no puede modificarse' in context.exception)
 
     def test_set_pago_contra_factura_devuelve_error_si_el_estudio_esta_pagado_al_actuante(self):
         self.estudio.pago_medico_actuante_id = 1
@@ -53,7 +53,7 @@ class PagoContraFacturaTest(TestCase):
 
         with self.assertRaises(AssertionError) as context:
             self.estudio.set_pago_contra_factura(self.nuevo_importe_pago_contra_factura)
-            self.assertTrue(u'Estudio ya fue pagado al medico y no puede modificarse' in context.exception)
+            self.assertTrue('Estudio ya fue pagado al medico y no puede modificarse' in context.exception)
 
     def test_set_pago_contra_factura_devuelve_error_si_el_estudio_esta_pagado_al_solicitante(self):
         self.estudio.pago_medico_solicitante_id = 1
@@ -62,7 +62,7 @@ class PagoContraFacturaTest(TestCase):
 
         with self.assertRaises(AssertionError) as context:
             self.estudio.set_pago_contra_factura(self.nuevo_importe_pago_contra_factura)
-            self.assertTrue(u'Estudio ya fue pagado al medico y no puede modificarse' in context.exception)
+            self.assertTrue('Estudio ya fue pagado al medico y no puede modificarse' in context.exception)
 
     def test_anular_pago_contra_factura_success(self):
         self.estudio.es_pago_contra_factura = 1
@@ -86,7 +86,7 @@ class PagoContraFacturaTest(TestCase):
 
         with self.assertRaises(AssertionError) as context:
             self.estudio.anular_pago_contra_factura()
-            self.assertTrue(u'El estudio no esta como Pago Contra Factura' in context.exception)
+            self.assertTrue('El estudio no esta como Pago Contra Factura' in context.exception)
             self.assertFalse(bool(self.estudio.es_pago_contra_factura))
             self.assertEqual(self.estudio.pago_contra_factura, Decimal(0))
             self.assertEqual(self.estudio.fecha_cobro, None)
@@ -101,7 +101,7 @@ class PagoContraFacturaTest(TestCase):
 
         with self.assertRaises(AssertionError) as context:
             self.estudio.anular_pago_contra_factura()
-            self.assertTrue(u'Estudio ya fue pagado al medico y no puede modificarse' in context.exception)
+            self.assertTrue('Estudio ya fue pagado al medico y no puede modificarse' in context.exception)
 
     def test_anular_pago_contra_factura_devuelve_error_si_el_estudio_fue_ya_pagado_al_solicitante(self):
         self.estudio.pago_medico_actuante = None
@@ -113,4 +113,4 @@ class PagoContraFacturaTest(TestCase):
 
         with self.assertRaises(AssertionError) as context:
             self.estudio.anular_pago_contra_factura()
-            self.assertTrue(u'Estudio ya fue pagado al medico y no puede modificarse' in context.exception)
+            self.assertTrue('Estudio ya fue pagado al medico y no puede modificarse' in context.exception)

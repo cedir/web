@@ -1,12 +1,12 @@
 from django.contrib import admin
-from models import Anestesista, ComplejidadEstudio, Complejidad
+from .models import Anestesista, ComplejidadEstudio, Complejidad
 
 
 class AnestesistaAdmin(admin.ModelAdmin):
-    fields = (u'nombre', u'apellido', u'matricula', u'direccion', u'localidad', u'telefono', u'email', u'porcentaje_anestesista')
-    search_fields = [u'nombre', u'apellido', ]
-    list_display = (u'apellido', u'nombre', u'matricula', u'localidad', u'telefono')
-    ordering = (u'apellido', u'nombre', )
+    fields = ('nombre', 'apellido', 'matricula', 'direccion', 'localidad', 'telefono', 'email', 'porcentaje_anestesista')
+    search_fields = ['nombre', 'apellido', ]
+    list_display = ('apellido', 'nombre', 'matricula', 'localidad', 'telefono')
+    ordering = ('apellido', 'nombre', )
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -15,15 +15,15 @@ admin.site.register(Anestesista, AnestesistaAdmin)
 
 
 class ComplejidadEstudioAdmin(admin.ModelAdmin):
-    fields = (u'estudios', 'formula')
-    list_display = (u'practicas', u'estudios', 'formula')
+    fields = ('estudios', 'formula')
+    list_display = ('practicas', 'estudios', 'formula')
 
 admin.site.register(ComplejidadEstudio, ComplejidadEstudioAdmin)
 
 
 class ComplejidadAdmin(admin.ModelAdmin):
-    fields = (u'importe', )
-    list_display = (u'id', 'importe')
+    fields = ('importe', )
+    list_display = ('id', 'importe')
 
 admin.site.register(Complejidad, ComplejidadAdmin)
 

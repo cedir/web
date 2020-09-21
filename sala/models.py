@@ -7,7 +7,7 @@ class Sala(models.Model):
     observaciones = models.CharField(max_length=200)
 
     class Meta:
-        db_table = u'turnos_salas'
+        db_table = 'turnos_salas'
 
-    def __unicode__(self):
-        return self.nombre
+    def __str__(self):
+        return str(self.nombre)

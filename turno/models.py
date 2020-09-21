@@ -18,8 +18,8 @@ class Estado(models.Model):
     class Meta:
         db_table = 'turnos_estados'
 
-    def __unicode__(self):
-        return self.descripcion
+    def __str__(self):
+        return str(self.descripcion)
 
 
 class Turno(models.Model):
@@ -42,8 +42,8 @@ class Turno(models.Model):
     def getDuracionEnMinutos(self):
         return (self.horaFinEstimada.hour * 60 + self.horaFinEstimada.minute) - (self.horaInicio.hour * 60 + self.horaInicio.minute)
 
-    def __unicode__(self):
-        return u"Turno: id={0}, fecha={1}, paciente={2}, OS={3}".format(self.id, self.fechaTurno, self.paciente, self.obraSocial)
+    def __str__(self):
+        return "Turno: id={0}, fecha={1}, paciente={2}, OS={3}".format(self.id, self.fechaTurno, self.paciente, self.obraSocial)
 
 
 class InfoTurno(models.Model):
@@ -53,12 +53,12 @@ class InfoTurno(models.Model):
     texto = models.TextField()
 
     def get_obras_sociales_as_string(self):
-        return u' - '.join([obra_social.nombre for obra_social in self.obra_sociales.all()])
+        return ' - '.join([obra_social.nombre for obra_social in self.obra_sociales.all()])
 
     get_obras_sociales_as_string.short_description = 'Obras Sociales'
 
     def get_practicas_as_string(self):
-        return u' - '.join([practica.abreviatura if practica.abreviatura else practica.descripcion for practica in self.practicas.all()])
+        return ' - '.join([practica.abreviatura if practica.abreviatura else practica.descripcion for practica in self.practicas.all()])
 
     get_practicas_as_string.short_description = 'Practicas'
 

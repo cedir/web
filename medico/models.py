@@ -25,7 +25,7 @@ class Medico(models.Model):
                             db_column="mail", blank=True)
     clave_fiscal = models.CharField("Clave Fiscal", max_length=200, \
                                     db_column="claveFiscal", blank=True, default="")
-    responsabilidad_fiscal = models.CharField(u'Responsabilidad Fiscal', \
+    responsabilidad_fiscal = models.CharField('Responsabilidad Fiscal', \
                                               db_column='responsabilidadFiscal',
                                               max_length=200, choices=RESPONSABILIDADES_FISCALES, \
                                               default='MONOTRIBUTO')
@@ -33,12 +33,12 @@ class Medico(models.Model):
     facturar_amr_en_nombre_de_medico = models.ForeignKey('self', models.SET_NULL, related_name='facturar_amr_medico', blank=True, null=True)
     facturar_osde_en_nombre_de_medico = models.ForeignKey('self', models.SET_NULL, related_name='facturar_osde_medico', blank=True, null=True)
 
-    def __unicode__(self):
-        return u'%s, %s' % (self.apellido, self.nombre, )
+    def __str__(self):
+        return '%s, %s' % (self.apellido, self.nombre, )
 
     class Meta:
         db_table = 'tblMedicosAct'
-        ordering = [u'apellido']
+        ordering = ['apellido']
 
     #TODO: resolver duplicación de tablas de médicos y luego borrar este método.
     def save(self, *args, **kwargs):
@@ -113,10 +113,10 @@ class Disponibilidad(models.Model):
 
 
 class PagoMedico(models.Model):
-    id = models.AutoField(primary_key=True, db_column=u'nroPago')
-    fecha = models.DateField(db_column=u'fechaPago')
-    medico = models.ForeignKey(Medico, db_column=u'idMedico')
-    observacion = models.TextField(db_column=u'observacionPago')
+    id = models.AutoField(primary_key=True, db_column='nroPago')
+    fecha = models.DateField(db_column='fechaPago')
+    medico = models.ForeignKey(Medico, db_column='idMedico')
+    observacion = models.TextField(db_column='observacionPago')
 
     class Meta:
         db_table = 'tblPagosMedicos'

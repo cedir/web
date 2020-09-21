@@ -3,10 +3,10 @@ from turno.models import InfoTurno, PeriodoSinAtencion, Turno
 
 
 class TurnoAdmin(admin.ModelAdmin):
-    search_fields = [u'medico__apellido', u'paciente__apellido', u'fechaTurno']
-    list_display = (u'fechaTurno', u'horaInicio', u'paciente', u'medico', u'obraSocial',)
-    ordering = (u'-fechaTurno', u'-horaInicio', )
-    raw_id_fields = (u'paciente', )
+    search_fields = ['medico__apellido', 'paciente__apellido', 'fechaTurno']
+    list_display = ('fechaTurno', 'horaInicio', 'paciente', 'medico', 'obraSocial',)
+    ordering = ('-fechaTurno', '-horaInicio', )
+    raw_id_fields = ('paciente', )
     filter_horizontal = ('practicas',)
 
     def has_add_permission(self, request):
@@ -23,16 +23,16 @@ class TurnoAdmin(admin.ModelAdmin):
 
 
 class InfoTurnoAdmin(admin.ModelAdmin):
-    search_fields = [u'medico__apellido', u'medico__nombre', u'texto']
-    list_display = (u'medico', u'texto', u'get_obras_sociales_as_string', u'get_practicas_as_string')
-    ordering = (u'medico__apellido', u'medico__nombre', )
-    filter_horizontal = ('practicas', u'obra_sociales')
+    search_fields = ['medico__apellido', 'medico__nombre', 'texto']
+    list_display = ('medico', 'texto', 'get_obras_sociales_as_string', 'get_practicas_as_string')
+    ordering = ('medico__apellido', 'medico__nombre', )
+    filter_horizontal = ('practicas', 'obra_sociales')
 
 
 class PeriodoSinAtencionAdmin(admin.ModelAdmin):
-    search_fields = [u'medico__apellido', u'medico__nombre']
-    list_display = [u'medico', u'fecha_inicio', u'fecha_fin']
-    ordering = (u'medico__apellido', u'fecha_inicio', )
+    search_fields = ['medico__apellido', 'medico__nombre']
+    list_display = ['medico', 'fecha_inicio', 'fecha_fin']
+    ordering = ('medico__apellido', 'fecha_inicio', )
 
 
 admin.site.register(Turno, TurnoAdmin)

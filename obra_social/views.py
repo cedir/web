@@ -11,7 +11,7 @@ class ObraSocialNombreFilterBackend(filters.BaseFilterBackend):
     Filtro de obra social por nombre
     """
     def filter_queryset(self, request, queryset, view):
-        nombre = request.query_params.get(u'nombre')
+        nombre = request.query_params.get('nombre')
         if nombre:
             queryset = queryset.filter(nombre__icontains=nombre)
 
@@ -31,7 +31,7 @@ class ObraSocialViewSet(viewsets.ModelViewSet):
         # El legacy le pone id=0
         # Como aca presentacion es FK (como corresponde), esto esta bastante DUDOSO por ahora y complica despues el serializer
         # Cuando el legacy arregle eso (o lo tiremos) esto deberia cambiar para buscar presentacion=None
-        sucursal = request.query_params.get(u'sucursal', default=ID_SUCURSAL_CEDIR)
+        sucursal = request.query_params.get('sucursal', default=ID_SUCURSAL_CEDIR)
         estudios = Estudio.objects.filter(
             obra_social__pk=pk,
             es_pago_contra_factura=0,

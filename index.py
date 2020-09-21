@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 import datetime
-from django.template import Template, Context, loader
+from django.template import Template, loader
 
-from contenidos.models import *
+from .contenidos.models import *
 import os
 
 
@@ -25,10 +25,10 @@ def render_home(request):
 
         arrDestacados_contents.append(contents_dicc)
 
-    c = Context({
+    c = {
         'home_contents': contents,
         'destacados_contents': arrDestacados_contents,
         'flash_button_id': 1,
-    })
+    }
     return HttpResponse(t.render(c))
 

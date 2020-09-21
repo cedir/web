@@ -1,15 +1,15 @@
 language: python
 cache: pip
 python:
-    - "2.7"
+    - "3.7"
 env:
-    -DJANGO=1.8 DB=postgresql
+    -DJANGO=1.11.29 DB=postgresql
 services:
   - postgresql
 before_install:
   - sudo apt-get -y install libpq-dev libjpeg-dev
 install:
-    - pip install -r requirements-travis.txt
+    - pip install -r requirements.txt
     - mkdir logs
     - cp settings-travis.py settings.py
     - npm install newman@4.6.1
@@ -23,5 +23,5 @@ before_script:
     - python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_user('asd', 'asd@asd.com', 'asd')"
 script:
     - python manage.py test
-    - pylint caja/ comprobante/ estudio/ medico/ medicamento/ obra_social/ paciente/ practica/ presentacion/ sala/ scripts/ security/ turno/ usuario/
+    - pylint anestesista/ caja/ comprobante/ estudio/ medico/ medicamento/ obra_social/ paciente/ practica/ presentacion/ sala/ scripts/ security/ turno/ usuario/
     - python manage.py runserver & node_modules/.bin/newman run integration_tests/cedir_web.postman_collection.json -e integration_tests/local.postman_environment.json --verbose

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Anestesista
+from .models import Anestesista
 from estudio.models import Estudio
 from obra_social.serializers import ObraSocialSerializer
 from paciente.serializers import PacienteSerializer
@@ -20,7 +20,7 @@ class EstudioSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Estudio
-        fields = (u'id', u'fecha', u'practica', )
+        fields = ('id', 'fecha', 'practica', )
 
 
 class LineaPagoAnestesistaVMSerializer(serializers.Serializer):

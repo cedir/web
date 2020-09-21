@@ -23,20 +23,20 @@ ID_SUCURSAL_HOSPITAL_ITALIANO = 2
 class Estudio(models.Model):
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
-    fecha = models.DateField(u'Fecha', db_column="fechaEstudio")
+    fecha = models.DateField('Fecha', db_column="fechaEstudio")
     practica = models.ForeignKey(Practica, db_column="idEstudio")
-    motivo = models.CharField(u'Motivo', db_column="motivoEstudio", max_length=300, blank=True, default=u'')
-    informe = models.TextField(blank=True, default=u'')
+    motivo = models.CharField('Motivo', db_column="motivoEstudio", max_length=300, blank=True, default='')
+    informe = models.TextField(blank=True, default='')
     enlace_video = models.CharField(max_length=256, db_column="enlaceVideo", blank=True)
     public_id = models.CharField(max_length=35, db_column="publicID", default=generate_uuid)
-    sucursal = models.IntegerField(u'Sucursal', db_column='sucursal', default=ID_SUCURSAL_CEDIR, choices=[(ID_SUCURSAL_CEDIR, "Cedir"), (ID_SUCURSAL_HOSPITAL_ITALIANO, "Hospital Italiano")])
+    sucursal = models.IntegerField('Sucursal', db_column='sucursal', default=ID_SUCURSAL_CEDIR, choices=[(ID_SUCURSAL_CEDIR, "Cedir"), (ID_SUCURSAL_HOSPITAL_ITALIANO, "Hospital Italiano")])
 
-    medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name=u'medico_actuante')
+    medico = models.ForeignKey(Medico, db_column="idMedicoActuante", related_name='medico_actuante')
     obra_social = models.ForeignKey(ObraSocial, db_column="idObraSocial")
-    medico_solicitante = models.ForeignKey(Medico, db_column="idMedicoSolicitante", related_name=u'medico_solicitante')
-    presentacion = models.ForeignKey(Presentacion, db_column=u'idFacturacion', null=True, blank=True, related_name=u'estudios')
-    nro_de_orden = models.CharField(db_column=u'nroDeOrden', max_length=200)
-    anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name=u'anestesista')
+    medico_solicitante = models.ForeignKey(Medico, db_column="idMedicoSolicitante", related_name='medico_solicitante')
+    presentacion = models.ForeignKey(Presentacion, db_column='idFacturacion', null=True, blank=True, related_name='estudios')
+    nro_de_orden = models.CharField(db_column='nroDeOrden', max_length=200)
+    anestesista = models.ForeignKey(Anestesista, db_column="idAnestesista", related_name='anestesista')
 
     es_pago_contra_factura = models.IntegerField(db_column="esPagoContraFactura", default=0)
     medicacion = models.ManyToManyField(Medicamento, through='Medicacion')
@@ -47,11 +47,11 @@ class Estudio(models.Model):
     pago_contra_factura = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="pagoContraFactura")
     diferencia_paciente = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="diferenciaPaciente")
     pension = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'))
-    importe_pago_medico = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column=u'importePagoMedico')
-    importe_pago_medico_solicitante = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column=u'importePagoMedicoSol')
+    importe_pago_medico = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column='importePagoMedico')
+    importe_pago_medico_solicitante = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column='importePagoMedicoSol')
     #diferencia_paciente_medicacion = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column=u'diferenciaPacienteMedicacion')
-    pago_medico_actuante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoAct', null=True, blank=True, related_name=u'estudios_actuantes')
-    pago_medico_solicitante = models.ForeignKey(PagoMedico, db_column=u'nroPagoMedicoSol', null=True, blank=True, related_name=u'estudios_solicitantes')
+    pago_medico_actuante = models.ForeignKey(PagoMedico, db_column='nroPagoMedicoAct', null=True, blank=True, related_name='estudios_actuantes')
+    pago_medico_solicitante = models.ForeignKey(PagoMedico, db_column='nroPagoMedicoSol', null=True, blank=True, related_name='estudios_solicitantes')
     importe_cobrado_pension = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeCobradoPension")
     importe_cobrado_arancel_anestesia = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeCobradoArancelAnestesia")
     importe_estudio_cobrado = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeEstudioCobrado")
@@ -60,9 +60,10 @@ class Estudio(models.Model):
 
     class Meta:
         db_table = 'tblEstudios'
+        ordering = ['id']
 
-    def __unicode__(self):
-        return u'%s %s' % (self.fecha, self.paciente)
+    def __str__(self):
+        return '%s %s' % (self.fecha, self.paciente)
 
     @property
     def fecha_vencimiento_link_video(self):
@@ -80,7 +81,7 @@ class Estudio(models.Model):
         # TODO: move this to database default values on each field
         # self.motivo = u''
         # self.informe = u''
-        self.nro_de_orden = u''
+        self.nro_de_orden = ''
         # self.anestesista_id = 1
         self.es_pago_contra_factura = 0
         self.fecha_cobro = None
@@ -129,7 +130,7 @@ class Estudio(models.Model):
                                       'se han borrado')
 
         total_medicacion = 0
-        for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Medicación'):
+        for medicacion in self.estudioXmedicamento.filter(medicamento__tipo='Medicación'):
             total_medicacion += medicacion.importe
 
         return Decimal(total_medicacion).quantize(Decimal('.01'), ROUND_UP)
@@ -138,7 +139,7 @@ class Estudio(models.Model):
         if self.fecha_cobro:
             raise NotImplementedError('Imposible saber el total de material especifico ya que los registros'
                                       'estudioXmedicamento se han borrado')
-        total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.filter(medicamento__tipo=u'Mat Esp')])
+        total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.filter(medicamento__tipo='Mat Esp')])
         return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
 
     def get_total_medicacion(self):
@@ -149,17 +150,17 @@ class Estudio(models.Model):
         return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
 
     def set_pago_contra_factura(self, importe):
-        assert not self.presentacion_id, u'Estudio ya fue presentado y no puede modificarse'
-        assert not(self.pago_medico_actuante_id or self.pago_medico_solicitante_id), u'Estudio ya fue pagado al medico y no puede modificarse'
+        assert not self.presentacion_id, 'Estudio ya fue presentado y no puede modificarse'
+        assert not(self.pago_medico_actuante_id or self.pago_medico_solicitante_id), 'Estudio ya fue pagado al medico y no puede modificarse'
 
         self.es_pago_contra_factura = 1
         self.pago_contra_factura = importe
         self.fecha_cobro = datetime.datetime.today()
 
     def anular_pago_contra_factura(self):
-        assert bool(self.es_pago_contra_factura), u'El estudio no esta como Pago Contra Factura'
-        assert not(self.pago_medico_actuante_id or self.pago_medico_solicitante_id), u'Estudio ya fue pagado al medico y no puede modificarse'
-        assert self.fecha_cobro, u'El estudio no esta cobrado y por ende no es Pago Contra Factura'
+        assert bool(self.es_pago_contra_factura), 'El estudio no esta como Pago Contra Factura'
+        assert not(self.pago_medico_actuante_id or self.pago_medico_solicitante_id), 'Estudio ya fue pagado al medico y no puede modificarse'
+        assert self.fecha_cobro, 'El estudio no esta cobrado y por ende no es Pago Contra Factura'
 
         self.es_pago_contra_factura = 0
         self.pago_contra_factura = 0

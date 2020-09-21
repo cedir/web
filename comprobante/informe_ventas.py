@@ -20,8 +20,8 @@ def obtener_archivo_ventas(comprobantes):
 
 
 def obtener_lineas_alicuota(c):
-    return u'{1:03}{0.nro_terminal:05}{0.numero:020}{3:015}{2:04}{4:015}'.format(c, c.codigo_afip, c.codigo_alicuota_afip, int(100 * c.importe_gravado_afip), int(100 * c.importe_alicuota_afip))
+    return '{1:03}{0.nro_terminal:05}{0.numero:020}{3:015}{2:04}{4:015}'.format(c, c.codigo_afip, c.codigo_alicuota_afip, int(100 * c.importe_gravado_afip), int(100 * c.importe_alicuota_afip))
 
 
 def obtener_linea_ventas(c):
-    return u'{0.fecha_emision:%Y%m%d}{1:03}{0.nro_terminal:05}{0.numero:020}{0.numero:020}{2:02}{3}{0.nombre_cliente:<30.30}{4:015}{5:015}{5:015}{6:015}{5:015}{5:015}{5:015}{5:015}PES00010000001{7}{5:015}{8:%Y%m%d}'.format(c, c.codigo_afip, c.tipo_id_afip, c.nro_id_afip.zfill(20), int(100 * c.total_facturado), 0, int(100 * c.importe_excento_afip), c.codigo_operacion_afip, c.fecha_vencimiento)
+    return '{0.fecha_emision:%Y%m%d}{1:03}{0.nro_terminal:05}{0.numero:020}{0.numero:020}{2:02}{3}{0.nombre_cliente:<30.30}{4:015}{5:015}{5:015}{6:015}{5:015}{5:015}{5:015}{5:015}PES00010000001{7}{5:015}{8:%Y%m%d}'.format(c, c.codigo_afip, c.tipo_id_afip, c.nro_id_afip.zfill(20), int(100 * c.total_facturado), 0, int(100 * c.importe_excento_afip), c.codigo_operacion_afip, c.fecha_vencimiento)

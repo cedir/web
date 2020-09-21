@@ -20,7 +20,7 @@ class ListadoCajaTest(TestCase):
     def test_listado(self):
         response = self.client.get('/api/caja/', {})
         results = json.loads(response.content).get('results')
-        self.assertEquals(len(results), MovimientoCaja.objects.all().count())
+        self.assertEqual(len(results), MovimientoCaja.objects.all().count())
 
     def test_filtro_concepto_funciona(self):
         parametro_busqueda = 'ingreso'
@@ -49,7 +49,7 @@ class ListadoCajaTest(TestCase):
         results = json.loads(response.content).get('results')
 
         for result in results:
-            fecha = map(int, result['fecha'].split('-'))
+            fecha = list(map(int, result['fecha'].split('-')))
             assert fecha[0] == 2019
             assert fecha[1] == 2
             assert 1 <= fecha[2] <= 8

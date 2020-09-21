@@ -17,6 +17,6 @@ def add_log_entry(obj, user, mode, message):
         user_id=user.id,
         content_type_id=ct.pk,
         object_id=obj.pk,
-        object_repr=obj.__unicode__(),
+        object_repr=obj.__str__(),
         action_flag=mode,
         change_message=message)

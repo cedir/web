@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import MovimientoCaja, TipoMovimientoCaja
+from .models import MovimientoCaja, TipoMovimientoCaja
 from estudio.models import Estudio
 from practica.serializers import PracticaSerializer
 from obra_social.serializers import ObraSocialSerializer
@@ -19,7 +19,7 @@ class MovimientoCajaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MovimientoCaja
-        fields = (u'id', u'concepto', u'monto', u'fecha', u'hora', u'tipo')
+        fields = ('id', 'concepto', 'monto', 'fecha', 'hora', 'tipo')
 
 
 class EstudioCajaSerializer(serializers.ModelSerializer):
@@ -30,7 +30,7 @@ class EstudioCajaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Estudio
-        fields = (u'id', u'fecha', u'practica', u'obra_social', u'paciente', u'medico')
+        fields = ('id', 'fecha', 'practica', 'obra_social', 'paciente', 'medico')
 
 
 class MovimientoCajaFullSerializer(serializers.ModelSerializer):
@@ -40,4 +40,4 @@ class MovimientoCajaFullSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MovimientoCaja
-        fields = (u'id', u'concepto', u'estudio', u'monto', u'monto_acumulado', u'fecha', u'hora', u'tipo', 'medico')
+        fields = ('id', 'concepto', 'estudio', 'monto', 'monto_acumulado', 'fecha', 'hora', 'tipo', 'medico')

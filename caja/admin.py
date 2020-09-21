@@ -4,9 +4,9 @@ from caja.models import MovimientoCaja
 # Register your models here.
 class MovimientoCajaAdmin(admin.ModelAdmin):
     actions = None
-    fields = (u'fecha', u'hora', u'monto', u'concepto', u'tipo', u'estudio', u'medico')
-    list_display = (u'fecha', u'hora', u'monto', u'monto_acumulado', u'concepto', u'estudio')
-    raw_id_fields = (u'estudio', )
+    fields = ('fecha', 'hora', 'monto', 'concepto', 'tipo', 'estudio', 'medico')
+    list_display = ('fecha', 'hora', 'monto', 'monto_acumulado', 'concepto', 'estudio')
+    raw_id_fields = ('estudio', )
 
     def has_delete_permission(self, request, obj=None):
         return False

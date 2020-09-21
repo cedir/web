@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 from datetime import timedelta
 from decimal import Decimal
 
@@ -21,12 +21,12 @@ class Anestesista(models.Model):
     email = models.EmailField("E-mail", max_length=200, db_column="mail", null=True, blank=True)
     porcentaje_anestesista = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal('0.00'))
 
-    def __unicode__ (self):
-        return u'%s, %s' % (self.apellido, self.nombre, )
+    def __str__ (self):
+        return '%s, %s' % (self.apellido, self.nombre, )
 
     class Meta:
         db_table = 'tblMedicosAnestesistas'
-        ordering = [u'apellido']
+        ordering = ['apellido']
 
 
 class PagoAnestesistaVM(object):
@@ -48,14 +48,14 @@ class ComplejidadEstudio(models.Model):
     def practicas(self):
         practicas_ids = self.estudios.split(',')
         practicas = Practica.objects.filter(id__in=practicas_ids)
-        return map(lambda p: '{}'.format(p), practicas)
+        return ['{}'.format(p) for p in practicas]
 
     def clean(self):
         """Para que el filtro de complefidadEstudio funcione, debe estar guardado en forma ascendente"""
-        if ' ' in self.estudios:
+        if ' ' in str(self.estudios):
             raise ValidationError("Los estudios (practicas IDs) deben estar separados por comas y sin espacios")
 
-        practicas_ids = self.estudios.split(u',')
+        practicas_ids = self.estudios.split(',')
         init = 0
         for pid in practicas_ids:
             try:

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.shortcuts import redirect
-from django.template import Template, Context, loader
+from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
 from rest_framework.response import Response
@@ -20,7 +20,7 @@ from estudio.models import Estudio
 
 def get_disponibilidad_medicos(request):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
     cond = {}
@@ -54,13 +54,13 @@ def get_disponibilidad_medicos(request):
         "id": sala.id, "nombre": sala.nombre
     } for sala in salas]
 
-    c = Context({
+    c = {
       'logged_user_name': request.user.username,
       'medicos': arr_medicos,
       'disponibilidades':arr_disponibilidades,
       'salas': arr_salas,
       'dias': dias,
-    })
+    }
 
     t = loader.get_template('turnos/disponibilidadMedicosAMB.html')
 
@@ -69,7 +69,7 @@ def get_disponibilidad_medicos(request):
 
 def get_disponibilidad_medico(request, id_medico):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
@@ -93,7 +93,7 @@ def get_disponibilidad_medico(request, id_medico):
 
 def get_disponibilidad(request, id_disponibilidad):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
@@ -113,7 +113,7 @@ def get_disponibilidad(request, id_disponibilidad):
 
 def create_disponibilidad(request):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
@@ -139,7 +139,7 @@ def create_disponibilidad(request):
 
 def update_disponibilidad(request, id_disponibilidad):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
@@ -164,7 +164,7 @@ def update_disponibilidad(request, id_disponibilidad):
 
 def delete_disponibilidad(request, id_disponibilidad):
     # session check
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         response_dict = {
             'status': 0,
             'message': "Error, la sesion se ha perdido. Por favor, vuelva a loguearse en otra solapa y vuelva a intentarlo."
@@ -183,10 +183,10 @@ def delete_disponibilidad(request, id_disponibilidad):
 
 class MedicoNombreApellidoOMatriculaFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        search_text = request.query_params.get(u'search_text')
+        search_text = request.query_params.get('search_text')
 
         if search_text:
-            if unicode.isdigit(search_text):
+            if str.isdigit(search_text):
                 queryset = queryset.filter(Q(matricula__icontains=search_text))
             else:
                 search_params = [x.strip() for x in search_text.split(',')]

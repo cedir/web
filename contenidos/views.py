@@ -4,11 +4,9 @@ import logging
 import smtplib
 import settings
 import json
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
 from datetime import date
 from django.http import HttpResponse, Http404
-from django.template import Template, Context, RequestContext
 from django.template.loader import select_template
 from django.db.models import  Value
 from django.db.models.functions import Coalesce
@@ -19,7 +17,7 @@ from estudio.models import Estudio
 
 from email.mime.text import MIMEText
 
-logger = logging.getLogger(u'videos')
+logger = logging.getLogger('videos')
 NOVEDADES_CATEGORY_ID = 2
 
 def get_home(request):
@@ -30,14 +28,14 @@ def get_home(request):
     unidades = Contenido.objects.filter(categoria__name='Unidades', publishContent=True).annotate(publishinitdate_null=Coalesce('publishInitDate', Value(date.min))).order_by('-publishinitdate_null')[:10]
     novedades = Contenido.objects.filter(categoria__id__exact=NOVEDADES_CATEGORY_ID, publishContent=True).annotate(publishinitdate_null=Coalesce('publishInitDate', Value(date.min))).order_by("-publishinitdate_null")[:3]
     context = {
-        u'novedades': novedades,
-        u'slide_contents': slide_contents,
-        u'enfermedades_digestivas_contents': enfermedades_digestivas_contents,
-        u'unidades_contents': unidades,
-        u'preguntas_frecuentes_contents': preguntas_frecuentes_contents,
+        'novedades': novedades,
+        'slide_contents': slide_contents,
+        'enfermedades_digestivas_contents': enfermedades_digestivas_contents,
+        'unidades_contents': unidades,
+        'preguntas_frecuentes_contents': preguntas_frecuentes_contents,
     }
     t = select_template(['home/index.html'])
-    return HttpResponse(t.render(RequestContext(request, context)))
+    return HttpResponse(t.render(context))
 
 def get_content_friendly_url(request, friendly_url):
     """
@@ -51,7 +49,7 @@ def get_content_friendly_url(request, friendly_url):
 
 
 def get_content(request, id_content, templateName='detalle-contenido.html'):
-    if request.GET.has_key('template') and request.GET['template']:
+    if 'template' in request.GET and request.GET['template']:
         templateName = request.GET['template']
 
     content = Contenido.objects.get(pk=id_content)
@@ -66,7 +64,7 @@ def get_content(request, id_content, templateName='detalle-contenido.html'):
             file_path_name + ext,
         ) for file_path_name, ext in non_empty_parts]
 
-    context = Context({
+    context = {
         'id':content.id,
         'title':content.title,
         'description':content.description,
@@ -81,10 +79,10 @@ def get_content(request, id_content, templateName='detalle-contenido.html'):
             'url': r.friendlyURL or r.id,
             'images': get_images(r)
         } for r in related]
-    })
+    }
 
     template = select_template(['home/{}'.format(templateName)])
-    return HttpResponse(template.render(RequestContext(request, context)))
+    return HttpResponse(template.render(context))
 
 def get_categoria_friendly_url(request, friendly_url):
     """
@@ -103,7 +101,7 @@ def get_categoria(request):
     muestra los contenidos de una Categoria
     """
     category_id = 1
-    if request.GET.has_key('categoryId') and request.GET['categoryId']:
+    if 'categoryId' in request.GET and request.GET['categoryId']:
         category_id = request.GET['categoryId']
 
     categoria = Categoria.objects.get(id=category_id)
@@ -131,20 +129,19 @@ def get_categoria(request):
 
         return contents_dicc
 
-    context = Context({
+    context = {
         'title': categoria.name,
         'description': categoria.description,
         'friendly': categoria.friendlyURL,
         'contents': [create_content(content) for content in contents],
-        })
+        }
 
     template_name = 'listado-contenidos.html'
-    if request.GET.has_key('template') and request.GET['template']:
+    if 'template' in request.GET and request.GET['template']:
         template_name = request.GET['template']
 
     template = select_template(['home/{}'.format(template_name)])
-    return HttpResponse(template.render(RequestContext(request, context)))
-
+    return HttpResponse(template.render(context))
 
 def get_video(request, public_id):
     """
@@ -169,17 +166,17 @@ def get_video(request, public_id):
         logger.error('Intento con public_id erroneo: %s' % public_id)
 
     context = {
-        u'video_url': video_url,
-        u'paciente': paciente,
-        u'fecha_vencimiento': fecha_vencimiento,
-        u'link_vencido': link_vencido,
-        u'estudio_does_not_exist': estudio_does_not_exist,
+        'video_url': video_url,
+        'paciente': paciente,
+        'fecha_vencimiento': fecha_vencimiento,
+        'link_vencido': link_vencido,
+        'estudio_does_not_exist': estudio_does_not_exist,
     }
     t = select_template(['pages/video_details.html'])
-    return HttpResponse(t.render(RequestContext(request, context)))
+    return HttpResponse(t.render(context))
 
 def send_mail(request):
-    data = { u'sent': u'no' }
+    data = { 'sent': 'no' }
 
     try:
         toaddrs = settings.EMAIL_NOTIFICATION_ACCOUNTS
@@ -190,10 +187,10 @@ def send_mail(request):
         captcha = request.POST['captcha']
 
 
-        greq = urllib2.Request('https://www.google.com/recaptcha/api/siteverify')
-        greq.add_data(urllib.urlencode({ 'secret': settings.CAPTCHA_SECRET, 'response': captcha }))
+        greq = urllib.request.Request('https://www.google.com/recaptcha/api/siteverify')
+        greq.data = urllib.parse.urlencode({ 'secret': settings.CAPTCHA_SECRET, 'response': captcha }).encode('utf-8')
 
-        gres = urllib2.urlopen(greq)
+        gres = urllib.request.urlopen(greq)
         gdata = json.load(gres)
 
         if gdata['success']:
@@ -216,7 +213,7 @@ def send_mail(request):
             smtpserver.sendmail(gmail_user, toaddrs, msg.as_string())
             smtpserver.close()
 
-            data = { u'sent': u'yes' }
+            data = { 'sent': 'yes' }
     except:
         pass
 

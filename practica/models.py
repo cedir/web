@@ -11,8 +11,8 @@ class Practica(models.Model):
     porcentaje_medico = models.IntegerField(db_column="porcentajeMedico", default=0)
 
     class Meta:
-        db_table = u'AlmacenEstudios'
+        db_table = 'AlmacenEstudios'
         ordering = ['descripcion']
 
-    def __unicode__(self):
-        return u'%s' % (self.abreviatura or self.descripcion)
+    def __str__(self):
+        return '%s' % (self.abreviatura or self.descripcion)

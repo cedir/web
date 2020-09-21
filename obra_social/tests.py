@@ -35,14 +35,14 @@ class TestDetallesObrasSociales(TestCase):
         assert estudio.practica.pk == 1
 
         assert medicacion.estudio.id == 12
-        assert medicacion.medicamento.tipo == u'Medicaci\xf3n'
+        assert medicacion.medicamento.tipo == 'Medicaci\xf3n'
         assert medicacion.importe == 1
         assert mat_esp.estudio.id == 12
         assert mat_esp.medicamento.tipo == "Mat Esp"
         assert mat_esp.importe == 1
         assert len(estudio.estudioXmedicamento.all()) == 2
         response = self.client.get('/api/obra_social/1/estudios_sin_presentar/?sucursal={}'.format(ID_SUCURSAL_CEDIR), content_type='application/json')
-        estudio_response = filter(lambda e: e["id"] == 12, json.loads(response.content))[0]
+        estudio_response = [e for e in json.loads(response.content) if e["id"] == 12][0]
         estudio_response["importe_estudio"] == arancel.precio
         estudio_response["importe_medicacion"] == 2
 
