@@ -5,7 +5,6 @@ import smtplib
 import settings
 import json
 import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
 from datetime import date
 from django.http import HttpResponse, Http404
 from django.template.loader import select_template
@@ -189,7 +188,7 @@ def send_mail(request):
 
 
         greq = urllib.request.Request('https://www.google.com/recaptcha/api/siteverify')
-        greq.data = urllib.parse.urlencode({ 'secret': settings.CAPTCHA_SECRET, 'response': captcha })
+        greq.data = urllib.parse.urlencode({ 'secret': settings.CAPTCHA_SECRET, 'response': captcha }).encode('utf-8')
 
         gres = urllib.request.urlopen(greq)
         gdata = json.load(gres)

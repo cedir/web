@@ -19,7 +19,7 @@ class Estado(models.Model):
         db_table = 'turnos_estados'
 
     def __str__(self):
-        return self.descripcion
+        return str(self.descripcion)
 
 
 class Turno(models.Model):

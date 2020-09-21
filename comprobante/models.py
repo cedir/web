@@ -20,7 +20,7 @@ class TipoComprobante(models.Model):
         db_table = 'tblComprobantesTipo'
 
     def __str__(self):
-        return self.nombre
+        return str(self.nombre)
 
 
 class Gravado(models.Model):

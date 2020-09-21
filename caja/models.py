@@ -9,7 +9,7 @@ class TipoMovimientoCaja(models.Model):
         db_table = 'tblCajaTipoDeMovimientos'
 
     def __str__(self):
-        return self.descripcion
+        return str(self.descripcion)
 
 class MovimientoCaja(models.Model):
     concepto = models.TextField()

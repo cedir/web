@@ -60,6 +60,7 @@ class Estudio(models.Model):
 
     class Meta:
         db_table = 'tblEstudios'
+        ordering = ['id']
 
     def __str__(self):
         return '%s %s' % (self.fecha, self.paciente)
