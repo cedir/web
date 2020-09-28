@@ -340,8 +340,6 @@ def anunciar(request, id_turno):
             estudio.anestesista_id = 1
             estudio.set_create_defaults()
             estudio.save()
-            estudio.public_id = encode(estudio.id)  # actualiza a un public_id mas corto, para facilidad al paciente.
-            estudio.save()
 
             # log estudio
             add_log_entry(estudio, request.user, ADDITION, 'CREA (desde turnos)')

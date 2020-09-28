@@ -43,7 +43,7 @@ class CrearEstudioTest(TestCase):
         self.assertEqual(estudio.medico_id, self.estudio_data.get('medico'))
         self.assertIsNotNone(estudio.public_id)
         self.assertIsNot(estudio.public_id, '')
-        self.assertEqual(len(estudio.public_id), 32)
+        self.assertEqual(len(estudio.public_id), 8)
 
     def test_create_estudio_returns_error_if_practica_is_empty(self):
         self.estudio_data.pop('practica')

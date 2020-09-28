@@ -1,4 +1,5 @@
-import uuid
+import shortuuid
+
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 
@@ -8,8 +9,7 @@ def generate_uuid():
     Return a random UUID as a string with dashes removed
     Deberia reemplazar el encode(id) ya que es muy corto.
     """
-    return str(uuid.uuid1()).replace('-', '')
-
+    return shortuuid.uuid()[:8]
 
 def add_log_entry(obj, user, mode, message):
     ct = ContentType.objects.get_for_model(type(obj))
