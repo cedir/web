@@ -35,7 +35,7 @@ def imprimir(request, cae):
     return generar_factura(response, comp, leyenda)
 
 
-def ventas(request, responsable, anio, mes):
+def ventas(request, responsable : str, anio : str, mes : str) -> HttpResponse:
     if not request.user.is_authenticated or not request.user.has_perm('comprobante.informe_ventas'):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
 
@@ -45,8 +45,8 @@ def ventas(request, responsable, anio, mes):
     # Genera el archivo
     (ventas, alicuotas) = obtener_archivo_ventas(comprobantes)
 
-    # Abre un StringIO para guardar el contenido del archivo
-    stream = io.StringIO()
+    # Abre un BytesIO para guardar el contenido del archivo
+    stream = io.BytesIO()
 
     # Compresor zip
     zipcomp = zipfile.ZipFile(stream, 'w')

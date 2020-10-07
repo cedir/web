@@ -3,9 +3,9 @@ from comprobante.models import Comprobante
 from datetime import date
 
 
-def obtener_comprobantes_ventas(responsable, anio, mes):
-    anio = int(anio)
-    mes = int(mes)
+def obtener_comprobantes_ventas(responsable : str, anio_s : str, mes_s : str):
+    anio = int(anio_s)
+    mes = int(mes_s)
     is_december = not mes % 12  # True if mes is december, False otherwise
     primer_dia = date(anio, mes, 1)
     ultimo_dia = date(anio + int(is_december), 1 + mes % 12, 1)
