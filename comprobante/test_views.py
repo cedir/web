@@ -36,3 +36,9 @@ class TestViews(TestCase):
         self.assertEqual(comp['tipo_comprobante']['nombre'], (TipoComprobante.objects.get(pk = ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)).nombre)
         self.assertEqual(comp['tipo_comprobante']['id'], ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO)
         self.assertEqual(comp['total_facturado'], '200.00')
+
+    def test_informe_ventas_ok(self):
+
+        response = self.client.get("/comprobante/informe/ventas/cedir/2019/09/?responsable=cedir&anio=2019&mes=09")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], 'application/x-zip-compressed')
