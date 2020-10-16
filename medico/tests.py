@@ -1,4 +1,5 @@
 from decimal import Decimal
+from medico.calculo_honorarios.calculador import CalculadorHonorariosInformeContadora, CalculadorHonorariosPagoMedico
 from mock import patch
 
 
@@ -158,4 +159,29 @@ class TestPorcentajesCalculadorHonorarios(TestCase):
         self.assertEqual(p.solicitante, PORCENTAJE_ACUERDO_80_SOLICITANTE)
         self.assertEqual(p.cedir, PORCENTAJE_ACUERDO_80_CEDIR)
 
-    
+class TestCalculadorHonorarios(TestCase):
+    fixtures = ["medicos.json", "estudios.json", "obras_sociales.json", "practicas.json", "pacientes.json", "presentaciones.json", "comprobantes",
+                "anestesistas.json", "medicamentos.json"]
+    def test_calculador_honorarios_informe_comprobantes(self):
+        estudio = Estudio.objects.first()
+        calculador = CalculadorHonorariosInformeContadora(estudio)
+        self.assertEqual(
+            calculador.actuante + calculador.solicitante + calculador.cedir + calculador.uso_de_materiales,
+            estudio.importe_estudio - estudio.importe_estudio * calculador.porcentaje_GA() / Decimal(100.0)
+        )
+
+    def test_calculador_honorarios_pago_medico_comun(self):
+        estudio = Estudio.objects.filter(importe_estudio_cobrado__gt=0).first()
+        calculador = CalculadorHonorariosPagoMedico(estudio)
+        self.assertEqual(
+            calculador.actuante + calculador.solicitante + calculador.cedir + calculador.uso_de_materiales,
+            estudio.importe_estudio_cobrado - estudio.importe_estudio_cobrado * calculador.porcentaje_GA() / Decimal(100.0)
+        )
+
+    def test_calculador_honorarios_pago_medico_pago_contra_factura(self):
+        estudio = Estudio.objects.filter(pago_contra_factura__gt=0).first()
+        calculador = CalculadorHonorariosPagoMedico(estudio)
+        self.assertEqual(
+            calculador.actuante + calculador.solicitante + calculador.cedir + calculador.uso_de_materiales,
+            estudio.pago_contra_factura - estudio.pago_contra_factura * calculador.porcentaje_GA() / Decimal(100.0)
+        )

@@ -40,7 +40,7 @@ class CalculadorHonorarios(object):
         porcentaje_GA = self.porcentaje_GA()
 
         importe_estudio = self.get_importe()
-        monto_descuentos = self.descuentos.aplicar(estudio, importe_estudio)
+        monto_descuentos = self.uso_de_materiales
         r1 = (Decimal('100.00') - porcentaje_GA) / Decimal('100.00')
         self.total_honorarios = importe_estudio * r1 - monto_descuentos
 
@@ -64,6 +64,10 @@ class CalculadorHonorarios(object):
         porcentajes = Porcentajes(self.estudio)
         return Decimal(self.total_honorarios * porcentajes.cedir) / Decimal('100.00')
 
+    @property
+    def uso_de_materiales(self) -> Decimal:
+        return self.descuentos.aplicar(self.estudio, self.get_importe())
+
 
 class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
     '''
@@ -76,18 +80,13 @@ class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
 
     @property
     def descuentos(self) -> Descuento:
-        _descuentos = DescuentosVarios(
+        # Volver a revisar esto cuando hagamos pago a medico.
+        return DescuentosVarios(
             DescuentoPorPolipectomia(),
             DescuentoColangios(),
             DescuentoStent(),
             DescuentoRadiofrecuencia()
         )
-        self._uso_de_materiales = _descuentos.aplicar(self.estudio, self.get_importe())
-        return _descuentos
-
-    @property
-    def uso_de_materiales(self) -> Decimal:
-        return self._uso_de_materiales
 
 class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
     '''
@@ -107,7 +106,6 @@ class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
 
     @property
     def descuentos(self) -> Descuento:
-        # Volver a revisar esto cuando hagamos pago a medico.
         return DescuentosVarios(
             DescuentoPorPolipectomia(),
             DescuentoColangios(),
@@ -115,12 +113,3 @@ class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
             DescuentoRadiofrecuencia()
         )
 
-    # Gastos administrativos
-    # importe estudio
-    # iva 21
-    # iva 10.5
-    # importe neto
-    # pago
-    # pago contra factura
-    # porcentaje medico
-    # retencion cedir
