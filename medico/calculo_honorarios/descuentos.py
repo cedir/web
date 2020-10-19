@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from decimal import Decimal
 
+from estudio.models import Estudio
+
 PARTICULAR = 2
 PARTICULAR_ESPECIAL = 134
 OSDE = 3
@@ -30,12 +32,12 @@ class Descuento(object):
     Los descuentos devuelven el monto a descontar. Toman el importe solo por si fuera necesario para el calculo del descuento.
     """
     @abstractmethod
-    def aplicar(self, estudio, importe):
+    def aplicar(self, estudio : Estudio, importe : Decimal) -> Decimal:
         """
         Calcula el monto que debe descontarse de un estudio.
         Esta funcion debe devolver 0 en los casos en los que el descuento no se aplica al estudio en cuestion.
         """
-        pass
+        raise NotImplementedError
 
 
 class DescuentoNulo(Descuento):
@@ -43,7 +45,7 @@ class DescuentoNulo(Descuento):
     No se aplica ningun descuento al importe. Necesario para poder anular los descuentos con la menor modificacion posible
     al codigo de calculo de honorarios.
     """
-    def aplicar(self, estudio, importe):
+    def aplicar(self, estudio : Estudio, importe : Decimal) -> Decimal:
         return Decimal("0.00")
 
 
@@ -51,11 +53,11 @@ class DescuentosVarios(Descuento):
     """
     Calcular un descuento compuesto por la suma de una lista de descuentos.
     """
-    def __init__(self, *descuentos):
+    def __init__(self, *descuentos : Descuento):
         self._descuentos = descuentos
 
-    def aplicar(self, estudio, importe):
-        return sum([des.aplicar(estudio, importe) for des in self._descuentos])
+    def aplicar(self, estudio : Estudio, importe : Decimal) -> Decimal:
+        return Decimal(sum([des.aplicar(estudio, importe) for des in self._descuentos]))
 
 
 class DescuentosNoAcumulables(Descuento):
@@ -63,36 +65,36 @@ class DescuentosNoAcumulables(Descuento):
     Se aplica solo el mayor descuento de una lista de posibles.
     """
 
-    def __init__(self, *descuentos):
+    def __init__(self, *descuentos : Descuento):
         self._descuentos = descuentos
 
-    def aplicar(self, estudio, importe):
+    def aplicar(self, estudio : Estudio, importe : Decimal) -> Decimal:
         return max([des.aplicar(estudio, importe) for des in self._descuentos])
 
 
 class DescuentoColangios(Descuento):
-    def aplicar(self, estudio, importe):
+    def aplicar(self, estudio : Estudio, importe) -> Decimal:
         if estudio.practica.id in COLANGIOS:
             return Decimal("3500.00")
         return Decimal("0.00")
 
 
 class DescuentoStent(Descuento):
-    def aplicar(self, estudio, importe):
+    def aplicar(self, estudio : Estudio, importe : Decimal) -> Decimal:
         if estudio.practica.id in STENT:
             return Decimal("900.00")
         return Decimal("0.00")
 
 
 class DescuentoRadiofrecuencia(Descuento):
-    def aplicar(self, estudio, importe):
+    def aplicar(self, estudio : Estudio, importe : Decimal) -> Decimal:
         if estudio.practica.id in RADIOFRECUENCIA:
             return Decimal("500.00")
         return Decimal("0.00")
 
 
 class DescuentoPorPolipectomia(Descuento):
-    def aplicar(self, estudio, importe):
+    def aplicar(self, estudio : Estudio, importe : Decimal) -> Decimal:
         if estudio.practica.id not in POLIPECTOMIA:
             return Decimal("0.00")
 
