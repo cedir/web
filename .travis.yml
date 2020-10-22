@@ -17,7 +17,7 @@ before_install:
   - chmod 600 /tmp/travis_rsa
   - echo -e "Host $SSH_IP\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - ssh-add /tmp/travis_rsa
-  - ssh -i /tmp/travis_rsa $SSH_SERVER pwd
+  - scp -i /tmp/travis_rsa -r $SSH_SERVER:cache/ comprobante/
 install:
     - pip install -r requirements.txt
     - mkdir logs
@@ -36,4 +36,4 @@ script:
     - pylint anestesista/ caja/ comprobante/ estudio/ medico/ medicamento/ obra_social/ paciente/ practica/ presentacion/ sala/ scripts/ security/ turno/ usuario/
     - python manage.py runserver & node_modules/.bin/newman run integration_tests/cedir_web.postman_collection.json -e integration_tests/local.postman_environment.json --verbose
 after_script:
-    - scp -r comprobante/cache $SSH_USER@SSH_IP:
+    - scp -i /tmp/travis_rsa -r comprobante/cache $SSH_SERVER:./
