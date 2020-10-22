@@ -12,10 +12,12 @@ from rest_framework import viewsets, filters
 from rest_framework.decorators import list_route, detail_route
 
 from common.drf.views import StandardResultsSetPagination
-from medico.models import Medico, Disponibilidad, PagoMedico
-from medico.serializers import MedicoSerializer, PagoMedicoSerializer, ListNuevoPagoMedicoSerializer, CreateNuevoPagoMedicoSerializer, GETLineaPagoMedicoSerializer
 from sala.models import Sala
 from estudio.models import Estudio
+
+from medico.models import Medico, Disponibilidad, PagoMedico
+from medico.serializers import MedicoSerializer, PagoMedicoSerializer, ListNuevoPagoMedicoSerializer, CreateNuevoPagoMedicoSerializer, GETLineaPagoMedicoSerializer
+from medico.calculo_honorarios.calculador import CalculadorHonorariosPagoMedico
 
 
 def get_disponibilidad_medicos(request):
@@ -214,7 +216,11 @@ class MedicoViewSet(viewsets.ModelViewSet):
         # y no se lo pagamos/cobramos, esta pendiente.
         pendientes_del_medico = estudios_cobrados.filter(medico__id=pk, pago_medico_actuante__isnull=True) \
                                 | estudios_cobrados.filter(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
-        data = [ListNuevoPagoMedicoSerializer(q, context={'calculador': 1}).data for q in pendientes_del_medico]
+        data = [ListNuevoPagoMedicoSerializer(
+                    e,
+                    context={'calculador': CalculadorHonorariosPagoMedico(e), 'medico': Medico.objects.get(pk)}
+                ).data
+                for e in pendientes_del_medico]
         return Response(data)
 
 
