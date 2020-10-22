@@ -6,6 +6,9 @@ env:
     -DJANGO=1.11.29 DB=postgresql
 services:
   - postgresql
+addons:
+  ssh_known_hosts:
+    - $SSH_IP
 before_install:
   - sudo apt-get -y install libpq-dev libjpeg-dev
 install:
@@ -21,10 +24,11 @@ before_script:
     - python manage.py migrate
     - python manage.py loaddata fixtures/*.json
     - python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_user('asd', 'asd@asd.com', 'asd')"
-    - openssl aes-256-cbc -passin pass:$SSH_PASSPHRASE -K $encrypted_0ddd2445e49f_key -iv $encrypted_0ddd2445e49f_iv -in travis_rsa.enc -out /tmp/travis_rsa -d
-    - scp -r $SSH_USER@SSH_IP:cache/ comprobante/
+    - openssl aes-256-cbc -K $encrypted_0ddd2445e49f_key -iv $encrypted_0ddd2445e49f_iv -in travis_rsa.enc -out /tmp/travis_rsa -d
+    - eval "$(ssh-agent -s)"
     - chmod 600 /tmp/travis_rsa
     - ssh-add /tmp/travis_rsa
+    - scp -r $SSH_USER@SSH_IP:cache/ comprobante/
 script:
     - python manage.py test
     - pylint anestesista/ caja/ comprobante/ estudio/ medico/ medicamento/ obra_social/ paciente/ practica/ presentacion/ sala/ scripts/ security/ turno/ usuario/
