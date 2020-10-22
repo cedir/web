@@ -218,7 +218,7 @@ class MedicoViewSet(viewsets.ModelViewSet):
                                 | estudios_cobrados.filter(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
         data = [ListNuevoPagoMedicoSerializer(
                     e,
-                    context={'calculador': CalculadorHonorariosPagoMedico(e), 'medico': Medico.objects.get(pk)}
+                    context={'calculador': CalculadorHonorariosPagoMedico(e), 'medico': Medico.objects.get(pk=pk)}
                 ).data
                 for e in pendientes_del_medico]
         return Response(data)

@@ -1,12 +1,15 @@
 from decimal import Decimal
-from medico.calculo_honorarios.calculador import CalculadorHonorariosInformeContadora, CalculadorHonorariosPagoMedico
 from mock import patch
 
+from django.contrib.auth.models import User
+from django.test import TestCase, Client
+from rest_framework import status
 
-from django.test import TestCase
 from estudio.models import Estudio
 from practica.models import Practica
+
 from medico.models import Medico
+from medico.calculo_honorarios.calculador import CalculadorHonorariosInformeContadora, CalculadorHonorariosPagoMedico
 from medico.calculo_honorarios.descuentos import DescuentoColangios, DescuentoStent, DescuentoPorPolipectomia, DescuentoRadiofrecuencia
 from medico.calculo_honorarios.porcentajes import Porcentajes
 from medico.calculo_honorarios.constantes import *
@@ -185,3 +188,18 @@ class TestCalculadorHonorarios(TestCase):
             calculador.actuante + calculador.solicitante + calculador.cedir + calculador.uso_de_materiales,
             estudio.pago_contra_factura - estudio.pago_contra_factura * calculador.porcentaje_GA() / Decimal(100.0)
         )
+
+class TestPagoMedico(TestCase):
+    fixtures = ["medicos.json", "estudios.json", "obras_sociales.json", "practicas.json", "pacientes.json", "presentaciones.json", "comprobantes",
+                "anestesistas.json", "medicamentos.json"]
+
+    def setUp(self):
+            self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
+            self.client = Client(HTTP_POST='localhost')
+            self.client.login(username='walter', password='xx11')
+
+    def test_get_estudios_pendientes_de_pago(self):
+        medico = Medico.objects.get(pk=1)
+
+        response = self.client.get("/api/medico/1/get_estudios_pendientes_de_pago/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
