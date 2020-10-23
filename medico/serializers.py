@@ -59,11 +59,11 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
     def get_porcentaje_medico(self, estudio: Estudio) -> Decimal:
         calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
         medico: Medico = self.context.get('medico')
-        porcenteajes = Porcentajes(estudio)
+        porcentajes = Porcentajes(estudio)
         if estudio.medico == medico:
-            return porcenteajes.actuante
+            return porcentajes.actuante
         else:
-            return porcenteajes.solicitante
+            return porcentajes.solicitante
 
 
     def get_gastos_administrativos(self, estudio: Estudio) -> Decimal:

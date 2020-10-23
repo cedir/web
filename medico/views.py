@@ -214,14 +214,15 @@ class MedicoViewSet(viewsets.ModelViewSet):
                             | Estudio.objects.filter(pago_contra_factura=True)
         # Si el medico participo en el estudio (como actuante o solicitante)
         # y no se lo pagamos/cobramos, esta pendiente.
-        pendientes_del_medico = estudios_cobrados.filter(medico__id=pk, pago_medico_actuante__isnull=True) \
-                                | estudios_cobrados.filter(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
-        data = [ListNuevoPagoMedicoSerializer(
-                    e,
-                    context={'calculador': CalculadorHonorariosPagoMedico(e), 'medico': Medico.objects.get(pk=pk)}
-                ).data
-                for e in pendientes_del_medico]
-        return Response(data)
+        pendientes_del_medico = estudios_cobrados.filter(
+            Q(medico__id=pk, pago_medico_actuante__isnull=True)
+            | Q(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
+        )
+        data = [ListNuevoPagoMedicoSerializer(e, context={
+                    'calculador': CalculadorHonorariosPagoMedico(e),
+                    'medico': Medico.objects.get(pk=pk)
+                }).data for e in pendientes_del_medico]
+        return JsonResponse(data, safe=False, status=200)
 
 
 class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y POST

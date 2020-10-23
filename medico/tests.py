@@ -200,6 +200,14 @@ class TestPagoMedico(TestCase):
 
     def test_get_estudios_pendientes_de_pago(self):
         medico = Medico.objects.get(pk=1)
-
         response = self.client.get("/api/medico/1/get_estudios_pendientes_de_pago/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        estudios_response = response.json()
+        self.assertNotEqual(estudios_response, [])
+        for e in estudios_response:
+            estudio : Estudio = Estudio.objects.get(pk=e["id"])
+            self.assertTrue(
+                (estudio.medico == medico and estudio.pago_medico_actuante is None)
+                or (estudio.medico_solicitante == medico and estudio.pago_medico_solicitante is None)
+            )
