@@ -1,6 +1,8 @@
+from datetime import date
 from decimal import Decimal
 
 from rest_framework import serializers
+from rest_framework.serializers import ValidationError
 
 from estudio.models import Estudio
 from paciente.serializers import PacienteSerializer
@@ -98,7 +100,7 @@ class LineaPagoMedicoSerializer(serializers.Serializer):
     importe = serializers.DecimalField(max_digits=16, decimal_places=2)
 
 
-class CreateNuevoPagoMedicoSerializer(serializers.Serializer):
+class CreateNuevoPagoMedicoSerializer(serializers.ModelSerializer):
     """
     {"medico": 11, "lineas": [{"estudio_id": 22, "importe": 22.22}, ...]}
 
@@ -106,6 +108,46 @@ class CreateNuevoPagoMedicoSerializer(serializers.Serializer):
     medico = serializers.IntegerField()
     lineas = LineaPagoMedicoSerializer(many=True)
 
+    def validate(self, data):
+        medico = Medico.objects.get(pk=data['medico'])
+        for l in data['lineas']:
+            estudio : Estudio = Estudio.objects.get(pk=l.estudio_id)
+            importe : Decimal = l.importe
+            if estudio.fecha_cobro is None:
+                ValidationError(f"El estudio {l.estudio_id} aun no fue cobrado")
+            if estudio.medico == medico:
+                if estudio.pago_medico_actuante != 0:
+                    raise ValidationError(f'El estudio {l.estudio_id} ya esta pago para este actuante.')
+                data['es_actuante'] = True
+            elif estudio.medico_solicitante == medico:
+                if estudio.pago_medico_solicitante != 0:
+                    raise ValidationError(f'El estudio {l.estudio_id} ya esta pago para este solicitante.')
+                data['es_actuante'] = False
+            if importe == 0:
+                raise ValidationError('El importe del pago del estudio no puede ser 0.')
+
+    def create(self, validated_data) -> PagoMedico:
+        medico = Medico.objects.get(pk=validated_data['medico'])
+        for l in validated_data['lineas']:
+            estudio : Estudio = Estudio.objects.get(pk=l.estudio_id)
+            importe : Decimal = l.importe
+            if validated_data['es_actuante']:
+                estudio.pago_medico_actuante = importe
+            else:
+                estudio.pago_medico_solicitante = importe
+            estudio.save()
+        return PagoMedico.create(
+            fecha=date.today(),
+            medico=Medico,
+            observacion='',
+        )
+
+    class Meta:
+        model = PagoMedico
+        fields = (
+            'medico',
+            'lineas'
+        )
 
 class GETLineaPagoMedicoSerializer(serializers.ModelSerializer):
     paciente = PacienteSerializer()
