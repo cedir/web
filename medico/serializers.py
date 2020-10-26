@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from estudio.models import Estudio
+from comprobante.models import ID_GRAVADO_EXENTO, ID_GRAVADO_INSCRIPTO_10_5, ID_GRAVADO_INSCRIPTO_21
 from paciente.serializers import PacienteSerializer
 from obra_social.serializers import ObraSocialSerializer
 from practica.serializers import PracticaSerializer
@@ -81,18 +82,17 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
             return calculador.solicitante
 
     def get_total(self, estudio: Estudio) -> Decimal:
-        calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
-        #String.Format("{0:f2}", pagoDelCorrespondiente + IVASobreImportePagoAlMedico)
-        return Decimal(0)
+        return self.get_pago(estudio) + self.get_importe_iva_105(estudio) + self.get_importe_iva_21(estudio)
 
     def get_importe_iva_21(self, estudio: Estudio) -> Decimal:
-        calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
-        #Format(pagoDelCorrespondiente * 0.21, "############0.00")
-        return Decimal(0)
+        correspondiente = self.get_pago(estudio)
+        if estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_21:
+            correspondiente * Decimal(0.21)
 
     def get_importe_iva_105(self, estudio: Estudio) -> Decimal:
-        calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
-        return Decimal(0)
+        correspondiente = self.get_pago(estudio)
+        if estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_21:
+            correspondiente * Decimal(0.105)
 
 
 class LineaPagoMedicoSerializer(serializers.Serializer):
