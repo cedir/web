@@ -210,8 +210,7 @@ class MedicoViewSet(viewsets.ModelViewSet):
     def get_estudios_pendientes_de_pago(self, request, pk=None):
         # Si la fecha de cobro es null, no se lo cobramos a la OS
         # Si es pago_contra_factura entonces hay que cobrarle al medico los servicios administrativos
-        estudios_cobrados = Estudio.objects.filter(fecha_cobro__isnull=False) \
-                            | Estudio.objects.filter(pago_contra_factura=True)
+        estudios_cobrados = Estudio.objects.filter(Q(fecha_cobro__isnull=False) | Q(pago_contra_factura=True))
         # Si el medico participo en el estudio (como actuante o solicitante)
         # y no se lo pagamos/cobramos, esta pendiente.
         pendientes_del_medico = estudios_cobrados.filter(
