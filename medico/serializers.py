@@ -87,12 +87,16 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
     def get_importe_iva_21(self, estudio: Estudio) -> Decimal:
         correspondiente = self.get_pago(estudio)
         if estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_21:
-            correspondiente * Decimal(0.21)
+            return correspondiente * Decimal(0.21)
+        else:
+            return Decimal(0)
 
     def get_importe_iva_105(self, estudio: Estudio) -> Decimal:
         correspondiente = self.get_pago(estudio)
         if estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_21:
-            correspondiente * Decimal(0.105)
+            return correspondiente * Decimal(0.105)
+        else:
+            return Decimal(0)
 
 
 class LineaPagoMedicoSerializer(serializers.Serializer):
