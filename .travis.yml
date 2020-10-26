@@ -6,8 +6,18 @@ env:
     -DJANGO=1.11.29 DB=postgresql
 services:
   - postgresql
+addons:
+  ssh_known_hosts:
+    - $SSH_IP
 before_install:
   - sudo apt-get -y install libpq-dev libjpeg-dev
+  - openssl aes-256-cbc -K $encrypted_0ddd2445e49f_key -iv $encrypted_0ddd2445e49f_iv
+    -in travis_rsa.enc -out /tmp/travis_rsa -d
+  - eval "$(ssh-agent -s)"
+  - chmod 600 /tmp/travis_rsa
+  - echo -e "Host $SSH_IP\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - ssh-add /tmp/travis_rsa
+  - scp -i /tmp/travis_rsa -r $SSH_SERVER:cache/ comprobante/
 install:
     - pip install -r requirements.txt
     - mkdir logs
@@ -25,3 +35,5 @@ script:
     - python manage.py test
     - pylint anestesista/ caja/ comprobante/ estudio/ medico/ medicamento/ obra_social/ paciente/ practica/ presentacion/ sala/ scripts/ security/ turno/ usuario/
     - python manage.py runserver & node_modules/.bin/newman run integration_tests/cedir_web.postman_collection.json -e integration_tests/local.postman_environment.json --verbose
+after_script:
+    - scp -i /tmp/travis_rsa -r comprobante/cache $SSH_SERVER:./
