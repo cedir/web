@@ -12,10 +12,12 @@ from rest_framework import viewsets, filters
 from rest_framework.decorators import list_route, detail_route
 
 from common.drf.views import StandardResultsSetPagination
-from medico.models import Medico, Disponibilidad, PagoMedico
-from medico.serializers import MedicoSerializer, PagoMedicoSerializer, ListNuevoPagoMedicoSerializer, CreateNuevoPagoMedicoSerializer, GETLineaPagoMedicoSerializer
 from sala.models import Sala
 from estudio.models import Estudio
+
+from medico.models import Medico, Disponibilidad, PagoMedico
+from medico.serializers import MedicoSerializer, PagoMedicoSerializer, ListNuevoPagoMedicoSerializer, CreateNuevoPagoMedicoSerializer, GETLineaPagoMedicoSerializer
+from medico.calculo_honorarios.calculador import CalculadorHonorariosPagoMedico
 
 
 def get_disponibilidad_medicos(request):
@@ -208,14 +210,18 @@ class MedicoViewSet(viewsets.ModelViewSet):
     def get_estudios_pendientes_de_pago(self, request, pk=None):
         # Si la fecha de cobro es null, no se lo cobramos a la OS
         # Si es pago_contra_factura entonces hay que cobrarle al medico los servicios administrativos
-        estudios_cobrados = Estudio.objects.filter(fecha_cobro__isnull=False) \
-                            | Estudio.objects.filter(pago_contra_factura=True)
+        estudios_cobrados = Estudio.objects.filter(Q(fecha_cobro__isnull=False) | Q(pago_contra_factura=True))
         # Si el medico participo en el estudio (como actuante o solicitante)
         # y no se lo pagamos/cobramos, esta pendiente.
-        pendientes_del_medico = estudios_cobrados.filter(medico__id=pk, pago_medico_actuante__isnull=True) \
-                                | estudios_cobrados.filter(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
-        data = [ListNuevoPagoMedicoSerializer(q, context={'calculador': 1}).data for q in pendientes_del_medico]
-        return Response(data)
+        pendientes_del_medico = estudios_cobrados.filter(
+            Q(medico__id=pk, pago_medico_actuante__isnull=True)
+            | Q(medico_solicitante__id=pk, pago_medico_solicitante__isnull=True)
+        )
+        data = [ListNuevoPagoMedicoSerializer(e, context={
+                    'calculador': CalculadorHonorariosPagoMedico(e),
+                    'medico': Medico.objects.get(pk=pk)
+                }).data for e in pendientes_del_medico]
+        return JsonResponse(data, safe=False, status=200)
 
 
 class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y POST
