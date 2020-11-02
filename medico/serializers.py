@@ -43,14 +43,13 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
     gastos_administrativos = serializers.SerializerMethodField()
     pago = serializers.SerializerMethodField()
     total = serializers.SerializerMethodField()
-    importe_iva_21 = serializers.SerializerMethodField()
-    importe_iva_105 = serializers.SerializerMethodField()
+    importe_iva = serializers.SerializerMethodField()
 
     class Meta:
         model = Estudio
         fields = ('id', 'fecha', 'importe_estudio', 'importe_neto', 'fecha_cobro', 'paciente', 'obra_social', 'medico_actuante',
                   'medico_solicitante', 'practica', 'retencion_cedir', 'porcentaje_medico', 'gastos_administrativos',
-                  'pago_contra_factura', 'pago', 'importe_iva_21', 'importe_iva_105', 'total')
+                  'pago_contra_factura', 'pago', 'importe_iva', 'total')
 
     def get_importe_neto(self, estudio: Estudio) -> Decimal:
         calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
@@ -83,26 +82,14 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
             return calculador.solicitante
 
     def get_total(self, estudio: Estudio) -> Decimal:
-        return self.get_pago(estudio) + self.get_importe_iva_105(estudio) + self.get_importe_iva_21(estudio)
+        return self.get_pago(estudio) + self.get_importe_iva(estudio)
 
-    def get_importe_iva_21(self, estudio: Estudio) -> Decimal:
+    def get_importe_iva(self, estudio: Estudio) -> Decimal:
         correspondiente = self.get_pago(estudio)
         if estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_21:
             return correspondiente * Decimal(0.21)
         else:
-            return Decimal(0)
-
-    def get_importe_iva_105(self, estudio: Estudio) -> Decimal:
-        correspondiente = self.get_pago(estudio)
-        if estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_21:
             return correspondiente * Decimal(0.105)
-        else:
-            return Decimal(0)
-
-
-# class LineaPagoMedicoSerializer(serializers.Serializer):
-#     estudio_id = serializers.IntegerField()
-#     importe = serializers.DecimalField(max_digits=16, decimal_places=2)
 
 
 class CreateNuevoPagoMedicoSerializer(serializers.ModelSerializer):
