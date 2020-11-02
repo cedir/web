@@ -131,5 +131,35 @@
         "comprobante": 7,
         "sucursal": 1
     }
+},
+{
+    "model": "presentacion.presentacion",
+    "pk": 10,
+    "fields": {
+        "obra_social": 1,
+        "comprobante": 9,
+        "fecha": "2011-07-20",
+        "estado": 1,
+        "periodo": "g",
+        "iva": "0.00",
+        "total_cobrado": "2800.00",
+        "total_facturado": "2800.00",
+        "sucursal": 1
+    }
+},
+{
+    "model": "presentacion.presentacion",
+    "pk": 11,
+    "fields": {
+        "obra_social": 5,
+        "comprobante": 10,
+        "fecha": "2012-07-06",
+        "estado": 1,
+        "periodo": "JUNIO 2012",
+        "iva": "21.00",
+        "total_cobrado": "1368.36",
+        "total_facturado": "1368.36",
+        "sucursal": 1
+    }
 }
 ]

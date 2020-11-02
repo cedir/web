@@ -212,6 +212,56 @@
     }
 },
 {
+    "model": "comprobante.comprobante",
+    "pk": 9,
+    "fields": {
+        "nombre_cliente": "Obra Social de los Trabajadores de la Planta Nuclear de Springfield",
+        "domicilio_cliente": " - Springfield - (CP:2000)",
+        "nro_cuit": "11",
+        "gravado_paciente": "",
+        "condicion_fiscal": "EXENTO",
+        "responsable": "Cedir",
+        "sub_tipo": "B",
+        "estado": "COBRADO",
+        "numero": 1,
+        "nro_terminal": 1,
+        "total_facturado": "2800.00",
+        "total_cobrado": "0.00",
+        "fecha_emision": "2012-07-07",
+        "fecha_recepcion": "2012-07-07",
+        "tipo_comprobante": 1,
+        "factura": null,
+        "gravado": 1,
+        "cae": null,
+        "vencimiento_cae": null
+    }
+},
+{
+    "model": "comprobante.comprobante",
+    "pk": 10,
+    "fields": {
+        "nombre_cliente": "PARTICULAR",
+        "domicilio_cliente": " - Springfield - (CP:2000)",
+        "nro_cuit": "",
+        "gravado_paciente": "",
+        "condicion_fiscal": "",
+        "responsable": "Cedir",
+        "sub_tipo": "B",
+        "estado": "COBRADO",
+        "numero": 2,
+        "nro_terminal": 1,
+        "total_facturado": "1368.36",
+        "total_cobrado": "1368.36",
+        "fecha_emision": "2011-07-20",
+        "fecha_recepcion": "2011-07-20",
+        "tipo_comprobante": 1,
+        "factura": null,
+        "gravado": 3,
+        "cae": null,
+        "vencimiento_cae": null
+    }
+},
+{
     "model": "comprobante.gravado",
     "pk": 1,
     "fields": {

@@ -230,14 +230,13 @@ class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y
     pagination_class = StandardResultsSetPagination
     page_size = 20
 
-    def create(self, request, *args, **kwargs):
-        serializer = CreateNuevoPagoMedicoSerializer(data=request.data)
+    serializers = {
+        'retrieve': PagoMedicoSerializer,
+        'create': CreateNuevoPagoMedicoSerializer,
+    }
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        #serializer.save()
-        return Response({'success': True}, status=status.HTTP_200_OK)
+    def get_serializer_class(self):
+        return self.serializers.get(self.action, self.serializer_class)
 
     @detail_route(methods=['get'])
     def get_detalle_pago(self, request, pk=None):

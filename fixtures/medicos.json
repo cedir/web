@@ -28,5 +28,14 @@
         "clave_fiscal": "3333",
         "responsabilidad_fiscal": "INSCRIPTO"
     }
+},
+{
+    "model": "medico.pagomedico",
+    "pk": 1,
+    "fields": {
+        "fecha": "2014-04-07",
+        "observacion": "una observacion",
+        "medico": 2
+    }
 }
 ]
