@@ -88,8 +88,13 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
         correspondiente = self.get_pago(estudio)
         if estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_21:
             return correspondiente * Decimal(0.21)
-        else:
+        elif estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_10_5:
             return correspondiente * Decimal(0.105)
+        elif estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_EXENTO:
+            return Decimal(0)
+        else:
+            # El día que la AFIP apruebe un IVA nuevo esto va a saltar.
+            raise NotImplementedError
 
 
 class CreateNuevoPagoMedicoSerializer(serializers.ModelSerializer):
