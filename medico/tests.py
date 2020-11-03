@@ -1,5 +1,6 @@
 from decimal import Decimal
 from mock import patch
+import json
 
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
@@ -8,7 +9,7 @@ from rest_framework import status
 from estudio.models import Estudio
 from practica.models import Practica
 
-from medico.models import Medico
+from medico.models import Medico, PagoMedico
 from medico.calculo_honorarios.calculador import CalculadorHonorariosInformeContadora, CalculadorHonorariosPagoMedico
 from medico.calculo_honorarios.descuentos import DescuentoColangios, DescuentoStent, DescuentoPorPolipectomia, DescuentoRadiofrecuencia
 from medico.calculo_honorarios.porcentajes import Porcentajes
@@ -211,3 +212,117 @@ class TestPagoMedico(TestCase):
                 (estudio.medico == medico and estudio.pago_medico_actuante is None)
                 or (estudio.medico_solicitante == medico and estudio.pago_medico_solicitante is None)
             )
+
+    def test_create_pago_medico_actuante_ok(self):
+        PK_MEDICO = 2
+        PK_ESTUDIO = 14
+        IMPORTE = Decimal(1)
+        medico : Medico = Medico.objects.get(pk=PK_MEDICO)
+        estudio : Estudio = Estudio.objects.get(pk=PK_ESTUDIO)
+        self.assertEquals(estudio.medico, medico)
+        self.assertIsNotNone(estudio.fecha_cobro)
+        self.assertIsNone(estudio.pago_medico_actuante)
+        response = self.client.post("/api/pago-medico/", content_type='application/json', data=json.dumps({
+            "medico": PK_MEDICO,
+            "lineas": [{"estudio_id": PK_ESTUDIO, "importe": str(IMPORTE)}],
+            "observacion": "obs"
+        }))
+        self.assertEquals(response.status_code, 201)
+
+        pago : PagoMedico = PagoMedico.objects.get(pk=response.json()["id"])
+        estudio : Estudio = Estudio.objects.get(pk=PK_ESTUDIO)
+        self.assertEquals(pago.medico, medico)
+        self.assertEquals(pago.observacion, "obs")
+        self.assertEquals(estudio.pago_medico_actuante, pago)
+        self.assertEquals(estudio.importe_pago_medico, IMPORTE)
+
+    def test_create_pago_medico_error_solicitante_ok(self):
+        PK_MEDICO = 1
+        PK_ESTUDIO = 14
+        IMPORTE = Decimal(1)
+        medico : Medico = Medico.objects.get(pk=PK_MEDICO)
+        estudio : Estudio = Estudio.objects.get(pk=PK_ESTUDIO)
+        self.assertEquals(estudio.medico_solicitante, medico)
+        self.assertIsNotNone(estudio.fecha_cobro)
+        self.assertIsNone(estudio.pago_medico_solicitante)
+        response = self.client.post("/api/pago-medico/", content_type='application/json', data=json.dumps({
+            "medico": PK_MEDICO,
+            "lineas": [{"estudio_id": PK_ESTUDIO, "importe": str(IMPORTE)}],
+            "observacion": "obs"
+        }))
+        self.assertEquals(response.status_code, 201)
+
+        pago : PagoMedico = PagoMedico.objects.get(pk=response.json()["id"])
+        estudio : Estudio = Estudio.objects.get(pk=PK_ESTUDIO)
+        self.assertEquals(pago.medico, medico)
+        self.assertEquals(pago.observacion, "obs")
+        self.assertEquals(estudio.pago_medico_solicitante, pago)
+        self.assertEquals(estudio.importe_pago_medico_solicitante, IMPORTE)
+
+    # def test_create_pago_medico_actuante_y_solicitante_ok(self):
+    #     pass
+
+    # def test_create_pago_medico_contra_factura(self):
+    #     pass
+
+    def test_create_pago_medico_error_no_existe_medico(self):
+        PK_MEDICO = 9001
+        PK_ESTUDIO = 14
+        IMPORTE = Decimal(1)
+        response = self.client.post("/api/pago-medico/", content_type='application/json', data=json.dumps({
+            "medico": PK_MEDICO,
+            "lineas": [{"estudio_id": PK_ESTUDIO, "importe": str(IMPORTE)}],
+            "observacion": "obs"
+        }))
+        self.assertEquals(response.status_code, 400)
+
+    def test_create_pago_medico_error_estudio_ya_pagado(self):
+        PK_MEDICO = 2
+        PK_ESTUDIO = 15
+        IMPORTE = Decimal(1)
+        medico : Medico = Medico.objects.get(pk=PK_MEDICO)
+        estudio : Estudio = Estudio.objects.get(pk=PK_ESTUDIO)
+        self.assertEquals(estudio.medico, medico)
+        self.assertIsNotNone(estudio.fecha_cobro)
+        self.assertIsNotNone(estudio.pago_medico_actuante)
+        response = self.client.post("/api/pago-medico/", content_type='application/json', data=json.dumps({
+            "medico": PK_MEDICO,
+            "lineas": [{"estudio_id": PK_ESTUDIO, "importe": str(IMPORTE)}],
+            "observacion": "obs"
+        }))
+        self.assertEquals(response.status_code, 400)
+
+    def test_create_pago_medico_error_estudio_de_otro_medico(self):
+        PK_MEDICO = 1
+        PK_ESTUDIO = 14
+        IMPORTE = Decimal(1)
+        medico : Medico = Medico.objects.get(pk=PK_MEDICO)
+        otro_medico : Medico = Medico.objects.get(pk=2)
+        estudio : Estudio = Estudio.objects.get(pk=PK_ESTUDIO)
+        estudio.medico = otro_medico
+        estudio.medico_solicitante = otro_medico
+        estudio.pago_medico_actuante = None
+        estudio.save()
+        self.assertIsNotNone(estudio.fecha_cobro)
+        response = self.client.post("/api/pago-medico/", content_type='application/json', data=json.dumps({
+            "medico": PK_MEDICO,
+            "lineas": [{"estudio_id": PK_ESTUDIO, "importe": str(IMPORTE)}],
+            "observacion": "obs"
+        }))
+        self.assertEquals(response.status_code, 400)
+
+    def test_create_pago_medico_error_importe_cero(self):
+        PK_MEDICO = 2
+        PK_ESTUDIO = 14
+        IMPORTE = Decimal(0)
+        medico : Medico = Medico.objects.get(pk=PK_MEDICO)
+        estudio : Estudio = Estudio.objects.get(pk=PK_ESTUDIO)
+        self.assertEquals(estudio.medico, medico)
+        self.assertIsNotNone(estudio.fecha_cobro)
+        self.assertIsNone(estudio.pago_medico_actuante)
+        response = self.client.post("/api/pago-medico/", content_type='application/json', data=json.dumps({
+            "medico": PK_MEDICO,
+            "lineas": [{"estudio_id": PK_ESTUDIO, "importe": str(IMPORTE)}],
+            "observacion": "obs"
+        }))
+        self.assertEquals(response.status_code, 400)

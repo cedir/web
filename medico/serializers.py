@@ -1,8 +1,12 @@
+from datetime import date
 from decimal import Decimal
+from presentacion.models import Presentacion
 
 from rest_framework import serializers
+from rest_framework.serializers import Serializer, ValidationError
 
 from estudio.models import Estudio
+from comprobante.models import ID_GRAVADO_EXENTO, ID_GRAVADO_INSCRIPTO_10_5, ID_GRAVADO_INSCRIPTO_21
 from paciente.serializers import PacienteSerializer
 from obra_social.serializers import ObraSocialSerializer
 from practica.serializers import PracticaSerializer
@@ -39,14 +43,13 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
     gastos_administrativos = serializers.SerializerMethodField()
     pago = serializers.SerializerMethodField()
     total = serializers.SerializerMethodField()
-    importe_iva_21 = serializers.SerializerMethodField()
-    importe_iva_105 = serializers.SerializerMethodField()
+    importe_iva = serializers.SerializerMethodField()
 
     class Meta:
         model = Estudio
         fields = ('id', 'fecha', 'importe_estudio', 'importe_neto', 'fecha_cobro', 'paciente', 'obra_social', 'medico_actuante',
                   'medico_solicitante', 'practica', 'retencion_cedir', 'porcentaje_medico', 'gastos_administrativos',
-                  'pago_contra_factura', 'pago', 'importe_iva_21', 'importe_iva_105', 'total')
+                  'pago_contra_factura', 'pago', 'importe_iva', 'total')
 
     def get_importe_neto(self, estudio: Estudio) -> Decimal:
         calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
@@ -79,33 +82,97 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
             return calculador.solicitante
 
     def get_total(self, estudio: Estudio) -> Decimal:
-        calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
-        #String.Format("{0:f2}", pagoDelCorrespondiente + IVASobreImportePagoAlMedico)
-        return Decimal(0)
+        return self.get_pago(estudio) + self.get_importe_iva(estudio)
 
-    def get_importe_iva_21(self, estudio: Estudio) -> Decimal:
-        calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
-        #Format(pagoDelCorrespondiente * 0.21, "############0.00")
-        return Decimal(0)
-
-    def get_importe_iva_105(self, estudio: Estudio) -> Decimal:
-        calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
-        return Decimal(0)
-
-
-class LineaPagoMedicoSerializer(serializers.Serializer):
-    estudio_id = serializers.IntegerField()
-    importe = serializers.DecimalField(max_digits=16, decimal_places=2)
+    def get_importe_iva(self, estudio: Estudio) -> Decimal:
+        correspondiente = self.get_pago(estudio)
+        if estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_21:
+            return correspondiente * Decimal(0.21)
+        elif estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_10_5:
+            return correspondiente * Decimal(0.105)
+        elif estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_EXENTO:
+            return Decimal(0)
+        else:
+            # El día que la AFIP apruebe un IVA nuevo esto va a saltar.
+            raise NotImplementedError
 
 
-class CreateNuevoPagoMedicoSerializer(serializers.Serializer):
+class CreateNuevoPagoMedicoSerializer(serializers.ModelSerializer):
     """
-    {"medico": 11, "lineas": [{"estudio_id": 22, "importe": 22.22}, ...]}
+    {
+        "medico": 11,
+        "observacion": "asd",
+        "lineas": [{"estudio_id": 22, "importe": 22.22}, ...]
+    }
 
     """
     medico = serializers.IntegerField()
-    lineas = LineaPagoMedicoSerializer(many=True)
+    lineas = serializers.ListField()
+    observacion = serializers.CharField()
 
+
+    def to_representation(self, instance):
+        return {
+            'id': instance.id,
+            'medico': instance.medico_id,
+            'observacion': instance.observacion,
+            'fecha': instance.fecha
+        }
+
+    def validate(self, data):
+        try:
+            medico = Medico.objects.get(pk=data['medico'])
+        except Medico.DoesNotExist:
+            raise ValidationError(f"El medico {data['medico']} no existe")
+
+        data['observacion'] = data.get('observacion', '')
+
+        for l in data['lineas']:
+            estudio : Estudio = Estudio.objects.get(pk=l['estudio_id'])
+            importe : Decimal = Decimal(l['importe'])
+            if estudio.presentacion.estado != Presentacion.COBRADO:
+                raise ValidationError(f"El estudio {l['estudio_id']} aun no fue cobrado")
+            if estudio.medico == medico:
+                if estudio.pago_medico_actuante is not None:
+                    raise ValidationError(f"El estudio {l['estudio_id']} ya esta pago para este actuante.")
+                data['es_actuante'] = True
+            elif estudio.medico_solicitante == medico:
+                if estudio.pago_medico_solicitante  is not None:
+                    raise ValidationError(f"El estudio {l['estudio_id']} ya esta pago para este solicitante.")
+                data['es_actuante'] = False
+            else:
+                raise ValidationError(f"El medico no es actuante ni solicitante del estudio {l['estudio_id']}.")
+            if importe == 0:
+                raise ValidationError("El importe del pago del estudio no puede ser 0.")
+
+        return data
+
+    def create(self, validated_data) -> PagoMedico:
+        medico = Medico.objects.get(pk=validated_data['medico'])
+        pago = PagoMedico.objects.create(
+            fecha=date.today(),
+            medico=medico,
+            observacion=validated_data['observacion'],
+        )
+        for l in validated_data['lineas']:
+            estudio : Estudio = Estudio.objects.get(pk=l['estudio_id'])
+            importe : Decimal = Decimal(l['importe'])
+            if validated_data['es_actuante']:
+                estudio.pago_medico_actuante = pago
+                estudio.importe_pago_medico = importe
+            else:
+                estudio.pago_medico_solicitante = pago
+                estudio.importe_pago_medico_solicitante = importe
+            estudio.save()
+        return pago
+
+    class Meta:
+        model = PagoMedico
+        fields = (
+            'medico',
+            'lineas',
+            'observacion'
+        )
 
 class GETLineaPagoMedicoSerializer(serializers.ModelSerializer):
     paciente = PacienteSerializer()

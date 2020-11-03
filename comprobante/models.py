@@ -13,6 +13,10 @@ ID_DOCUMENTO_AFIP_TIPO_CUIT = 80
 ID_DOCUMENTO_AFIP_TIPO_CUIL = 86
 ID_DOCUMENTO_AFIP_TIPO_DNI = 96
 
+ID_GRAVADO_EXENTO = 1
+ID_GRAVADO_INSCRIPTO_10_5 = 2
+ID_GRAVADO_INSCRIPTO_21 = 3
+
 class TipoComprobante(models.Model):
     nombre = models.CharField(max_length=128, db_column='tipoComprobante')
 
