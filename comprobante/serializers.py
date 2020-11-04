@@ -201,6 +201,7 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         neto = validated_data["neto"]
+        print(neto)
         gravado = Gravado.objects.get(pk=validated_data['gravado_id'])
         responsable = validated_data['responsable']
         tipo_comprobante = TipoComprobante.objects.get(pk=validated_data['tipo_comprobante_id'])
@@ -231,6 +232,17 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
         linea.comprobante = comprobante
         linea.save()
         return comprobante
+
+class CrearComprobanteSerializer(serializers.ModelSerializer):
+    lineas = LineaDeComprobanteSerializer(many=True)
+    comprobante = CrearComprobanteAFIPSerializer()
+    class Meta(object):
+        model = Comprobante
+        fields = ('comprobante', 'lineas')
+
+    def create(self, validated_data):
+        print(validated_data)
+        return CrearComprobanteAFIPSerializer(data=validated_data)
 
 def crear_comprobante_serializer_factory(data):
     if data["tipo_comprobante_id"] == ID_TIPO_COMPROBANTE_LIQUIDACION:
