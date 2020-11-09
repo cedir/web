@@ -25,6 +25,20 @@ class LineaDeComprobanteSerializer(serializers.ModelSerializer):
         model = LineaDeComprobante
         fields = ('id', 'concepto', 'sub_total', 'iva', 'importe_neto')
 
+class CrearLineaDeComprobanteSerializer(serializers.ModelSerializer):
+    porcentaje_iva = serializers.DecimalField(5, 2)
+    importe_neto = serializers.DecimalField(16,2)
+
+    class Meta(object):
+        model = LineaDeComprobante
+        fields = ('concepto', 'porcentaje_iva', 'importe_neto')
+    
+    def create(self, validated_data):
+        neto = validated_data['importe_neto']
+        porcentaje_iva = validated_data['porcentaje_iva']
+        iva = Decimal(neto) * Decimal(porcentaje_iva) / Decimal(100)
+        del validated_data['porcentaje_iva']
+        return LineaDeComprobante(sub_total=iva + neto,iva=iva.normalize(), **validated_data)
 
 class ComprobanteSerializer(serializers.ModelSerializer):
     tipo_comprobante = TipoComprobanteSerializer()
@@ -170,10 +184,12 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
     # Debe haber una forma estandar y ya hecha de hacer esto en django, pero no la encontre
     tipo_comprobante_id = serializers.IntegerField()
     gravado_id = serializers.IntegerField()
+    lineas = CrearLineaDeComprobanteSerializer(required=False, many=True)
+
     class Meta(object):
         model = Comprobante
         fields = ('tipo_comprobante_id', 'sub_tipo', 'responsable', 'gravado_id', \
-            'neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', 'condicion_fiscal', 'concepto')
+            'neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', 'condicion_fiscal', 'concepto', 'lineas')
 
     def validate_gravado_id(self, value):
         try:
@@ -185,7 +201,7 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
     def validate_tipo_comprobante_id(self, value):
         try:
             TipoComprobante.objects.get(pk=value)
-        except Gravado.DoesNotExist:
+        except TipoComprobante.DoesNotExist:
             raise ValidationError("id de tipo_comprobante invalida")
         return value
 
@@ -201,7 +217,6 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         neto = validated_data["neto"]
-        print(neto)
         gravado = Gravado.objects.get(pk=validated_data['gravado_id'])
         responsable = validated_data['responsable']
         tipo_comprobante = TipoComprobante.objects.get(pk=validated_data['tipo_comprobante_id'])
@@ -232,17 +247,6 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
         linea.comprobante = comprobante
         linea.save()
         return comprobante
-
-class CrearComprobanteSerializer(serializers.ModelSerializer):
-    lineas = LineaDeComprobanteSerializer(many=True)
-    comprobante = CrearComprobanteAFIPSerializer()
-    class Meta(object):
-        model = Comprobante
-        fields = ('comprobante', 'lineas')
-
-    def create(self, validated_data):
-        print(validated_data)
-        return CrearComprobanteAFIPSerializer(data=validated_data)
 
 def crear_comprobante_serializer_factory(data):
     if data["tipo_comprobante_id"] == ID_TIPO_COMPROBANTE_LIQUIDACION:

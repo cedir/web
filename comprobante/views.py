@@ -13,7 +13,7 @@ import io
 from .imprimir import generar_factura, obtener_comprobante, obtener_filename
 from .informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
 
-from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer, ComprobanteSmallSerializer, CrearComprobanteSerializer
+from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer, ComprobanteSmallSerializer
 from comprobante.models import Comprobante
 from comprobante.calculador_informe import calculador_informe_factory
 from comprobante.comprobante_asociado import crear_comprobante_asociado, TipoComprobanteAsociadoNoValidoException
@@ -79,11 +79,6 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
     serializer_class = ComprobanteSerializer
     page_size = 50
     pagination_class = StandardResultsSetPagination
-
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return CrearComprobanteSerializer
-        return ComprobanteSerializer
 
     def get_queryset(self):
         filtro = self.request.GET.get('filtro').upper() if 'filtro' in self.request.GET else ''
