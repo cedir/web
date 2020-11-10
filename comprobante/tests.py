@@ -69,18 +69,7 @@ class TestCrearLineaSerializer(TestCase):
         self.user = User.objects.create_user(username='test', password='test', is_superuser=True)
         self.cliente = Client(HTTP_GET='localhost')
         self.client.login(username='test', password='test')
-        self.comprobante_data = {
-            'tipo_comprobante_id': 1,
-            'sub_tipo': 'B',
-            'responsable': 'Cedir',
-            'gravado_id': '1',
-            'neto': 100,
-            'nombre_cliente': 'Homero',
-            'domicilio_cliente': 'Avenida Siempreviva 123',
-            'nro_cuit': '20420874120',
-            'condicion_fiscal': 'RESPONSABLE INSCRIPTO',
-            'concepto': 'Este es un concepto',
-            'lineas': [
+        self.lineas_data = [
                 {
                     'concepto': 'Esta es la primera linea',
                     'importe_neto': 50
@@ -89,30 +78,73 @@ class TestCrearLineaSerializer(TestCase):
                     'concepto': 'Esta es la segunda linea',
                     'importe_neto': 60
                 }
-            ],
+            ]
+        self.comprobante_data = {
+            'tipo_comprobante_id': 1,
+            'sub_tipo': 'B',
+            'responsable': 'Cedir',
+            'gravado_id': '1',
+            'nombre_cliente': 'Homero',
+            'domicilio_cliente': 'Avenida Siempreviva 123',
+            'nro_cuit': '20420874120',
+            'condicion_fiscal': 'RESPONSABLE INSCRIPTO',
         }
     
     def test_comprobante_afip_serializer_funciona_si_no_envian_lineas(self):
-        del self.comprobante_data['lineas']
-        comprobante_serializer = CrearComprobanteAFIPSerializer(data=self.comprobante_data)
+        comprobante_data = {**self.comprobante_data}
+        comprobante_data['neto'] = 100
+        comprobante_data['concepto'] = 'Este es un concepto'
+        
+        comprobante_serializer = CrearComprobanteAFIPSerializer(data=comprobante_data)
 
         assert comprobante_serializer.is_valid()
         comprobante = comprobante_serializer.save()
 
-        neto = self.comprobante_data['neto']
+        neto = comprobante_data['neto']
 
-        iva = Gravado.objects.get(pk=self.comprobante_data['gravado_id']).porcentaje * neto
+        iva = Gravado.objects.get(pk=comprobante_data['gravado_id']).porcentaje * neto
 
         total = neto + neto * iva / Decimal(100)
 
         assert comprobante.total_facturado == total
-        assert comprobante.tipo_comprobante.id == self.comprobante_data['tipo_comprobante_id']
-        assert comprobante.sub_tipo == self.comprobante_data['sub_tipo']
-        assert comprobante.nombre_cliente == self.comprobante_data['nombre_cliente']
+        assert comprobante.tipo_comprobante.id == comprobante_data['tipo_comprobante_id']
+        assert comprobante.sub_tipo == comprobante_data['sub_tipo']
+        assert comprobante.nombre_cliente == comprobante_data['nombre_cliente']
 
         linea = LineaDeComprobante.objects.get(comprobante=comprobante)
 
         assert linea.importe_neto == neto
         assert linea.sub_total == total
-        assert linea.concepto == self.comprobante_data['concepto']
+        assert linea.concepto == comprobante_data['concepto']
+
+    def test_comprobante_afip_serializer_funciona_si_envian_lineas(self):
+        comprobante_data = {**self.comprobante_data}
+        comprobante_data['lineas'] = self.lineas_data
+        comprobante_serializer = CrearComprobanteAFIPSerializer(data=comprobante_data)
+
+        assert comprobante_serializer.is_valid()
+        comprobante = comprobante_serializer.save()
+
+        neto = sum(l['importe_neto'] for l in comprobante_data['lineas'])
+
+        gravado = Gravado.objects.get(pk=comprobante_data['gravado_id'])
+
+        iva = gravado.porcentaje * neto
+
+        total = neto + neto * iva / Decimal(100)
+
+        assert comprobante.total_facturado == total
+        assert comprobante.tipo_comprobante.id == comprobante_data['tipo_comprobante_id']
+        assert comprobante.sub_tipo == comprobante_data['sub_tipo']
+        assert comprobante.nombre_cliente == comprobante_data['nombre_cliente']
+
+        lineas = LineaDeComprobante.objects.filter(comprobante=comprobante)
         
+        assert lineas.count() == len(comprobante_data['lineas'])
+
+        for i in range(lineas.count()):
+            linea_data = comprobante_data['lineas'][i]
+
+            assert lineas[i].importe_neto == linea_data['importe_neto']
+            assert lineas[i].iva == linea_data['importe_neto'] * gravado.porcentaje / Decimal(100)
+            assert lineas[i].concepto == linea_data['concepto']
