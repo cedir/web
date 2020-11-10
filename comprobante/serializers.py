@@ -26,18 +26,25 @@ class LineaDeComprobanteSerializer(serializers.ModelSerializer):
         fields = ('id', 'concepto', 'sub_total', 'iva', 'importe_neto')
 
 class CrearLineaDeComprobanteSerializer(serializers.ModelSerializer):
-    porcentaje_iva = serializers.DecimalField(5, 2)
+    gravado_id = serializers.IntegerField()
     importe_neto = serializers.DecimalField(16,2)
 
     class Meta(object):
         model = LineaDeComprobante
-        fields = ('concepto', 'porcentaje_iva', 'importe_neto')
+        fields = ('concepto', 'gravado_id', 'importe_neto')
     
+    def validate_porcentaje_iva(self, value):
+        try:
+            Gravado.objects.get(pk=value)
+        except Gravado.DoesNotExist:
+            raise ValidationError('El valor del porcentaje no es valido')
+        return value
+
     def create(self, validated_data):
         neto = validated_data['importe_neto']
-        porcentaje_iva = validated_data['porcentaje_iva']
+        porcentaje_iva = Gravado.objects.get(pk=validated_data['gravado_id']).porcentaje
         iva = Decimal(neto) * Decimal(porcentaje_iva) / Decimal(100)
-        del validated_data['porcentaje_iva']
+        del validated_data['gravado_id']
         return LineaDeComprobante(sub_total=iva + neto,iva=iva.normalize(), **validated_data)
 
 class ComprobanteSerializer(serializers.ModelSerializer):
@@ -177,19 +184,35 @@ class CrearComprobanteLiquidacionSerializer(serializers.ModelSerializer):
             sub_total=neto
         )
         return comprobante
+
 class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
-    neto = serializers.DecimalField(16, 2)
-    concepto = serializers.CharField()
+    neto = serializers.DecimalField(16, 2, required=False)
+    concepto = serializers.CharField(required=False)
     # Traigo las ids como campos numericos para no tener que mandar un diccionario con todo el gravado
     # Debe haber una forma estandar y ya hecha de hacer esto en django, pero no la encontre
     tipo_comprobante_id = serializers.IntegerField()
     gravado_id = serializers.IntegerField()
-    lineas = CrearLineaDeComprobanteSerializer(required=False, many=True)
+    lineas = CrearLineaDeComprobanteSerializer(many=True)
 
     class Meta(object):
         model = Comprobante
         fields = ('tipo_comprobante_id', 'sub_tipo', 'responsable', 'gravado_id', \
             'neto', 'nombre_cliente', 'domicilio_cliente', 'nro_cuit', 'condicion_fiscal', 'concepto', 'lineas')
+
+    def to_internal_value(self, instance):
+        datos = {k: instance[k] for k in self.fields if k in instance}
+
+        if not 'lineas' in datos:
+            datos['lineas'] = [{
+                    'concepto': datos['concepto'],
+                    'importe_neto': datos['neto'],
+                }]
+            del datos['concepto']
+            del datos['neto']
+
+        datos['lineas'] = [CrearLineaDeComprobanteSerializer(data={'gravado_id': datos['gravado_id'], **linea}) for linea in datos['lineas']]
+
+        return datos
 
     def validate_gravado_id(self, value):
         try:
@@ -216,15 +239,14 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        neto = validated_data["neto"]
+        lineas = [linea.save() for linea in validated_data['lineas'] if linea.is_valid()]
+        neto = sum(linea.importe_neto for linea in lineas)
         gravado = Gravado.objects.get(pk=validated_data['gravado_id'])
         responsable = validated_data['responsable']
         tipo_comprobante = TipoComprobante.objects.get(pk=validated_data['tipo_comprobante_id'])
         iva = neto * gravado.porcentaje / Decimal("100.00")
         total = neto + iva
-        concepto = validated_data["concepto"]
-        del validated_data["neto"]
-        del validated_data["concepto"]
+        del validated_data["lineas"]
         comprobante = Comprobante(
                 estado=Comprobante.NO_COBRADO,
                 numero=0, # el numero nos lo va a dar la afip cuando emitamos
@@ -235,17 +257,13 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
                 nro_terminal=CEDIR_PTO_VENTA if responsable == "Cedir" else BRUNETTI_PTO_VENTA,
                 **validated_data
             )
-        linea = LineaDeComprobante(
-            comprobante=comprobante,
-            concepto=concepto,
-            importe_neto=neto,
-            iva=iva,
-            sub_total=total
-        )
-        Afip().emitir_comprobante(comprobante, [linea])
+        for linea in lineas:
+            linea.comprobante = comprobante
+        Afip().emitir_comprobante(comprobante, lineas)
         comprobante.save()
-        linea.comprobante = comprobante
-        linea.save()
+        for linea in lineas:
+            linea.comprobante = comprobante
+            linea.save()
         return comprobante
 
 def crear_comprobante_serializer_factory(data):
