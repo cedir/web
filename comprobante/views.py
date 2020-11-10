@@ -1,8 +1,8 @@
 # -*- coding: utf-8
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import redirect
-from rest_framework import generics, viewsets, status
+from rest_framework import generics, viewsets, status, serializers
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
 from decimal import Decimal
@@ -13,7 +13,7 @@ import io
 from .imprimir import generar_factura, obtener_comprobante, obtener_filename
 from .informe_ventas import obtener_comprobantes_ventas, obtener_archivo_ventas
 
-from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer, ComprobanteSmallSerializer
+from comprobante.serializers import ComprobanteListadoSerializer, ComprobanteSerializer, ComprobanteSmallSerializer, CrearComprobanteAFIPSerializer
 from comprobante.models import Comprobante
 from comprobante.calculador_informe import calculador_informe_factory
 from comprobante.comprobante_asociado import crear_comprobante_asociado, TipoComprobanteAsociadoNoValidoException
@@ -109,3 +109,18 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
         except Exception as e:
             content = {'data': {}, 'message': 'Ocurrio un error inesperado.\nError: ' + str(e)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def create(self, request):
+        try:
+            comprobante_serializer = CrearComprobanteAFIPSerializer(data=request.data)
+            if not comprobante_serializer.is_valid():
+                raise serializers.ValidationError(comprobantes_serializer.errors)
+
+            comprobante = comprobante_serializer.save()
+            response = JsonResponse({'comprobante_id': comprobante.id}, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError as ex:
+            response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as ex:
+            response = JsonResponse({'error': str(ex)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return response
