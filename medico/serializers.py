@@ -98,7 +98,7 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
             # El día que la AFIP apruebe un IVA nuevo esto va a saltar.
             raise NotImplementedError
 
-    def get_gravado(self, estudio: Estudio) -> int:
+    def get_gravado_id(self, estudio: Estudio) -> int:
         return estudio.presentacion.comprobante.gravado.id
 
 
