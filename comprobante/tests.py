@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from decimal import Decimal
-
+from mock import patch
 from .models import LineaDeComprobante, Gravado
 from .serializers import CrearComprobanteAFIPSerializer, CrearLineaDeComprobanteSerializer
 
@@ -38,7 +38,7 @@ class TestCrearLineaSerializer(TestCase):
         
         linea = linea_serializer.save()
         importe_neto = Decimal(self.linea_data['importe_neto'])
-        porcentaje_iva = Gravado.objects.get(pk=self.linea_data['gravado_id'])
+        porcentaje_iva = Gravado.objects.get(pk=self.linea_data['gravado_id']).porcentaje
         
         assert linea.iva == importe_neto * porcentaje_iva / Decimal(100)
 
@@ -49,20 +49,21 @@ class TestCrearLineaSerializer(TestCase):
         
         linea = linea_serializer.save()
         importe_neto = Decimal(self.linea_data['importe_neto'])
-        porcentaje_iva = Gravado.objects.get(pk=self.linea_data['gravado_id'])
+        porcentaje_iva = Gravado.objects.get(pk=self.linea_data['gravado_id']).porcentaje
         
         total = importe_neto + importe_neto * porcentaje_iva / Decimal(100)
         
         assert linea.sub_total == total
 
     def test_crear_linea_serializer_no_valido_si_id_iva_no_existe(self):
-        self.linea_data['gravado_id'] = Gravado.objects.count() + 1
-        linea_serializer = CrearLineaDeComprobanteSerializer(data=self.linea_data)
+        linea_data = {**self.linea_data}
+        linea_data['gravado_id'] = Gravado.objects.last().id + 1
+        linea_serializer = CrearLineaDeComprobanteSerializer(data=linea_data)
 
         assert not linea_serializer.is_valid()
         assert 'gravado_id' in linea_serializer.errors
 
-class TestCrearLineaSerializer(TestCase):
+class TestCrearComprobanteSerializer(TestCase):
     fixtures = ['comprobantes.json']
 
     def setUp(self):
@@ -90,7 +91,9 @@ class TestCrearLineaSerializer(TestCase):
             'condicion_fiscal': 'RESPONSABLE INSCRIPTO',
         }
     
-    def test_comprobante_afip_serializer_funciona_si_no_envian_lineas(self):
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_comprobante_afip_serializer_funciona_si_no_envian_lineas(self, afip_mock):
+        afip = afip_mock()
         comprobante_data = {**self.comprobante_data}
         comprobante_data['neto'] = 100
         comprobante_data['concepto'] = 'Este es un concepto'
@@ -117,7 +120,9 @@ class TestCrearLineaSerializer(TestCase):
         assert linea.sub_total == total
         assert linea.concepto == comprobante_data['concepto']
 
-    def test_comprobante_afip_serializer_funciona_si_envian_lineas(self):
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_comprobante_afip_serializer_funciona_si_envian_lineas(self, afip_mock):
+        afip = afip_mock()
         comprobante_data = {**self.comprobante_data}
         comprobante_data['lineas'] = self.lineas_data
         comprobante_serializer = CrearComprobanteAFIPSerializer(data=comprobante_data)
@@ -148,3 +153,15 @@ class TestCrearLineaSerializer(TestCase):
             assert lineas[i].importe_neto == linea_data['importe_neto']
             assert lineas[i].iva == linea_data['importe_neto'] * gravado.porcentaje / Decimal(100)
             assert lineas[i].concepto == linea_data['concepto']
+
+    @patch('comprobante.comprobante_asociado.Afip')
+    def test_crear_comprobante_error_si_gravado_id_no_existe(self, afip_mock):
+        afip = afip_mock()
+        comprobante_data = {**self.comprobante_data}
+        comprobante_data['gravado_id'] = Gravado.objects.last().id + 1
+        comprobante_data['lineas'] = self.lineas_data
+
+        comprobante_serializer = CrearComprobanteAFIPSerializer(data=comprobante_data)
+
+        assert not comprobante_serializer.is_valid()
+        assert 'gravado_id' in comprobante_serializer.errors

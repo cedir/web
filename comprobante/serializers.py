@@ -33,7 +33,7 @@ class CrearLineaDeComprobanteSerializer(serializers.ModelSerializer):
         model = LineaDeComprobante
         fields = ('concepto', 'gravado_id', 'importe_neto')
     
-    def validate_porcentaje_iva(self, value):
+    def validate_gravado_id(self, value):
         try:
             Gravado.objects.get(pk=value)
         except Gravado.DoesNotExist:
@@ -214,16 +214,11 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
 
         return datos
 
-    def validate_gravado_id(self, value):
-        try:
-            Gravado.objects.get(pk=value)
-        except Gravado.DoesNotExist:
-            raise ValidationError("id de gravado invalida")
-        return value
-
     def validate_tipo_comprobante_id(self, value):
         try:
             TipoComprobante.objects.get(pk=value)
+            if value == ID_TIPO_COMPROBANTE_LIQUIDACION:
+                raise ValidationError("Liquidacion no es un tipo de comprobante valido para AFIP")
         except TipoComprobante.DoesNotExist:
             raise ValidationError("id de tipo_comprobante invalida")
         return value
@@ -238,8 +233,13 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('"responsable" debe ser "Cedir" o Brunetti"')
         return value
 
+    def validate(self, data):
+        for linea in data['lineas']:
+            linea.is_valid(raise_exception=True)
+        return data
+
     def create(self, validated_data):
-        lineas = [linea.save() for linea in validated_data['lineas'] if linea.is_valid()]
+        lineas = [linea.save() for linea in validated_data['lineas']]
         neto = sum(linea.importe_neto for linea in lineas)
         gravado = Gravado.objects.get(pk=validated_data['gravado_id'])
         responsable = validated_data['responsable']

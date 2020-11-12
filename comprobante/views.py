@@ -114,7 +114,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
         try:
             comprobante_serializer = CrearComprobanteAFIPSerializer(data=request.data)
             if not comprobante_serializer.is_valid():
-                raise serializers.ValidationError(comprobantes_serializer.errors)
+                raise serializers.ValidationError(comprobante_serializer.errors)
 
             comprobante = comprobante_serializer.save()
             response = JsonResponse({'comprobante_id': comprobante.id}, status=status.HTTP_201_CREATED)
