@@ -18,6 +18,7 @@ from estudio.models import Estudio
 from medico.models import Medico, Disponibilidad, PagoMedico
 from medico.serializers import MedicoSerializer, PagoMedicoSerializer, ListNuevoPagoMedicoSerializer, CreateNuevoPagoMedicoSerializer, GETLineaPagoMedicoSerializer
 from medico.calculo_honorarios.calculador import CalculadorHonorariosPagoMedico
+from medico.imprimir_pago import generar_pdf_detalle_pago
 
 
 def get_disponibilidad_medicos(request):
@@ -237,6 +238,17 @@ class PagoMedicoViewList(viewsets.ModelViewSet):  # TODO: solo allow list, get y
 
     def get_serializer_class(self):
         return self.serializers.get(self.action, self.serializer_class)
+
+    @detail_route(methods=['get'])
+    def imprimir_detalle(self, request, pk=None):
+        pago : PagoMedico = PagoMedico.objects.get(pk=pk)
+
+        # Create the HttpResponse object with the appropriate PDF headers.
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'filename="Pago de {pago.medico.apellido}.pdf"'
+
+        return generar_pdf_detalle_pago(response, pago)
+
 
     @detail_route(methods=['get'])
     def get_detalle_pago(self, request, pk=None):

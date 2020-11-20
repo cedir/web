@@ -7,6 +7,7 @@ from rest_framework.serializers import Serializer, ValidationError
 
 from estudio.models import Estudio
 from comprobante.models import ID_GRAVADO_EXENTO, ID_GRAVADO_INSCRIPTO_10_5, ID_GRAVADO_INSCRIPTO_21
+from comprobante.serializers import GravadoSerializer
 from paciente.serializers import PacienteSerializer
 from obra_social.serializers import ObraSocialSerializer
 from practica.serializers import PracticaSerializer
@@ -44,12 +45,13 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
     pago = serializers.SerializerMethodField()
     total = serializers.SerializerMethodField()
     importe_iva = serializers.SerializerMethodField()
+    gravado_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Estudio
         fields = ('id', 'fecha', 'importe_estudio', 'importe_neto', 'fecha_cobro', 'paciente', 'obra_social', 'medico_actuante',
                   'medico_solicitante', 'practica', 'retencion_cedir', 'porcentaje_medico', 'gastos_administrativos',
-                  'pago_contra_factura', 'pago', 'importe_iva', 'total')
+                  'pago_contra_factura', 'pago', 'importe_iva', 'gravado_id', 'total')
 
     def get_importe_neto(self, estudio: Estudio) -> Decimal:
         calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
@@ -95,6 +97,9 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
         else:
             # El día que la AFIP apruebe un IVA nuevo esto va a saltar.
             raise NotImplementedError
+
+    def get_gravado_id(self, estudio: Estudio) -> int:
+        return estudio.presentacion.comprobante.gravado.id
 
 
 class CreateNuevoPagoMedicoSerializer(serializers.ModelSerializer):
