@@ -55,7 +55,7 @@ class ComprobanteSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Comprobante
         fields = ('id', 'nombre_cliente', 'sub_tipo', 'numero', 'nro_terminal', 'total_facturado', 'total_cobrado',
-                  'fecha_emision', 'tipo_comprobante', 'gravado', 'lineas')
+                  'fecha_emision', 'tipo_comprobante', 'gravado', 'lineas', 'cae')
 
 
 class ComprobanteSmallSerializer(serializers.ModelSerializer):
