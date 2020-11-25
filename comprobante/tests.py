@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from decimal import Decimal
 from mock import patch
 from comprobante.afip import AfipError
-from .models import LineaDeComprobante, Gravado
+from .models import LineaDeComprobante, Gravado, TipoComprobante
 from .serializers import CrearComprobanteAFIPSerializer, CrearLineaDeComprobanteSerializer
 
 class TestCrearLineaSerializer(TestCase):
@@ -167,4 +167,17 @@ class TestCrearComprobanteSerializer(TestCase):
         comprobante_serializer = CrearComprobanteAFIPSerializer(data=comprobante_data)
 
         assert not comprobante_serializer.is_valid()
-        assert 'gravado_id' in comprobante_serializer.errors
+        assert 'lineas' in comprobante_serializer.errors
+        assert 'gravado_id' in comprobante_serializer.errors['lineas']
+
+    @patch('comprobante.serializers.Afip')
+    def test_crear_comprobante_error_si_tipo_comprobante_id_no_existe(self, afip_mock):
+        afip = afip_mock()
+        comprobante_data = {**self.comprobante_data}
+        comprobante_data['tipo_comprobante_id'] = TipoComprobante.objects.last().id + 1
+        comprobante_data['lineas'] = self.lineas_data
+
+        comprobante_serializer = CrearComprobanteAFIPSerializer(data=comprobante_data)
+
+        assert not comprobante_serializer.is_valid()
+        assert 'tipo_comprobante_id' in comprobante_serializer.errors

@@ -3,6 +3,7 @@ from decimal import Decimal, ROUND_UP
 from datetime import date
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
+from collections import OrderedDict
 
 from comprobante.models import Comprobante, LineaDeComprobante, TipoComprobante, Gravado, ID_TIPO_COMPROBANTE_LIQUIDACION
 from settings import CEDIR_PTO_VENTA, BRUNETTI_PTO_VENTA
@@ -233,9 +234,27 @@ class CrearComprobanteAFIPSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('"responsable" debe ser "Cedir" o Brunetti"')
         return value
 
-    def validate(self, data):
-        for linea in data['lineas']:
+    def validate_lineas(self, value):
+        for linea in value:
             linea.is_valid(raise_exception=True)
+        return value
+
+    def validate(self, data):
+        errors = OrderedDict()
+        
+        for field in data:
+            validate_method = getattr(self, 'validate_' + field, None)
+            try:
+                if validate_method:
+                    validate_method(data[field])
+            except ValidationError as e:
+                errors[field] = e.detail
+            except Exception as e:
+                errors[field] = str(e)
+        
+        if errors:
+            raise ValidationError(errors)
+
         return data
 
     def create(self, validated_data):
