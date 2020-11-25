@@ -86,6 +86,23 @@ class ActualizarEstudiosTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk, object_id=estudio.id, action_flag=CHANGE).count(), 1)
 
+class EliminarEstudiosTest(TestCase):
+    fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'estudios.json', 'medicamentos.json']
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
+        self.client = Client(HTTP_POST='localhost')
+        self.client.login(username='walter', password='xx11')
+        self.base_url = '/api/estudio/'
+
+    def test_borrar_estudio(self):
+        id_eliminar = Estudio.objects.last().id
+        cantidad_vieja = len(Estudio.objects.all())
+        self.client.delete(self.base_url + str(id_eliminar))
+        assert cantidad_vieja, len(Estudio.objects.all()) + 1
+
+
 
 class UpdateImportesYPagoContraFacturaTests(TestCase):
     fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',

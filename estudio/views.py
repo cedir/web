@@ -147,6 +147,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
         'create': EstudioCreateUpdateSerializer,
         'update': EstudioCreateUpdateSerializer,
         'retrieve': EstudioRetrieveSerializer,
+        'destroy': EstudioSerializer,
     }
 
     def get_serializer_class(self):
@@ -217,6 +218,17 @@ class EstudioViewSet(viewsets.ModelViewSet):
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA IMPORTES')
         return Response({'success': True})
 
+    def destroy(self, request, pk=None):
+        print("EYYYYYYYYYY")
+        try:
+            estudio = Estudio.objects.get(pk = pk)
+            estudio.delete()
+            response = JsonResponse({}, status=status.HTTP_200_OK)
+        except Estudio.DoesNotExist as e:
+            response = JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            response = JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return response
 
 class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
     """
