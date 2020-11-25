@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from decimal import Decimal
 from mock import patch
+from comprobante.afip import AfipError
 from .models import LineaDeComprobante, Gravado
 from .serializers import CrearComprobanteAFIPSerializer, CrearLineaDeComprobanteSerializer
 
@@ -82,7 +83,7 @@ class TestCrearComprobanteSerializer(TestCase):
             ]
         self.comprobante_data = {
             'tipo_comprobante_id': 1,
-            'sub_tipo': 'B',
+            'sub_tipo': 'A',
             'responsable': 'Cedir',
             'gravado_id': '1',
             'nombre_cliente': 'Homero',
@@ -91,7 +92,7 @@ class TestCrearComprobanteSerializer(TestCase):
             'condicion_fiscal': 'RESPONSABLE INSCRIPTO',
         }
     
-    @patch('comprobante.comprobante_asociado.Afip')
+    @patch('comprobante.serializers.Afip')
     def test_comprobante_afip_serializer_funciona_si_no_envian_lineas(self, afip_mock):
         afip = afip_mock()
         comprobante_data = {**self.comprobante_data}
@@ -109,6 +110,7 @@ class TestCrearComprobanteSerializer(TestCase):
 
         total = neto + neto * iva / Decimal(100)
 
+        afip.emitir_comprobante.assert_called_once()
         assert comprobante.total_facturado == total
         assert comprobante.tipo_comprobante.id == comprobante_data['tipo_comprobante_id']
         assert comprobante.sub_tipo == comprobante_data['sub_tipo']
@@ -120,7 +122,7 @@ class TestCrearComprobanteSerializer(TestCase):
         assert linea.sub_total == total
         assert linea.concepto == comprobante_data['concepto']
 
-    @patch('comprobante.comprobante_asociado.Afip')
+    @patch('comprobante.serializers.Afip')
     def test_comprobante_afip_serializer_funciona_si_envian_lineas(self, afip_mock):
         afip = afip_mock()
         comprobante_data = {**self.comprobante_data}
@@ -138,6 +140,7 @@ class TestCrearComprobanteSerializer(TestCase):
 
         total = neto + neto * iva / Decimal(100)
 
+        afip.emitir_comprobante.assert_called_once()
         assert comprobante.total_facturado == total
         assert comprobante.tipo_comprobante.id == comprobante_data['tipo_comprobante_id']
         assert comprobante.sub_tipo == comprobante_data['sub_tipo']
@@ -154,7 +157,7 @@ class TestCrearComprobanteSerializer(TestCase):
             assert lineas[i].iva == linea_data['importe_neto'] * gravado.porcentaje / Decimal(100)
             assert lineas[i].concepto == linea_data['concepto']
 
-    @patch('comprobante.comprobante_asociado.Afip')
+    @patch('comprobante.serializers.Afip')
     def test_crear_comprobante_error_si_gravado_id_no_existe(self, afip_mock):
         afip = afip_mock()
         comprobante_data = {**self.comprobante_data}
