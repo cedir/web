@@ -117,7 +117,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError(comprobante_serializer.errors)
 
             comprobante = comprobante_serializer.save()
-            response = JsonResponse({'comprobante_id': comprobante.id}, status=status.HTTP_201_CREATED)
+            response = JsonResponse({'cae': comprobante.cae}, status=status.HTTP_201_CREATED)
         except serializers.ValidationError as ex:
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
