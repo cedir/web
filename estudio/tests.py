@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from datetime import timedelta
 import json
 from decimal import Decimal
 from mock import patch
@@ -96,13 +97,23 @@ class EliminarEstudiosTest(TestCase):
         self.client.login(username='walter', password='xx11')
         self.base_url = '/api/estudio/'
 
-    def test_borrar_estudio(self):
-        id_eliminar = Estudio.objects.last().id
+    def test_borrar_id_invalido(self):
+        id_eliminar = Estudio.objects.last().id + 1
         cantidad_vieja = len(Estudio.objects.all())
-        self.client.delete(self.base_url + str(id_eliminar))
-        assert cantidad_vieja, len(Estudio.objects.all()) + 1
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
 
+        self.assertEqual(cantidad_vieja, len(Estudio.objects.all()))
 
+    def test_borrar_estudio_fecha_invalida(self):
+        estudio_a_eliminar = Estudio.objects.last()
+        estudio_a_eliminar.fecha = datetime.today().date() - timedelta(days=3)
+        estudio_a_eliminar.save()
+        id_eliminar = estudio_a_eliminar.id
+        cantidad_vieja = len(Estudio.objects.all())
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
+
+        self.assertEqual(cantidad_vieja, len(Estudio.objects.all()))
+        self.assertEqual(len(Estudio.objects.filter(pk = id_eliminar)), 1)
 
 class UpdateImportesYPagoContraFacturaTests(TestCase):
     fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',

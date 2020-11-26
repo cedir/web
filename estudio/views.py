@@ -16,6 +16,7 @@ from medicamento.models import Medicamento
 from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer, EstudioRetrieveSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from .imprimir import generar_informe
+from datetime import date
 
 def imprimir(request, id_estudio):
 
@@ -147,7 +148,6 @@ class EstudioViewSet(viewsets.ModelViewSet):
         'create': EstudioCreateUpdateSerializer,
         'update': EstudioCreateUpdateSerializer,
         'retrieve': EstudioRetrieveSerializer,
-        'destroy': EstudioSerializer,
     }
 
     def get_serializer_class(self):
@@ -219,12 +219,16 @@ class EstudioViewSet(viewsets.ModelViewSet):
         return Response({'success': True})
 
     def destroy(self, request, pk=None):
-        print("EYYYYYYYYYY")
         try:
             estudio = Estudio.objects.get(pk = pk)
-            estudio.delete()
-            response = JsonResponse({}, status=status.HTTP_200_OK)
+            if((date.today() - estudio.fecha).days >= 3):
+                raise ValidationError('No se puede eliminar estudios con mas de tres dias de ingreso')
+            else:
+                estudio.delete()
+                response = JsonResponse({}, status=status.HTTP_200_OK)
         except Estudio.DoesNotExist as e:
+            response = JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
             response = JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             response = JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
