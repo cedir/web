@@ -33,6 +33,9 @@ class PagoMedicoSerializer(serializers.ModelSerializer):
 
 
 class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
+    """
+    Serializa una lista de estudios para un nuevo pago medico.
+    """
     paciente = PacienteSerializer()
     obra_social = ObraSocialSerializer()
     medico_actuante = MedicoSerializer(source='medico')
@@ -55,6 +58,7 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
 
     def get_importe_neto(self, estudio: Estudio) -> Decimal:
         calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
+        # este es el neto?
         return calculador.get_importe() - calculador.cedir
 
     def get_retencion_cedir(self, estudio: Estudio) -> Decimal:
@@ -65,6 +69,7 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
         calculador : CalculadorHonorariosPagoMedico = self.context.get('calculador')
         medico: Medico = self.context.get('medico')
         porcentajes = Porcentajes(estudio)
+        # Si es los dos?
         if estudio.medico == medico:
             return porcentajes.actuante
         else:
@@ -88,6 +93,7 @@ class ListNuevoPagoMedicoSerializer(serializers.ModelSerializer):
 
     def get_importe_iva(self, estudio: Estudio) -> Decimal:
         correspondiente = self.get_pago(estudio)
+        # tendria que ser gravado.porcentaje
         if estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_21:
             return correspondiente * Decimal(0.21)
         elif estudio.presentacion.comprobante.gravado.id == ID_GRAVADO_INSCRIPTO_10_5:
@@ -143,6 +149,7 @@ class CreateNuevoPagoMedicoSerializer(serializers.ModelSerializer):
                 data['es_actuante'] = True
             elif estudio.medico_solicitante == medico:
                 if estudio.pago_medico_solicitante  is not None:
+                    #TODO: revisar si puede estar pago como actuante pero impago como solicitante
                     raise ValidationError(f"El estudio {l['estudio_id']} ya esta pago para este solicitante.")
                 data['es_actuante'] = False
             else:
@@ -166,6 +173,7 @@ class CreateNuevoPagoMedicoSerializer(serializers.ModelSerializer):
                 estudio.pago_medico_actuante = pago
                 estudio.importe_pago_medico = importe
             else:
+                # TODO: verificar que pasa si es actuante y solicitante al mismo tiempo
                 estudio.pago_medico_solicitante = pago
                 estudio.importe_pago_medico_solicitante = importe
             estudio.save()

@@ -140,5 +140,6 @@ def recuadro(totales: Dict, styles: StyleSheet1) -> List[Flowable]:
 def elem_observacion(observacion: str, styles: StyleSheet1) -> List[Flowable]:
     return [
         Paragraph("<br/><br/>", styles["Normal"]),
+        # Revisar si esto va aca o no
         Paragraph(observacion, styles["Normal"]),
     ]
