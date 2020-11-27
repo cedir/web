@@ -31,7 +31,7 @@ class CalculadorHonorarios(object):
         '''
         Logica principal comun para todos los casos.
         Los honorarios de un medico siempre se calculan de la siguiente forma:
-        1) Se busca el importe adecuado del estudio y se calcula la retención.
+        1) Se busca el importe adecuado del estudio y se sacan los gastos administrativos.
         2) Se realizan los descuentos que correspondan.
         3) Se asignan los honorarios de cada medico segun los porcentajes que
           apliquen.
@@ -80,7 +80,6 @@ class CalculadorHonorariosInformeContadora(CalculadorHonorarios):
 
     @property
     def descuentos(self) -> Descuento:
-        # Volver a revisar esto cuando hagamos pago a medico.
         return DescuentosVarios(
             DescuentoPorPolipectomia(),
             DescuentoColangios(),
@@ -99,6 +98,7 @@ class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
     '''
     def get_importe(self) -> Decimal:
         estudio = self.estudio
+        # TODO: checkear
         if estudio.es_pago_contra_factura:
             return Decimal(estudio.pago_contra_factura)
         else:
@@ -106,6 +106,7 @@ class CalculadorHonorariosPagoMedico(CalculadorHonorarios):
 
     @property
     def descuentos(self) -> Descuento:
+        # TODO: No esta checkeado
         return DescuentosVarios(
             DescuentoPorPolipectomia(),
             DescuentoColangios(),

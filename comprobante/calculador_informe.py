@@ -89,6 +89,7 @@ class CalculadorInformeFactura(CalculadorInforme):
         self.presentacion = self.comprobante.presentacion.first()
         self.lineas = LineaDeComprobante.objects.filter(comprobante=self.comprobante)
         if self.presentacion is not None:
+            # TODO: self.estudios = list(self.presentacion.estudios.all())
             self.estudios = self.presentacion.estudios.all()
             self.calculadores_honorarios = [CalculadorHonorariosInformeContadora(estudio) for estudio in self.estudios]
 

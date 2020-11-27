@@ -149,6 +149,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             pago_serializer.is_valid(raise_exception=True)
             pago = pago_serializer.save()
             diferencia_facturada = pago.presentacion.total_facturado - pago.importe
+            # TODO: preguntar si no es mejor crear la nota directamente siempre
             response = JsonResponse({"diferencia_facturada": diferencia_facturada})
         except Presentacion.DoesNotExist:
                 response = JsonResponse({'error': "No existe una presentacion con esa id"}, status=400)

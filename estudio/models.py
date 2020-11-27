@@ -45,6 +45,7 @@ class Estudio(models.Model):
     importe_estudio = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeEstudio")
     importe_medicacion = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="importeMedicacion")
     pago_contra_factura = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="pagoContraFactura")
+    # TODO: ver donde se setea esta diferencia_paciente y si hay comprobantes o que
     diferencia_paciente = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column="diferenciaPaciente")
     pension = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'))
     importe_pago_medico = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal('0.00'), db_column='importePagoMedico')
