@@ -13,6 +13,7 @@ from common.utils import add_log_entry
 from estudio.models import Estudio
 from estudio.models import Medicacion
 from medicamento.models import Medicamento
+from caja.models import MovimientoCaja
 from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer, EstudioRetrieveSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from .imprimir import generar_informe
@@ -225,6 +226,12 @@ class EstudioViewSet(viewsets.ModelViewSet):
             elif estudio.presentacion:
                 raise ValidationError('No se puede eliminar estudios que esten en una presentacion')
             else:
+                movimientos_caja_asociados = MovimientoCaja.objects.filter(estudio = estudio)
+                for movimiento in movimientos_caja_asociados:
+                    movimiento.estudio = None
+                    mensaje = "ESTE MOVIMIENTO POSEÍA UN ESTUDIO ASOCIADO. Paciente: {0}. Fecha: {1}. ".format(estudio.paciente, estudio.fecha)
+                    movimiento.concepto = mensaje + movimiento.concepto
+                    movimiento.save()
                 medicaciones = Medicacion.objects.filter(estudio = estudio)
                 for medicacion in medicaciones:
                     medicacion.delete()

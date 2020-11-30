@@ -15,6 +15,7 @@ from rest_framework import status
 from medicamento.models import Medicamento
 from estudio.models import Estudio, Medicacion
 from presentacion.models import Presentacion
+from caja.models import MovimientoCaja
 
 from estudio.models import ID_SUCURSAL_CEDIR, ID_SUCURSAL_HOSPITAL_ITALIANO
 
@@ -89,7 +90,7 @@ class ActualizarEstudiosTest(TestCase):
 
 class EliminarEstudiosTest(TestCase):
     fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
-                'anestesistas.json', 'presentaciones.json', 'estudios.json', 'medicamentos.json']
+                'anestesistas.json', 'presentaciones.json', 'estudios.json', 'medicamentos.json', 'caja.json']
 
     def setUp(self):
         self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
@@ -127,21 +128,43 @@ class EliminarEstudiosTest(TestCase):
 
         self.assertEqual(cantidad_vieja, len(Estudio.objects.all()))
         self.assertEqual(len(Estudio.objects.filter(pk = id_eliminar)), 1)
+
+    def test_borrar_cambia_concepto_movimiento_caja(self):
+        movimiento = MovimientoCaja.objects.last()
+
+        estudio_a_eliminar = movimiento.estudio
+        id_eliminar = estudio_a_eliminar.id
+        estudio_a_eliminar.fecha = datetime.today().date() - timedelta(days=2)
+        estudio_a_eliminar.presentacion = None
+        estudio_a_eliminar.save()
+        cantidad_vieja_estudios = len(Estudio.objects.all())
+
+        concepto_nuevo = "ESTE MOVIMIENTO POSEÍA UN ESTUDIO ASOCIADO. Paciente: {0}. Fecha: {1}. ".format(estudio_a_eliminar.paciente, estudio_a_eliminar.fecha) + movimiento.concepto
+        
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
+
+        self.assertEqual(cantidad_vieja_estudios, len(Estudio.objects.all()) + 1)
+        self.assertEqual(len(Estudio.objects.filter(pk = id_eliminar)), 0)
+        
+        movimiento = MovimientoCaja.objects.get(pk = movimiento.id)
+
+        self.assertEqual(movimiento.concepto, concepto_nuevo)
+        self.assertEqual(movimiento.estudio, None)
         
     def test_borrar_estudio_funciona(self):
         medicacion = Medicacion.objects.first()
         medicaciones_asociadas = len(Medicacion.objects.filter(estudio = medicacion.estudio))
         cantidad_vieja_medicaciones = len(Medicacion.objects.all())
 
+        estudio_a_eliminar = medicacion.estudio
         id_eliminar = estudio_a_eliminar.id
-        estudio_a_eliminar = Estudio.objects.get(pk = id_eliminar)
         estudio_a_eliminar.fecha = datetime.today().date() - timedelta(days=2)
         estudio_a_eliminar.presentacion = None
         estudio_a_eliminar.save()
         cantidad_vieja_estudios = len(Estudio.objects.all())
         
         request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
-        
+
         self.assertEqual(cantidad_vieja_estudios, len(Estudio.objects.all()) + 1)
         self.assertEqual(len(Estudio.objects.filter(pk = id_eliminar)), 0)
         self.assertEqual(len(Medicacion.objects.all()), cantidad_vieja_medicaciones - medicaciones_asociadas)
