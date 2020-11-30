@@ -35,7 +35,6 @@ def add_default_medicacion(request):
     default_medicamentos_ids = (2, 3, 4, 5, 6, 7, 8, 22, 23, 35, 36, 37, 42, 48, 109, 128, 144, 167, 169)
 
     estudio = Estudio.objects.get(pk=id_estudio)
-
     for medicamento_id in default_medicamentos_ids:
         medicacion = Medicacion()
         medicacion.estudio = estudio
@@ -223,7 +222,12 @@ class EstudioViewSet(viewsets.ModelViewSet):
             estudio = Estudio.objects.get(pk = pk)
             if((date.today() - estudio.fecha).days >= 3):
                 raise ValidationError('No se puede eliminar estudios con mas de tres dias de ingreso')
+            elif estudio.presentacion:
+                raise ValidationError('No se puede eliminar estudios que esten en una presentacion')
             else:
+                medicaciones = Medicacion.objects.filter(estudio = estudio)
+                for medicacion in medicaciones:
+                    medicacion.delete()
                 estudio.delete()
                 response = JsonResponse({}, status=status.HTTP_200_OK)
         except Estudio.DoesNotExist as e:

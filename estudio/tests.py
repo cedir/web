@@ -12,8 +12,8 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import ADDITION, CHANGE
 from rest_framework import status
-
-from estudio.models import Estudio
+from medicamento.models import Medicamento
+from estudio.models import Estudio, Medicacion
 from presentacion.models import Presentacion
 
 from estudio.models import ID_SUCURSAL_CEDIR, ID_SUCURSAL_HOSPITAL_ITALIANO
@@ -99,6 +99,7 @@ class EliminarEstudiosTest(TestCase):
 
     def test_borrar_id_invalido(self):
         id_eliminar = Estudio.objects.last().id + 1
+        
         cantidad_vieja = len(Estudio.objects.all())
         request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
 
@@ -107,6 +108,18 @@ class EliminarEstudiosTest(TestCase):
     def test_borrar_estudio_fecha_invalida(self):
         estudio_a_eliminar = Estudio.objects.last()
         estudio_a_eliminar.fecha = datetime.today().date() - timedelta(days=3)
+        estudio_a_eliminar.presentaciones = None
+        estudio_a_eliminar.save()
+        id_eliminar = estudio_a_eliminar.id
+        cantidad_vieja = len(Estudio.objects.all())
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
+        self.assertEqual(cantidad_vieja, len(Estudio.objects.all()))
+        self.assertEqual(len(Estudio.objects.filter(pk = id_eliminar)), 1)
+
+    def test_borrar_estudio_asociado_a_presentacion_falla(self):
+        estudio_a_eliminar = Estudio.objects.last()
+        estudio_a_eliminar.fecha = datetime.today().date()
+        estudio_a_eliminar.presentacion = Presentacion.objects.first()
         estudio_a_eliminar.save()
         id_eliminar = estudio_a_eliminar.id
         cantidad_vieja = len(Estudio.objects.all())
@@ -114,6 +127,25 @@ class EliminarEstudiosTest(TestCase):
 
         self.assertEqual(cantidad_vieja, len(Estudio.objects.all()))
         self.assertEqual(len(Estudio.objects.filter(pk = id_eliminar)), 1)
+        
+    def test_borrar_estudio_funciona(self):
+        medicacion = Medicacion.objects.first()
+        medicaciones_asociadas = len(Medicacion.objects.filter(estudio = medicacion.estudio))
+        cantidad_vieja_medicaciones = len(Medicacion.objects.all())
+
+        id_eliminar = estudio_a_eliminar.id
+        estudio_a_eliminar = Estudio.objects.get(pk = id_eliminar)
+        estudio_a_eliminar.fecha = datetime.today().date() - timedelta(days=2)
+        estudio_a_eliminar.presentacion = None
+        estudio_a_eliminar.save()
+        cantidad_vieja_estudios = len(Estudio.objects.all())
+        
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
+        
+        self.assertEqual(cantidad_vieja_estudios, len(Estudio.objects.all()) + 1)
+        self.assertEqual(len(Estudio.objects.filter(pk = id_eliminar)), 0)
+        self.assertEqual(len(Medicacion.objects.all()), cantidad_vieja_medicaciones - medicaciones_asociadas)
+        self.assertEqual(len(Medicacion.objects.filter(estudio = medicacion.estudio)), 0)
 
 class UpdateImportesYPagoContraFacturaTests(TestCase):
     fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
