@@ -221,22 +221,23 @@ class EstudioViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         try:
             estudio = Estudio.objects.get(pk = pk)
-            if((date.today() - estudio.fecha).days >= 3):
+            if(date.today() - estudio.fecha).days >= 3:
                 raise ValidationError('No se puede eliminar estudios con mas de tres dias de ingreso')
-            elif estudio.presentacion:
+            
+            if estudio.presentacion_id:
                 raise ValidationError('No se puede eliminar estudios que esten en una presentacion')
-            else:
-                movimientos_caja_asociados = MovimientoCaja.objects.filter(estudio = estudio)
-                for movimiento in movimientos_caja_asociados:
-                    movimiento.estudio = None
-                    mensaje = "ESTE MOVIMIENTO POSEÍA UN ESTUDIO ASOCIADO. Paciente: {0}. Fecha: {1}. ".format(estudio.paciente, estudio.fecha)
-                    movimiento.concepto = mensaje + movimiento.concepto
-                    movimiento.save()
-                medicaciones = Medicacion.objects.filter(estudio = estudio)
-                for medicacion in medicaciones:
-                    medicacion.delete()
-                estudio.delete()
-                response = JsonResponse({}, status=status.HTTP_200_OK)
+
+            movimientos_caja_asociados = MovimientoCaja.objects.filter(estudio = estudio)
+            for movimiento in movimientos_caja_asociados:
+                movimiento.estudio = None
+                mensaje = "ESTE MOVIMIENTO POSEÍA UN ESTUDIO ASOCIADO. Paciente: {0}. Fecha: {1}. ".format(estudio.paciente, estudio.fecha)
+                movimiento.concepto = mensaje + movimiento.concepto
+                movimiento.save()
+            medicaciones = Medicacion.objects.filter(estudio = estudio)
+            for medicacion in medicaciones:
+                medicacion.delete()
+            estudio.delete()
+            response = JsonResponse({}, status=status.HTTP_200_OK)
         except Estudio.DoesNotExist as e:
             response = JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError as e:
