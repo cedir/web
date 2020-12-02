@@ -18,6 +18,8 @@ from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from .imprimir import generar_informe
 from datetime import date
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 
 def imprimir(request, id_estudio):
 
@@ -226,7 +228,9 @@ class EstudioViewSet(viewsets.ModelViewSet):
             
             if estudio.presentacion_id:
                 raise ValidationError('No se puede eliminar estudios que esten en una presentacion')
-
+            
+            ct = ContentType.objects.get_for_model(Estudio)
+            LogEntry.objects.filter(content_type_id=ct.pk).filter(object_id = estudio.id).delete()
             movimientos_caja_asociados = MovimientoCaja.objects.filter(estudio = estudio)
             for movimiento in movimientos_caja_asociados:
                 movimiento.estudio = None
