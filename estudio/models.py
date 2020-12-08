@@ -170,7 +170,7 @@ class Estudio(models.Model):
 
 def asignar_presentacion_nula(sender, instance, **kwargs):
     """
-    Esto es un hook para asgnar una presentacion nula cuando se crea un estudio.
+    Esto es un hook para asignar una presentacion nula cuando se crea un estudio.
     Esto es porque por defecto el campo idFacturacion = 0 cuando deberia ser igual a None.
     Cuando se actualice esto, este codigo puede ser eliminado.
     """

@@ -13,9 +13,13 @@ from common.utils import add_log_entry
 from estudio.models import Estudio
 from estudio.models import Medicacion
 from medicamento.models import Medicamento
+from caja.models import MovimientoCaja
 from estudio.serializers import EstudioSerializer, EstudioCreateUpdateSerializer, EstudioRetrieveSerializer
 from estudio.serializers import MedicacionSerializer, MedicacionCreateUpdateSerializer
 from .imprimir import generar_informe
+from datetime import date
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 
 def imprimir(request, id_estudio):
 
@@ -34,7 +38,6 @@ def add_default_medicacion(request):
     default_medicamentos_ids = (2, 3, 4, 5, 6, 7, 8, 22, 23, 35, 36, 37, 42, 48, 109, 128, 144, 167, 169)
 
     estudio = Estudio.objects.get(pk=id_estudio)
-
     for medicamento_id in default_medicamentos_ids:
         medicacion = Medicacion()
         medicacion.estudio = estudio
@@ -217,6 +220,35 @@ class EstudioViewSet(viewsets.ModelViewSet):
         add_log_entry(estudio, self.request.user, CHANGE, 'ACTUALIZA IMPORTES')
         return Response({'success': True})
 
+    def destroy(self, request, pk=None):
+        try:
+            estudio = Estudio.objects.get(pk = pk)
+            if(date.today() - estudio.fecha).days >= 3:
+                raise ValidationError('No se puede eliminar estudios con mas de tres dias de ingreso')
+            
+            if estudio.presentacion_id:
+                raise ValidationError('No se puede eliminar estudios que esten en una presentacion')
+            
+            ct = ContentType.objects.get_for_model(Estudio)
+            LogEntry.objects.filter(content_type_id=ct.pk).filter(object_id = estudio.id).delete()
+            movimientos_caja_asociados = MovimientoCaja.objects.filter(estudio = estudio)
+            for movimiento in movimientos_caja_asociados:
+                movimiento.estudio = None
+                mensaje = "ESTE MOVIMIENTO POSEÍA UN ESTUDIO ASOCIADO. Paciente: {0}. Fecha: {1}. ".format(estudio.paciente, estudio.fecha)
+                movimiento.concepto = mensaje + movimiento.concepto
+                movimiento.save()
+            medicaciones = Medicacion.objects.filter(estudio = estudio)
+            for medicacion in medicaciones:
+                medicacion.delete()
+            estudio.delete()
+            response = JsonResponse({}, status=status.HTTP_200_OK)
+        except Estudio.DoesNotExist as e:
+            response = JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            response = JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            response = JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return response
 
 class MedicacionEstudioFilterBackend(filters.BaseFilterBackend):
     """

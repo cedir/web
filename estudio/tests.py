@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from decimal import Decimal
 from mock import patch
@@ -11,9 +11,10 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import ADDITION, CHANGE
 from rest_framework import status
-
-from estudio.models import Estudio
+from medicamento.models import Medicamento
+from estudio.models import Estudio, Medicacion
 from presentacion.models import Presentacion
+from caja.models import MovimientoCaja
 
 from estudio.models import ID_SUCURSAL_CEDIR, ID_SUCURSAL_HOSPITAL_ITALIANO
 
@@ -86,6 +87,95 @@ class ActualizarEstudiosTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct.pk, object_id=estudio.id, action_flag=CHANGE).count(), 1)
 
+class EliminarEstudiosTest(TestCase):
+    fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+                'anestesistas.json', 'presentaciones.json', 'estudios.json', 'medicamentos.json', 'caja.json']
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
+        self.client = Client(HTTP_POST='localhost')
+        self.client.login(username='walter', password='xx11')
+        self.base_url = '/api/estudio/'
+
+    def test_borrar_id_invalido(self):
+        id_eliminar = Estudio.objects.last().id + 1
+        cantidad_vieja = Estudio.objects.count()
+
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(cantidad_vieja, Estudio.objects.count())
+
+    def test_borrar_estudio_fecha_invalida(self):
+        estudio_a_eliminar = Estudio.objects.last()
+        estudio_a_eliminar.fecha = datetime.today().date() - timedelta(days=3)
+        estudio_a_eliminar.presentaciones = None
+        estudio_a_eliminar.save()
+        id_eliminar = estudio_a_eliminar.id
+        cantidad_vieja = Estudio.objects.count()
+
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(cantidad_vieja, Estudio.objects.count())
+        self.assertEqual(Estudio.objects.filter(pk = id_eliminar).count(), 1)
+
+    def test_borrar_estudio_asociado_a_presentacion_falla(self):
+        estudio_a_eliminar = Estudio.objects.last()
+        estudio_a_eliminar.fecha = datetime.today().date()
+        estudio_a_eliminar.presentacion = Presentacion.objects.get(pk = 2)
+        estudio_a_eliminar.save()
+        id_eliminar = estudio_a_eliminar.id
+        cantidad_vieja = Estudio.objects.count()
+
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
+
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(cantidad_vieja, Estudio.objects.count())
+        self.assertEqual(Estudio.objects.filter(pk = id_eliminar).count(), 1)
+
+    def test_borrar_cambia_concepto_movimiento_caja(self):
+        movimiento = MovimientoCaja.objects.get(pk = 2)
+
+        estudio_a_eliminar = movimiento.estudio
+        id_eliminar = estudio_a_eliminar.id
+        estudio_a_eliminar.fecha = datetime.today().date() - timedelta(days=2)
+        estudio_a_eliminar.presentacion = None
+        estudio_a_eliminar.save()
+        cantidad_vieja_estudios = Estudio.objects.count()
+
+        concepto_nuevo = "ESTE MOVIMIENTO POSEÍA UN ESTUDIO ASOCIADO. Paciente: {0}. Fecha: {1}. ".format(estudio_a_eliminar.paciente, estudio_a_eliminar.fecha) + movimiento.concepto
+        
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
+
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        self.assertEqual(cantidad_vieja_estudios, Estudio.objects.count() + 1)
+        self.assertEqual(Estudio.objects.filter(pk = id_eliminar).count(), 0)
+        
+        movimiento = MovimientoCaja.objects.get(pk = movimiento.id)
+
+        self.assertEqual(movimiento.concepto, concepto_nuevo)
+        self.assertEqual(movimiento.estudio, None)
+        
+    def test_borrar_estudio_funciona(self):
+        medicacion = Medicacion.objects.first()
+        medicaciones_asociadas = Medicacion.objects.filter(estudio = medicacion.estudio).count()
+        cantidad_vieja_medicaciones = Medicacion.objects.count()
+
+        estudio_a_eliminar = medicacion.estudio
+        id_eliminar = estudio_a_eliminar.id
+        estudio_a_eliminar.fecha = datetime.today().date() - timedelta(days=2)
+        estudio_a_eliminar.presentacion = None
+        estudio_a_eliminar.save()
+        cantidad_vieja_estudios = Estudio.objects.count()
+        
+        request = self.client.delete(self.base_url + str(id_eliminar)+ '/')
+
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        self.assertEqual(cantidad_vieja_estudios, Estudio.objects.count() + 1)
+        self.assertEqual(Estudio.objects.filter(pk = id_eliminar).count(), 0)
+        self.assertEqual(Medicacion.objects.count(), cantidad_vieja_medicaciones - medicaciones_asociadas)
+        self.assertEqual(Medicacion.objects.filter(estudio = medicacion.estudio).count(), 0)
 
 class UpdateImportesYPagoContraFacturaTests(TestCase):
     fixtures = ['comprobantes.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
