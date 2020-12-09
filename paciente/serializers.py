@@ -5,10 +5,14 @@ from django.conf import settings
 
 
 class PacienteSerializer(serializers.HyperlinkedModelSerializer):
+    domicilio = serializers.SerializerMethodField()
 
     class Meta:
         model = Paciente
-        fields = ('id', 'dni', 'nombre', 'apellido', '_edad', 'nroAfiliado', 'informacion_extra')
+        fields = ('id', 'dni', 'nombre', 'apellido', '_edad', 'nroAfiliado', 'informacion_extra', 'domicilio')
+
+    def get_domicilio(self, obj):
+        return obj.domicilio
 
 class PacienteFormSerializer(serializers.ModelSerializer):
 
