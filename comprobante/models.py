@@ -154,7 +154,7 @@ class Comprobante(models.Model):
 
 class LineaDeComprobante(models.Model):
     comprobante = models.ForeignKey(Comprobante, db_column='idComprobante', related_name='lineas')
-    concepto = models.CharField(max_length=128, )
+    concepto = models.CharField(max_length=1000, )
     sub_total = models.DecimalField(db_column='subtotal', max_digits=16, decimal_places=2)
     iva = models.DecimalField(db_column='importeIVA', max_digits=16, decimal_places=2)
     importe_neto = models.DecimalField(db_column='importeNeto', max_digits=16, decimal_places=2)
