@@ -11,6 +11,7 @@ from estudio.models import Estudio
 from estudio.serializers import EstudioDePresentacionRetrieveSerializer
 from obra_social.serializers import ObraSocialSerializer
 from comprobante.serializers import ComprobanteSerializer
+from estudio.serializers import EstudioDePresentacionImprimirSerializer
 
 class EstadoField(serializers.Field):
     def to_representation(self, value):
@@ -33,6 +34,13 @@ class PresentacionRetrieveSerializer(serializers.ModelSerializer):
     estado = EstadoField()
     estudios = EstudioDePresentacionRetrieveSerializer(many=True)
 
+    class Meta:
+        model = Presentacion
+
+class PresentacionImprimirSerializer(serializers.ModelSerializer):
+    obra_social = ObraSocialSerializer()
+    estudios = EstudioDePresentacionImprimirSerializer(many=True)
+    
     class Meta:
         model = Presentacion
 
