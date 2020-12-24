@@ -15,6 +15,7 @@ from estudio.models import Estudio
 from estudio.serializers import EstudioDePresentacionRetrieveSerializer
 from comprobante.serializers import crear_comprobante_serializer_factory
 from presentacion.imprimir_presentacion import generar_pdf_presentacion
+from presentacion.serializers import PresentacionImprimirSerializer
 
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
@@ -162,14 +163,14 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             response = JsonResponse({'error': str(ex)}, status=500)
         return response
 
-        @detail_route(methods=['get'])
-        def imprimir_presentacion(self, request, pk=None):
-            presentacion : Presentacion = Presentacion.objects.get(pk=pk)
-            presentacion = PresentacionRetrieveSerializer(presentacion).data
-
-            # Create the HttpResponse object with the appropriate PDF headers.
-            response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = f'filename="Presentacion numero {presentacion.id}.pdf"'
-
-            return generar_pdf_presentacion(response, presentacion)
+    @detail_route(methods=['get'])
+    def imprimir_presentacion(self, request, pk=None):
+        presentacion : Presentacion = Presentacion.objects.get(pk=pk)
+        presentacion_serializer = PresentacionImprimirSerializer(presentacion).data 
+        # estudios = presentacion.estudios.all().order_by('fecha', 'id')
+        # estudios = EstudioDePresentacionRetrieveSerializer(estudios, many=True).data
+        # Create the HttpResponse object with the appropriate PDF headers.
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'filename="Presentacion_{presentacion.id}.pdf"'
+        return generar_pdf_presentacion(response, presentacion_serializer)
 
