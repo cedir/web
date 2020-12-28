@@ -148,6 +148,35 @@ class PresentacionUpdateSerializer(serializers.ModelSerializer):
             'estudios',
         )
 
+class PresentacionRefacturarSerializer(serializers.ModelSerializer):
+    estudios = serializers.ListField()
+
+    class Meta:
+        model = Presentacion
+        fields = (
+            'estudios',
+        )
+    
+    def validate(self, data):
+        for estudio_data in data['estudios']:
+            estudio = Estudio.objects.get(pk=estudio_data)
+            if estudio.obra_social_id != self.instance.obra_social_id:
+                raise ValidationError('El estudio id = {0} es de una obra social distinta a la presentacion'.format(estudio.id))
+            if estudio.presentacion_id != 0 and estudio.presentacion_id != self.instance.id:
+                raise ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
+            if estudio.sucursal != self.instance.sucursal:
+                raise ValidationError('El estudio id = {0} no es de esta sucursal'.format(estudio.id))
+        return data
+    
+    def update(self, instance, validated_data):
+        estudios_data = validated_data['estudios']
+        for estudio_id in estudios_data:
+            estudio = Estudio.objects.get(pk=estudio_id)
+            estudio.presentacion_id = 0
+            estudio.save()
+        estudios = Estudio.objects.filter(id__in=[e for e in estudios_data])
+        return instance
+
 class PagoPresentacionSerializer(serializers.ModelSerializer):
     presentacion_id = serializers.IntegerField()
     estudios = serializers.ListField()
