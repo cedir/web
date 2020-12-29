@@ -116,6 +116,3 @@ class EstudioDePresentacionImprimirSerializer(EstudioDePresentacionRetrieveSeria
         fields = ('id', 'fecha', 'nro_de_orden', 'paciente', 'practica',
             'medico', 'importe_estudio', 'pension', 'diferencia_paciente',
             'importe_medicacion', 'arancel_anestesia', 'medicacion')
-
-    def get_medicacion(self, estudio):
-        print("AAAAAAAAAAAAAAAAAA  ")

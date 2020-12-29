@@ -43,6 +43,12 @@ class PresentacionImprimirSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Presentacion
+        fields = (
+            'obra_social',
+            'estudios',
+            'periodo',
+            'fecha'
+        )
 
 class PresentacionCreateSerializer(serializers.ModelSerializer):
     obra_social_id = serializers.IntegerField()

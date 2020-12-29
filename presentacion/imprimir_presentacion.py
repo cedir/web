@@ -31,7 +31,8 @@ def generar_pdf_presentacion(response, presentacion):
         rightMargin=15*mm,
         leftMargin=15*mm
     )
-    elements = pdf_encabezado(presentacion['obra_social'], presentacion['fecha']) + [separacion, enter]
+    presentacion = get_pacientes(presentacion)
+    elements = pdf_encabezado(presentacion['obra_social'], presentacion['fecha'], presentacion['periodo']) + [separacion]
     estudios, total_presentacion = pdf_estudios(presentacion['estudios'])
     for estudio in estudios:
         elements += estudio
@@ -39,14 +40,32 @@ def generar_pdf_presentacion(response, presentacion):
     pdf.build(elements)
     return response
 
-def pdf_encabezado(obra_social, fecha):
+def pdf_encabezado(obra_social, fecha, periodo):
     return [
         Paragraph(f"Obra Social: {obra_social['nombre']}", styles["Title"]),
         Paragraph("<br/><br/>", styles["Normal"]),
-        Paragraph("Detalle de Facturacion correspondiente al mes de", styles["Normal"]),
+        Paragraph(f"Detalle de Facturacion correspondiente al mes de {periodo}", styles["Normal"]),
         Paragraph(f"Fecha: {fecha}", styles["Normal"]),
-        Paragraph("<br/><br/>", styles["Normal"]),
     ]
+
+def estudios_por_paciente(nombre, estudios):
+    estudios_del_paciente = []
+    for estudio in estudios:
+        if estudio['paciente']['apellido'] + ', ' + estudio['paciente']['apellido'] == nombre:
+            estudios_del_paciente += [estudio]
+    return estudios_del_paciente
+
+def get_pacientes(presentacion):
+    estudios = presentacion['estudios']
+    pacientes = set([estudio['paciente']['apellido'] + ', ' + estudio['paciente']['apellido'] for estudio in estudios ])
+    presentacion['pacientes'] = [
+        {
+            'nombre' : nombre,
+            'estudios': estudios_por_paciente(nombre, estudios)
+        }
+    for nombre in pacientes]
+    #print(presentacion['pacientes'])
+    return presentacion
 
 def filas_pension(importe_pension):
     
@@ -69,14 +88,13 @@ def filas_elementos(lista, titulo):
         extra = ''
         if titulo == 'Medicacion':
             extra = ' * Valorizada de acuerdo al Vademecum Kairo'
-        filas += [[f'Total {titulo}', '', f'${importe_total}' + extra]]
+        filas += [[f'Total {titulo}', '', Paragraph(f"{importe_total} {extra}", styles["Normal"])]]
         return filas, importe_total
     return [], importe_total
 
 def pdf_tabla_estudio(estudio):
     material_especifico = []
     medicacion = []
-
     for medicamento in estudio['medicacion']:
         if medicamento['tipo'] == TIPOS_MEDICAMENTOS[0][0]:
             material_especifico.append(medicamento)
@@ -93,8 +111,9 @@ def pdf_tabla_estudio(estudio):
          + fila_medicacion \
          + fila_material \
          + [['Total del estudio', '', f'${total_estudio}']]
-    style = [('GRID', (0, 0), (-1, -1), 0.5, colors.black)]
-    table = Table(tabla, style = style)
+
+    style = [('INNERGRID', (0, x), (2, x), 0.25, colors.black) for x in range(len(tabla)-1)] #crea lineas en la tabla
+    table = Table(tabla, style = style, colWidths=[80*mm,30*mm,70*mm])
     return table, total_estudio
 
 def pdf_estudio(estudio):
