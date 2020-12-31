@@ -167,9 +167,6 @@ class PresentacionViewSet(viewsets.ModelViewSet):
     def imprimir_presentacion(self, request, pk=None):
         presentacion : Presentacion = Presentacion.objects.get(pk=pk)
         presentacion_serializer = PresentacionImprimirSerializer(presentacion).data 
-        # estudios = presentacion.estudios.all().order_by('fecha', 'id')
-        # estudios = EstudioDePresentacionRetrieveSerializer(estudios, many=True).data
-        # Create the HttpResponse object with the appropriate PDF headers.
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'filename="Presentacion_{presentacion.id}.pdf"'
         return generar_pdf_presentacion(response, presentacion_serializer)

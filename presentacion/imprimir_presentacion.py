@@ -1,14 +1,11 @@
-from typing import Dict, List
-from reportlab.platypus.tables import TableStyle
-from rest_framework.response import Response
 from itertools import chain
-from decimal import *
+from decimal import Decimal
 
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import StyleSheet1, getSampleStyleSheet
 from reportlab.lib.units import cm, mm
 from reportlab.lib.enums import TA_JUSTIFY
-from reportlab.platypus import Table, Paragraph
+from reportlab.platypus import Table, Paragraph, KeepTogether
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 from reportlab.platypus.flowables import Flowable
 from reportlab.lib import colors
@@ -18,58 +15,64 @@ from medicamento.models import TIPOS_MEDICAMENTOS
 styles = getSampleStyleSheet()
 styles["Normal"].fontSize = 10
 styles["Heading1"].fontSize = 10
-separacion = Paragraph('_'*89, styles["Normal"])
-enter = Paragraph("<br/><br/>", styles["Normal"])
+HLINE = KeepTogether(Paragraph('_'*89, styles["Normal"]))
+ENTER = KeepTogether(Paragraph("<br/><br/>", styles["Normal"]))
+TOPMARGIN = 60*mm
+BOTTOMMARGIN = 10*mm
+RIGHTMARGIN = 15*mm
+LEFTMARGIN = 15*mm
+COL1 = 80*mm
+COL2 = 30*mm
+COL3 = 70*mm
 
 def generar_pdf_presentacion(response, presentacion):
 
     pdf = SimpleDocTemplate(
         response,
-        pagesize=(A4),
-        topMargin=60*mm,
-        bottomMargin=10*mm,
-        rightMargin=15*mm,
-        leftMargin=15*mm
+        pagesize = (A4),
+        topMargin = TOPMARGIN,
+        bottomMargin = BOTTOMMARGIN,
+        rightMargin = RIGHTMARGIN,
+        leftMargin = LEFTMARGIN,
     )
     presentacion = get_pacientes(presentacion)
-    elements = pdf_encabezado(presentacion['obra_social'], presentacion['fecha'], presentacion['periodo']) + [separacion]
+    elements = pdf_encabezado(presentacion['obra_social'], presentacion['fecha'], presentacion['periodo']) + [HLINE]
     estudios, total_presentacion = pdf_estudios(presentacion['estudios'])
     for estudio in estudios:
         elements += estudio
-    elements += [Paragraph(f"Total: ${total_presentacion}", styles['Heading2'])]
+    elements += [KeepTogether(Paragraph(f"Total: ${total_presentacion}", styles['Heading2']))]
     pdf.build(elements)
     return response
 
 def pdf_encabezado(obra_social, fecha, periodo):
     return [
-        Paragraph(f"Obra Social: {obra_social['nombre']}", styles["Title"]),
-        Paragraph("<br/><br/>", styles["Normal"]),
-        Paragraph(f"Detalle de Facturacion correspondiente al mes de {periodo}", styles["Normal"]),
-        Paragraph(f"Fecha: {fecha}", styles["Normal"]),
+        KeepTogether(Paragraph(f"Obra Social: {obra_social['nombre']}", styles["Title"])),
+        ENTER,
+        KeepTogether(Paragraph(f"Detalle de Facturacion correspondiente al mes de {periodo}", styles["Normal"])),
+        KeepTogether(Paragraph(f"Fecha: {fecha}", styles["Normal"])),
     ]
 
 def estudios_por_paciente(nombre, estudios):
     estudios_del_paciente = []
     for estudio in estudios:
-        if estudio['paciente']['apellido'] + ', ' + estudio['paciente']['apellido'] == nombre:
+        if estudio['paciente']['apellido'] + ', ' + estudio['paciente']['nombre'] == nombre:
             estudios_del_paciente += [estudio]
     return estudios_del_paciente
 
 def get_pacientes(presentacion):
     estudios = presentacion['estudios']
-    pacientes = set([estudio['paciente']['apellido'] + ', ' + estudio['paciente']['apellido'] for estudio in estudios ])
+    pacientes = set([estudio['paciente']['apellido'] + ', ' + estudio['paciente']['nombre'] for estudio in estudios ])
     presentacion['pacientes'] = [
         {
             'nombre' : nombre,
             'estudios': estudios_por_paciente(nombre, estudios)
         }
     for nombre in pacientes]
-    #print(presentacion['pacientes'])
     return presentacion
 
 def filas_pension(importe_pension):
     
-    if not (importe_pension == '0.00'):
+    if not (Decimal(importe_pension) == Decimal(0)):
         return [['Pension', '', f"${importe_pension}"]]
     return []
 
@@ -78,31 +81,29 @@ def filas_anestesia(importe_anestecia):
         return [['Anestesia', '', f"${importe_anestecia}"]]
     return []
 
-def filas_elementos(lista, titulo):
+def filas_medicamentos(medicamentos, tipo_medicamento):
     importe_total = Decimal(0)
-    if len(lista) > 0:
-        filas = [[f'{titulo}:', '', '']]
-        for elemento in lista:
+    filas = []
+    if medicamentos:
+        filas = [[f'{tipo_medicamento}:', '', '']]
+        for elemento in medicamentos:
             filas += [[' * ' + elemento['descripcion'], '$' + elemento['importe'], '']]
             importe_total += Decimal(elemento['importe'])
-        extra = ''
-        if titulo == 'Medicacion':
-            extra = ' * Valorizada de acuerdo al Vademecum Kairo'
-        filas += [[f'Total {titulo}', '', Paragraph(f"{importe_total} {extra}", styles["Normal"])]]
-        return filas, importe_total
-    return [], importe_total
+        extra = ' * Valorizada de acuerdo al Vademecum Kairo' if tipo_medicamento == 'Medicacion' else ''
+        filas += [[f'Total {tipo_medicamento}', '', f"{importe_total} {extra}"]]
+    return filas, importe_total
 
 def pdf_tabla_estudio(estudio):
     material_especifico = []
     medicacion = []
     for medicamento in estudio['medicacion']:
         if medicamento['tipo'] == TIPOS_MEDICAMENTOS[0][0]:
-            material_especifico.append(medicamento)
-        if medicamento['tipo'] == TIPOS_MEDICAMENTOS[1][0]:
-            medicacion.append(medicamento)
+            material_especifico += [medicamento]
+        else:
+            medicacion += [medicamento]
     total_estudio = Decimal(estudio['importe_estudio']) + Decimal(estudio['pension'])
-    fila_medicacion, costo_medicacion = filas_elementos(medicacion, 'Medicacion')
-    fila_material, costo_material = filas_elementos(material_especifico, 'Material Especifico')
+    fila_medicacion, costo_medicacion = filas_medicamentos(medicacion, 'Medicacion')
+    fila_material, costo_material = filas_medicamentos(material_especifico, 'Material Especifico')
     total_estudio = total_estudio + costo_material + costo_medicacion
 
     tabla = [['Practica', '', f"${estudio['importe_estudio']}"]] \
@@ -113,20 +114,20 @@ def pdf_tabla_estudio(estudio):
          + [['Total del estudio', '', f'${total_estudio}']]
 
     style = [('INNERGRID', (0, x), (2, x), 0.25, colors.black) for x in range(len(tabla)-1)] #crea lineas en la tabla
-    table = Table(tabla, style = style, colWidths=[80*mm,30*mm,70*mm])
+    table = Table(tabla, style = style, colWidths=[COL1, COL2, COL3])
     return table, total_estudio
 
 def pdf_estudio(estudio):
     nombre_paciente = estudio['paciente']['apellido'] + ', ' + estudio['paciente']['nombre']
-    info_extra = estudio.get('informacion_extra', '')
+    info_extra = estudio['paciente'].get('informacion_extra', '') or ''
     tabla, total_estudio = pdf_tabla_estudio(estudio)
-    return [Paragraph(f"Fecha: {estudio['fecha']}", styles["Normal"]),
-        Paragraph(f"Paciente: {nombre_paciente} - Nro de afiliado: {estudio['paciente']['nroAfiliado']} {info_extra}", styles["Normal"]),
-        Paragraph(f"Nro de orden: {estudio['nro_de_orden']}", styles["Normal"]),
-        Paragraph(f"Practica: {estudio['practica']['descripcion']}", styles["Normal"]),
-        enter,
+    return [KeepTogether(Paragraph(f"Fecha: {estudio['fecha']}", styles["Normal"])),
+        KeepTogether(Paragraph(f"Paciente: {nombre_paciente} - Nro de afiliado: {estudio['paciente']['nroAfiliado']} {info_extra}", styles["Normal"])),
+        KeepTogether(Paragraph(f"Nro de orden: {estudio['nro_de_orden']}", styles["Normal"])),
+        KeepTogether(Paragraph(f"Practica: {estudio['practica']['descripcion']}", styles["Normal"])),
+        ENTER,
         tabla,
-        enter,] , total_estudio
+        ENTER,] , total_estudio
 
 def pdf_estudios(estudios):
     informacion = [[]]
@@ -134,5 +135,5 @@ def pdf_estudios(estudios):
     for estudio in estudios:
         informacion_estudio, total_estudio = pdf_estudio(estudio)
         total_presentacion += total_estudio
-        informacion += [informacion_estudio, [separacion]]
+        informacion += [informacion_estudio, [HLINE]]
     return informacion, total_presentacion

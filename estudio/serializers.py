@@ -10,7 +10,6 @@ from practica.serializers import PracticaSerializer
 from medicamento.serializers import MedicamentoSerializer
 from comprobante.serializers import ComprobanteSmallSerializer
 from decimal import Decimal
-from medicamento.models import Medicamento
 
 class EstadoField(serializers.Field):
     def to_representation(self, value):
@@ -101,12 +100,6 @@ class EstudioDePresentacionRetrieveSerializer(EstudioSinPresentarSerializer):
     
     def get_importe_medicacion(self, estudio):
         return str(estudio.get_total_medicacion())
-
-class MedicacionImprimirPresentacionSerializer(serializers.HyperlinkedModelSerializer):
-    medicamento = MedicamentoSerializer()
-    class Meta:
-        model = Medicacion
-        fields = ('medicamento', 'importe')
 
 class EstudioDePresentacionImprimirSerializer(EstudioDePresentacionRetrieveSerializer):
     medicacion = MedicamentoSerializer(many=True)
