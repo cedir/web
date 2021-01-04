@@ -166,6 +166,10 @@ class PresentacionRefacturarSerializer(serializers.ModelSerializer):
                 raise ValidationError('El estudio id = {0} ya se encuentra presentado'.format(estudio.id))
             if estudio.sucursal != self.instance.sucursal:
                 raise ValidationError('El estudio id = {0} no es de esta sucursal'.format(estudio.id))
+
+        if self.instance.estado != Presentacion.PENDIENTE:
+            raise ValidationError('La presentacion debe estar en estado PENDIENTE')
+        
         return data
     
     def update(self, instance, validated_data):
@@ -174,7 +178,6 @@ class PresentacionRefacturarSerializer(serializers.ModelSerializer):
             estudio = Estudio.objects.get(pk=estudio_id)
             estudio.presentacion_id = 0
             estudio.save()
-        estudios = Estudio.objects.filter(id__in=[e for e in estudios_data])
         return instance
 
 class PagoPresentacionSerializer(serializers.ModelSerializer):

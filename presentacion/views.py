@@ -1,3 +1,4 @@
+from typing import Dict
 from datetime import date
 
 from django.http import HttpResponse, JsonResponse
@@ -166,11 +167,11 @@ class PresentacionViewSet(viewsets.ModelViewSet):
     def refacturar_estudios(self, request, pk=None):
         try:
             presentacion = Presentacion.objects.get(pk=pk)
-            estudios = request.data
+            estudios: Dict = request.data
             presentacion_serializer = PresentacionRefacturarSerializer(presentacion, data=estudios)
             presentacion_serializer.is_valid(raise_exception=True)
             presentacion = presentacion_serializer.save()
-            response = JsonResponse({}, status=status.HTTP_202_ACCEPTED)
+            response = JsonResponse({}, status=status.HTTP_200_OK)
         except Presentacion.DoesNotExist:
             response = JsonResponse({'error': 'No existe la presentacion que se quiere modificar'}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError as ex:
