@@ -5,6 +5,7 @@ from datetime import date
 
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from rest_framework import status
 
 from presentacion.models import Presentacion
 from obra_social.models import ObraSocial
@@ -275,6 +276,155 @@ class TestCobrarPresentacion(TestCase):
                                      content_type='application/json')
         assert response.status_code == 400
         presentacion = Presentacion.objects.get(pk=7)
+        assert presentacion.estado == Presentacion.PENDIENTE
+        assert presentacion.comprobante.estado == Comprobante.NO_COBRADO
+
+    def test_refacturar_estudios_funciona_con_un_estudio(self):
+        presentacion = Presentacion.objects.get(pk=1)
+        presentacion.estado = Presentacion.PENDIENTE
+        presentacion.save()
+        estudio = Estudio.objects.filter(presentacion=presentacion).first()
+        assert estudio
+        response = self.client.patch('/api/presentacion/1/refacturar_estudios/', json.dumps({'estudios': [estudio.id]}),
+                                     content_type='application/json')
+
+        estudio = Estudio.objects.get(pk=estudio.id)
+        assert response.status_code == status.HTTP_200_OK
+        assert not estudio.presentacion.id
+
+    def test_refacturar_estudios_funciona_con_varios_estudios(self):
+        presentacion = Presentacion.objects.get(pk=5)
+        presentacion.estado = Presentacion.PENDIENTE
+        presentacion.save()
+
+        estudios = Estudio.objects.filter(presentacion=presentacion)
+
+        for estudio in estudios:
+            estudio.obra_social = presentacion.obra_social
+            estudio.sucursal = presentacion.sucursal
+            estudio.save()
+
+        assert estudios.count() > 1
+
+        response = self.client.patch('/api/presentacion/5/refacturar_estudios/', json.dumps({'estudios': [estudio.id for estudio in estudios]}),
+                                     content_type='application/json')
+
+        estudios_presentacion = Estudio.objects.filter(
+            presentacion=presentacion)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert estudios_presentacion.count() == 0
+        for estudio in estudios:
+            estudio.refresh_from_db()
+            assert estudio.presentacion.id == 0
+
+    def test_refacturar_estudios_no_funciona_con_estudios_de_otra_presentacion(self):
+        presentacion = Presentacion.objects.get(pk=1)
+        presentacion.estado = Presentacion.PENDIENTE
+        presentacion.save()
+
+        estudio = Estudio.objects.filter(presentacion=presentacion).first()
+
+        estudio.presentacion = Presentacion.objects.get(pk=2)
+        estudio.save()
+
+        response = self.client.patch('/api/presentacion/1/refacturar_estudios/', json.dumps({'estudios': [estudio.id]}),
+                                     content_type='application/json')
+        
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        estudio.presentacion = Presentacion.objects.get(pk=1)
+        estudio.save()
+
+        response = self.client.patch('/api/presentacion/1/refacturar_estudios/', json.dumps({'estudios': [estudio.id]}),
+                                     content_type='application/json')
+        
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_refacturar_estudios_no_funciona_con_estudios_de_otra_obra_social(self):
+        presentacion = Presentacion.objects.get(pk=1)
+        presentacion.estado = Presentacion.PENDIENTE
+        presentacion.save()
+
+        estudio = Estudio.objects.filter(presentacion=presentacion).first()
+
+        estudio.obra_social = ObraSocial.objects.get(pk=2)
+        estudio.save()
+
+        response = self.client.patch('/api/presentacion/1/refacturar_estudios/', json.dumps({'estudios': [estudio.id]}),
+                                     content_type='application/json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        estudio.obra_social = presentacion.obra_social
+        estudio.save()
+
+        response = self.client.patch('/api/presentacion/1/refacturar_estudios/', json.dumps({'estudios': [estudio.id]}),
+                                     content_type='application/json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_refacturar_estudios_no_funciona_con_estudios_de_presentaciones_no_pendientes(self):
+        presentacion = Presentacion.objects.get(pk=1)
+        presentacion.estado = Presentacion.COBRADO
+        presentacion.save()
+
+        estudio = Estudio.objects.filter(presentacion=presentacion).first()
+
+        response = self.client.patch('/api/presentacion/1/refacturar_estudios/', json.dumps({'estudios': [estudio.id]}),
+                                     content_type='application/json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        presentacion.estado = Presentacion.ABIERTO
+        presentacion.save()
+
+        response = self.client.patch('/api/presentacion/1/refacturar_estudios/', json.dumps({'estudios': [estudio.id]}),
+                                     content_type='application/json')
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        presentacion.estado = Presentacion.PENDIENTE
+        presentacion.save()
+
+        response = self.client.patch('/api/presentacion/1/refacturar_estudios/', json.dumps({'estudios': [estudio.id]}),
+                                     content_type='application/json')
+                                     
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_cobrar_presentacion_no_permite_recibir_estudios_refacturados(self):
+        presentacion = Presentacion.objects.get(pk=5)
+        presentacion.estado = Presentacion.PENDIENTE
+        presentacion.save()
+        
+        estudio = Estudio.objects.filter(presentacion=presentacion).first()
+        estudio.obra_social = presentacion.obra_social
+        estudio.sucursal = presentacion.sucursal
+        estudio.save()
+
+        response = self.client.patch('/api/presentacion/5/refacturar_estudios/', json.dumps({'estudios': [estudio.id]}),
+                                     content_type='application/json')
+
+        assert response.status_code == status.HTTP_200_OK
+
+        datos = {
+            "estudios": [
+                {
+                    "id": estudio.id,
+                    "importe_cobrado_pension": "1.00",
+                    "importe_cobrado_arancel_anestesia": "1.00",
+                    "importe_estudio_cobrado": "1.00",
+                    "importe_medicacion_cobrado": "1.00",
+                },
+            ],
+            "retencion_impositiva": "32.00",
+            "nro_recibo": 1,
+        }
+        response = self.client.patch('/api/presentacion/5/cobrar/', data=json.dumps(datos),
+                                     content_type='application/json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+        presentacion.refresh_from_db()
+
         assert presentacion.estado == Presentacion.PENDIENTE
         assert presentacion.comprobante.estado == Comprobante.NO_COBRADO
 
