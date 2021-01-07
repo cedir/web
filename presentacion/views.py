@@ -17,6 +17,8 @@ from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRow
 from estudio.models import Estudio
 from estudio.serializers import EstudioDePresentacionRetrieveSerializer
 from comprobante.serializers import crear_comprobante_serializer_factory
+from presentacion.imprimir_presentacion import generar_pdf_presentacion
+from presentacion.serializers import PresentacionImprimirSerializer
 
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
@@ -162,6 +164,14 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         except Exception as ex:
             response = JsonResponse({'error': str(ex)}, status=500)
         return response
+
+    @detail_route(methods=['get'])
+    def imprimir_presentacion(self, request, pk=None):
+        presentacion : Presentacion = Presentacion.objects.get(pk=pk)
+        presentacion_serializer = PresentacionImprimirSerializer(presentacion).data 
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'filename="Presentacion_{presentacion.id}.pdf"'
+        return generar_pdf_presentacion(response, presentacion_serializer)
     
     @detail_route(methods=['patch'])
     def refacturar_estudios(self, request, pk=None):

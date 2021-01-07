@@ -79,11 +79,6 @@ class EstudioSinPresentarSerializer(serializers.ModelSerializer):
     def get_importe_medicacion(self, estudio):
         return estudio.get_total_medicacion()
 
-
-class EstudioDePresentacionRetrieveSerializer(EstudioSinPresentarSerializer):
-   def get_importe_estudio(self, estudio):
-        return estudio.importe_estudio
-
 class MedicacionSerializer(serializers.HyperlinkedModelSerializer):
     medicamento = MedicamentoSerializer()
 
@@ -91,9 +86,26 @@ class MedicacionSerializer(serializers.HyperlinkedModelSerializer):
         model = Medicacion
         fields = ('id', 'medicamento', 'estudio_id', 'importe')
 
-
 class MedicacionCreateUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Medicacion
         fields = ('id', 'medicamento', 'importe', 'estudio')
+
+
+
+class EstudioDePresentacionRetrieveSerializer(EstudioSinPresentarSerializer):
+    def get_importe_estudio(self, estudio):
+        return str(estudio.importe_estudio)
+    
+    def get_importe_medicacion(self, estudio):
+        return str(estudio.get_total_medicacion())
+
+class EstudioDePresentacionImprimirSerializer(EstudioDePresentacionRetrieveSerializer):
+    medicacion = MedicamentoSerializer(many=True)
+
+    class Meta:
+        model = Estudio
+        fields = ('id', 'fecha', 'nro_de_orden', 'paciente', 'practica',
+            'medico', 'importe_estudio', 'pension', 'diferencia_paciente',
+            'importe_medicacion', 'arancel_anestesia', 'medicacion')
