@@ -1,13 +1,16 @@
+from typing import Dict
 from datetime import date
 
 from django.http import HttpResponse, JsonResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.serializers import ValidationError
 from rest_framework.decorators import detail_route
 from common.drf.views import StandardResultsSetPagination
 
 from presentacion.models import Presentacion
-from presentacion.serializers import PagoPresentacionSerializer, PresentacionCreateSerializer, PresentacionRetrieveSerializer, PresentacionSerializer, PresentacionUpdateSerializer
+from presentacion.serializers import PagoPresentacionSerializer, PresentacionCreateSerializer, \
+    PresentacionRetrieveSerializer, PresentacionSerializer, PresentacionUpdateSerializer, \
+    PresentacionRefacturarSerializer
 from presentacion.obra_social_custom_code.osde_presentacion_digital import \
     OsdeRowEstudio, OsdeRowMedicacion, OsdeRowPension, OsdeRowMaterialEspecifico
 from presentacion.obra_social_custom_code.amr_presentacion_digital import AmrRowEstudio
@@ -151,7 +154,6 @@ class PresentacionViewSet(viewsets.ModelViewSet):
             pago_serializer.is_valid(raise_exception=True)
             pago = pago_serializer.save()
             diferencia_facturada = pago.presentacion.total_facturado - pago.importe
-            # TODO: preguntar si no es mejor crear la nota directamente siempre
             response = JsonResponse({"diferencia_facturada": diferencia_facturada})
         except Presentacion.DoesNotExist:
                 response = JsonResponse({'error': "No existe una presentacion con esa id"}, status=400)
@@ -170,4 +172,20 @@ class PresentacionViewSet(viewsets.ModelViewSet):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'filename="Presentacion_{presentacion.id}.pdf"'
         return generar_pdf_presentacion(response, presentacion_serializer)
-
+    
+    @detail_route(methods=['patch'])
+    def refacturar_estudios(self, request, pk=None):
+        try:
+            presentacion = Presentacion.objects.get(pk=pk)
+            estudios: Dict = request.data
+            presentacion_serializer = PresentacionRefacturarSerializer(presentacion, data=estudios)
+            presentacion_serializer.is_valid(raise_exception=True)
+            presentacion = presentacion_serializer.save()
+            response = JsonResponse({}, status=status.HTTP_200_OK)
+        except Presentacion.DoesNotExist:
+            response = JsonResponse({'error': 'No existe la presentacion que se quiere modificar'}, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as ex:
+            response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as ex:
+            response = JsonResponse({'error': str(ex)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return response
