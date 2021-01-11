@@ -62,6 +62,11 @@ def filas_anestesia(importe_anestecia):
         return [['Anestesia', '', f"${importe_anestecia}"]]
     return []
 
+def controlar_longitud(medicamento):
+    if medicamento.isupper():
+        return medicamento[0:30]
+    return medicamento[0:35]
+
 def filas_medicamentos(medicamentos, tipo_medicamento):
     importe_total = Decimal(0)
     filas = []
@@ -69,7 +74,7 @@ def filas_medicamentos(medicamentos, tipo_medicamento):
     if medicamentos:
         filas = [[f'{tipo_medicamento}:', '', '']]
         for elemento in medicamentos:
-            filas += [[' * ' + elemento['descripcion'], '$' + elemento['importe'], '']]
+            filas += [[' * ' + controlar_longitud(elemento['descripcion']), '$' + elemento['importe'], '']]
             importe_total += Decimal(elemento['importe'])
 
         extra = ' * Valorizada de acuerdo al Vademecum Kairo' if tipo_medicamento == 'Medicacion' else ''
