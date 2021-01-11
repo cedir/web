@@ -39,7 +39,7 @@ class PresentacionRetrieveSerializer(serializers.ModelSerializer):
 
 class PresentacionImprimirSerializer(serializers.ModelSerializer):
     obra_social = ObraSocialSerializer()
-    estudios = EstudioDePresentacionImprimirSerializer(many=True)
+    estudios = serializers.SerializerMethodField()
     
     class Meta:
         model = Presentacion
@@ -49,6 +49,10 @@ class PresentacionImprimirSerializer(serializers.ModelSerializer):
             'periodo',
             'fecha'
         )
+
+    def get_estudios(self, presentacion):
+        estudios = Estudio.objects.filter(presentacion=presentacion).order_by('fecha', 'paciente__dni')
+        return [EstudioDePresentacionImprimirSerializer(estudio).data for estudio in estudios]
 
 class PresentacionCreateSerializer(serializers.ModelSerializer):
     obra_social_id = serializers.IntegerField()

@@ -168,7 +168,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def imprimir_presentacion(self, request, pk=None):
         presentacion : Presentacion = Presentacion.objects.get(pk=pk)
-        presentacion_serializer = PresentacionImprimirSerializer(presentacion).data 
+        presentacion_serializer = PresentacionImprimirSerializer(presentacion).data
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'filename="Presentacion_{presentacion.id}.pdf"'
         return generar_pdf_presentacion(response, presentacion_serializer)
