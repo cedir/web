@@ -9,7 +9,7 @@ from django.db.models import Q
 from rest_framework.renderers import JSONRenderer
 
 from estudio.models import Estudio
-from anestesista.models import Anestesista, PagoAnestesistaVM, LineaPagoAnestesistaVM, Complejidad
+from anestesista.models import Anestesista, PagoAnestesistaVM, LineaPagoAnestesistaVM, Complejidad, SIN_ANESTESIA
 from anestesista.serializers import AnestesistaSerializer, PagoAnestesistaVMSerializer
 from anestesista.calculador_honorarios.calculador_honorarios import CalculadorHonorariosAnestesista
 
@@ -46,7 +46,10 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
         linea.fecha = fecha
         linea.paciente = paciente
         linea.obra_social = obra_social
-        linea.es_paciente_diferenciado = 1 <= linea.paciente.get_edad() <=12 or linea.paciente.get_edad() >= 70
+        if int(id_anestesista) != SIN_ANESTESIA:
+            linea.es_paciente_diferenciado = 1 <= linea.paciente.get_edad() <=12 or linea.paciente.get_edad() >= 70
+        else:
+            linea.es_paciente_diferenciado = False
         linea.comprobante = None
 
         linea.importe = 0
