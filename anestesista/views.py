@@ -8,7 +8,7 @@ from rest_framework import viewsets, filters
 from django.db.models import Q
 from rest_framework.renderers import JSONRenderer
 
-from estudio.models import Estudio
+from estudio.models import Estudio, ID_SUCURSAL_CEDIR
 from anestesista.models import Anestesista, PagoAnestesistaVM, LineaPagoAnestesistaVM, Complejidad, SIN_ANESTESIA
 from anestesista.serializers import AnestesistaSerializer, PagoAnestesistaVMSerializer
 from anestesista.calculador_honorarios.calculador_honorarios import CalculadorHonorariosAnestesista
@@ -25,6 +25,7 @@ class JSONResponse(HttpResponse):
 
 
 def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
+    sucursal = request.GET.get('sucursal', ID_SUCURSAL_CEDIR)
     pago = PagoAnestesistaVM()
     pago.anestesista = Anestesista.objects.get(id=id_anestesista)
     pago.anio = anio
@@ -37,7 +38,7 @@ def generar_vista_nuevo_pago(request, id_anestesista, anio, mes):
     pago.subtotales_no_ara = {}  # {"iva00": XX, "iva105": XX, "iva21": XX}
     pago.totales_iva_no_ara = {}  # {"iva00": XX, "iva105": XX, "iva21": XX}
 
-    estudios = Estudio.objects.filter(anestesista_id=id_anestesista, fecha__year=anio, fecha__month=mes).order_by('fecha','paciente','obra_social')
+    estudios = Estudio.objects.filter(anestesista_id=id_anestesista, fecha__year=anio, fecha__month=mes, sucursal=sucursal).order_by('fecha','paciente','obra_social')
     grupos_de_estudios = groupby(estudios, lambda e: (e.fecha, e.paciente, e.obra_social))
 
     for (fecha, paciente, obra_social), grupo in grupos_de_estudios:
