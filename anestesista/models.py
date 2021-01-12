@@ -9,6 +9,7 @@ from paciente.models import Paciente
 from obra_social.models import ObraSocial
 from practica.models import Practica
 
+SIN_ANESTESIA = 1
 
 class Anestesista(models.Model):
     id = models.AutoField(primary_key=True, db_column="idMedicoAn")

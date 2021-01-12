@@ -3,7 +3,7 @@ from decimal import Decimal, ROUND_UP
 import ast
 import operator as op
 from datetime import timedelta
-from anestesista.models import Complejidad, ComplejidadEstudio
+from anestesista.models import Complejidad, ComplejidadEstudio, SIN_ANESTESIA
 from comprobante.models import LineaDeComprobante
 
 
@@ -122,6 +122,8 @@ class CalculadorHonorariosAnestesista(object):
         """
         Devuelve True si la edad del paciente esta entre 1 y 12, o mayor a 70 anios.
         """
+        if self.anestesista.id == SIN_ANESTESIA:
+            return False
         return 1 <= self.paciente.get_edad() <=12 or self.paciente.get_edad() >= 70
 
     def _get_coeficiente_paciente_diferenciado(self):
