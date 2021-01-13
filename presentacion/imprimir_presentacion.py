@@ -15,12 +15,12 @@ from medicamento.models import TIPOS_MEDICAMENTOS
 styles = getSampleStyleSheet()
 styles["Normal"].fontSize = 10
 styles["Heading1"].fontSize = 10
-HLINE = KeepTogether(Paragraph('_'*89, styles["Normal"]))
+HLINE = KeepTogether(Paragraph('_'*93, styles["Normal"]))
 ENTER = KeepTogether(Paragraph("<br/><br/>", styles["Normal"]))
-TOPMARGIN = 60*mm
+TOPMARGIN = 50*mm
 BOTTOMMARGIN = 10*mm
-RIGHTMARGIN = 15*mm
-LEFTMARGIN = 15*mm
+RIGHTMARGIN = 11*mm
+LEFTMARGIN = 11*mm
 COL1 = 80*mm
 COL2 = 30*mm
 COL3 = 70*mm
@@ -69,14 +69,18 @@ def controlar_longitud(medicamento):
 
 def filas_medicamentos(medicamentos, tipo_medicamento):
     importe_total = Decimal(0)
+    filas_elementos = []
     filas = []
 
-    if medicamentos:
-        filas = [[f'{tipo_medicamento}:', '', '']]
-        for elemento in medicamentos:
-            filas += [[' * ' + controlar_longitud(elemento['descripcion']), '$' + elemento['importe'], '']]
+    for elemento in medicamentos:
+        
+        if not Decimal(elemento['importe']) == Decimal(0):
+            filas_elementos += [[' * ' + controlar_longitud(elemento['descripcion']), '$' + elemento['importe'], '']]
             importe_total += Decimal(elemento['importe'])
 
+    if filas_elementos:
+        filas = [[f'{tipo_medicamento}:', '', '']]
+        filas += filas_elementos
         extra = ' * Valorizada de acuerdo al Vademecum Kairo' if tipo_medicamento == 'Medicacion' else ''
         filas += [[f'Total {tipo_medicamento}', '', f"{importe_total} {extra}"]]
 
