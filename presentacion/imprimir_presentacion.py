@@ -144,6 +144,6 @@ def pdf_estudios(estudios):
 
         informacion_estudio, total_estudio = pdf_estudio(estudio)
         total_presentacion += total_estudio
-        informacion += [[ENTER, HLINE] if nuevo_paciente else [], informacion_paciente, informacion_estudio]
+        informacion += [[HLINE] if nuevo_paciente else [], informacion_paciente, informacion_estudio]
 
     return informacion, total_presentacion
