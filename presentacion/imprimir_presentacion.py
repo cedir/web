@@ -53,12 +53,12 @@ def pdf_encabezado(obra_social, fecha, periodo):
     ]
 
 def filas_pension(importe_pension):
-    if not (Decimal(importe_pension) == Decimal(0)):
+    if (Decimal(importe_pension) != Decimal(0)):
         return [['Pension', '', f"${importe_pension}"]]
     return []
 
 def filas_anestesia(importe_anestecia):
-    if not (Decimal(importe_anestecia) == Decimal(0)):
+    if (Decimal(importe_anestecia) != Decimal(0)):
         return [['Anestesia', '', f"${importe_anestecia}"]]
     return []
 
@@ -74,7 +74,7 @@ def filas_medicamentos(medicamentos, tipo_medicamento):
 
     for elemento in medicamentos:
         
-        if not Decimal(elemento['importe']) == Decimal(0):
+        if Decimal(elemento['importe']) != Decimal(0):
             filas_elementos += [[' * ' + controlar_longitud(elemento['descripcion']), '$' + elemento['importe'], '']]
             importe_total += Decimal(elemento['importe'])
 
@@ -134,16 +134,14 @@ def pdf_estudios(estudios):
     dni = ''
 
     for estudio in estudios:
-        nuevo_paciente = False
         informacion_paciente = []
 
-        if not dni == estudio['paciente']['dni']:
-            nuevo_paciente = True
+        if dni != estudio['paciente']['dni']:
             dni = estudio['paciente']['dni']
             informacion_paciente = info_paciente(estudio)
 
         informacion_estudio, total_estudio = pdf_estudio(estudio)
         total_presentacion += total_estudio
-        informacion += [[HLINE] if nuevo_paciente else [], informacion_paciente, informacion_estudio]
+        informacion += [[HLINE] if informacion_paciente else [], informacion_paciente, informacion_estudio]
 
     return informacion, total_presentacion
