@@ -121,15 +121,7 @@ class Estudio(models.Model):
     def get_total_medicacion_tipo_medicamentos(self):
         """
         Return: total medicacion sin material especifico
-        NOTA: si la presentacion esta cobrada, los registros estudioXmedicamento se borran,
-        por lo que perdemos el detalle de que era Medicamento y que era Material Especifico.
-        En dicho caso esta funcion FALLA, ya que devuelve la suma de los dos (total) y no
-        solamente Material especifico.
         """
-        if self.fecha_cobro:
-            raise NotImplementedError('Imposible saber el total de medicacion ya que los registros estudioXmedicamento'
-                                      'se han borrado')
-
         total_medicacion = 0
         for medicacion in self.estudioXmedicamento.filter(medicamento__tipo='Medicación'):
             total_medicacion += medicacion.importe
@@ -137,16 +129,10 @@ class Estudio(models.Model):
         return Decimal(total_medicacion).quantize(Decimal('.01'), ROUND_UP)
 
     def get_total_medicacion_tipo_material_especifico(self):
-        if self.fecha_cobro:
-            raise NotImplementedError('Imposible saber el total de material especifico ya que los registros'
-                                      'estudioXmedicamento se han borrado')
         total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.filter(medicamento__tipo='Mat Esp')])
         return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
 
     def get_total_medicacion(self):
-        if self.fecha_cobro:
-            raise NotImplementedError('Imposible saber el total de material especifico ya que los registros'
-                                      'estudioXmedicamento se han borrado')
         total = sum([medicacion.importe for medicacion in self.estudioXmedicamento.all()])
         return Decimal(total).quantize(Decimal('.01'), ROUND_UP)
 
