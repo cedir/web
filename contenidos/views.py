@@ -201,7 +201,7 @@ def send_mail(request):
 
             text = 'Nombre: ' + name + "\n" + 'Mail: ' + email + "\n" + 'Tel: ' + tel + "\n" + 'Mensaje: ' + message + "\n"
             msg = MIMEText(text.encode('utf-8'), _charset='utf-8')
-            msg['Subject'] = "Nuevo mensaje registrado desde cedirsalud.com.ar"
+            msg['Subject'] = "Nuevo mensaje registrado desde cedir.com.ar"
             msg['From'] = gmail_user
             msg['To'] = ','.join(toaddrs)
 

@@ -158,7 +158,7 @@ def _draw_firstpage_frame(estudio, imprimeLinea=True):
         canvas.drawCentredString(
             width / 2,
             height - 770,
-            'http://www.cedirsalud.com.ar/video/{0}'.format(str(estudio.public_id))
+            'http://www.cedir.com.ar/video/{0}'.format(str(estudio.public_id))
             )
 
         canvas.restoreState()
