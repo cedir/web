@@ -220,8 +220,10 @@ class _Afip(object):
             pass
 
         comprobante_cedir.cae = self.webservice.CAE
-        comprobante_cedir.vencimiento_cae = datetime.strptime(self.webservice.Vencimiento,'%Y%m%d').date()
         comprobante_cedir.numero = nro
+
+        if self.webservice.Vencimiento:
+            comprobante_cedir.vencimiento_cae = datetime.strptime(self.webservice.Vencimiento,'%Y%m%d').date()
 
     @requiere_ticket
     def consultar_comprobante(self, comprobante):
