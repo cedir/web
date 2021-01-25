@@ -12,5 +12,33 @@
         "telefono": "",
         "email": ""
     }
+},
+{
+    "pk": 2,
+    "model": "anestesista.anestesista",
+    "fields": {
+        "apellido": "Simpson",
+        "nombre": "Homero Jay",
+        "direccion": "Avenida Siempre Viva 742",
+        "porcentaje_anestesista": "10.00",
+        "matricula": "123456",
+        "localidad": "Springfield",
+        "telefono": "1234567890",
+        "email": "homerosimpson@gmail.com"
+    }
+},
+{
+    "pk": 3,
+    "model": "anestesista.anestesista",
+    "fields": {
+        "apellido": "Flanders",
+        "nombre": "Nedward",
+        "direccion": "Avenida Siempre Viva 748",
+        "porcentaje_anestesista": "7.50",
+        "matricula": "789",
+        "localidad": "Springfield",
+        "telefono": "1234567891",
+        "email": "nedflanders@live.com"
+    }
 }
 ]
