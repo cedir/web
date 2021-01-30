@@ -102,10 +102,19 @@ class EstudioDePresentacionRetrieveSerializer(EstudioSinPresentarSerializer):
         return str(estudio.get_total_medicacion())
 
 class EstudioDePresentacionImprimirSerializer(EstudioDePresentacionRetrieveSerializer):
-    medicacion = MedicamentoSerializer(many=True)
+    medicacion = serializers.SerializerMethodField()
 
     class Meta:
         model = Estudio
         fields = ('id', 'fecha', 'nro_de_orden', 'paciente', 'practica',
             'medico', 'importe_estudio', 'pension', 'diferencia_paciente',
             'importe_medicacion', 'arancel_anestesia', 'medicacion')
+
+    def get_medicacion(self, estudio):
+        medicacion = []
+        for medicamento in Medicacion.objects.filter(estudio=estudio):
+            medicacion_serializer = MedicacionSerializer(medicamento).data
+            medicamento = medicacion_serializer['medicamento']
+            medicamento['importe'] = medicacion_serializer['importe'] #Se actualiza el importe del medicamento con el importe con el que salio en el momento
+            medicacion += [medicamento]
+        return medicacion
