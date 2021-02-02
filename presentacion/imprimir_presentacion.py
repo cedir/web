@@ -62,6 +62,11 @@ def filas_anestesia(importe_anestecia):
         return [['Anestesia', '', f"${importe_anestecia}"]]
     return []
 
+def filas_pago_paciente(pago_paciente):
+    if (Decimal(pago_paciente) != Decimal(0)):
+        return [['A cargo del paciente', '', f"${pago_paciente}"]]
+    return []
+
 def controlar_longitud(medicamento):
     if medicamento.isupper():
         return medicamento[0:30]
@@ -95,14 +100,16 @@ def pdf_tabla_estudio(estudio):
             material_especifico += [medicamento]
         else:
             medicacion += [medicamento]
-
-    total_estudio = Decimal(estudio['importe_estudio']) + Decimal(estudio['pension']) + Decimal(estudio['arancel_anestesia'])
+    estudio['diferencia_paciente'] = Decimal(1)
+    total_estudio = Decimal(estudio['importe_estudio']) + Decimal(estudio['pension']) + Decimal(estudio['arancel_anestesia']) + Decimal(estudio['diferencia_paciente'])
     fila_medicacion, costo_medicacion = filas_medicamentos(medicacion, 'Medicacion')
     fila_material, costo_material = filas_medicamentos(material_especifico, 'Material Especifico')
+    fila_pago_paciente = filas_pago_paciente(estudio['diferencia_paciente'])
     total_estudio = total_estudio + costo_material + costo_medicacion
 
     tabla = [['Practica', '', f"${estudio['importe_estudio']}"]] \
          + filas_pension(estudio['pension']) \
+         + fila_pago_paciente \
          + filas_anestesia(estudio['arancel_anestesia']) \
          + fila_medicacion \
          + fila_material \
