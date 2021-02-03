@@ -2,16 +2,20 @@
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm, mm
+from reportlab.lib.utils import Image
 from reportlab.lib.colors import black,white, Color
-from reportlab.graphics.barcode.common import I2of5
 from reportlab.platypus import Table, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
+from qrcode import make as make_qr
+from base64 import urlsafe_b64encode
 
 from comprobante.models import *
 
 from textwrap import wrap
 
 from datetime import timedelta
+
+from settings import CEDIR_CUIT, BRUNETTI_CUIT
 
 width, height = A4
 margin = 6*mm
@@ -59,45 +63,15 @@ responsables = {
     }
 }
 
-def digito_verificador_modulo10(numero):
-    "Rutina para el cálculo del dígito verificador 'módulo 10'"
-    codigo = str(numero)
-    # Ver RG 1702 AFIP
-    # Etapa 1: comenzar desde la izquierda, sumar todos los caracteres ubicados en las posiciones impares.
-    etapa1 = sum([int(c) for i, c in enumerate(codigo) if not i % 2])
-    # Etapa 2: multiplicar la suma obtenida en la etapa 1 por el número 3
-    etapa2 = etapa1 * 3
-    # Etapa 3: comenzar desde la izquierda, sumar todos los caracteres que están ubicados en las posiciones pares.
-    etapa3 = sum([int(c) for i, c in enumerate(codigo) if i % 2])
-    # Etapa 4: sumar los resultados obtenidos en las etapas 2 y 3.
-    etapa4 = etapa2 + etapa3
-    # Etapa 5: buscar el menor número que sumado al resultado obtenido en la etapa 4 dé un número múltiplo de 10.
-    # Este será el valor del dígito verificador del módulo 10.
-    digito = 10 - (etapa4 % 10)
-    if digito == 10:
-        digito = 0
-    return numero*10 + digito
-
-
 def codigo_barra_i25(canvas, cabecera):
-        altura = 12 * mm
+        size = 30 * mm
         trazoFino = 0.24 * mm # Tamanho correto aproximado
-        x, y = 1.5*margin, 23*mm
+        x, y = 1.5*margin, 15*mm
 
-        num = digito_verificador_modulo10(cabecera['codigo_barras'])
+        qr = make_qr('https://www.afip.gob.ar/fe/qr/?p=' + cabecera["qr"])
+        canvas.drawInlineImage(qr, x, y, width=size, height=size)
 
-        bc = I2of5(num,
-                   barWidth=trazoFino,
-                   ratio=2.5,
-                   barHeight=altura,
-                   bearers=0,
-                   quiet=0,
-                   checksum=0)
-
-        bc.drawOn(canvas, x, y)
         canvas.saveState()
-        canvas.setFont(font_std, 8)
-        canvas.drawCentredString(x + bc.width/2, y - 3*mm, str(num))
         canvas.restoreState()
 
 
@@ -542,7 +516,19 @@ def obtener_comprobante(cae):
             'vencimiento': (c.fecha_vencimiento).strftime('%d/%m/%Y'),
             'CAE': c.cae,
             'CAE_vencimiento': c.vencimiento_cae.strftime('%d/%m/%Y'),
-            'codigo_barras': obtener_codigo_barras(c),
+            'qr': urlsafe_b64encode(bytes(str({ # Datos necesarios de la afip para generar el qr. https://www.afip.gob.ar/fe/qr/especificaciones.asp
+                'ver': 1,
+                'fecha': c.fecha_emision.strftime("%Y-%m-%d"),
+                'cuit': CEDIR_CUIT if c.responsable == 'Cedir' else BRUNETTI_CUIT,
+                'ptoVta': c.nro_terminal,
+                'tipoCmp': c.codigo_afip,
+                'nroCmp': c.numero,
+                'importe': float(c.total_facturado),
+                'moneda': 'PES',
+                'ctz': 1,
+                'tipoCodAut': 'E',
+                'codAut': int(c.cae),
+            }), 'utf-8')).decode('utf-8'),
         },
         'cliente': {
             'CUIT': c.nro_cuit,
