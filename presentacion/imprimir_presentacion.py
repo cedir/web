@@ -100,8 +100,7 @@ def pdf_tabla_estudio(estudio):
             material_especifico += [medicamento]
         else:
             medicacion += [medicamento]
-    estudio['diferencia_paciente'] = Decimal(1)
-    total_estudio = Decimal(estudio['importe_estudio']) + Decimal(estudio['pension']) + Decimal(estudio['arancel_anestesia']) + Decimal(estudio['diferencia_paciente'])
+    total_estudio = Decimal(estudio['importe_estudio']) + Decimal(estudio['pension']) + Decimal(estudio['arancel_anestesia']) - Decimal(estudio['diferencia_paciente'])
     fila_medicacion, costo_medicacion = filas_medicamentos(medicacion, 'Medicacion')
     fila_material, costo_material = filas_medicamentos(material_especifico, 'Material Especifico')
     fila_pago_paciente = filas_pago_paciente(estudio['diferencia_paciente'])
