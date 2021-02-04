@@ -23,6 +23,7 @@ from presentacion.serializers import PresentacionImprimirSerializer
 from rest_framework.filters import BaseFilterBackend
 from presentacion.models import Presentacion
 from distutils.util import strtobool
+from estudio.models import ID_SUCURSAL_CEDIR
 
 class PresentacionAnioFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -40,11 +41,12 @@ class PresentacionObraSocialFilterBackend(BaseFilterBackend):
 
 class PresentacionEstadoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        esta_cobrada = (request.query_params.get('estadoPresentacion'))
-        if strtobool(esta_cobrada):
-            queryset = queryset.filter(estado=Presentacion.COBRADO)
-        else:
-            queryset = queryset.exclude(estado=Presentacion.COBRADO)
+        esta_cobrada = request.query_params.get('estadoPresentacion', 'False')
+        if esta_cobrada:
+            if strtobool(esta_cobrada) :
+                queryset = queryset.filter(estado=Presentacion.COBRADO)
+            else:
+                queryset = queryset.exclude(estado=Presentacion.COBRADO)
         return queryset
 
 class PresentacionTipoPresentacionFilterBackend(BaseFilterBackend):
@@ -76,13 +78,16 @@ class PresentacionSucursalFilterBackend(BaseFilterBackend):
         sucursal = request.query_params.get('sucursal')
         if sucursal:
             queryset = queryset.filter(sucursal=sucursal)
+        else:
+            queryset = queryset.filter(sucursal=ID_SUCURSAL_CEDIR)
         return queryset
 
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
     serializer_class = PresentacionSerializer
+    # filter_fields= ('obra_social', 'sucursal')
     filter_backends = (PresentacionAnioFilterBackend, PresentacionObraSocialFilterBackend,
-        PresentacionEstadoFilterBackend, PresentacionTipoComprobanteFilterBackend, PresentacionNumeroComprobanteFilterBackend,
+        PresentacionTipoComprobanteFilterBackend, PresentacionNumeroComprobanteFilterBackend,
         PresentacionTipoPresentacionFilterBackend, PresentacionSucursalFilterBackend)
     pagination_class = StandardResultsSetPagination
     page_size = 50
