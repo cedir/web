@@ -25,52 +25,42 @@ from presentacion.models import Presentacion
 from distutils.util import strtobool
 from estudio.models import ID_SUCURSAL_CEDIR
 
-class PresentacionAnioFilterBackend(BaseFilterBackend):
+class PresentacionComprobantesFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        tipo_comprobante = request.query_params.get('tipoComprobante')
+        numero_comprobante = request.query_params.get('numeroComprobante')
+
+        if tipo_comprobante:
+            queryset = queryset.filter(comprobante__tipo_comprobante__id=tipo_comprobante)
+
+        if numero_comprobante:
+            queryset = queryset.filter(comprobante__numero=numero_comprobante)
+        return queryset
+
+class PresentacionFieldsFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         anio = (request.query_params.get('anio'))
+        obra_social_id = request.query_params.get('obraSocial')
+        esta_cobrada = request.query_params.get('estadoPresentacion', '')
+        tipo_presentacion = request.query_params.get('tipoPresentacion')
+
         if anio:
             queryset = queryset.filter(fecha__year=anio)
-        return queryset
-
-class PresentacionObraSocialFilterBackend(BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        obra_social_id = request.query_params.get('obraSocial')
+        
         if obra_social_id:
             queryset = queryset.filter(obra_social__id=obra_social_id)
-        return queryset
-
-class PresentacionEstadoFilterBackend(BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        esta_cobrada = request.query_params.get('estadoPresentacion', 'False')
+        
         if esta_cobrada:
             if strtobool(esta_cobrada) :
                 queryset = queryset.filter(estado=Presentacion.COBRADO)
             else:
                 queryset = queryset.exclude(estado=Presentacion.COBRADO)
-        return queryset
-
-class PresentacionTipoPresentacionFilterBackend(BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        tipo_presentacion = request.query_params.get('tipoPresentacion')
+        
         if tipo_presentacion:
             if tipo_presentacion == 'Directa':
                 queryset = queryset.filter(obra_social__se_presenta_por_AMR='1')
             else:
-                queryset = queryset.filter(obra_social__se_presenta_por_AMR='0')
-        return queryset
-
-class PresentacionTipoComprobanteFilterBackend(BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        tipo_comprobante = request.query_params.get('tipoComprobante')
-        if tipo_comprobante:
-            queryset = queryset.filter(comprobante__tipo_comprobante__id=tipo_comprobante)
-        return queryset
-
-class PresentacionNumeroComprobanteFilterBackend(BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        numero_comprobante = request.query_params.get('numeroComprobante')
-        if numero_comprobante:
-            queryset = queryset.filter(comprobante__numero=numero_comprobante)
+                queryset = queryset.filter(obra_social__se_presenta_por_AMR='0')   
         return queryset
 
 class PresentacionSucursalFilterBackend(BaseFilterBackend):
@@ -85,10 +75,7 @@ class PresentacionSucursalFilterBackend(BaseFilterBackend):
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
     serializer_class = PresentacionSerializer
-    # filter_fields= ('obra_social', 'sucursal')
-    filter_backends = (PresentacionAnioFilterBackend, PresentacionObraSocialFilterBackend,
-        PresentacionTipoComprobanteFilterBackend, PresentacionNumeroComprobanteFilterBackend,
-        PresentacionTipoPresentacionFilterBackend, PresentacionSucursalFilterBackend)
+    filter_backends = (PresentacionSucursalFilterBackend, PresentacionFieldsFilterBackend, PresentacionComprobantesFilterBackend)
     pagination_class = StandardResultsSetPagination
     page_size = 50
 
