@@ -63,16 +63,15 @@ responsables = {
     }
 }
 
-def codigo_barra_i25(canvas, cabecera):
-        size = 30 * mm
-        trazoFino = 0.24 * mm # Tamanho correto aproximado
-        x, y = 1.5*margin, 15*mm
+def codigo_qr(canvas, cabecera):
+    size_qr = 35*mm
+    posicion_qr = (1.5*margin, 7*mm)
 
-        qr = make_qr('https://www.afip.gob.ar/fe/qr/?p=' + cabecera["qr"])
-        canvas.drawInlineImage(qr, x, y, width=size, height=size)
+    qr = make_qr(cabecera["url_qr"])
+    canvas.drawInlineImage(qr, posicion_qr[0], posicion_qr[1], width=size_qr, height=size_qr)
 
-        canvas.saveState()
-        canvas.restoreState()
+    canvas.saveState()
+    canvas.restoreState()
 
 
 def cae_y_fecha (p, cabecera):
@@ -393,8 +392,8 @@ def generar_factura(response, comp, leyenda):
 
         pie_de_pagina(p, comp['responsable'], leyenda)
 
-        # Escribe código de barras
-        codigo_barra_i25(p, comp['cabecera'])
+        # Escribe código de qr
+        codigo_qr(p, comp['cabecera'])
 
         # Escribe el CAE y la fecha
         cae_y_fecha(p, comp['cabecera'])
@@ -516,8 +515,8 @@ def obtener_comprobante(cae):
             'vencimiento': (c.fecha_vencimiento).strftime('%d/%m/%Y'),
             'CAE': c.cae,
             'CAE_vencimiento': c.vencimiento_cae.strftime('%d/%m/%Y'),
-            'qr': urlsafe_b64encode(bytes(str({ # Datos necesarios de la afip para generar el qr. https://www.afip.gob.ar/fe/qr/especificaciones.asp
-                'ver': 1,
+            'url_qr': 'https://www.afip.gob.ar/fe/qr/?p=' + urlsafe_b64encode(bytes(str({ # Datos necesarios de la afip para generar el qr
+                'ver': 1,                                                                 # https://www.afip.gob.ar/fe/qr/especificaciones.asp
                 'fecha': c.fecha_emision.strftime("%Y-%m-%d"),
                 'cuit': CEDIR_CUIT if c.responsable == 'Cedir' else BRUNETTI_CUIT,
                 'ptoVta': c.nro_terminal,
