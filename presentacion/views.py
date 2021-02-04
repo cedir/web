@@ -1,3 +1,4 @@
+# pylint: disable=no-name-in-module, import-error
 from typing import Dict
 from datetime import date
 
@@ -20,36 +21,37 @@ from comprobante.serializers import crear_comprobante_serializer_factory
 from presentacion.imprimir_presentacion import generar_pdf_presentacion
 from presentacion.serializers import PresentacionImprimirSerializer
 from rest_framework.filters import BaseFilterBackend
-from django.db.models import Q
+from presentacion.models import Presentacion
+from distutils.util import strtobool
 
 class PresentacionAnioFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        anio = int(request.query_params.get('anio'))
+        anio = (request.query_params.get('anio'))
         if anio:
             queryset = queryset.filter(fecha__year=anio)
         return queryset
 
 class PresentacionObraSocialFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        obraSocialId = int(request.query_params.get('obraSocial'))
-        if obraSocialId:
-            queryset = queryset.filter(obra_social__id=obraSocialId)
+        obra_social_id = request.query_params.get('obraSocial')
+        if obra_social_id:
+            queryset = queryset.filter(obra_social__id=obra_social_id)
         return queryset
 
 class PresentacionEstadoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        estadoPresentacion = (request.query_params.get('estadoPresentacion'))
-        if estadoPresentacion == 'true':
-            queryset = queryset.filter(Q(estado=0) | Q(estado=2))
+        esta_cobrada = (request.query_params.get('estadoPresentacion'))
+        if strtobool(esta_cobrada):
+            queryset = queryset.filter(estado=Presentacion.COBRADO)
         else:
-            queryset = queryset.filter(estado=1)
+            queryset = queryset.exclude(estado=Presentacion.COBRADO)
         return queryset
 
 class PresentacionTipoPresentacionFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        tipoPresentacion = request.query_params.get('tipoPresentacion')
-        if tipoPresentacion:
-            if tipoPresentacion == 'Directa':
+        tipo_presentacion = request.query_params.get('tipoPresentacion')
+        if tipo_presentacion:
+            if tipo_presentacion == 'Directa':
                 queryset = queryset.filter(obra_social__se_presenta_por_AMR='1')
             else:
                 queryset = queryset.filter(obra_social__se_presenta_por_AMR='0')
@@ -57,22 +59,23 @@ class PresentacionTipoPresentacionFilterBackend(BaseFilterBackend):
 
 class PresentacionTipoComprobanteFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        tipoComprobante = int(request.query_params.get('tipoComprobante'))
-        if tipoComprobante:
-            queryset = queryset.filter(comprobante__tipo_comprobante__id=tipoComprobante)
+        tipo_comprobante = request.query_params.get('tipoComprobante')
+        if tipo_comprobante:
+            queryset = queryset.filter(comprobante__tipo_comprobante__id=tipo_comprobante)
         return queryset
 
 class PresentacionNumeroComprobanteFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        numeroComprobante = int(request.query_params.get('numeroComprobante'))
-        if numeroComprobante:
-            queryset = queryset.filter(comprobante__numero=numeroComprobante)
+        numero_comprobante = request.query_params.get('numeroComprobante')
+        if numero_comprobante:
+            queryset = queryset.filter(comprobante__numero=numero_comprobante)
         return queryset
 
 class PresentacionSucursalFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        sucursal = int(request.query_params.get('sucursal'))
-        queryset = queryset.filter(sucursal=sucursal)
+        sucursal = request.query_params.get('sucursal')
+        if sucursal:
+            queryset = queryset.filter(sucursal=sucursal)
         return queryset
 
 class PresentacionViewSet(viewsets.ModelViewSet):
