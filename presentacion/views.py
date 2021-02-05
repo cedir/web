@@ -41,7 +41,7 @@ class PresentacionFieldsFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         anio = (request.query_params.get('anio'))
         obra_social_id = request.query_params.get('obraSocial')
-        esta_cobrada = request.query_params.get('estadoPresentacion', '')
+        esta_cobrada = request.query_params.get('presentacionesCobradas', '')
         tipo_presentacion = request.query_params.get('tipoPresentacion')
 
         if anio:
