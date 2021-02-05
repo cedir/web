@@ -16,6 +16,7 @@ shortuuid==1.0.1
 # AFIP
 httplib2==0.9.2
 M2Crypto==0.36.0
+qrcode==6.1
 git+https://github.com/pysimplesoap/pysimplesoap.git@stable_py3k
 git+https://github.com/reingart/pyafipws.git@py3k
 
