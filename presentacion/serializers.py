@@ -245,6 +245,7 @@ class PagoPresentacionSerializer(serializers.ModelSerializer):
             estudio.importe_medicacion_cobrado = e['importe_medicacion_cobrado']
             estudio.importe_cobrado_pension = e['importe_cobrado_pension']
             estudio.importe_cobrado_arancel_anestesia = e['importe_cobrado_arancel_anestesia']
+            estudio.fecha_cobro = date.today()
             estudio.save()
         total = sum([
             e.importe_cobrado_pension
