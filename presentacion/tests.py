@@ -427,6 +427,39 @@ class TestCobrarPresentacion(TestCase):
 
         assert presentacion.estado == Presentacion.PENDIENTE
         assert presentacion.comprobante.estado == Comprobante.NO_COBRADO
+    
+    def test_cobrar_presentacion_actualiza_fecha_cobro_en_estudios(self):
+        presentacion = Presentacion.objects.get(pk=7)
+        assert presentacion.estado == Presentacion.PENDIENTE
+
+        estudio = Estudio.objects.get(pk=8)
+        assert estudio.fecha_cobro == None
+        assert estudio.presentacion == presentacion
+
+        datos = {
+            "estudios": [
+                {
+                    "id": 8,
+                    "importe_cobrado_pension": "1.00",
+                    "importe_cobrado_arancel_anestesia": "1.00",
+                    "importe_estudio_cobrado": "1.00",
+                    "importe_medicacion_cobrado": "1.00",
+                },
+            ],
+            "retencion_impositiva": "32.00",
+            "nro_recibo": 1,
+        }
+        response = self.client.patch('/api/presentacion/7/cobrar/', data=json.dumps(datos),
+                                     content_type='application/json')
+        assert response.status_code == 200
+        presentacion.refresh_from_db()
+        assert presentacion.estado == Presentacion.COBRADO
+        assert presentacion.pago != None
+        
+        estudio.refresh_from_db()
+        assert estudio.presentacion == presentacion
+        assert estudio.fecha_cobro == str(date.today())
+
 
 class TestEstudiosDePresentacion(TestCase):
     fixtures = ['pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
