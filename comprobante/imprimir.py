@@ -15,13 +15,15 @@ from textwrap import wrap
 
 from datetime import timedelta
 
-from settings import CEDIR_CUIT, BRUNETTI_CUIT
+from settings import CEDIR_CUIT, BRUNETTI_CUIT, PROJECT_ROOT
 
 width, height = A4
 margin = 6*mm
 font_std = 'Helvetica'
 font_bld = 'Helvetica-Bold'
 max_char = 24
+
+LOGO_AFIP = PROJECT_ROOT + '/static/templates/images/comprobante/logo_afip.png'
 
 mensajes = {
     'mensaje_leyenda_honorarios': 'Este comprobante contiene honorarios por cuenta y órden de médicos.',
@@ -66,9 +68,15 @@ responsables = {
 def codigo_qr(canvas, cabecera):
     size_qr = 35*mm
     posicion_qr = (1.5*margin, 7*mm)
+    posicion_afip = (posicion_qr[0]+40*mm, -40*mm)
 
     qr = make_qr(cabecera["url_qr"])
     canvas.drawInlineImage(qr, posicion_qr[0], posicion_qr[1], width=size_qr, height=size_qr)
+
+    canvas.drawImage(cabecera['logo_afip'], posicion_afip[0], posicion_afip[1], width=size_qr*1.1, preserveAspectRatio=True, mask='auto')
+
+    canvas.setFont(font_bld, 10)
+    canvas.drawString(posicion_qr[0] + size_qr + 5*mm, posicion_qr[1] + 15*mm, 'Comprobante Autorizado')
 
     canvas.saveState()
     canvas.restoreState()
@@ -528,6 +536,7 @@ def obtener_comprobante(cae):
                 'tipoCodAut': 'E',
                 'codAut': int(c.cae),
             }), 'utf-8')).decode('utf-8'),
+            'logo_afip': LOGO_AFIP,
         },
         'cliente': {
             'CUIT': c.nro_cuit,
