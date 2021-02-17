@@ -58,9 +58,9 @@ class PresentacionFieldsFilterBackend(BaseFilterBackend):
         
         if tipo_presentacion:
             if tipo_presentacion == 'Directa':
-                queryset = queryset.filter(obra_social__se_presenta_por_AMR='1')
+                queryset = queryset.filter(obra_social__se_presenta_por_AMR='0')
             else:
-                queryset = queryset.filter(obra_social__se_presenta_por_AMR='0')   
+                queryset = queryset.filter(obra_social__se_presenta_por_AMR='1')   
         return queryset
 
 class PresentacionSucursalFilterBackend(BaseFilterBackend):
