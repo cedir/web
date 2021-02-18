@@ -1,7 +1,7 @@
 # pylint: disable=no-name-in-module, import-error
 from rest_framework import viewsets
 from caja.models import MovimientoCaja
-from caja.serializers import MovimientoCajaFullSerializer
+from caja.serializers import MovimientoCajaFullSerializer, MovimientoCajaCreateSerializer
 from common.drf.views import StandardResultsSetPagination
 from rest_framework.filters import BaseFilterBackend
 from distutils.util import strtobool
@@ -48,24 +48,27 @@ class CajaIncluirEstudioFilterBackend(BaseFilterBackend):
         return queryset
 
 class MovimientoCajaViewSet(viewsets.ModelViewSet):
-    z = MovimientoCaja
+    model = MovimientoCaja
     queryset = MovimientoCaja.objects.all().order_by('-id')
     serializer_class = MovimientoCajaFullSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = (CajaConceptoFilterBackend, CajaMedicoFilterBackend,
         CajaFechaFilterBackend, CajaTipoMovimientoFilterBackend,
         CajaIncluirEstudioFilterBackend)
+    serializers = {
+        'create': MovimientoCajaCreateSerializer,
+    }
 
     def create(self, request):
         try:
             request: Dict = request.data
             fecha = request['fecha']
-            hora = request['hora']
             estudio = request['estudio']
             movimientos = request['movimientos']
             monto_acumulado = MovimientoCaja().objects.last().monto_acumulado
             
             for movimiento in movimientos:
+                hora = movimiento['hora']
                 concepto = movimiento['concepto']
                 tipo = movimiento['tipo']
                 medico = movimiento['medico']
