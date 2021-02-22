@@ -359,7 +359,7 @@ def detalle_iva(p, detalle):
 
 def pie_de_pagina(p, responsable, imprimir_leyenda_honorarios):
     mensaje = mensajes['mensaje_leyenda_honorarios'] if imprimir_leyenda_honorarios else ''
-    top = 250*mm
+    top = 245*mm
     ew = width - 2*margin
     eh = 7*mm if mensaje else 0
 
