@@ -1,3 +1,4 @@
+# pylint: disable=no-name-in-module, import-error
 from typing import Dict
 from datetime import date
 
@@ -19,11 +20,62 @@ from estudio.serializers import EstudioDePresentacionRetrieveSerializer
 from comprobante.serializers import crear_comprobante_serializer_factory
 from presentacion.imprimir_presentacion import generar_pdf_presentacion
 from presentacion.serializers import PresentacionImprimirSerializer
+from rest_framework.filters import BaseFilterBackend
+from presentacion.models import Presentacion
+from distutils.util import strtobool
+from estudio.models import ID_SUCURSAL_CEDIR
+
+class PresentacionComprobantesFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        tipo_comprobante = request.query_params.get('tipoComprobante')
+        numero_comprobante = request.query_params.get('numeroComprobante')
+
+        if tipo_comprobante:
+            queryset = queryset.filter(comprobante__tipo_comprobante__id=tipo_comprobante)
+
+        if numero_comprobante:
+            queryset = queryset.filter(comprobante__numero=numero_comprobante)
+        return queryset
+
+class PresentacionFieldsFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        anio = (request.query_params.get('anio'))
+        obra_social_id = request.query_params.get('obraSocial')
+        esta_cobrada = request.query_params.get('presentacionesCobradas', '')
+        tipo_presentacion = request.query_params.get('tipoPresentacion')
+
+        if anio:
+            queryset = queryset.filter(fecha__year=anio)
+        
+        if obra_social_id:
+            queryset = queryset.filter(obra_social__id=obra_social_id)
+        
+        if esta_cobrada:
+            if strtobool(esta_cobrada) :
+                queryset = queryset.filter(estado=Presentacion.COBRADO)
+            else:
+                queryset = queryset.exclude(estado=Presentacion.COBRADO)
+        
+        if tipo_presentacion:
+            if tipo_presentacion == 'Directa':
+                queryset = queryset.filter(obra_social__se_presenta_por_AMR='0')
+            else:
+                queryset = queryset.filter(obra_social__se_presenta_por_AMR='1')   
+        return queryset
+
+class PresentacionSucursalFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        sucursal = request.query_params.get('sucursal')
+        if sucursal:
+            queryset = queryset.filter(sucursal=sucursal)
+        else:
+            queryset = queryset.filter(sucursal=ID_SUCURSAL_CEDIR)
+        return queryset
 
 class PresentacionViewSet(viewsets.ModelViewSet):
     queryset = Presentacion.objects.all().order_by('-fecha')
     serializer_class = PresentacionSerializer
-    filter_fields = ('obra_social', 'sucursal')
+    filter_backends = (PresentacionSucursalFilterBackend, PresentacionFieldsFilterBackend, PresentacionComprobantesFilterBackend)
     pagination_class = StandardResultsSetPagination
     page_size = 50
 
