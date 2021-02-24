@@ -95,8 +95,6 @@ class Comprobante(models.Model):
     def tipo_id_afip(self):
         if len(self.nro_cuit.replace('-', '')) <= 9:
             return ID_DOCUMENTO_AFIP_TIPO_DNI
-        elif self.nro_cuit[0] == '2': # pylint: disable=E1136
-            return ID_DOCUMENTO_AFIP_TIPO_CUIL
         else:
             return ID_DOCUMENTO_AFIP_TIPO_CUIT
 
