@@ -2,7 +2,9 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from rest_framework import status
 from mock import patch
-from comprobante.models import TipoComprobante, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO
+import json
+
+from comprobante.models import Comprobante, TipoComprobante, ID_TIPO_COMPROBANTE_NOTA_DE_CREDITO
 
 class TestViews(TestCase):
 
@@ -42,3 +44,14 @@ class TestViews(TestCase):
         response = self.client.get("/comprobante/informe/ventas/cedir/2019/09/?responsable=cedir&anio=2019&mes=09")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response["Content-Type"], 'application/x-zip-compressed')
+
+    def test_filtro_por_nombre_cliente_funciona(self):
+        keywords = 'Planta Springfield'
+        
+        response = self.client.get(f'/api/comprobante?nombre_cliente={keywords}')
+        assert response.status_code == status.HTTP_200_OK
+        
+        results = json.loads(response.content).get('results')
+        for comprobante in results:
+            for word in keywords.split():
+                assert word in comprobante['nombre_cliente']

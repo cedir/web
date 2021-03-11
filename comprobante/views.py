@@ -81,7 +81,7 @@ class InformeMensualView(generics.ListAPIView):
 
 class ComprobanteNombreClienteFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        nombre = request.query_params.get('filtro')
+        nombre = request.query_params.get('nombre_cliente')
         if nombre:
             q = reduce(and_, [Q(nombre_cliente__icontains=palabra) for palabra in nombre.split()])
             queryset = queryset.filter(q)
