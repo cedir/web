@@ -2,10 +2,14 @@
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import redirect
+from django.db.models import Q
 from rest_framework import generics, viewsets, status, serializers
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
+from rest_framework.filters import BaseFilterBackend
 from decimal import Decimal
+from functools import reduce
+from operator import and_
 
 import zipfile
 import io
@@ -75,14 +79,20 @@ class InformeMensualView(generics.ListAPIView):
                 for q in queryset]
         return Response(data)
 
+class ComprobanteNombreClienteFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        nombre = request.query_params.get('filtro')
+        if nombre:
+            q = reduce(and_, [Q(nombre_cliente__icontains=palabra) for palabra in nombre.split()])
+            queryset = queryset.filter(q)
+        return queryset
+
 class ComprobanteViewSet(viewsets.ModelViewSet):
+    queryset = Comprobante.objects.all().order_by('-id')
     serializer_class = ComprobanteSerializer
     page_size = 50
     pagination_class = StandardResultsSetPagination
-
-    def get_queryset(self):
-        filtro = self.request.GET.get('filtro').upper() if 'filtro' in self.request.GET else ''
-        return Comprobante.objects.filter(nombre_cliente__contains=filtro).order_by('-id')
+    filter_backends = (ComprobanteNombreClienteFilterBackend, )
 
     @list_route(methods=['POST'])
     def crear_comprobante_asociado(self, request, pk=None):
