@@ -79,12 +79,22 @@ class InformeMensualView(generics.ListAPIView):
                 for q in queryset]
         return Response(data)
 
-class ComprobanteNombreClienteFilterBackend(BaseFilterBackend):
+class ComprobanteClienteFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         nombre = request.query_params.get('nombre_cliente')
+        cuit = request.query_params.get('cuit')
         if nombre:
             q = reduce(and_, [Q(nombre_cliente__icontains=palabra) for palabra in nombre.split()])
             queryset = queryset.filter(q)
+        if cuit:
+            queryset = queryset.filter(nro_cuit__icontains=cuit)
+        return queryset
+
+class ComprobanteCabeceraFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        numero = request.query_params.get('numero')
+        if numero:
+            queryset = queryset.filter(numero=numero)
         return queryset
 
 class ComprobanteViewSet(viewsets.ModelViewSet):
@@ -92,7 +102,7 @@ class ComprobanteViewSet(viewsets.ModelViewSet):
     serializer_class = ComprobanteSerializer
     page_size = 50
     pagination_class = StandardResultsSetPagination
-    filter_backends = (ComprobanteNombreClienteFilterBackend, )
+    filter_backends = (ComprobanteClienteFilterBackend, ComprobanteCabeceraFilterBackend, )
 
     @list_route(methods=['POST'])
     def crear_comprobante_asociado(self, request, pk=None):
