@@ -66,16 +66,6 @@ class TestViews(TestCase):
         for comprobante in results:
             assert cuit == comprobante['cuit']
 
-    def test_filtro_por_cuit_funciona(self):
-        cuit = '11'
-        
-        response = self.client.get(f'/api/comprobante?nombre_cliente={cuit}')
-        assert response.status_code == status.HTTP_200_OK
-        
-        results = json.loads(response.content).get('results')
-        for comprobante in results:
-            assert cuit == comprobante['cuit']
-
     def test_filtro_por_numero_funciona(self):
         numero = '2'
         
