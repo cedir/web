@@ -64,7 +64,7 @@ class TestViews(TestCase):
         
         results = json.loads(response.content).get('results')
         for comprobante in results:
-            assert cuit == comprobante['cuit']
+            assert cuit in comprobante['cuit']
 
     def test_filtro_por_numero_funciona(self):
         numero = '2'
