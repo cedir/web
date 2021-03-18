@@ -32,11 +32,19 @@ class EstudioSerializer(serializers.ModelSerializer):
     medico = MedicoSerializer()
     medico_solicitante = MedicoSerializer()
     anestesista = AnestesistaSerializer()
+    estado = serializers.SerializerMethodField()
 
     class Meta:
         model = Estudio
         fields = ('id', 'fecha', 'paciente', 'practica', 'obra_social', 'medico',
-                  'medico_solicitante', 'anestesista', 'motivo', 'informe')
+                  'medico_solicitante', 'anestesista', 'motivo', 'informe', 'estado')
+
+    def get_estado(self, estudio):
+        if estudio.presentacion_id:
+            return Presentacion.ESTADOS[estudio.presentacion.estado][1].upper()
+        if estudio.es_pago_contra_factura:
+            return 'COBRADO'
+        return 'NO COBRADO'
 
 
 class EstudioRetrieveSerializer(EstudioSerializer):
