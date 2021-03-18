@@ -328,3 +328,21 @@ class RetreiveEstudiosTest(TestCase):
 
         for estudio in response:
             self.assertEqual(results[estudio['id'] - 1].sucursal, ID_SUCURSAL_HOSPITAL_ITALIANO)
+    
+    def test_filtro_por_practica_funciona_correctamente(self):
+        practica = Estudio.objects.first().practica
+
+        assert practica
+
+        response = json.loads(self.client.get(f'/api/estudio/?practica={practica.id}', content_type='application/json').content)['results']
+        
+        id_estudios = []
+
+        for estudio in response:
+            assert estudio['practica']['id'] != str(practica.id)
+            id_estudios += [estudio['id']]
+        
+        estudios_excluidos = Estudio.objects.exclude(id__in=id_estudios) 
+
+        for estudio in estudios_excluidos:
+            assert estudio.practica != practica
