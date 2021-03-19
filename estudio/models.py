@@ -21,6 +21,17 @@ ID_SUCURSAL_CEDIR = 1
 ID_SUCURSAL_HOSPITAL_ITALIANO = 2
 
 class Estudio(models.Model):
+
+    PENDIENTE = 0
+    COBRADO = 1
+    NO_COBRADO = 2
+
+    ESTADOS = (
+        'PENDIENTE', # Se colocan en este orden para prevalecer el orden de presentacion
+        'COBRADO',
+        'NO COBRADO',
+    )
+
     id = models.AutoField(primary_key=True, db_column="nroEstudio")
     paciente = models.ForeignKey(Paciente, db_column="idPaciente")
     fecha = models.DateField('Fecha', db_column="fechaEstudio")

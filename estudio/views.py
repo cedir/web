@@ -64,7 +64,6 @@ class EstudioObraSocialFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(obra_social__nombre__icontains=obra_social)
         return queryset
 
-
 class EstudioMedicoFilterBackend(filters.BaseFilterBackend):
     """
     Filtro de estudios por medico actuante
@@ -134,6 +133,12 @@ class SucursalFilterBackend(filters.BaseFilterBackend):
 
         return queryset
 
+class EstudioPracticaFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        practica = request.query_params.get('practica')
+        if practica:
+            queryset = queryset.filter(practica__id=practica)
+        return queryset
 
 class EstudioViewSet(viewsets.ModelViewSet):
     model = Estudio
@@ -141,7 +146,7 @@ class EstudioViewSet(viewsets.ModelViewSet):
     serializer_class = EstudioSerializer
     filter_backends = (EstudioObraSocialFilterBackend, EstudioMedicoFilterBackend,
         EstudioMedicoSolicitanteFilterBackend, EstudioPacienteFilterBackend,
-        EstudioFechaFilterBackend, SucursalFilterBackend, filters.OrderingFilter, )
+        EstudioFechaFilterBackend, SucursalFilterBackend, filters.OrderingFilter, EstudioPracticaFilterBackend )
     pagination_class = StandardResultsSetPagination
     ordering_fields = ('fecha', 'id')
     page_size = 20

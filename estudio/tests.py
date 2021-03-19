@@ -15,6 +15,7 @@ from medicamento.models import Medicamento
 from estudio.models import Estudio, Medicacion
 from presentacion.models import Presentacion
 from caja.models import MovimientoCaja
+from estudio.serializers import EstudioSerializer
 
 from estudio.models import ID_SUCURSAL_CEDIR, ID_SUCURSAL_HOSPITAL_ITALIANO
 
@@ -328,3 +329,38 @@ class RetreiveEstudiosTest(TestCase):
 
         for estudio in response:
             self.assertEqual(results[estudio['id'] - 1].sucursal, ID_SUCURSAL_HOSPITAL_ITALIANO)
+    
+    def test_filtro_por_practica_funciona_correctamente(self):
+        practica = Estudio.objects.first().practica
+
+        assert practica
+
+        response = json.loads(self.client.get(f'/api/estudio/?practica={practica.id}', content_type='application/json').content)['results']
+        
+        id_estudios = []
+
+        for estudio in response:
+            assert estudio['practica']['id'] == practica.id
+            id_estudios += [estudio['id']]
+        
+        estudios_excluidos = Estudio.objects.exclude(id__in=id_estudios) 
+
+        for estudio in estudios_excluidos:
+            assert estudio.practica != practica
+    
+    def test_estado_estudio_funciona_correctamente(self):
+        estudio = Estudio.objects.filter(presentacion__estado=Presentacion.PENDIENTE).first()
+        estudio_serializer = EstudioSerializer(estudio)
+        assert estudio_serializer.data['estado'] == 'PENDIENTE'
+
+        estudio = Estudio.objects.filter(presentacion__estado=Presentacion.COBRADO).first()
+        estudio_serializer = EstudioSerializer(estudio)
+        assert estudio_serializer.data['estado'] == 'COBRADO'
+
+        estudio = Estudio.objects.exclude(es_pago_contra_factura=0).first()
+        estudio_serializer = EstudioSerializer(estudio)
+        assert estudio_serializer.data['estado'] == 'COBRADO'
+
+        estudio = Estudio.objects.filter(presentacion__isnull=True, es_pago_contra_factura=0).first()
+        estudio_serializer = EstudioSerializer(estudio)
+        assert estudio_serializer.data['estado'] == 'NO COBRADO'
