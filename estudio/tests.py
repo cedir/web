@@ -15,6 +15,7 @@ from medicamento.models import Medicamento
 from estudio.models import Estudio, Medicacion
 from presentacion.models import Presentacion
 from caja.models import MovimientoCaja
+from estudio.serializers import EstudioSerializer
 
 from estudio.models import ID_SUCURSAL_CEDIR, ID_SUCURSAL_HOSPITAL_ITALIANO
 
@@ -346,3 +347,20 @@ class RetreiveEstudiosTest(TestCase):
 
         for estudio in estudios_excluidos:
             assert estudio.practica != practica
+    
+    def test_estado_estudio_funciona_correctamente(self):
+        estudio = Estudio.objects.filter(presentacion__estado=Presentacion.PENDIENTE).first()
+        estudio_serializer = EstudioSerializer(estudio)
+        assert estudio_serializer.data['estado'] == 'PENDIENTE'
+
+        estudio = Estudio.objects.filter(presentacion__estado=Presentacion.COBRADO).first()
+        estudio_serializer = EstudioSerializer(estudio)
+        assert estudio_serializer.data['estado'] == 'COBRADO'
+
+        estudio = Estudio.objects.exclude(es_pago_contra_factura=0).first()
+        estudio_serializer = EstudioSerializer(estudio)
+        assert estudio_serializer.data['estado'] == 'COBRADO'
+
+        estudio = Estudio.objects.filter(presentacion__isnull=True, es_pago_contra_factura=0).first()
+        estudio_serializer = EstudioSerializer(estudio)
+        assert estudio_serializer.data['estado'] == 'NO COBRADO'
