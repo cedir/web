@@ -339,7 +339,7 @@ class RetreiveEstudiosTest(TestCase):
         id_estudios = []
 
         for estudio in response:
-            assert estudio['practica']['id'] != str(practica.id)
+            assert estudio['practica']['id'] == practica.id
             id_estudios += [estudio['id']]
         
         estudios_excluidos = Estudio.objects.exclude(id__in=id_estudios) 
