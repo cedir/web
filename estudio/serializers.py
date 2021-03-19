@@ -41,10 +41,10 @@ class EstudioSerializer(serializers.ModelSerializer):
 
     def get_estado(self, estudio):
         if estudio.presentacion_id:
-            return Presentacion.ESTADOS[estudio.presentacion.estado][1].upper()
+            return Estudio.ESTADOS[estudio.presentacion.estado]
         if estudio.es_pago_contra_factura:
-            return 'COBRADO'
-        return 'NO COBRADO'
+            return Estudio.ESTADOS[Estudio.COBRADO]
+        return Estudio.ESTADOS[Estudio.NO_COBRADO]
 
 
 class EstudioRetrieveSerializer(EstudioSerializer):
