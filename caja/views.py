@@ -2,9 +2,12 @@
 from rest_framework import viewsets
 from caja.models import MovimientoCaja
 from caja.serializers import MovimientoCajaFullSerializer
+from caja.imprimir import generar_pdf_caja
 from common.drf.views import StandardResultsSetPagination
 from rest_framework.filters import BaseFilterBackend
+from rest_framework.decorators import list_route
 from distutils.util import strtobool
+from django.http import HttpResponse
 
 class CajaConceptoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -54,3 +57,12 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
     filter_backends = (CajaConceptoFilterBackend, CajaMedicoFilterBackend,
         CajaFechaFilterBackend, CajaTipoMovimientoFilterBackend,
         CajaIncluirEstudioFilterBackend)
+
+    @list_route(methods=['GET'])
+    def imprimir(self, request):
+        fecha=request.GET.get('fecha')
+        movimientos = MovimientoCaja.objects.filter(fecha=fecha)
+        movimientos_serializer = MovimientoCajaFullSerializer(movimientos)
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'filename="Detalle_Caja_{fecha}.pdf"'
+        return generar_pdf_caja(response, movimientos_serializer)
