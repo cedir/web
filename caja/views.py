@@ -61,8 +61,8 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
     @list_route(methods=['GET'])
     def imprimir(self, request):
         fecha=request.GET.get('fecha')
-        movimientos = MovimientoCaja.objects.filter(fecha=fecha)
-        movimientos_serializer = MovimientoCajaFullSerializer(movimientos)
+        movimientos = MovimientoCaja.objects.filter(fecha=fecha).order_by('-id') #Manejar cuando no haya movimientos
+        movimientos_serializer = MovimientoCajaFullSerializer(movimientos, many=True).data
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'filename="Detalle_Caja_{fecha}.pdf"'
-        return generar_pdf_caja(response, movimientos_serializer)
+        return generar_pdf_caja(response, movimientos_serializer, fecha)
