@@ -2,6 +2,19 @@ from django.db import models
 from medico.models import Medico
 from estudio.models import Estudio
 
+ID_GENERAL = 1
+ID_HONORARIO_MEDICO = 2
+ID_HONORARIO_ANESTESISTA = 3
+ID_MEDICACION = 4
+ID_PRACTICA = 5
+ID_DESCARTABLE = 6
+ID_MATERIAL_ESPECIFICO = 7
+ID_PAGO_A_MEDICO = 8
+ID_CONSULTORIO_1 = 9
+ID_COSEGURO = 10
+ID_EGRESO = 11
+ID_CONSULTORIO_2 = 12
+
 class TipoMovimientoCaja(models.Model):
     descripcion = models.CharField(max_length=50, blank=True, null=True)
 

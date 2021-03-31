@@ -3,10 +3,177 @@ import json
 from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import User
+from rest_framework import status
 
-from caja.models import MovimientoCaja
+from medico.models import Medico
+from caja.models import MovimientoCaja, TipoMovimientoCaja
+from estudio.models import Estudio
+
 from distutils.util import strtobool
+from datetime import datetime, date
+from decimal import Decimal
 
+class CrearMovimientosTest(TestCase):
+    fixtures = ['caja.json', 'medicos.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
+        'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', 'medicamentos.json']
+    
+    def setUp(self):
+        self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
+        self.client = Client(HTTP_POST='localhost')
+        self.client.login(username='walter', password='xx11')
+    
+    def test_crear_un_movimiento_funciona(self):
+        medico_id = Medico.objects.all().first().id
+        tipo_id = TipoMovimientoCaja.objects.all().first().id
+        estudio_id = Estudio.objects.all().first().id
+        cantidad_movimientos = len(MovimientoCaja.objects.all())
+        monto = '10.00'
+        ultimo_monto = MovimientoCaja.objects.all().last().monto_acumulado
+        datos = {
+            'estudio_id': estudio_id,
+            'movimientos': [
+                {
+                    'concepto': 'ASD',
+                    'tipo_id': tipo_id,
+                    'medico_id': medico_id,
+                    'monto': monto,
+                },
+            ],
+        }
+
+        response = self.client.post('/api/caja/', data=json.dumps(datos),
+                                content_type='application/json')
+
+        nuevo_movimiento = MovimientoCaja.objects.all().last()
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert cantidad_movimientos + 1 == len(MovimientoCaja.objects.all())
+        assert nuevo_movimiento.monto_acumulado == ultimo_monto + Decimal(monto)
+        assert nuevo_movimiento.estudio == Estudio.objects.all().first()
+        assert nuevo_movimiento.medico == Medico.objects.all().first()
+        assert nuevo_movimiento.tipo == TipoMovimientoCaja.objects.all().first()
+
+    def test_crear_movimientos_funciona(self):
+        medico_id = Medico.objects.all().first().id, Medico.objects.all().last().id
+        tipo_id = TipoMovimientoCaja.objects.all().first().id, TipoMovimientoCaja.objects.all().last().id
+        estudio_id = Estudio.objects.all().first().id
+        cantidad_movimientos = len(MovimientoCaja.objects.all())
+        montos = '10.00', '-1.99'
+        ultimo_monto = MovimientoCaja.objects.all().last().monto_acumulado
+        datos = {
+            'estudio_id': estudio_id,
+            'movimientos': [
+                {
+                    'concepto': 'ASD',
+                    'tipo_id': tipo_id[0],
+                    'medico_id': medico_id[0],
+                    'monto': montos[0],
+                },
+                {
+                    'concepto': 'ASDasd',
+                    'tipo_id': tipo_id[1],
+                    'medico_id': medico_id[1],
+                    'monto': montos[1],
+                }
+            ],
+        }
+
+        response = self.client.post('/api/caja/', data=json.dumps(datos),
+                                content_type='application/json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert cantidad_movimientos + 2 == len(MovimientoCaja.objects.all())
+        monto =  ultimo_monto + Decimal(montos[0]) + Decimal(montos[1])
+        assert MovimientoCaja.objects.all().last().monto_acumulado == monto
+
+    def test_crear_movimiento_funciona_sin_algunos_campos(self):
+        tipo_id = TipoMovimientoCaja.objects.all().first().id
+        cantidad_movimientos = len(MovimientoCaja.objects.all())
+        monto = '10.00'
+        ultimo_monto = MovimientoCaja.objects.all().last().monto_acumulado
+        datos = {
+            'estudio_id': '',
+            'movimientos': [
+                {
+                    'concepto': '',
+                    'tipo_id': tipo_id,
+                    'medico_id': '',
+                    'monto': monto,
+                },
+            ],
+        }
+
+        response = self.client.post('/api/caja/', data=json.dumps(datos),
+                                content_type='application/json')
+        # print(response.content)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert cantidad_movimientos + 1 == len(MovimientoCaja.objects.all())
+        assert MovimientoCaja.objects.all().last().estudio == None
+        assert MovimientoCaja.objects.all().last().medico == None
+        assert MovimientoCaja.objects.all().last().concepto == ''
+
+        def test_crear_movimientos_falla_sin_monto(self):
+            medico_id = Medico.objects.all().first().id
+            tipo_id = TipoMovimientoCaja.objects.all().first().id
+            estudio_id = Estudio.objects.all().first().id
+            cantidad_movimientos = len(MovimientoCaja.objects.all())
+            monto = '10.00'
+            ultimo_monto = MovimientoCaja.objects.all().last().monto_acumulado
+            datos = {
+                'estudio_id': estudio_id,
+                'movimientos': [
+                    {
+                        'concepto': 'asd',
+                        'tipo_id': tipo_id,
+                        'medico_id': medico_id,
+                        'monto': '',
+                    },
+                    {
+                        'concepto': 'asd',
+                        'tipo_id': tipo_id,
+                        'medico_id': medico_id,
+                        'monto': monto,
+                    }
+                ],
+            }
+
+            response = self.client.post('/api/caja/', data=json.dumps(datos),
+                                    content_type='application/json')
+
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert cantidad_movimientos == len(MovimientoCaja.objects.all())
+        
+        def test_crear_movimientos_falla_sin_tipo(self):
+            medico_id = Medico.objects.all().first().id
+            tipo_id = TipoMovimientoCaja.objects.all().first().id
+            estudio_id = Estudio.objects.all().first().id
+            cantidad_movimientos = len(MovimientoCaja.objects.all())
+            monto = '10.00'
+            ultimo_monto = MovimientoCaja.objects.all().last().monto_acumulado
+            datos = {
+                'estudio_id': estudio_id,
+                'movimientos': [
+                    {
+                        'concepto': 'asd',
+                        'tipo_id': tipo_id,
+                        'medico_id': medico_id,
+                        'monto': '',
+                    },
+                    {
+                        'concepto': 'asd',
+                        'tipo_id': '',
+                        'medico_id': medico_id,
+                        'monto': monto,
+                    }
+                ],
+            }
+
+            response = self.client.post('/api/caja/', data=json.dumps(datos),
+                                    content_type='application/json')
+
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
+            assert cantidad_movimientos == len(MovimientoCaja.objects.all())
 
 class ListadoCajaTest(TestCase):
     fixtures = ['caja.json', 'medicos.json', 'pacientes.json', 'medicos.json', 'practicas.json', 'obras_sociales.json',
