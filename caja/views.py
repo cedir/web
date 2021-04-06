@@ -1,7 +1,7 @@
 # pylint: disable=no-name-in-module, import-error
 from rest_framework import viewsets
 from caja.models import MovimientoCaja
-from caja.serializers import MovimientoCajaFullSerializer
+from caja.serializers import MovimientoCajaFullSerializer, MovimientoCajaImprimirSerializer
 from caja.imprimir import generar_pdf_caja
 from common.drf.views import StandardResultsSetPagination
 from rest_framework.filters import BaseFilterBackend
@@ -62,7 +62,7 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
     def imprimir(self, request):
         fecha=request.GET.get('fecha')
         movimientos = MovimientoCaja.objects.filter(fecha=fecha).order_by('-id') #Manejar cuando no haya movimientos
-        movimientos_serializer = MovimientoCajaFullSerializer(movimientos, many=True).data
+        movimientos_serializer = MovimientoCajaImprimirSerializer(movimientos, many=True).data
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'filename="Detalle_Caja_{fecha}.pdf"'
         return generar_pdf_caja(response, movimientos_serializer, fecha)
