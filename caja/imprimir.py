@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from caja.serializers import MovimientoCajaFullSerializer
+from caja.serializers import MovimientoCajaImprimirSerializer
 from typing import Union, List
 
 from reportlab.lib.pagesizes import A4, landscape
@@ -9,11 +9,11 @@ from reportlab.platypus import Table, Paragraph
 
 styles = getSampleStyleSheet()
 
-def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaFullSerializer, fecha: str) -> HttpResponse:
-
+def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimirSerializer, fecha: str) -> HttpResponse:
     pdf = SimpleDocTemplate(
         response,
         pagesize=landscape(A4),
+        title=f'movimientos del dia {fecha}'
     )
 
     elements = pdf_encabezado(fecha, movimientos[0]['monto_acumulado'])
@@ -27,24 +27,13 @@ def pdf_encabezado(fecha: str, monto_acumulado: int) -> Table:
                    '', f'Dia: {fecha}      Monto acumulado: {monto_acumulado}']]
     return [Table(encabezado)]
 
-def pdf_tabla(movimientos: MovimientoCajaFullSerializer):
+def pdf_tabla(movimientos: MovimientoCajaImprimirSerializer):
     return [Table(pdf_tabla_encabezado() + pdf_tabla_body(movimientos))]
 
 def pdf_tabla_encabezado():
-    return [[
-        paragraph('Usuario'),
-        paragraph('Tipo de mov.'),
-        paragraph('Paciente'),
-        paragraph('Obra Social'),
-        paragraph('Médico'),
-        paragraph('Práctica'),
-        paragraph('Detalle'),
-        paragraph('Monto'),
-        paragraph('Monto ac.'),
-    ]]
+    return [[paragraph(key) for key in ('Usuario', 'Tipo de mov.', 'Paciente', 'Obra Social', 'Médico', 'Práctica', 'Detalle', 'Monto', 'Monto ac.')]]
 
-
-def pdf_tabla_body(movimientos: MovimientoCajaFullSerializer) -> List[List[Paragraph]]:
+def pdf_tabla_body(movimientos: MovimientoCajaImprimirSerializer) -> List[List[Paragraph]]:
     return [[
         paragraph('-'),
         paragraph(movimiento['tipo']),
