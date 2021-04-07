@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from caja.serializers import MovimientoCajaFullSerializer
+from typing import Union, List
 
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus.doctemplate import SimpleDocTemplate
@@ -22,7 +23,7 @@ def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaFullSeri
     return response
 
 def pdf_encabezado(fecha: str, monto_acumulado: int) -> Table:
-    encabezado = [[Paragraph('Informe movimientos de caja', styles['Heading3']),
+    encabezado = [[paragraph('Informe movimientos de caja', 'Heading3'),
                    '', f'Dia: {fecha}      Monto acumulado: {monto_acumulado}']]
     return [Table(encabezado)]
 
@@ -31,27 +32,30 @@ def pdf_tabla(movimientos: MovimientoCajaFullSerializer):
 
 def pdf_tabla_encabezado():
     return [[
-        Paragraph('Usuario', styles['Normal']),
-        Paragraph('Tipo de mov.', styles['Normal']),
-        Paragraph('Paciente', styles['Normal']),
-        Paragraph('Obra Social', styles['Normal']),
-        Paragraph('Médico', styles['Normal']),
-        Paragraph('Práctica', styles['Normal']),
-        Paragraph('Detalle', styles['Normal']),
-        Paragraph('Monto', styles['Normal']),
-        Paragraph('Monto ac.', styles['Normal']),
+        paragraph('Usuario'),
+        paragraph('Tipo de mov.'),
+        paragraph('Paciente'),
+        paragraph('Obra Social'),
+        paragraph('Médico'),
+        paragraph('Práctica'),
+        paragraph('Detalle'),
+        paragraph('Monto'),
+        paragraph('Monto ac.'),
     ]]
 
 
-def pdf_tabla_body(movimientos: MovimientoCajaFullSerializer):
+def pdf_tabla_body(movimientos: MovimientoCajaFullSerializer) -> List[List[Paragraph]]:
     return [[
-        Paragraph('-', styles['Normal']),
-        Paragraph(movimiento['tipo'], styles['Normal']),
-        Paragraph(movimiento['paciente'], styles['Normal']),
-        Paragraph(movimiento['obra_social'], styles['Normal']),
-        Paragraph(movimiento['medico'], styles['Normal']),
-        Paragraph(movimiento['practica'], styles['Normal']),
-        Paragraph(movimiento['concepto'], styles['Normal']),
-        Paragraph(movimiento['monto'], styles['Normal']),
-        Paragraph(movimiento['monto_acumulado'], styles['Normal'])] for movimiento in movimientos
+        paragraph('-'),
+        paragraph(movimiento['tipo']),
+        paragraph(movimiento['paciente']),
+        paragraph(movimiento['obra_social']),
+        paragraph(movimiento['medico']),
+        paragraph(movimiento['practica']),
+        paragraph(movimiento['concepto']),
+        paragraph(movimiento['monto']),
+        paragraph(movimiento['monto_acumulado'])] for movimiento in movimientos
     ]
+
+def paragraph(text: Union[str, int], estilo: str = 'Normal') -> Paragraph:
+    return Paragraph(text, styles[estilo])
