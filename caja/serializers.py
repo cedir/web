@@ -63,7 +63,7 @@ class MovimientoCajaImprimirSerializer(serializers.ModelSerializer):
         return obj.estudio.obra_social.nombre if obj.estudio else ''
 
     def get_medico(self, obj):
-        medico = obj.estudio.medico if obj.estudio else obj.medico
+        medico = obj.medico or (obj.estudio and obj.estudio.medico)
         return f'{medico.apellido}, {medico.nombre}' if medico else ''
 
     def get_practica(self, obj):
