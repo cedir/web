@@ -14,9 +14,11 @@ MARGINS = {
     'top': 10*mm,
     'bottom': 10*mm,
 }
-COLUMNAS = (('Usuario', 17*mm), ('Tipo de mov.', 26*mm), ('Paciente', 33*mm),
-            ('Obra Social', 33*mm), ('Médico', 33*mm), ('Práctica', 33*mm),
-            ('Detalle', 62*mm), ('Monto', 20*mm), ('Monto ac.', 20*mm))
+COLUMNAS = (('Usuario', 17*mm, 'usuario'), ('Tipo de mov.', 26*mm, 'tipo'),
+            ('Paciente', 33*mm, 'paciente'), ('Obra Social', 33*mm, 'obra_social'),
+            ('Médico', 33*mm, 'medico'), ('Práctica', 33*mm, 'practica'),
+            ('Detalle', 62*mm, 'concepto'), ('Monto', 20*mm, 'monto'),
+            ('Monto ac.', 20*mm, 'monto_acumulado'))  #En cada entrada posee (nombre_columna, tamaño, key)
 
 GRIS_CLARO = 0xE0E0E0
 GRIS_OSCURO = 0xBDBBBC
@@ -68,14 +70,7 @@ def pdf_tabla_encabezado():
 
 
 def pdf_tabla_body(movimientos: MovimientoCajaImprimirSerializer) -> List[List[Paragraph]]:
-    return [[
-        paragraph('-'),
-        paragraph(movimiento['tipo']),
-        paragraph(movimiento['paciente']),
-        paragraph(movimiento['obra_social']),
-        paragraph(movimiento['medico']),
-        paragraph(movimiento['practica']),
-        paragraph(movimiento['concepto']),
-        paragraph(movimiento['monto']),
-        paragraph(movimiento['monto_acumulado'])] for movimiento in movimientos
+    return [
+        [paragraph(movimiento[key[2]]) for key in COLUMNAS]
+        for movimiento in movimientos
     ]
