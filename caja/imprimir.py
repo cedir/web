@@ -9,12 +9,23 @@ from reportlab.platypus import Table, Paragraph, TableStyle
 from reportlab.lib.units import mm, cm
 from reportlab.lib import colors
 
-styles = getSampleStyleSheet()
+
 MARGINS = {
     'top': 10*mm,
     'bottom': 10*mm,
 }
-COLS_WIDTH = [17*mm, 26*mm] + [33*mm]*4 + [62*mm] + [20*mm, 20*mm]
+COLUMNAS = (('Usuario', 17*mm), ('Tipo de mov.', 26*mm), ('Paciente', 33*mm),
+            ('Obra Social', 33*mm), ('Médico', 33*mm), ('Práctica', 33*mm),
+            ('Detalle', 62*mm), ('Monto', 20*mm), ('Monto ac.', 20*mm))
+
+GRIS_CLARO = 0xE0E0E0
+GRIS_OSCURO = 0xBDBBBC
+
+styles = getSampleStyleSheet()
+
+def paragraph(text: Union[str, int], estilo: str = 'Normal') -> Paragraph:
+    return Paragraph(text, styles[estilo])
+
 
 def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimirSerializer, fecha: str) -> HttpResponse:
     pdf = SimpleDocTemplate(
@@ -31,27 +42,30 @@ def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimir
     pdf.build(elements)
     return response
 
+
 def pdf_encabezado(fecha: str, monto_acumulado: int) -> Table:
     encabezado = [[paragraph('Informe movimientos de caja', 'Heading3'),
                    '', f'Dia: {fecha}      Monto acumulado: {monto_acumulado}']]
     return [Table(encabezado)]
 
+
 def pdf_tabla(movimientos: MovimientoCajaImprimirSerializer):
-    table_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT')])
-    table_style.add('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(0xBDBBBC))
+    table_style = TableStyle(
+        [('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(GRIS_OSCURO))] +       # La fila con los nombres de las columnas esta con fondo gris oscuro
+        [('BACKGROUND', (0, i), (-1, i), colors.HexColor(GRIS_CLARO))           # Las filas pares tienen fondo gris claro
+         for i in range(2, len(movimientos), 2)]
+    )
 
-    for i in range(1, len(movimientos)):
-        if i % 2 == 0:
-            table_style.add('BACKGROUND', (0, i), (-1, i), colors.HexColor(0xE0E0E0))
+    return [Table(
+        pdf_tabla_encabezado() + pdf_tabla_body(movimientos),
+        colWidths=[columna[1] for columna in COLUMNAS],
+        style=table_style,
+    )]
 
-    table = Table(pdf_tabla_encabezado() + pdf_tabla_body(movimientos), colWidths=COLS_WIDTH)
-
-    table.setStyle(table_style)
-
-    return [table]
 
 def pdf_tabla_encabezado():
-    return [[paragraph(key) for key in ('Usuario', 'Tipo de mov.', 'Paciente', 'Obra Social', 'Médico', 'Práctica', 'Detalle', 'Monto', 'Monto ac.')]]
+    return [[paragraph(columna[0]) for columna in COLUMNAS]]
+
 
 def pdf_tabla_body(movimientos: MovimientoCajaImprimirSerializer) -> List[List[Paragraph]]:
     return [[
@@ -65,6 +79,3 @@ def pdf_tabla_body(movimientos: MovimientoCajaImprimirSerializer) -> List[List[P
         paragraph(movimiento['monto']),
         paragraph(movimiento['monto_acumulado'])] for movimiento in movimientos
     ]
-
-def paragraph(text: Union[str, int], estilo: str = 'Normal') -> Paragraph:
-    return Paragraph(text, styles[estilo])

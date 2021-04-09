@@ -60,7 +60,7 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['GET'])
     def imprimir(self, request):
-        fecha=request.GET.get('fecha')
+        fecha=request.GET.get('fecha') # Debe poder filtrarse por cualquiera de los filtros
         movimientos = MovimientoCaja.objects.filter(fecha=fecha).order_by('-id') #Manejar cuando no haya movimientos
         movimientos_serializer = MovimientoCajaImprimirSerializer(movimientos, many=True).data
         response = HttpResponse(content_type='application/pdf')
