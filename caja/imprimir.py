@@ -5,15 +5,24 @@ from typing import Union, List
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import Table, Paragraph
+from reportlab.platypus import Table, Paragraph, TableStyle
+from reportlab.lib.units import mm, cm
+from reportlab.lib import colors
 
 styles = getSampleStyleSheet()
+MARGINS = {
+    'top': 10*mm,
+    'bottom': 10*mm,
+}
+COLS_WIDTH = [17*mm, 26*mm] + [33*mm]*4 + [62*mm] + [20*mm, 20*mm]
 
 def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimirSerializer, fecha: str) -> HttpResponse:
     pdf = SimpleDocTemplate(
         response,
         pagesize=landscape(A4),
-        title=f'movimientos del dia {fecha}'
+        title=f'movimientos del dia {fecha}',
+        topMargin=MARGINS['top'],
+        bottomMargin=MARGINS['bottom'],
     )
 
     elements = pdf_encabezado(fecha, movimientos[0]['monto_acumulado'])
