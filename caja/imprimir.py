@@ -37,7 +37,18 @@ def pdf_encabezado(fecha: str, monto_acumulado: int) -> Table:
     return [Table(encabezado)]
 
 def pdf_tabla(movimientos: MovimientoCajaImprimirSerializer):
-    return [Table(pdf_tabla_encabezado() + pdf_tabla_body(movimientos))]
+    table_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'LEFT')])
+    table_style.add('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(0xBDBBBC))
+
+    for i in range(1, len(movimientos)):
+        if i % 2 == 0:
+            table_style.add('BACKGROUND', (0, i), (-1, i), colors.HexColor(0xE0E0E0))
+
+    table = Table(pdf_tabla_encabezado() + pdf_tabla_body(movimientos), colWidths=COLS_WIDTH)
+
+    table.setStyle(table_style)
+
+    return [table]
 
 def pdf_tabla_encabezado():
     return [[paragraph(key) for key in ('Usuario', 'Tipo de mov.', 'Paciente', 'Obra Social', 'Médico', 'Práctica', 'Detalle', 'Monto', 'Monto ac.')]]
