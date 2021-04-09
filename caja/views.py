@@ -8,6 +8,7 @@ from rest_framework.filters import BaseFilterBackend
 from rest_framework.decorators import list_route
 from distutils.util import strtobool
 from django.http import HttpResponse
+from datetime import datetime
 
 class CajaConceptoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -65,4 +66,4 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
         movimientos_serializer = MovimientoCajaImprimirSerializer(movimientos, many=True).data
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'filename="Detalle_Caja_{fecha}.pdf"'
-        return generar_pdf_caja(response, movimientos_serializer, fecha)
+        return generar_pdf_caja(response, movimientos_serializer, datetime.strptime(fecha, '%Y-%m-%d'))
