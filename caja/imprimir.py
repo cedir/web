@@ -11,26 +11,47 @@ from reportlab.platypus import Table, Paragraph, TableStyle
 from reportlab.lib.units import mm, cm
 from reportlab.lib import colors
 
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+from settings import GOTHIC_FONT_PATH, GOTHIC_BOLD_FONT_PATH
+
 GRIS_CLARO = 0xE0E0E0
 GRIS_OSCURO = 0xBDBBBC
 
-styles = getSampleStyleSheet()
-styles.add(ParagraphStyle(name='Right', alignment=TA_RIGHT, parent=styles['Normal']))
-styles.add(ParagraphStyle(name='Center', alignment=TA_CENTER, parent=styles['Normal']))
-
-LARGOS_CABECERA = [110*mm, 75*mm, 93*mm]
+LARGOS_CABECERA = [100*mm, 75*mm, 103*mm]
 MARGINS = { 'top': 10*mm, 'bottom': 10*mm }
 
-COLUMNAS = (('Usuario', 17*mm, 'usuario'), ('Tipo de mov.', 26*mm, 'tipo'),
+COLUMNAS = (('Usuario', 17*mm, 'usuario'), ('Tipo de mov.', 27*mm, 'tipo'),
             ('Paciente', 33*mm, 'paciente'), ('Obra Social', 33*mm, 'obra_social'),
             ('Médico', 33*mm, 'medico'), ('Práctica', 33*mm, 'practica'),
-            ('Detalle', 62*mm, 'concepto'), ('Monto', 20*mm, 'monto'),
-            ('Monto ac.', 20*mm, 'monto_acumulado'))  #En cada entrada posee (nombre_columna, tamaño, key)
+            ('Detalle', 59*mm, 'concepto'), ('Monto', 19*mm, 'monto'),
+            ('Monto ac.', 23*mm, 'monto_acumulado'))  #En cada entrada posee (nombre_columna, tamaño, key)
 
 
 def paragraph(text: Union[str, int], estilo: str = 'Normal') -> Paragraph:
     return Paragraph(text, styles[estilo])
 
+def setUpStyles():
+    styles = getSampleStyleSheet()
+    
+    styles.add(ParagraphStyle(name='Right', alignment=TA_RIGHT, fontSize=12, parent=styles['Normal']))
+    styles.add(ParagraphStyle(name='Center', alignment=TA_CENTER, fontSize=12, parent=styles['Normal']))
+    
+    try:
+        pdfmetrics.registerFont(TTFont('Gothic', GOTHIC_FONT_PATH))
+        pdfmetrics.registerFont(TTFont('Gothic-Bold', GOTHIC_BOLD_FONT_PATH))
+    
+        styles['Normal'].fontName='Gothic'
+        styles['Normal'].fontSize=10
+        styles['Heading3'].fontName='Gothic-Bold'
+        styles['Heading3'].fontSize = 12
+    
+    except Exception:
+        pass
+
+    return styles
+    
 
 def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimirSerializer, fecha: datetime) -> HttpResponse:
     pdf = SimpleDocTemplate(
@@ -81,3 +102,5 @@ def pdf_tabla_body(movimientos: MovimientoCajaImprimirSerializer) -> List[List[P
         [paragraph(movimiento[key[2]]) for key in COLUMNAS]
         for movimiento in movimientos
     ]
+
+styles = setUpStyles()
