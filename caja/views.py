@@ -5,14 +5,17 @@ from caja.serializers import MovimientoCajaFullSerializer
 from common.drf.views import StandardResultsSetPagination
 from rest_framework.filters import BaseFilterBackend
 from distutils.util import strtobool
+from functools import reduce
+from operator import and_
+from django.db.models import Q
 
 class CajaConceptoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         concepto = request.query_params.get('concepto')
         if concepto:
-            queryset = queryset.filter(concepto__icontains=concepto)
+            q = reduce(and_, [Q(concepto__icontains=palabra) for palabra in concepto.split()])
+            queryset = queryset.filter(q)
         return queryset
-    
 
 class CajaMedicoFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
