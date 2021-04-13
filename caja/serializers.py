@@ -43,6 +43,7 @@ class MovimientoCajaFullSerializer(serializers.ModelSerializer):
         fields = ('id', 'concepto', 'estudio', 'monto', 'monto_acumulado', 'fecha', 'hora', 'tipo', 'medico')
 
 class MovimientoCajaImprimirSerializer(serializers.ModelSerializer):
+    hora = serializers.SerializerMethodField()
     usuario = serializers.SerializerMethodField()
     tipo = serializers.SerializerMethodField()
     paciente = serializers.SerializerMethodField()
@@ -52,8 +53,12 @@ class MovimientoCajaImprimirSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MovimientoCaja
-        fields = ('usuario', 'tipo', 'paciente', 'obra_social', 'medico', 'practica', 'concepto', 'monto', 'monto_acumulado')
-    
+        fields = ('hora', 'usuario', 'tipo', 'paciente', 'obra_social',
+                  'medico', 'practica', 'concepto', 'monto', 'monto_acumulado')
+
+    def get_hora(self, obj):
+        return obj.hora or ''
+
     def get_tipo(self, obj):
         return obj.tipo.descripcion or ''
 

@@ -23,11 +23,12 @@ GRIS_OSCURO = 0xBDBBBC
 LARGOS_CABECERA = [100*mm, 75*mm, 103*mm]
 MARGINS = { 'top': 10*mm, 'bottom': 10*mm }
 
-COLUMNAS = (('Usuario', 17*mm, 'usuario'), ('Tipo de mov.', 27*mm, 'tipo'),
-            ('Paciente', 33*mm, 'paciente'), ('Obra Social', 33*mm, 'obra_social'),
-            ('Médico', 33*mm, 'medico'), ('Práctica', 33*mm, 'practica'),
-            ('Detalle', 59*mm, 'concepto'), ('Monto', 19*mm, 'monto'),
-            ('Monto ac.', 23*mm, 'monto_acumulado'))  #En cada entrada posee (nombre_columna, tamaño, key)
+#Columans contiene en cada entrada (nombre_columna, tamaño, key)
+COLUMNAS = (('Hora', 14*mm, 'hora'), ('Usuario', 17*mm, 'usuario'),
+            ('Tipo de mov.', 27*mm, 'tipo'), ('Paciente', 33*mm, 'paciente'),
+            ('Obra Social', 33*mm, 'obra_social'), ('Médico', 33*mm, 'medico'),
+            ('Práctica', 33*mm, 'practica'), ('Detalle', 42*mm, 'concepto'),
+            ('Monto', 21*mm, 'monto'), ('Monto ac.', 23*mm, 'monto_acumulado'))
 
 
 def paragraph(text: Union[str, int], estilo: str = 'Normal') -> Paragraph:
@@ -86,7 +87,7 @@ def pdf_tabla(movimientos: MovimientosSerializer) -> List[Table]:
     table_style = TableStyle(
         [('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(GRIS_OSCURO))] +       # La fila con los nombres de las columnas esta con fondo gris oscuro
         [('BACKGROUND', (0, i), (-1, i), colors.HexColor(GRIS_CLARO))           # Las filas pares tienen fondo gris claro
-         for i in range(2, len(movimientos), 2)]
+        for i in range(2, len(movimientos), 2)]
     )
 
     return [Table(
