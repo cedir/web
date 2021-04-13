@@ -6,7 +6,7 @@ from caja.imprimir import generar_pdf_caja
 from common.drf.views import StandardResultsSetPagination
 from distutils.util import strtobool
 from django.http import HttpResponse, JsonResponse
-from datetime import datetime
+from datetime import date
 
 from rest_framework import viewsets, status
 from rest_framework.serializers import ValidationError
@@ -65,17 +65,17 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
     @list_route(methods=['GET'])
     def imprimir(self, request):
         try:
-            fecha=request.GET.get('fecha') # Debe poder filtrarse por cualquiera de los filtros
-        
-            movimientos = MovimientoCaja.objects.filter(fecha=fecha).order_by('-id') #Manejar cuando no haya movimientos
-        
+            movimientos = self.filter_queryset(self.queryset)
+
             if len(movimientos) == 0:
                 raise ValidationError('Debe seleccionarse una fecha donde hayan movimientos')
         
             movimientos_serializer = MovimientoCajaImprimirSerializer(movimientos, many=True).data
             response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = f'filename="Detalle_Caja_{fecha}.pdf"'
-            response = generar_pdf_caja(response, movimientos_serializer, datetime.strptime(fecha, '%Y-%m-%d')) 
+            response['Content-Disposition'] = f'filename="Detalle_Caja_Generado_{date.today()}.pdf"'
+
+            fecha = movimientos.first().fecha if movimientos.first().fecha == movimientos.last().fecha else ''
+            response = generar_pdf_caja(response, movimientos_serializer, fecha) 
         except ValidationError as ex:
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:

@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from caja.serializers import MovimientoCajaImprimirSerializer
-from typing import Union, List
+from typing import Union, List, Optional
 from datetime import datetime
 
 from reportlab.lib.pagesizes import A4, landscape
@@ -52,12 +52,13 @@ def setUpStyles():
 
     return styles
     
+styles = setUpStyles()
 
-def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimirSerializer, fecha: datetime) -> HttpResponse:
+def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimirSerializer, fecha: Optional[datetime]) -> HttpResponse:
     pdf = SimpleDocTemplate(
         response,
         pagesize=landscape(A4),
-        title='Movimientos de caja {0}'.format(fecha.strftime('%Y-%m-%d')),
+        title='Movimientos de caja {0}'.format(fecha),
         topMargin=MARGINS['top'],
         bottomMargin=MARGINS['bottom'],
     )
@@ -69,10 +70,11 @@ def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimir
     return response
 
 
-def pdf_encabezado(fecha: datetime, monto_acumulado: int) -> List[Table]:
+def pdf_encabezado(fecha: Optional[datetime], monto_acumulado: int) -> List[Table]:
+    fecha_str = fecha.strftime('%A, %d de %B de %Y') if fecha else ''
     return [Table([[
         paragraph('INFORME DE MOVIMIENTOS DE CAJA', 'Heading3'),
-        paragraph(fecha.strftime('%A, %d de %B de %Y'), 'Center'),
+        paragraph(fecha_str, 'Center'),
         paragraph(f'Monto acumulado hasta la fecha: {monto_acumulado}', 'Right')
         ]],
         colWidths=LARGOS_CABECERA,
@@ -102,5 +104,3 @@ def pdf_tabla_body(movimientos: MovimientoCajaImprimirSerializer) -> List[List[P
         [paragraph(movimiento[key[2]]) for key in COLUMNAS]
         for movimiento in movimientos
     ]
-
-styles = setUpStyles()
