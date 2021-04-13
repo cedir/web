@@ -1,7 +1,8 @@
 from django.http import HttpResponse
-from caja.serializers import MovimientoCajaImprimirSerializer
+from caja.serializers import MovimientoCajaImprimirSerializer as MovimientosSerializer
 from typing import Union, List, Optional
 from datetime import datetime
+from decimal import Decimal
 
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus.doctemplate import SimpleDocTemplate
@@ -54,7 +55,7 @@ def setUpStyles():
     
 styles = setUpStyles()
 
-def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimirSerializer, fecha: Optional[datetime]) -> HttpResponse:
+def generar_pdf_caja(response: HttpResponse, movimientos: MovimientosSerializer, fecha: Optional[datetime], monto_acumulado: Decimal) -> HttpResponse:
     pdf = SimpleDocTemplate(
         response,
         pagesize=landscape(A4),
@@ -63,7 +64,7 @@ def generar_pdf_caja(response: HttpResponse, movimientos: MovimientoCajaImprimir
         bottomMargin=MARGINS['bottom'],
     )
 
-    elements = pdf_encabezado(fecha, movimientos[0]['monto_acumulado'])
+    elements = pdf_encabezado(fecha, monto_acumulado)
     elements += pdf_tabla(movimientos)
 
     pdf.build(elements)
@@ -81,7 +82,7 @@ def pdf_encabezado(fecha: Optional[datetime], monto_acumulado: int) -> List[Tabl
     )]
 
 
-def pdf_tabla(movimientos: MovimientoCajaImprimirSerializer) -> List[Table]:
+def pdf_tabla(movimientos: MovimientosSerializer) -> List[Table]:
     table_style = TableStyle(
         [('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(GRIS_OSCURO))] +       # La fila con los nombres de las columnas esta con fondo gris oscuro
         [('BACKGROUND', (0, i), (-1, i), colors.HexColor(GRIS_CLARO))           # Las filas pares tienen fondo gris claro
@@ -99,7 +100,7 @@ def pdf_tabla_encabezado() -> List[List[Paragraph]]:
     return [[paragraph(columna[0]) for columna in COLUMNAS]]
 
 
-def pdf_tabla_body(movimientos: MovimientoCajaImprimirSerializer) -> List[List[Paragraph]]:
+def pdf_tabla_body(movimientos: MovimientosSerializer) -> List[List[Paragraph]]:
     return [
         [paragraph(movimiento[key[2]]) for key in COLUMNAS]
         for movimiento in movimientos

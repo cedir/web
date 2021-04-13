@@ -75,7 +75,7 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
             response['Content-Disposition'] = f'filename="Detalle_Caja_Generado_{date.today()}.pdf"'
 
             fecha = movimientos.first().fecha if movimientos.first().fecha == movimientos.last().fecha else ''
-            response = generar_pdf_caja(response, movimientos_serializer, fecha) 
+            response = generar_pdf_caja(response, movimientos_serializer, fecha, MovimientoCaja.objects.last().monto_acumulado)
         except ValidationError as ex:
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
