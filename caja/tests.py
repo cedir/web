@@ -3,8 +3,12 @@ import json
 from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import User
+from datetime import date
 
-from caja.models import MovimientoCaja
+from caja.models import MovimientoCaja, TipoMovimientoCaja
+from caja.serializers import MovimientoCajaImprimirSerializer
+from medico.models import Medico
+from estudio.models import Estudio
 from distutils.util import strtobool
 
 
@@ -82,3 +86,67 @@ class ListadoCajaTest(TestCase):
             assert result['estudio'] is None
 
         assert MovimientoCaja.objects.count() - MovimientoCaja.objects.filter(estudio__isnull=strtobool(parametro_busqueda)).count() == len(results)
+
+
+class ImprimirCajaTest(TestCase):
+    fixtures = ['caja.json', 'medicos.json', 'pacientes.json', 'practicas.json', 'obras_sociales.json',
+        'anestesistas.json', 'presentaciones.json', 'comprobantes.json', 'estudios.json', 'medicamentos.json']
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='walter', password='xx11', is_superuser=True)
+        self.client = Client(HTTP_POST='localhost')
+        self.client.login(username='walter', password='xx11')
+
+    def test_serializer_funciona(self):
+        movimientos = MovimientoCaja.objects.all()
+        movimientos_serializer = MovimientoCajaImprimirSerializer(movimientos, many=True).data
+
+        assert movimientos.count() == len(movimientos_serializer)
+
+        for mov, mov_serializer in zip(movimientos, movimientos_serializer):
+            assert str(mov.monto) == mov_serializer['monto']
+            assert str(mov.monto_acumulado) == mov_serializer['monto_acumulado']
+            assert mov.hora == mov_serializer['hora']
+            assert mov.concepto == mov_serializer['concepto']
+            assert str(mov.tipo) == mov_serializer['tipo']
+            
+            medico = mov.medico
+            if mov.estudio:
+                assert str(mov.estudio.obra_social) == mov_serializer['obra_social']
+                assert str(mov.estudio.practica) == mov_serializer['practica']
+                medico = medico or mov.estudio.medico
+            
+            if medico:
+                assert str(medico) == mov_serializer['medico']
+
+    def test_serializer_rellena_los_campos_opcionales(self):
+        movimiento = MovimientoCaja(concepto='', fecha=date.today(), hora='00:00', tipo=TipoMovimientoCaja.objects.first())
+        movimiento_serializer = MovimientoCajaImprimirSerializer(movimiento).data
+
+        assert movimiento_serializer['concepto'] == ''
+        assert movimiento_serializer['paciente'] == ''
+        assert movimiento_serializer['obra_social'] == ''
+        assert movimiento_serializer['medico'] == ''
+        assert movimiento_serializer['practica'] == ''
+
+    def test_serializer_elige_el_medico_correctamente(self):
+        movimiento = MovimientoCaja.objects.first()
+        medico = Medico.objects.first()
+        medico_estudio = Medico.objects.get(pk=2)
+
+        assert medico != medico_estudio
+
+        movimiento.medico = medico
+        movimiento_serializer = MovimientoCajaImprimirSerializer(movimiento).data
+        assert movimiento_serializer['medico'] == str(medico)
+
+        movimiento.medico = None
+        movimiento.estudio = Estudio.objects.first()
+        movimiento.estudio.medico = medico_estudio
+        movimiento_serializer = MovimientoCajaImprimirSerializer(movimiento).data
+        assert movimiento_serializer['medico'] == str(medico_estudio)
+
+        movimiento.medico = medico
+        movimiento_serializer = MovimientoCajaImprimirSerializer(movimiento).data
+
+        assert movimiento_serializer['medico'] == str(medico)
