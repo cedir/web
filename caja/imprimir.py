@@ -27,7 +27,7 @@ MARGINS = { 'top': 10*mm, 'bottom': 10*mm }
 COLUMNAS = (('Hora', 14*mm, 'hora'), ('Usuario', 17*mm, 'usuario'),
             ('Tipo de mov.', 27*mm, 'tipo'), ('Paciente', 33*mm, 'paciente'),
             ('Obra Social', 33*mm, 'obra_social'), ('Médico', 33*mm, 'medico'),
-            ('Práctica', 33*mm, 'practica'), ('Detalle', 42*mm, 'concepto'),
+            ('Práctica', 23*mm, 'practica'), ('Detalle', 49*mm, 'concepto'),
             ('Monto', 21*mm, 'monto'), ('Monto ac.', 23*mm, 'monto_acumulado'))
 
 
