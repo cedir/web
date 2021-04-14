@@ -7,6 +7,8 @@ from datetime import date
 
 from caja.models import MovimientoCaja, TipoMovimientoCaja
 from caja.serializers import MovimientoCajaImprimirSerializer
+from medico.models import Medico
+from estudio.models import Estudio
 from distutils.util import strtobool
 
 
@@ -115,7 +117,7 @@ class ImprimirCajaTest(TestCase):
                 medico = medico or mov.estudio.medico
             
             if medico:
-                assert f'{medico.apellido}, {medico.nombre}' == mov_serializer['medico']
+                assert str(medico) == mov_serializer['medico']
 
     def test_serializer_rellena_los_campos_opcionales(self):
         movimiento = MovimientoCaja(concepto='', fecha=date.today(), hora='00:00', tipo=TipoMovimientoCaja.objects.first())
@@ -126,3 +128,25 @@ class ImprimirCajaTest(TestCase):
         assert movimiento_serializer['obra_social'] == ''
         assert movimiento_serializer['medico'] == ''
         assert movimiento_serializer['practica'] == ''
+
+    def test_serializer_elige_el_medico_correctamente(self):
+        movimiento = MovimientoCaja.objects.first()
+        medico = Medico.objects.first()
+        medico_estudio = Medico.objects.get(pk=2)
+
+        assert medico != medico_estudio
+
+        movimiento.medico = medico
+        movimiento_serializer = MovimientoCajaImprimirSerializer(movimiento).data
+        assert movimiento_serializer['medico'] == str(medico)
+
+        movimiento.medico = None
+        movimiento.estudio = Estudio.objects.first()
+        movimiento.estudio.medico = medico_estudio
+        movimiento_serializer = MovimientoCajaImprimirSerializer(movimiento).data
+        assert movimiento_serializer['medico'] == str(medico_estudio)
+
+        movimiento.medico = medico
+        movimiento_serializer = MovimientoCajaImprimirSerializer(movimiento).data
+
+        assert movimiento_serializer['medico'] == str(medico)

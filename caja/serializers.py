@@ -60,20 +60,20 @@ class MovimientoCajaImprimirSerializer(serializers.ModelSerializer):
         return obj.hora or ''
 
     def get_tipo(self, obj):
-        return obj.tipo.descripcion or ''
+        return str(obj.tipo) or ''
 
     def get_usuario(self, obj):
         return ''
 
     def get_paciente(self, obj):
-        return f'{obj.estudio.paciente.apellido}, {obj.estudio.paciente.nombre}' if obj.estudio else ''
+        return str(obj.estudio.paciente) if obj.estudio else ''
 
     def get_obra_social(self, obj):
-        return obj.estudio.obra_social.nombre if obj.estudio else ''
+        return str(obj.estudio.obra_social) if obj.estudio else ''
 
     def get_medico(self, obj):
         medico = obj.medico or (obj.estudio and obj.estudio.medico)
-        return f'{medico.apellido}, {medico.nombre}' if medico else ''
+        return str(medico) if medico else ''
 
     def get_practica(self, obj):
         return str(obj.estudio.practica) if obj.estudio else ''

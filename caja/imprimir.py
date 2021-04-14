@@ -23,7 +23,7 @@ GRIS_OSCURO = 0xBDBBBC
 LARGOS_CABECERA = [100*mm, 75*mm, 103*mm]
 MARGINS = { 'top': 10*mm, 'bottom': 10*mm }
 
-#Columans contiene en cada entrada (nombre_columna, tamaño, key)
+#Columnas contiene en cada entrada (nombre_columna, tamaño, key)
 COLUMNAS = (('Hora', 14*mm, 'hora'), ('Usuario', 17*mm, 'usuario'),
             ('Tipo de mov.', 27*mm, 'tipo'), ('Paciente', 33*mm, 'paciente'),
             ('Obra Social', 33*mm, 'obra_social'), ('Médico', 33*mm, 'medico'),
@@ -40,7 +40,7 @@ def setUpStyles():
     styles.add(ParagraphStyle(name='Right', alignment=TA_RIGHT, fontSize=12, parent=styles['Normal']))
     styles.add(ParagraphStyle(name='Center', alignment=TA_CENTER, fontSize=12, parent=styles['Normal']))
     
-    try:
+    try:     # En caso de que no exista el archivo de las fuentes
         pdfmetrics.registerFont(TTFont('Gothic', GOTHIC_FONT_PATH))
         pdfmetrics.registerFont(TTFont('Gothic-Bold', GOTHIC_BOLD_FONT_PATH))
     
