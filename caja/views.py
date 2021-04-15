@@ -58,9 +58,6 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
     filter_backends = (CajaConceptoFilterBackend, CajaMedicoFilterBackend,
         CajaFechaFilterBackend, CajaTipoMovimientoFilterBackend,
         CajaIncluirEstudioFilterBackend)
-    serializers = {
-        'create': MovimientoCajaCreateSerializer,
-    }
 
     def create(self, request):
         try:
@@ -77,36 +74,3 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return response
-
-    # def create(self, request):
-    #     request = MovimientoCajaCreateSerializer(request)
-    #     try:
-    #         request: Dict = request.data
-    #         fecha = date.today()
-    #         hora = datetime.now()
-    #         estudio = request['estudio']
-    #         movimientos = request['movimientos']
-    #         monto_acumulado = MovimientoCaja.objects.last().monto_acumulado
-            
-    #         for movimiento in movimientos:
-    #             concepto = movimiento['concepto']
-    #             tipo = movimiento['tipo']
-    #             medico = movimiento['medico']
-    #             monto = Decimal(movimiento['monto']) # corroborar
-    #             monto_acumulado = monto + monto_acumulado
-    #             print(medico)
-    #             movimiento_caja = MovimientoCaja(
-    #                 medico = medico, estudio = estudio,
-    #                 concepto = concepto, fecha = fecha,
-    #                 hora = hora, tipo = tipo, monto = monto,
-    #                 monto_acumulado = monto_acumulado,
-    #             )
-    #             print('aaaaaaaa')
-    #             movimiento_caja.is_valid(raise_exception=True)
-    #             movimiento_caja.save()
-
-    #         response = JsonResponse({}, status=status.HTTP_200_OK)
-
-    #     except Exception as ex:
-    #         response = JsonResponse({'error': str(ex)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    #     return response

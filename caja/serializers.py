@@ -53,10 +53,28 @@ class MovimientoCajaCamposVariablesSerializer(serializers.Serializer):
     monto = serializers.DecimalField(16, 2, required=True)
 
     def to_internal_value(self, data):
-        data['tipo_id'] = self.validate_tipo_id(data['tipo_id'])
-        data['medico_id'] = self.validate_medico_id(data['medico_id'])
-        data['monto'] = self.validate_monto(data['monto'])
-        return data
+        datos = {}
+        datos['tipo_id'] = data['tipo_id']
+        datos['medico_id'] = data['medico_id']
+        datos['monto'] = data['monto']
+        datos['concepto'] = data['concepto']
+
+        errors = OrderedDict()
+
+        for field in datos:
+            validate_method = getattr(self, 'validate_' + field, None)
+            try:
+                if validate_method:
+                    datos[field] = validate_method(datos[field])
+            except ValidationError as e:
+                errors[field] = e.detail
+            except Exception as e:
+                errors[field] = str(e)
+        
+        if errors:
+            raise ValidationError(errors)
+
+        return datos
 
     def validate_medico_id(self, value):
         try:
@@ -73,6 +91,8 @@ class MovimientoCajaCamposVariablesSerializer(serializers.Serializer):
             raise ValidationError('No existe monto')
         try:
             value = Decimal(value)
+            if value == 0:
+                raise ValidationError('El monto no puede ser nulo')
         except Decimal.InvalidOperation:
             raise ValidationError('El monto no es un numero')
         return value
@@ -101,7 +121,7 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
         # super().to_internal_value()
         errors = OrderedDict()
         
-        for field in data:
+        for field in datos:
             validate_method = getattr(self, 'validate_' + field, None)
             try:
                 if validate_method:
@@ -141,8 +161,7 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
             concepto = movimiento['concepto']
             monto = movimiento['monto']
             monto_acumulado += monto
-            movimiento = MovimientoCaja(fecha = fecha, hora = hora, estudio = estudio,
+            movimiento = MovimientoCaja.objects.create(fecha = fecha, hora = hora, estudio = estudio,
             tipo = tipo, medico = medico, monto = monto, concepto = concepto, monto_acumulado = monto_acumulado)
-            movimiento.save()
             movimientos += [movimiento]
         return movimientos
