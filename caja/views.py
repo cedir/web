@@ -65,6 +65,7 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
     def create(self, request):
         try:
             movimientos_serializer = MovimientoCajaCreateSerializer(data=request.data)
+
             if not movimientos_serializer.is_valid():
                 raise serializers.ValidationError(movimientos_serializer.errors)
 
