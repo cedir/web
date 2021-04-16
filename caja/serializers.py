@@ -1,14 +1,18 @@
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from .models import MovimientoCaja, TipoMovimientoCaja
+from django.utils.dateparse import parse_date, parse_time
+
 from estudio.models import Estudio
 from medico.models import Medico
 from practica.serializers import PracticaSerializer
 from obra_social.serializers import ObraSocialSerializer
 from paciente.serializers import PacienteSerializer
 from medico.serializers import MedicoSerializer
+
 from decimal import Decimal
-from datetime import date, datetime
+from datetime import datetime
+from pytz import timezone
 from collections import OrderedDict
 
 class TipoMovimientoCajaSerializer(serializers.ModelSerializer):
@@ -151,10 +155,14 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         monto_acumulado = MovimientoCaja.objects.last().monto_acumulado
-        fecha = date.today()
-        hora = datetime.now()
+        argentina = timezone('America/Argentina/Buenos_Aires')
+        nowArgentina = datetime.now(argentina)
+        hora = parse_time(nowArgentina.strftime("%H:%M"))
+        fecha = parse_date(nowArgentina.strftime("%Y-%m-%d"))
+
         estudio = validated_data['estudio_id']
         movimientos = []
+
         for movimiento in validated_data['movimientos']:
             tipo = movimiento['tipo_id']
             medico = movimiento['medico_id']
@@ -164,4 +172,5 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
             movimiento = MovimientoCaja.objects.create(fecha = fecha, hora = hora, estudio = estudio,
             tipo = tipo, medico = medico, monto = monto, concepto = concepto, monto_acumulado = monto_acumulado)
             movimientos += [movimiento]
+
         return movimientos
