@@ -1,10 +1,14 @@
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-from .models import MovimientoCaja, TipoMovimientoCaja
+from django.utils.encoding import force_text
 from django.utils.dateparse import parse_date, parse_time
+from django.contrib.admin.models import LogEntry, ADDITION
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 
 from estudio.models import Estudio
 from medico.models import Medico
+from .models import MovimientoCaja, TipoMovimientoCaja
 from practica.serializers import PracticaSerializer
 from obra_social.serializers import ObraSocialSerializer
 from paciente.serializers import PacienteSerializer
@@ -113,14 +117,16 @@ class MovimientoCajaCamposVariablesSerializer(serializers.Serializer):
 class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
     estudio_id = serializers.IntegerField(required=False)
     movimientos = MovimientoCajaCamposVariablesSerializer(many=True)
+    username = serializers.CharField(required=True) 
 
     class Meta:
         model = MovimientoCaja
-        fields = ('estudio_id', 'movimientos')
+        fields = ('estudio_id', 'movimientos', 'username')
 
     def to_internal_value(self, data):
         datos = {}
         datos['estudio_id'] = data['estudio_id']
+        datos['username'] = data['username']
         datos['movimientos'] = [MovimientoCajaCamposVariablesSerializer(data=movimiento) for movimiento in data['movimientos']]
         # super().to_internal_value()
         errors = OrderedDict()
@@ -140,6 +146,13 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
 
         return datos
     
+    def validate_username(self, value):
+        try:
+            value = User.objects.get(username=value)
+        except User.DoesNotExist:
+            raise ValidationError('Usuario invalido')
+        return value
+
     def validate_movimientos(self, value):
         return [movimiento.validated_data for movimiento in value if movimiento.is_valid(raise_exception=True)]
 
@@ -155,11 +168,13 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         monto_acumulado = MovimientoCaja.objects.last().monto_acumulado
+
         argentina = timezone('America/Argentina/Buenos_Aires')
         nowArgentina = datetime.now(argentina)
         hora = parse_time(nowArgentina.strftime("%H:%M"))
         fecha = parse_date(nowArgentina.strftime("%Y-%m-%d"))
 
+        user = validated_data['username']
         estudio = validated_data['estudio_id']
         movimientos = []
 
@@ -171,6 +186,15 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
             monto_acumulado += monto
             movimiento = MovimientoCaja.objects.create(fecha = fecha, hora = hora, estudio = estudio,
             tipo = tipo, medico = medico, monto = monto, concepto = concepto, monto_acumulado = monto_acumulado)
+
+            LogEntry.objects.log_action(
+                user_id=user.pk,
+                content_type_id=ContentType.objects.get_for_model(MovimientoCaja).pk,
+                object_id=movimiento.pk,
+                object_repr=force_text(movimiento),
+                action_flag=ADDITION
+            )
+
             movimientos += [movimiento]
 
         return movimientos

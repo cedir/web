@@ -1,6 +1,7 @@
 from django.db import models
 from medico.models import Medico
 from estudio.models import Estudio
+from django.contrib.auth.models import User
 
 ID_GENERAL = 1
 ID_HONORARIO_MEDICO = 2
@@ -33,6 +34,7 @@ class MovimientoCaja(models.Model):
     medico = models.ForeignKey(Medico, db_column='idMedico', blank=True, null=True)
     monto = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     monto_acumulado = models.DecimalField(db_column='montoAcumulado', max_digits=14, decimal_places=2)
+    # user = models.ForeignKey(User, db_column='username')
     estado = models.BooleanField(default=False) #Este campo debe removerse cuando el azul no se utilice mas
 
     class Meta:
