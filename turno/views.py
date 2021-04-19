@@ -20,7 +20,8 @@ from practica.models import Practica
 from sala.models import Sala
 from turno.models import InfoTurno
 from turno.models import Turno, Estado, PeriodoSinAtencion
-from turno.serializers import InfoTurnoSerializer
+from turno.serializers import InfoTurnoSerializer, TurnoSerializer
+from rest_framework.decorators import list_route
 from security.encryption import encode
 from common.drf.views import StandardResultsSetPagination
 from common.utils import add_log_entry
@@ -682,3 +683,28 @@ class InfoTurnoViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(Q(practicas__id__in=practica_ids.split(',')) | Q(practicas__isnull=True))
 
         return queryset.distinct()
+
+class TurnoViewSet(viewsets.ModelViewSet):
+    model = Turno
+    queryset = Turno.objects.all()
+    serializer_class = TurnoSerializer
+    pagination_class = StandardResultsSetPagination
+
+    @list_route(methods=['POST'])
+    def contador_turnos(self, request):
+        print(request.data)
+        usuarios = request.data.get('usuarios', [])
+        fecha_desde = request.data.get('fecha_desde')
+        fecha_hasta = request.data.get('fecha_hasta')
+        print(usuarios, fecha_desde, fecha_hasta)
+        ct = ContentType.objects.get_for_model(Turno)
+        turnos = LogEntry.objects.filter(
+                        content_type_id=ct.id,
+                        action_flag=ADDITION,
+                        action_time__gte=fecha_desde,
+                        action_time=fecha_hasta
+                    )
+        cantidad_turnos = [(usuario, turnos.filter(user__username=usuario).count()) for usuario in usuarios]
+
+                
+        return JsonResponse({ 'cantidad_turnos': cantidad_turnos }, status=200)
