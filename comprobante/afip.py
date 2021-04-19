@@ -196,9 +196,11 @@ class _Afip(object):
             )
 
         # Si es Factura de Credito Electronica, hayq eu agregar como opcional el CBU del Cedir
+        # y el opcional Sistema de Circulacion Abierta
         if comprobante_cedir.tipo_comprobante.id in [
             ID_TIPO_COMPROBANTE_FACTURA_CREDITO_ELECTRONICA]:
             self.webservice.AgregarOpcional(2101, "0150506102000109564632")
+            self.webservice.AgregarOpcional(27, 'SCA')
 
         # Si es Nota de Debito/Credito Electronica, hay que agregar un opcional indicando que no es anulacion.
         # En principio, el Cedir nunca anula facturas.
