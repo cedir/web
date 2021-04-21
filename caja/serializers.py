@@ -2,9 +2,8 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 from django.utils.encoding import force_text
 from django.utils.dateparse import parse_date, parse_time
-from django.contrib.admin.models import LogEntry, ADDITION
+from django.contrib.admin.models import ADDITION
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 
 from estudio.models import Estudio
 from medico.models import Medico
@@ -13,6 +12,7 @@ from practica.serializers import PracticaSerializer
 from obra_social.serializers import ObraSocialSerializer
 from paciente.serializers import PacienteSerializer
 from medico.serializers import MedicoSerializer
+from common.utils import add_log_entry
 
 from decimal import Decimal
 from datetime import datetime
@@ -128,7 +128,7 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
         datos['estudio_id'] = data['estudio_id']
         datos['username'] = data['username']
         datos['movimientos'] = [MovimientoCajaCamposVariablesSerializer(data=movimiento) for movimiento in data['movimientos']]
-        # super().to_internal_value()
+
         errors = OrderedDict()
         
         for field in datos:
@@ -169,11 +169,6 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         monto_acumulado = MovimientoCaja.objects.last().monto_acumulado
 
-        argentina = timezone('America/Argentina/Buenos_Aires')
-        nowArgentina = datetime.now(argentina)
-        hora = parse_time(nowArgentina.strftime("%H:%M"))
-        fecha = parse_date(nowArgentina.strftime("%Y-%m-%d"))
-
         user = validated_data['username']
         estudio = validated_data['estudio_id']
         movimientos = []
@@ -184,17 +179,10 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
             concepto = movimiento['concepto']
             monto = movimiento['monto']
             monto_acumulado += monto
-            movimiento = MovimientoCaja.objects.create(fecha = fecha, hora = hora, estudio = estudio,
-            tipo = tipo, medico = medico, monto = monto, concepto = concepto, monto_acumulado = monto_acumulado)
+            movimiento = MovimientoCaja.objects.create(estudio = estudio, user = user, tipo = tipo,
+            medico = medico, monto = monto, concepto = concepto, monto_acumulado = monto_acumulado)
 
-            LogEntry.objects.log_action(
-                user_id=user.pk,
-                content_type_id=ContentType.objects.get_for_model(MovimientoCaja).pk,
-                object_id=movimiento.pk,
-                object_repr=force_text(movimiento),
-                action_flag=ADDITION
-            )
-
+            add_log_entry(movimiento, user, ADDITION, 'CREA')
             movimientos += [movimiento]
 
         return movimientos
