@@ -692,11 +692,9 @@ class TurnoViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['POST'])
     def contador_turnos(self, request):
-        print(request.data)
         usuarios = request.data.get('usuarios', [])
         fecha_desde = request.data.get('fecha_desde')
         fecha_hasta = request.data.get('fecha_hasta')
-        print(usuarios, fecha_desde, fecha_hasta)
         ct = ContentType.objects.get_for_model(Turno)
         turnos = LogEntry.objects.filter(
                         content_type_id=ct.id,
@@ -705,6 +703,5 @@ class TurnoViewSet(viewsets.ModelViewSet):
                         action_time=fecha_hasta
                     )
         cantidad_turnos = [(usuario, turnos.filter(user__username=usuario).count()) for usuario in usuarios]
-
                 
         return JsonResponse({ 'cantidad_turnos': cantidad_turnos }, status=200)
