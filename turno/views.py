@@ -693,15 +693,20 @@ class TurnoViewSet(viewsets.ModelViewSet):
     @list_route(methods=['POST'])
     def contador_turnos(self, request):
         usuarios = request.data.get('usuarios', [])
-        fecha_desde = request.data.get('fecha_desde')
-        fecha_hasta = request.data.get('fecha_hasta')
+        tiempos = request.data.get('tiempos', [])
         ct = ContentType.objects.get_for_model(Turno)
-        turnos = LogEntry.objects.filter(
-                        content_type_id=ct.id,
-                        action_flag=ADDITION,
-                        action_time__gte=fecha_desde,
-                        action_time=fecha_hasta
-                    )
-        cantidad_turnos = [(usuario, turnos.filter(user__username=usuario).count()) for usuario in usuarios]
-                
-        return JsonResponse({ 'cantidad_turnos': cantidad_turnos }, status=200)
+        turnos = LogEntry.objects.filter(content_type_id=ct.id, action_flag=ADDITION)
+
+        cantidad_turnos = {}
+
+        for usuario in usuarios:
+            turnos_usuario = turnos.filter(user__username=usuario)
+
+            cantidades = [
+                    turnos_usuario.filter(action_time__gte=desde, action_time__lte=hasta).count()
+                    for desde, hasta in tiempos
+                ]
+
+            cantidad_turnos[usuario] = cantidades
+
+        return JsonResponse(cantidad_turnos, status=200)
