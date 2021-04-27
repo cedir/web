@@ -66,7 +66,6 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
         CajaFechaFilterBackend, CajaTipoMovimientoFilterBackend,
         CajaIncluirEstudioFilterBackend)
 
-
     def create(self, request):
         try:
 
@@ -82,6 +81,8 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return response
 
     @list_route(methods=['GET'])
     def imprimir(self, request):
