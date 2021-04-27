@@ -68,8 +68,6 @@ class PresentacionCreateSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
-        if ObraSocial.objects.get(pk=data['obra_social_id']).is_particular_or_especial():
-            raise ValidationError('La Obra Social no puede ser Particular o Particular Especial')
         for estudio_data in data['estudios']:
             estudio = Estudio.objects.get(pk=estudio_data['id'])
             if estudio.obra_social_id != data['obra_social_id']:

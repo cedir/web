@@ -657,13 +657,6 @@ class TestTipoIdAfip(TestCase):
         comprobante = Comprobante.objects.get(pk=1)
         assert comprobante.tipo_id_afip == ID_DOCUMENTO_AFIP_TIPO_DNI
 
-    def test_cuil(self):
-        comprobante = Comprobante.objects.get(pk=1)
-        comprobante.nro_cuit = "20-38905723-7"
-        comprobante.save()
-        comprobante = Comprobante.objects.get(pk=1)
-        assert comprobante.tipo_id_afip == ID_DOCUMENTO_AFIP_TIPO_CUIL
-
     def test_cuit(self):
         comprobante = Comprobante.objects.get(pk=1)
         comprobante.nro_cuit = "30-38905723-7"

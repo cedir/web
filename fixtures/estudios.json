@@ -323,6 +323,24 @@
     }
 },
 {
+    "model": "estudio.estudio",
+    "pk": 16,
+    "fields": {
+        "paciente": 1,
+        "practica_id": 1,
+        "medico": 2,
+        "obra_social": 1,
+        "presentacion_id": null,
+        "medico_solicitante": 1,
+        "importe_estudio": "10000.00",
+        "es_pago_contra_factura": 0,
+        "pago_contra_factura": "0.00",
+        "fecha": "2021-03-19",
+        "anestesista": 1,
+        "sucursal": 1
+    }
+},
+{
     "model": "estudio.medicacion",
     "pk": 1,
     "fields": {

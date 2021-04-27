@@ -149,3 +149,39 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
             movimientos += [movimiento]
 
         return movimientos
+
+class MovimientoCajaImprimirSerializer(serializers.ModelSerializer):
+    hora = serializers.SerializerMethodField()
+    usuario = serializers.SerializerMethodField()
+    tipo = serializers.SerializerMethodField()
+    paciente = serializers.SerializerMethodField()
+    obra_social = serializers.SerializerMethodField()
+    medico = serializers.SerializerMethodField()
+    practica = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MovimientoCaja
+        fields = ('hora', 'usuario', 'tipo', 'paciente', 'obra_social',
+                  'medico', 'practica', 'concepto', 'monto', 'monto_acumulado')
+
+    def get_hora(self, obj):
+        return obj.hora or ''
+
+    def get_tipo(self, obj):
+        return str(obj.tipo) or ''
+
+    def get_usuario(self, obj):
+        return ''
+
+    def get_paciente(self, obj):
+        return str(obj.estudio.paciente) if obj.estudio else ''
+
+    def get_obra_social(self, obj):
+        return str(obj.estudio.obra_social) if obj.estudio else ''
+
+    def get_medico(self, obj):
+        medico = obj.medico or (obj.estudio and obj.estudio.medico)
+        return str(medico) if medico else ''
+
+    def get_practica(self, obj):
+        return str(obj.estudio.practica) if obj.estudio else ''
