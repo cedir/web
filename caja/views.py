@@ -61,8 +61,6 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         try:
-            if not request.user.is_authenticated:
-                raise serializers.ValidationError('Usuario invalido')
 
             data = {'username': request.user.get_username(), **request.data}
             movimientos_serializer = MovimientoCajaCreateSerializer(data=data)

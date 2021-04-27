@@ -145,7 +145,7 @@ class CrearMovimientosTest(TestCase):
         
         assert self.cantidad_movimientos == MovimientoCaja.objects.count()
 
-    def test_crear_movimientos_falla_monto_nulo(self):
+    def test_crear_movimientos_funciona_con_monto_nulo(self):
         datos = {
             'estudio_id': self.estudio_id,
             'movimientos': [
@@ -159,8 +159,8 @@ class CrearMovimientosTest(TestCase):
         response = self.client.post('/api/caja/', data=json.dumps(datos),
                                 content_type='application/json')
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert self.cantidad_movimientos == MovimientoCaja.objects.count()
+        assert response.status_code == status.HTTP_201_CREATED
+        assert self.cantidad_movimientos + 2 == MovimientoCaja.objects.count()
         
     def test_crear_movimientos_falla_con_tipo_erroneo(self):
         datos = {
@@ -206,6 +206,14 @@ class CrearMovimientosTest(TestCase):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert self.cantidad_movimientos == MovimientoCaja.objects.count()
+
+        datos['movimientos'][1]['monto'] = self.montos[1]
+        
+        response = self.client.post('/api/caja/', data=json.dumps(datos),
+                                content_type='application/json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert self.cantidad_movimientos + 2 == MovimientoCaja.objects.count()
 
     def test_crear_movimientos_falla_sin_tipo(self):
         datos = {

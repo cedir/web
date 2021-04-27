@@ -1,7 +1,5 @@
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
-from django.utils.encoding import force_text
-from django.utils.dateparse import parse_date, parse_time
 from django.contrib.admin.models import ADDITION
 from django.contrib.auth.models import User
 
@@ -12,12 +10,9 @@ from practica.serializers import PracticaSerializer
 from obra_social.serializers import ObraSocialSerializer
 from paciente.serializers import PacienteSerializer
 from medico.serializers import MedicoSerializer
-from common.utils import add_log_entry
+from common.utils import add_log_entry, standar_to_internal_value
 
 from decimal import Decimal
-from datetime import datetime
-from pytz import timezone
-from collections import OrderedDict
 
 class TipoMovimientoCajaSerializer(serializers.ModelSerializer):
 
@@ -67,22 +62,7 @@ class MovimientoCajaCamposVariablesSerializer(serializers.Serializer):
         datos['monto'] = data['monto']
         datos['concepto'] = data['concepto']
 
-        errors = OrderedDict()
-
-        for field in datos:
-            validate_method = getattr(self, 'validate_' + field, None)
-            try:
-                if validate_method:
-                    datos[field] = validate_method(datos[field])
-            except ValidationError as e:
-                errors[field] = e.detail
-            except Exception as e:
-                errors[field] = str(e)
-        
-        if errors:
-            raise ValidationError(errors)
-
-        return datos
+        return standar_to_internal_value(self, datos)
 
     def validate_medico_id(self, value):
         try:
@@ -99,15 +79,13 @@ class MovimientoCajaCamposVariablesSerializer(serializers.Serializer):
             raise ValidationError('No existe monto')
         try:
             value = Decimal(value)
-            if value == 0:
-                raise ValidationError('El monto no puede ser nulo')
         except Decimal.InvalidOperation:
             raise ValidationError('El monto no es un numero')
         return value
 
     def validate_tipo_id(self, value):
         if not value:
-            raise ValidationError("No hay tipo de movimiento")
+            raise ValidationError("El tipo de movimiento es obligatorio")
         try:
             value = TipoMovimientoCaja.objects.get(pk=value)
         except TipoMovimientoCaja.DoesNotExist:
@@ -129,23 +107,8 @@ class MovimientoCajaCreateSerializer(serializers.ModelSerializer):
         datos['username'] = data['username']
         datos['movimientos'] = [MovimientoCajaCamposVariablesSerializer(data=movimiento) for movimiento in data['movimientos']]
 
-        errors = OrderedDict()
-        
-        for field in datos:
-            validate_method = getattr(self, 'validate_' + field, None)
-            try:
-                if validate_method:
-                    datos[field] = validate_method(datos[field])
-            except ValidationError as e:
-                errors[field] = e.detail
-            except Exception as e:
-                errors[field] = str(e)
-        
-        if errors:
-            raise ValidationError(errors)
+        return standar_to_internal_value(self, datos)
 
-        return datos
-    
     def validate_username(self, value):
         try:
             value = User.objects.get(username=value)
