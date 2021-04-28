@@ -1,14 +1,18 @@
 # pylint: disable=no-name-in-module, import-error
+from rest_framework import viewsets, status, serializers
 from caja.models import MovimientoCaja
-from caja.serializers import MovimientoCajaFullSerializer, MovimientoCajaImprimirSerializer
+from caja.serializers import MovimientoCajaFullSerializer, MovimientoCajaImprimirSerializer, MovimientoCajaCreateSerializer
 from caja.imprimir import generar_pdf_caja
 
 from common.drf.views import StandardResultsSetPagination
 from distutils.util import strtobool
-from django.http import HttpResponse, JsonResponse
-from datetime import date
 
-from rest_framework import viewsets, status
+from typing import Dict
+from datetime import date, datetime
+from decimal import Decimal
+
+from django.http import HttpResponse, JsonResponse
+
 from rest_framework.serializers import ValidationError
 from rest_framework.filters import BaseFilterBackend
 from rest_framework.decorators import list_route
@@ -62,6 +66,24 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
         CajaFechaFilterBackend, CajaTipoMovimientoFilterBackend,
         CajaIncluirEstudioFilterBackend)
 
+    def create(self, request):
+        try:
+
+            data = {'username': request.user.get_username(), **request.data}
+            movimientos_serializer = MovimientoCajaCreateSerializer(data=data)
+
+            if not movimientos_serializer.is_valid():
+                raise serializers.ValidationError(movimientos_serializer.errors)
+
+            movimientos = movimientos_serializer.save()
+            response = JsonResponse({}, status=status.HTTP_201_CREATED)
+        except serializers.ValidationError as ex:
+            response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as ex:
+            response = JsonResponse({'error': str(ex)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return response
+
     @list_route(methods=['GET'])
     def imprimir(self, request):
         try:
@@ -80,5 +102,5 @@ class MovimientoCajaViewSet(viewsets.ModelViewSet):
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             response = JsonResponse({'error': str(ex)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
+
         return response
