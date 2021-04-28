@@ -21,4 +21,13 @@ class ArancelObraSocialAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        
+        if not self.has_add_permission(request):
+            extra_context['show_save_and_continue'] = False
+            extra_context['show_save'] = False
+
+        return super(ArancelObraSocialAdmin, self).changeform_view(request, object_id, extra_context=extra_context)
+
 admin.site.register(ArancelObraSocial, ArancelObraSocialAdmin)
