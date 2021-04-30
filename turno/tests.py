@@ -210,10 +210,6 @@ class TurnosTest(TestCase):
         self.assertEqual(turno.estado.id, Estado.CONFIRMADO)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
 
-    def test_contador_turnos_funciona(self):
-        response = self.client.get('/api/turno_d/contador_turnos/', {'usuarios': ['lynda'], 'fecha_desde': '2021-03-19', 'fecha_hasta': '2021-04-19'})
-        print(response.content)
-
 class IsFeriadoTest(TestCase):
 
     def setUp(self):
