@@ -4,12 +4,10 @@ from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import User
 from rest_framework import status
-
 from caja.models import MovimientoCaja, TipoMovimientoCaja
 from caja.serializers import MovimientoCajaImprimirSerializer
 from medico.models import Medico
 from estudio.models import Estudio
-
 from distutils.util import strtobool
 from datetime import datetime, date
 from decimal import Decimal
@@ -249,20 +247,21 @@ class ListadoCajaTest(TestCase):
         self.assertEqual(len(results), MovimientoCaja.objects.all().count())
 
     def test_filtro_concepto_funciona(self):
-        parametro_busqueda = 'ingreso'
-        response = self.client.get('/api/caja/?concepto={0}'.format(parametro_busqueda))
+        keywords = 'ingreso X'
+        response = self.client.get(f'/api/caja/?concepto={keywords}')
+        
+        assert response.status_code == status.HTTP_200_OK
+        
         results = json.loads(response.content).get('results')
-
-        for result in results:
-            assert parametro_busqueda in result['concepto']
-
-        assert MovimientoCaja.objects.count() - MovimientoCaja.objects.exclude(concepto__contains=parametro_busqueda).count() == len(results)
+        for movimiento in results:
+            for word in keywords.split():
+                assert word in movimiento['concepto']
 
     def test_filtro_medico_funciona(self):
         parametro_busqueda = '1'
         response = self.client.get('/api/caja/?medico={0}'.format(parametro_busqueda))
         results = json.loads(response.content).get('results')
-
+    
         for result in results:
             assert result['medico']['id'] == int(parametro_busqueda)
 
