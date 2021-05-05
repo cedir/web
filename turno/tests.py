@@ -210,7 +210,6 @@ class TurnosTest(TestCase):
         self.assertEqual(turno.estado.id, Estado.CONFIRMADO)
         self.assertEqual(LogEntry.objects.filter(content_type_id=ct_turno.pk, action_flag=CHANGE, object_id=turno.id).count(), 1)
 
-
 class IsFeriadoTest(TestCase):
 
     def setUp(self):
